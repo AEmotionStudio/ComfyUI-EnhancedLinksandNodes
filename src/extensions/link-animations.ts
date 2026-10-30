@@ -12,16 +12,14 @@
  * @module extensions/link-animations
  */
 
+import type { LLink, Point } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import {
-    type ComfyExtension,
-    type ComfyApp,
-} from '@/core';
+import type { ComfyExtension, ComfyApp } from '@/core/types';
 import { enableAntiAliasing } from '@/renderers/render-utils';
 import { renderAnimatedStyle, type RenderItem } from '@/effects/animated-renderers';
 import { renderStaticStyle } from '@/effects/static-renderers';
-import { initSidebar } from '@/sidebar';
+import { initSidebar } from '@/sidebar/sidebar';
 import { registerAllSettings } from '@/ui/register-settings';
 
 // =============================================================================
@@ -30,29 +28,6 @@ import { registerAllSettings } from '@/ui/register-settings';
 
 function setting<T>(key: string, def: T): T {
     return (app.ui.settings.getSettingValue(key) ?? def) as T;
-}
-
-/**
- * Updates the settings cache from the app settings.
- * This should be called periodically (e.g. every 500ms).
- */
-function updateSettingsCache(timestamp: number) {
-    // Update throttle
-    if (timestamp - settingsCache.lastUpdate < SETTINGS_UPDATE_INTERVAL) return;
-
-    settingsCache.animate = getSetting<number>('🔗 Enhanced Links.Animate');
-    settingsCache.speed = getSetting<number>('🔗 Enhanced Links.Animation.Speed');
-    settingsCache.direction = getSetting<number>('🔗 Enhanced Links.Direction');
-    settingsCache.pauseDuringRender = getSetting<boolean>('🔗 Enhanced Links.Pause.During.Render');
-
-    settingsCache.intensity = getSetting<number>('🔗 Enhanced Links.Glow.Intensity');
-    settingsCache.quality = getSetting<number>('🔗 Enhanced Links.Quality');
-    settingsCache.particleDensity = getSetting<number>('🔗 Enhanced Links.Particle.Density');
-    settingsCache.isStatic = getSetting<boolean>('🔗 Enhanced Links.Static.Mode');
-    settingsCache.markerEnabled = getSetting<boolean>('🔗 Enhanced Links.Marker.Enabled');
-    settingsCache.markerSize = getSetting<number>('🔗 Enhanced Links.Marker.Size');
-
-    settingsCache.lastUpdate = timestamp;
 }
 
 // =============================================================================
@@ -113,6 +88,12 @@ const State = {
 // Extension
 // =============================================================================
 
+/**
+ * Asserted, not checked: the override assumes a graph (native drawConnections throws without one) and indexes
+ * graph.links with for...in's string keys, which the links Map's deprecated indexed access takes.
+ */
+type LinksCanvas = InstanceType<typeof LGraphCanvas> & { graph: { links: Record<string, LLink | undefined> } };
+
 const ext: ComfyExtension = {
     name: 'enhanced.link.animations',
 
@@ -135,7 +116,7 @@ const ext: ComfyExtension = {
 
         const origDrawConnections = LGraphCanvas.prototype.drawConnections;
 
-        LGraphCanvas.prototype.drawConnections = function (ctx: CanvasRenderingContext2D) {
+        LGraphCanvas.prototype.drawConnections = function (this: LinksCanvas, ctx: CanvasRenderingContext2D) {
             try {
                 ctx.save();
                 enableAntiAliasing(ctx);
@@ -207,15 +188,17 @@ const ext: ComfyExtension = {
                     if (!originNode || !targetNode ||
                         originNode.flags?.collapsed || targetNode.flags?.collapsed) continue;
 
-                    const startPos = new Float32Array(2);
-                    const endPos = new Float32Array(2);
+                    // getConnectionPos fills any array-like `out`, though its types ask for a Point.
+                    const startPos = new Float32Array(2) as Float32Array & Point;
+                    const endPos = new Float32Array(2) as Float32Array & Point;
 
                     originNode.getConnectionPos(false, linkData.origin_slot, startPos);
                     targetNode.getConnectionPos(true, linkData.target_slot, endPos);
 
-                    const defaultColor: string = linkData.type
-                        ? (LGraphCanvas.link_type_colors?.[linkData.type] ?? this.default_connection_color)
-                        : this.default_connection_color;
+                    // BUG: without a link_type_colors entry this is the default_connection_color object (color-fallback.test.ts).
+                    const defaultColor = (linkData.type
+                        ? (LGraphCanvas.link_type_colors?.[linkData.type as string] ?? this.default_connection_color)
+                        : this.default_connection_color) as string;
 
                     if (!renderQueue.has(animStyle)) {
                         renderQueue.set(animStyle, []);

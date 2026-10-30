@@ -1,153 +1,115 @@
 /**
- * Unit tests for renderer utilities
+ * Unit tests for the link path renderers and marker shapes
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-    MarkerShapes,
-    getMarkerShape,
-    getLinkRenderer,
-    splineRenderer,
-    straightRenderer,
-    linearRenderer,
-} from '@/renderers';
-import type { Point } from '@/core/types';
+import { getLinkRenderer } from '@/renderers/link-renderers';
+import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
+import { LINK_STYLE_OPTIONS, MARKER_SHAPE_OPTIONS } from '@/ui/settings';
+import { CanvasRecorder } from '../helpers/recording-context';
 
 describe('MarkerShapes', () => {
-    it('should have all expected shapes', () => {
-        const expectedShapes = [
-            'none',
-            'diamond',
-            'circle',
-            'arrow',
-            'square',
-            'triangle',
-            'star',
-            'heart',
-            'cross',
-            'hexagon',
-            'flower',
-            'spiral',
-        ];
-
-        for (const shape of expectedShapes) {
-            expect(MarkerShapes[shape]).toBeDefined();
-            expect(typeof MarkerShapes[shape]).toBe('function');
+    it('has a shape for each Marker.Shape option', () => {
+        expect(Object.keys(MarkerShapes).sort()).toEqual(MARKER_SHAPE_OPTIONS.map((o) => o.value).sort());
+        for (const shape of Object.values(MarkerShapes)) {
+            expect(typeof shape).toBe('function');
         }
     });
 
-    it('should return arrow as default for unknown shapes', () => {
-        expect(getMarkerShape('unknown')).toBe(MarkerShapes.arrow);
-        expect(getMarkerShape('')).toBe(MarkerShapes.arrow);
+    it('has no entry for unknown names', () => {
+        expect(MarkerShapes['unknown']).toBeUndefined();
+        expect(MarkerShapes['']).toBeUndefined();
     });
 
-    it('should return correct shape by name', () => {
-        expect(getMarkerShape('diamond')).toBe(MarkerShapes.diamond);
-        expect(getMarkerShape('circle')).toBe(MarkerShapes.circle);
-        expect(getMarkerShape('star')).toBe(MarkerShapes.star);
+    it('draws the named shape', () => {
+        const rec = new CanvasRecorder();
+        MarkerShapes.diamond(rec.ctx, 10, 20, 5);
+        MarkerShapes.circle(rec.ctx, 10, 20, 5);
+        MarkerShapes.arrow(rec.ctx, 10, 20, 5, Math.PI / 2);
+        expect(rec.lines).toEqual([
+            'beginPath()', 'moveTo(10, 15)', 'lineTo(15, 20)', 'lineTo(10, 25)', 'lineTo(5, 20)', 'closePath()',
+            'beginPath()', 'arc(10, 20, 5, 0, 6.28)', 'closePath()',
+            'save()', 'translate(10, 20)', 'rotate(1.57)',
+            'beginPath()', 'moveTo(5, 0)', 'lineTo(-5, 5)', 'lineTo(-2.5, 0)', 'lineTo(-5, -5)', 'closePath()',
+            'restore()',
+        ]);
+    });
+
+    it('fills every shape but cross, which strokes itself, and none', () => {
+        expect(Object.keys(MarkerShapes).filter((name) => !shapeNeedsFill(name))).toEqual(['none', 'cross']);
     });
 });
 
-describe('LinkRenderers', () => {
-    describe('splineRenderer', () => {
-        const start: Point = [0, 0];
-        const end: Point = [100, 0];
-
-        it('should calculate path length', () => {
-            const length = splineRenderer.getLength(start, end);
-            // Spline is curved, so length should be close to but potentially slightly different from straight distance
-            expect(length).toBeGreaterThan(0);
-            expect(length).toBeGreaterThanOrEqual(100); // At least as long as straight line
-        });
-
-        it('should get points along the path', () => {
-            const startPoint = splineRenderer.getPoint(start, end, 0);
-            const endPoint = splineRenderer.getPoint(start, end, 1);
-            const midPoint = splineRenderer.getPoint(start, end, 0.5);
-
-            // Start point should match start
-            expect(startPoint[0]).toBeCloseTo(start[0], 1);
-            expect(startPoint[1]).toBeCloseTo(start[1], 1);
-
-            // End point should match end
-            expect(endPoint[0]).toBeCloseTo(end[0], 1);
-            expect(endPoint[1]).toBeCloseTo(end[1], 1);
-
-            // Mid point should be somewhere in between
-            expect(midPoint[0]).toBeGreaterThan(start[0]);
-            expect(midPoint[0]).toBeLessThan(end[0]);
-        });
-
-        it('should calculate normalized t for distance', () => {
-            const length = splineRenderer.getLength(start, end);
-            const midT = splineRenderer.getNormalizedT(start, end, length / 2, length);
-
-            expect(midT).toBeGreaterThan(0);
-            expect(midT).toBeLessThan(1);
-        });
+describe('getLinkRenderer', () => {
+    it('gives each Link.Style option its own renderer', () => {
+        const styles = LINK_STYLE_OPTIONS.map((o) => o.value);
+        expect(new Set(styles.map(getLinkRenderer)).size).toBe(styles.length);
     });
 
-    describe('straightRenderer', () => {
-        const start: Point = [0, 0];
-        const end: Point = [100, 0];
+    it('falls back to spline for unknown styles', () => {
+        expect(getLinkRenderer('unknown')).toBe(getLinkRenderer('spline'));
+        expect(getLinkRenderer('')).toBe(getLinkRenderer('spline'));
+    });
+});
 
-        it('should calculate exact distance', () => {
-            const length = straightRenderer.getLength(start, end);
-            expect(length).toBe(100);
-        });
+describe('spline', () => {
+    const spline = getLinkRenderer('spline');
 
-        it('should get points along straight line', () => {
-            const midPoint = straightRenderer.getPoint(start, end, 0.5);
-            expect(midPoint[0]).toBe(50);
-            expect(midPoint[1]).toBe(0);
-
-            const quarterPoint = straightRenderer.getPoint(start, end, 0.25);
-            expect(quarterPoint[0]).toBe(25);
-            expect(quarterPoint[1]).toBe(0);
-        });
-
-        it('should calculate linear normalized t', () => {
-            const length = straightRenderer.getLength(start, end);
-            const t = straightRenderer.getNormalizedT(start, end, 50, length);
-            expect(t).toBe(0.5);
-        });
+    it('measures the path length', () => {
+        // A horizontal link's control points lie on the line, so its curve is the straight segment.
+        expect(spline.getLength([0, 0], [100, 0])).toBe(100);
+        expect(spline.getLength([0, 0], [300, 100])).toBeCloseTo(319.126023060036, 9);
     });
 
-    describe('linearRenderer', () => {
-        const start: Point = [0, 0];
-        const end: Point = [100, 100];
-
-        it('should calculate Manhattan-like path length', () => {
-            const length = linearRenderer.getLength(start, end);
-            // Linear path goes horizontal, then vertical, then horizontal
-            // midX = 50, so horizontal1 = 50, vertical = 100, horizontal2 = 50
-            expect(length).toBe(200);
-        });
-
-        it('should get points in three segments', () => {
-            // First third: horizontal movement
-            const p1 = linearRenderer.getPoint(start, end, 0.16);
-            expect(p1[1]).toBeCloseTo(0, 1); // Still at start y
-
-            // Middle third: vertical movement
-            const p2 = linearRenderer.getPoint(start, end, 0.5);
-            expect(p2[0]).toBe(50); // At midX
-
-            // Last third: horizontal movement
-            const p3 = linearRenderer.getPoint(start, end, 0.84);
-            expect(p3[1]).toBeCloseTo(100, 1); // At end y
-        });
+    it('gets points along the path', () => {
+        expect([0, 0.25, 0.5, 0.75, 1].map((t) => spline.getPoint([0, 0], [300, 100], t))).toEqual([
+            [0, 0], [75, 15.625], [150, 50], [225, 84.375], [300, 100],
+        ]);
     });
 
-    describe('getLinkRenderer', () => {
-        it('should return spline as default for unknown styles', () => {
-            expect(getLinkRenderer('unknown')).toBe(splineRenderer);
-            expect(getLinkRenderer('')).toBe(splineRenderer);
-        });
+    it('maps a distance along the path to t, clamped to 1 past the end', () => {
+        const length = spline.getLength([0, 0], [300, 100]);
+        const t = (fraction: number) => spline.getNormalizedT([0, 0], [300, 100], length * fraction, length);
+        expect(t(0.25)).toBeCloseTo(0.258579142689, 9);
+        expect(t(0.5)).toBeCloseTo(0.5, 9);
+        expect(t(0.75)).toBeCloseTo(0.741420857311, 9);
+        expect(t(2)).toBe(1);
+    });
+});
 
-        it('should return correct renderer by style', () => {
-            expect(getLinkRenderer('straight')).toBe(straightRenderer);
-            expect(getLinkRenderer('linear')).toBe(linearRenderer);
-        });
+describe('straight', () => {
+    const straight = getLinkRenderer('straight');
+
+    it('measures the distance between the ends', () => {
+        expect(straight.getLength([0, 0], [100, 0])).toBe(100);
+        expect(straight.getLength([0, 0], [30, 40])).toBe(50);
+    });
+
+    it('gets points along the line', () => {
+        expect(straight.getPoint([0, 0], [100, 0], 0.5)).toEqual([50, 0]);
+        expect(straight.getPoint([0, 0], [100, 0], 0.25)).toEqual([25, 0]);
+    });
+
+    it('maps a distance to t linearly', () => {
+        expect(straight.getNormalizedT([0, 0], [100, 0], 50, 100)).toBe(0.5);
+    });
+});
+
+describe('linear', () => {
+    const linear = getLinkRenderer('linear');
+
+    it('measures the horizontal, vertical and horizontal segments', () => {
+        expect(linear.getLength([0, 0], [100, 100])).toBe(200);
+    });
+
+    it('spends a third of t on each segment', () => {
+        expect(linear.getPoint([0, 0], [100, 100], 0.16)).toEqual([expect.closeTo(24.242424242424, 9), 0]);
+        expect(linear.getPoint([0, 0], [100, 100], 0.5)).toEqual([50, expect.closeTo(50, 9)]);
+        expect(linear.getPoint([0, 0], [100, 100], 0.84)).toEqual([expect.closeTo(75.757575757576, 9), 100]);
+    });
+
+    it('maps a distance to the t of that point on its segment', () => {
+        const t = [0, 25, 50, 100, 150, 175, 200].map((distance) => linear.getNormalizedT([0, 0], [100, 100], distance, 200));
+        expect(t).toEqual([0, 0.165, 0.33, 0.5, 0.67, expect.closeTo(0.835, 9), 1]);
     });
 });

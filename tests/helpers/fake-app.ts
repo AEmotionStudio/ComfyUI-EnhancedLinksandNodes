@@ -21,6 +21,8 @@ export const fake = {
     /** Calls that reached the fake LiteGraph originals. */
     native: [] as string[],
     extensions: [] as Extension[],
+    /** The LGraphCanvas global, a new class after every resetFakeApp(). */
+    LGraphCanvas: installLiteGraph(),
 };
 
 function read(id: string): unknown {
@@ -73,8 +75,8 @@ export const api = {
     removeEventListener(): void {},
 };
 
-/** Fresh LiteGraph globals; a new LGraphCanvas class drops prototype patches from earlier setups. */
-function installLiteGraph(): void {
+/** Installs fresh LiteGraph globals and returns their LGraphCanvas; a new class drops prototype patches from earlier setups. */
+function installLiteGraph() {
     const LiteGraph = { STRAIGHT_LINK: 0, LINEAR_LINK: 1, SPLINE_LINK: 2, LINK_COLOR: '#9A9', EVENT_LINK_COLOR: '#A86' };
 
     class LGraphCanvas {
@@ -97,6 +99,7 @@ function installLiteGraph(): void {
     }
 
     Object.assign(globalThis, { LiteGraph, LGraphCanvas });
+    return LGraphCanvas;
 }
 
 /**
@@ -108,7 +111,5 @@ export function resetFakeApp(settings: Record<string, unknown> = {}): void {
     fake.settings = new Map(Object.entries(settings));
     fake.reads = 0;
     fake.native = [];
-    installLiteGraph();
+    fake.LGraphCanvas = installLiteGraph();
 }
-
-installLiteGraph();

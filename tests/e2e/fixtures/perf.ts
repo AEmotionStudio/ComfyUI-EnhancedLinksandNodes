@@ -1,7 +1,7 @@
 import type { GraphSpec, LinkSpec, NodeSpec } from '../helpers';
 
 /** Input and output order of the ELNMix test node (fixtures/nodes/eln_e2e). */
-export const MIX_TYPES = ['IMAGE', 'LATENT', 'MODEL', 'INT', 'FLOAT', 'STRING', 'ELN_CUSTOM'];
+const MIX_TYPES = ['IMAGE', 'LATENT', 'MODEL', 'INT', 'FLOAT', 'STRING', 'ELN_CUSTOM'];
 
 const ROWS = 8;
 /** How many nodes back a link may start, which keeps links a few columns long. */

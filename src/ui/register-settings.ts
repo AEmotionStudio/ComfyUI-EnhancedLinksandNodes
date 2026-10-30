@@ -9,7 +9,6 @@
  * @module ui/register-settings
  */
 
-// @ts-ignore
 import { app } from '/scripts/app.js';
 
 import { LINK_DEFAULTS, NODE_DEFAULTS } from '@/core/config';

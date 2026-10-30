@@ -12,9 +12,6 @@ import type { Color, ColorScheme, HexColor } from '@/core/types';
 // Configuration
 // =============================================================================
 
-/** Default color used when no valid color is provided */
-export const DEFAULT_COLOR = '#00ffff'; // Cyan
-
 /** Pre-defined color palettes for different animation styles */
 export const ANIMATION_COLORS = Object.freeze({
     gentlePulse: Object.freeze({

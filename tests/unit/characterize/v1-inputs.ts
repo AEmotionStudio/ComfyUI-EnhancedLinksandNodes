@@ -43,7 +43,7 @@ export const LINK_STYLES: Array<[style: number, slug: string, name: string]> = [
     [9, 'classic-flow', 'Classic Flow'],
 ];
 
-export interface LinkFrame {
+interface LinkFrame {
     items: RenderItem[];
     phase: number;
     totalTime: number;

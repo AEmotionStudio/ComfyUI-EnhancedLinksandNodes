@@ -38,7 +38,7 @@ export interface QualitySettings {
 }
 
 /** Particle settings for effects */
-export interface ParticleSettings {
+interface ParticleSettings {
     /** Whether to show particles */
     showParticles: boolean;
     /** Particle density multiplier (0.5-2) */
@@ -54,7 +54,7 @@ export interface ParticleSettings {
 }
 
 /** Color settings for animation */
-export interface ColorSettings {
+interface ColorSettings {
     /** Primary color */
     primary: string;
     /** Secondary color */
@@ -74,21 +74,6 @@ export interface NodeEffectSettings {
     particles: ParticleSettings;
     colors: ColorSettings;
 }
-
-/** Animation effect function signature */
-export type AnimationEffect = (
-    ctx: CanvasRenderingContext2D,
-    node: ComfyNode,
-    settings: NodeEffectSettings,
-    particleTime: number
-) => void;
-
-/** Animation style identifier */
-export type NodeAnimationStyleName =
-    | 'gentlePulse'
-    | 'neonNexus'
-    | 'cosmicRipple'
-    | 'flowerOfLife';
 
 // =============================================================================
 // Calculation Helpers

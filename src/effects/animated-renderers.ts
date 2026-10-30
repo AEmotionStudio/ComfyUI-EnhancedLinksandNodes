@@ -10,7 +10,6 @@
  * @module effects/animated-renderers
  */
 
-// @ts-ignore
 import { app } from '/scripts/app.js';
 import { getLinkRenderer, type LinkPoint } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
@@ -50,7 +49,7 @@ function setting<T>(key: string, def: T): T {
 // 1. Sacred Flow
 // =============================================================================
 
-export function renderSacredFlow(
+function renderSacredFlow(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     phase: number,
@@ -129,7 +128,7 @@ export function renderSacredFlow(
 // 2. Crystal Stream
 // =============================================================================
 
-export function renderCrystalStream(
+function renderCrystalStream(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     _phase: number,
@@ -195,7 +194,7 @@ export function renderCrystalStream(
 // 3. Quantum Field
 // =============================================================================
 
-export function renderQuantumField(
+function renderQuantumField(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     phase: number,
@@ -250,7 +249,7 @@ export function renderQuantumField(
 // 4. Cosmic Weave
 // =============================================================================
 
-export function renderCosmicWeave(
+function renderCosmicWeave(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     _phase: number,
@@ -309,7 +308,7 @@ export function renderCosmicWeave(
 // 5. Energy Pulse
 // =============================================================================
 
-export function renderEnergyPulse(
+function renderEnergyPulse(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     _phase: number,
@@ -362,7 +361,7 @@ export function renderEnergyPulse(
 // 6. DNA Helix
 // =============================================================================
 
-export function renderDNAHelix(
+function renderDNAHelix(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     _phase: number,
@@ -443,7 +442,7 @@ export function renderDNAHelix(
 // 7. Lava Flow
 // =============================================================================
 
-export function renderLavaFlow(
+function renderLavaFlow(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     phase: number,
@@ -550,7 +549,7 @@ export function renderLavaFlow(
 // 8. Stellar Plasma
 // =============================================================================
 
-export function renderStellarPlasma(
+function renderStellarPlasma(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     _phase: number,
@@ -620,7 +619,7 @@ export function renderStellarPlasma(
 // 9. Classic Flow (with markers, shadows, effects)
 // =============================================================================
 
-export function renderClassicFlow(
+function renderClassicFlow(
     ctx: CanvasRenderingContext2D,
     items: RenderItem[],
     phase: number,

@@ -6,7 +6,6 @@
  * @module sidebar/sidebar
  */
 
-// @ts-ignore
 import { app } from '/scripts/app.js';
 
 import { renderSettingsPanel } from './SidebarSettings';
@@ -81,7 +80,7 @@ function renderSidebar(container: HTMLElement): void {
 /**
  * Register the sidebar tab with ComfyUI.
  */
-export function registerSidebar(): void {
+function registerSidebar(): void {
     if (sidebarRegistered) return;
 
     if (!app.extensionManager) {

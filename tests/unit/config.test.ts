@@ -96,10 +96,10 @@ describe('LINK_DEFAULTS', () => {
 
 describe('NODE_DEFAULTS', () => {
     it('should define all required node settings', () => {
-        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animate']).toBe(1);
+        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animate']).toBe(0);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animation.Speed']).toBe(1);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.Color.Mode']).toBe('default');
-        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Particle.Show']).toBe(true);
+        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Particle.Show']).toBe(false);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.Static.Mode']).toBe(false);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.Pause.During.Render']).toBe(true);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.End Animation.Enabled']).toBe(false);

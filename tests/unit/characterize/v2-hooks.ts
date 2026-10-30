@@ -29,7 +29,7 @@ interface LinkSpec {
 
 /** An LGraphCanvas over a graph of these links, in the dark palette, which has '' for INT. */
 export function canvasWithLinks(specs: LinkSpec[]): { drawConnections(ctx: CanvasRenderingContext2D): void } {
-    Object.assign(LGraphCanvas.link_type_colors, { IMAGE: '#64B5F6', INT: '' });
+    Object.assign(fake.LGraphCanvas.link_type_colors, { IMAGE: '#64B5F6', INT: '' });
     const node = (id: number, pos: ArrayLike<number>) => ({
         id,
         flags: {},
@@ -42,7 +42,7 @@ export function canvasWithLinks(specs: LinkSpec[]): { drawConnections(ctx: Canva
         nodes[2 * i + 2] = node(2 * i + 2, end);
         links[i + 1] = { id: i + 1, origin_id: 2 * i + 1, origin_slot: 0, target_id: 2 * i + 2, target_slot: 0, type };
     });
-    const canvas = new LGraphCanvas();
+    const canvas = new fake.LGraphCanvas();
     canvas.graph = { links, _nodes_by_id: nodes };
     return canvas;
 }

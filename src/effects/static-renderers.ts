@@ -10,7 +10,6 @@
  * @module effects/static-renderers
  */
 
-// @ts-ignore
 import { app } from '/scripts/app.js';
 import { getLinkRenderer } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';

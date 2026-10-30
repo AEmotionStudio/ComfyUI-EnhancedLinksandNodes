@@ -43,7 +43,7 @@ function roundedRect(
     ctx.closePath();
 }
 
-export function drawHoverOutline(
+function drawHoverOutline(
     ctx: CanvasRenderingContext2D,
     node: ComfyNode,
     settings: NodeEffectSettings,
@@ -215,7 +215,6 @@ export function neonNexus(
     ctx.shadowColor = 'transparent';
 
     // 1. Holographic base layers
-    const hologramPhase = phase * 0.8 * direction;
     for (let i = 0; i < hologramDepth; i++) {
         ctx.save();
         ctx.globalAlpha = 0.2 - (i * 0.05);
@@ -616,13 +615,6 @@ export function flowerOfLife(
 // =============================================================================
 // Exports
 // =============================================================================
-
-export const NodeEffects = {
-    gentlePulse,
-    neonNexus,
-    cosmicRipple,
-    flowerOfLife,
-};
 
 export function getNodeEffect(style: number): typeof gentlePulse {
     switch (style) {

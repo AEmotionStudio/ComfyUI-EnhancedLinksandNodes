@@ -502,10 +502,10 @@ const holographic: LinkRenderer = {
 };
 
 // =============================================================================
-// Export map
+// Renderer map
 // =============================================================================
 
-export const LinkRenderers: Record<string, LinkRenderer> = {
+const LinkRenderers: Record<string, LinkRenderer> = {
     spline,
     straight,
     linear,

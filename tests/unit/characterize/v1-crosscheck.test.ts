@@ -12,6 +12,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import type { RenderItem } from '@/effects/animated-renderers';
 import * as colors from '@/utils/colors';
 import { parseColor, type CanvasRecorder } from '../../helpers/recording-context';
 import { fake } from '../../helpers/fake-app';
@@ -23,6 +24,10 @@ import {
 } from './v1-inputs';
 
 type Locals = Record<string, any>;
+/** The fake LGraphCanvas with the dispatcher v1's setup() adds to its prototype. */
+type V1Canvas = InstanceType<typeof fake.LGraphCanvas> & {
+    renderAnimationStyle(ctx: CanvasRenderingContext2D, items: RenderItem[], style: number, phase: number, isStatic: boolean): void;
+};
 
 let links: Locals;
 let nodes: Locals;
@@ -41,7 +46,7 @@ function v1Body(draw: () => CanvasRecorder): string {
 const v1Animated = (style: number): LinkDraw => (ctx, { items, phase, totalTime, direction }) => {
     links.State.totalTime = totalTime;
     links.AnimationState.direction = direction;
-    LGraphCanvas.prototype.renderAnimationStyle.call(new LGraphCanvas(), ctx, items, style, phase, false);
+    (fake.LGraphCanvas.prototype as V1Canvas).renderAnimationStyle.call(new fake.LGraphCanvas(), ctx, items, style, phase, false);
 };
 const v1Static = (style: number): LinkDraw => (ctx, { items, phase, direction }) => {
     links.AnimationState.direction = direction;

@@ -15,16 +15,11 @@
  * @module extensions/node-animations
  */
 
+import type { LGraphNode } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import {
-    createNodeState,
-    type NodeState,
-    type ComfyExtension,
-    type ComfyApp,
-    type ComfyNode,
-    type Color,
-} from '@/core';
+import { createNodeState } from '@/core/state';
+import type { NodeState, ComfyExtension, ComfyApp, Color } from '@/core/types';
 import { getNodeEffect, drawParticles } from '@/effects/node-effects';
 import { getCustomNodeColors } from '@/utils/color-manager';
 import { withAlpha, validateHexColor } from '@/utils/colors';
@@ -317,7 +312,7 @@ const ext: ComfyExtension = {
 
         const originalDrawNode = LGraphCanvas.prototype.drawNode;
 
-        LGraphCanvas.prototype.drawNode = function (node: ComfyNode, ctx: CanvasRenderingContext2D) {
+        LGraphCanvas.prototype.drawNode = function (node, ctx) {
             const animStyle = setting('📦 Enhanced Nodes.Animate', 0);
             const animEnabled = setting('📦 Enhanced Nodes.Animations.Enabled', true);
 
@@ -467,11 +462,7 @@ const ext: ComfyExtension = {
 
         const originalDrawNodeShape = LGraphCanvas.prototype.drawNodeShape;
         if (originalDrawNodeShape) {
-            LGraphCanvas.prototype.drawNodeShape = function (
-                node: ComfyNode,
-                ctx: CanvasRenderingContext2D,
-                ...args: any[]
-            ) {
+            LGraphCanvas.prototype.drawNodeShape = function (node, ctx, ...args) {
                 originalDrawNodeShape.call(this, node, ctx, ...args);
 
                 const showHover = setting('📦 Enhanced Nodes.Color.Hover.Show', false);
@@ -488,10 +479,9 @@ const ext: ComfyExtension = {
                     ctx.strokeStyle = withAlpha(hoverColor, 0.7);
                     ctx.lineWidth = 2;
 
-                    // @ts-ignore — LiteGraph internal property
-                    const shape = (node as any)._shape || 'box';
+                    // BUG: _shape is a RenderShape number on 1.39 and gone on 1.57, so round nodes get the square outline.
+                    const shape = (node as LGraphNode & { _shape?: unknown })._shape || 'box';
                     if (shape === 'round' || shape === 'card') {
-                        // @ts-ignore — LiteGraph constructor property
                         const radius = node.constructor?.slot_start_y ? 8 : 4;
                         ctx.beginPath();
                         ctx.roundRect(0, 0, node.size[0], node.size[1], radius);

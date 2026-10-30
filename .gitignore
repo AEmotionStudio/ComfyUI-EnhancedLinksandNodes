@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-pnpm-lock.yaml
 
 # Build outputs
 # Note: js/ is NOT ignored because it contains the runtime files for ComfyUI
@@ -56,5 +55,3 @@ errors.md
 # Legacy source files
 old_link_animations.js
 old_node_animations.js
-link_animations.js
-node_animations.js

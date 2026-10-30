@@ -10,11 +10,6 @@ import {
     calculateParticlePosition,
     calculateBlinkFactor,
 } from '@/effects/types';
-import {
-    forEachFlowPosition,
-    calculateWaveOffset,
-    calculatePulseEffect,
-} from '@/effects/link-effects';
 
 describe('isEffectivelyStatic', () => {
     it('should return true when isStaticMode is true', () => {
@@ -142,53 +137,6 @@ describe('calculateBlinkFactor', () => {
             const factor = calculateBlinkFactor(0, time, 1, false);
             expect(factor).toBeGreaterThanOrEqual(0);
             expect(factor).toBeLessThanOrEqual(1.2);
-        }
-    });
-});
-
-describe('forEachFlowPosition', () => {
-    it('should iterate over positions', () => {
-        const positions: number[] = [];
-        forEachFlowPosition(200, 0, 1, 1, (t) => positions.push(t));
-        expect(positions.length).toBeGreaterThan(0);
-    });
-
-    it('should return positions between 0 and 1', () => {
-        forEachFlowPosition(200, 5, 1.5, -1, (t) => {
-            expect(t).toBeGreaterThanOrEqual(0);
-            expect(t).toBeLessThanOrEqual(1);
-        });
-    });
-
-    it('should have more positions with higher density', () => {
-        let lowDensityCount = 0;
-        forEachFlowPosition(200, 0, 0.5, 1, () => lowDensityCount++);
-
-        let highDensityCount = 0;
-        forEachFlowPosition(200, 0, 2, 1, () => highDensityCount++);
-
-        expect(highDensityCount).toBeGreaterThanOrEqual(lowDensityCount);
-    });
-});
-
-describe('calculateWaveOffset', () => {
-    it('should return 0 when static', () => {
-        expect(calculateWaveOffset(0.5, 1, 10, true)).toBe(0);
-    });
-
-    it('should return sinusoidal value when animated', () => {
-        const offset = calculateWaveOffset(0.5, 0, 5, false);
-        expect(offset).toBeGreaterThanOrEqual(-5);
-        expect(offset).toBeLessThanOrEqual(5);
-    });
-});
-
-describe('calculatePulseEffect', () => {
-    it('should return value around 0.8 - 1.0', () => {
-        for (let phase = 0; phase < Math.PI * 4; phase += 0.5) {
-            const pulse = calculatePulseEffect(0.5, phase, 2);
-            expect(pulse).toBeGreaterThanOrEqual(0.6);
-            expect(pulse).toBeLessThanOrEqual(1.0);
         }
     });
 });

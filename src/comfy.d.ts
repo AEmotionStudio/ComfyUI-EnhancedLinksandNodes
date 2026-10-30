@@ -1,6 +1,7 @@
 import { ComfyApp, ComfyAPI } from './core/types';
 
 declare module "/scripts/app.js" {
+    // TODO(M2): use the frontend types' ComfyApp, whose getSettingValue takes only core ids, once M2 drops getSettingValue.
     export const app: ComfyApp;
 }
 
@@ -9,7 +10,7 @@ declare module "/scripts/api.js" {
 }
 
 declare global {
-    const LGraphCanvas: any;
+    const LGraphCanvas: typeof import('@comfyorg/comfyui-frontend-types').LGraphCanvas;
 }
 
 export { };

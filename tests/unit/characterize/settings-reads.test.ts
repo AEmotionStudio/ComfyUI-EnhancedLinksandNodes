@@ -51,7 +51,7 @@ describe('settings reads (BUG: expect 0 inside paints after M2)', () => {
             await setupV2({ ...NODE_DEFAULTS, '📦 Enhanced Nodes.Animate': style, '📦 Enhanced Nodes.Particle.Show': true });
             const node = { id: 1, title: 'KSampler', size: [220, 120], flags: {} };
             const rec = new CanvasRecorder();
-            counts[style] = reads(() => new LGraphCanvas().drawNode(node, rec.ctx));
+            counts[style] = reads(() => new fake.LGraphCanvas().drawNode(node, rec.ctx));
             expect(rec.paints.length, `style ${style}`).toBeGreaterThan(0);
         }
         expect(counts).toEqual({ 1: 83, 2: 373, 3: 273, 4: 1548 });

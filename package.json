@@ -5,15 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build",
+    "build": "tsc --noEmit && vite build",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "e2e:perf": "ELN_PERF=1 playwright test --grep @perf",
     "e2e:serve": "node tests/e2e/serve.mjs",
-    "type-check": "tsc --noEmit",
-    "lint": "tsc --noEmit && echo 'Type check passed'"
+    "type-check": "tsc --noEmit && tsc --noEmit -p tests/e2e",
+    "lint": "tsc --noEmit && tsc --noEmit -p tests/e2e && echo 'Type check passed'"
   },
   "keywords": [
     "comfyui",
@@ -30,11 +30,12 @@
   },
   "packageManager": "pnpm@10.27.0",
   "devDependencies": {
+    "@comfyorg/comfyui-frontend-types": "1.60.0",
     "@playwright/test": "^1.57.0",
     "@types/node": "^25.0.6",
     "@vitest/coverage-v8": "^4.0.16",
     "jsdom": "^27.4.0",
-    "playwright": "^1.57.0",
+    "knip": "6.44.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.16"

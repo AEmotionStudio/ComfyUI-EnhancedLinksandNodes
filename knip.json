@@ -1,0 +1,8 @@
+{
+  "$schema": "node_modules/knip/schema.json",
+  "include": ["nsExports", "nsTypes"],
+  "project": [
+    "**/*.{js,mjs,ts}",
+    "!js/**"
+  ]
+}

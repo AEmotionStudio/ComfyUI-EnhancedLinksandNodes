@@ -132,11 +132,3 @@ export const CONFIG = Object.freeze({
     SACRED,
     ANIMATION,
 });
-
-// =============================================================================
-// Types
-// =============================================================================
-
-export type LinkSettingKey = keyof typeof LINK_DEFAULTS;
-export type NodeSettingKey = keyof typeof NODE_DEFAULTS;
-export type SettingKey = LinkSettingKey | NodeSettingKey;

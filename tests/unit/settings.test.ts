@@ -119,7 +119,7 @@ describe('Default Settings', () => {
     });
 
     it('should have node defaults', () => {
-        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animate']).toBe(1);
+        expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animate']).toBe(0);
         expect(NODE_DEFAULTS['📦 Enhanced Nodes.Animation.Speed']).toBe(1);
     });
 });

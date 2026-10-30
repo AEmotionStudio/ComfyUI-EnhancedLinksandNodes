@@ -54,7 +54,7 @@ export interface CspViolation {
 }
 
 /** One native renderLink call. */
-export interface Segment {
+interface Segment {
     link: number | null;
     origin: number | null;
     target: number | null;
@@ -281,7 +281,7 @@ export function settle(page: Page, quietMs = 500, timeoutMs = 10_000): Promise<b
 const EMPTY_WORKFLOW = { last_node_id: 0, last_link_id: 0, nodes: [], links: [], groups: [], config: {}, extra: {}, version: 0.4 };
 
 /** Loads a workflow without restoring its saved view; the view is reset so graph and canvas coordinates match. */
-export async function loadWorkflow(page: Page, workflow: object): Promise<void> {
+async function loadWorkflow(page: Page, workflow: object): Promise<void> {
     await page.evaluate(async (data) => {
         const { app } = window;
         await app.loadGraphData(data, true, false);

@@ -1,0 +1,10 @@
+{
+  // The e2e suite types the page's window.app and LiteGraph globals itself, which clashes with
+  // the optional Window members that @comfyorg/comfyui-frontend-types declares, so it is its own program.
+  "extends": "../../tsconfig.json",
+  "include": [
+    "**/*",
+    "../../playwright.config.ts"
+  ],
+  "exclude": []
+}

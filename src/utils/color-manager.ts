@@ -9,7 +9,6 @@
  * @module utils/color-manager
  */
 
-// @ts-ignore
 import { app } from '/scripts/app.js';
 
 // =============================================================================
@@ -155,7 +154,7 @@ export function getAccentColor(defaultColor: string): string {
 // =============================================================================
 
 /** Animation-specific default colors for node effects */
-export const NODE_ANIMATION_COLORS = Object.freeze({
+const NODE_ANIMATION_COLORS = Object.freeze({
     gentlePulse: Object.freeze({ primary: '#44aaff', secondary: '#88ccff', accent: '#0088ff' }),
     neonNexus: Object.freeze({ primary: '#00ff88', secondary: '#00ffcc', accent: '#00ff44' }),
     cosmicRipple: Object.freeze({ primary: '#ff00ff', secondary: '#aa00ff', accent: '#ff40ff' }),
