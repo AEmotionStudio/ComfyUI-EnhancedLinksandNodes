@@ -1,0 +1,97 @@
+# v1 TextAnimator.drawAnimatedText, minimal
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.7
+shadowColor = #00ffff
+shadowBlur = 1.5
+fillStyle = #00ffff
+fillText("Load Image", 70, 16)
+beginPath()
+strokeStyle = #00ffff
+lineWidth = 1
+globalAlpha = 0.35
+measureText("Load Image")
+moveTo(35, 26)
+lineTo(105, 26)
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=0.4s phase=0.17 particleTime=0.17 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.799
+shadowColor = #00ffff
+shadowBlur = 1.5
+fillStyle = #00ffff
+fillText("KSampler", 110, 16)
+beginPath()
+strokeStyle = #00ffff
+lineWidth = 1
+globalAlpha = 0.399
+measureText("KSampler")
+moveTo(82, 26)
+lineTo(138, 26)
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=0.9s phase=0.38 particleTime=0.38 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.905
+shadowColor = #00ffff
+shadowBlur = 1.5
+fillStyle = #00ffff
+fillText("Save Image", 160, 16)
+beginPath()
+strokeStyle = #00ffff
+lineWidth = 1
+globalAlpha = 0.453
+measureText("Save Image")
+moveTo(125, 26)
+lineTo(195, 26)
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=1.9s phase=0.8 particleTime=0.8 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 1
+shadowColor = #00ffff
+shadowBlur = 1.5
+fillStyle = #00ffff
+fillText("CLIP Text Encode", 200, 16)
+beginPath()
+strokeStyle = #00ffff
+lineWidth = 1
+globalAlpha = 0.5
+measureText("CLIP Text Encode")
+moveTo(144, 26)
+lineTo(256, 26)
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0

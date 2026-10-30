@@ -1,0 +1,2701 @@
+# Lava Flow (7), animated: v2 renderAnimatedStyle with other v1 settings
+# custom colours, Divine quality, Dense particles, pulse markers: t=1.9s phase=-4.97 totalTime=3.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #ffb300
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 98.76)
+lineTo(102.2, 99.41)
+lineTo(104.36, 100.22)
+lineTo(106.48, 101.16)
+lineTo(108.57, 102.21)
+lineTo(110.61, 103.34)
+lineTo(112.62, 104.53)
+lineTo(114.59, 105.75)
+lineTo(116.53, 106.95)
+lineTo(118.43, 108.13)
+lineTo(120.29, 109.23)
+lineTo(122.12, 110.24)
+lineTo(123.92, 111.13)
+lineTo(125.69, 111.88)
+lineTo(127.43, 112.46)
+lineTo(129.13, 112.86)
+lineTo(130.81, 113.06)
+lineTo(132.46, 113.05)
+lineTo(134.07, 112.83)
+lineTo(135.67, 112.39)
+lineTo(137.23, 111.75)
+lineTo(138.77, 110.9)
+lineTo(140.28, 109.87)
+lineTo(141.77, 108.66)
+lineTo(143.24, 107.29)
+lineTo(144.68, 105.8)
+lineTo(146.1, 104.2)
+lineTo(147.5, 102.52)
+lineTo(148.88, 100.79)
+lineTo(150.24, 99.05)
+lineTo(151.58, 97.32)
+lineTo(152.9, 95.63)
+lineTo(154.2, 94.02)
+lineTo(155.49, 92.51)
+lineTo(156.76, 91.13)
+lineTo(158.02, 89.9)
+lineTo(159.26, 88.84)
+lineTo(160.49, 87.97)
+lineTo(161.7, 87.29)
+lineTo(162.9, 86.83)
+lineTo(164.1, 86.59)
+lineTo(165.28, 86.55)
+lineTo(166.45, 86.73)
+lineTo(167.61, 87.1)
+lineTo(168.76, 87.66)
+lineTo(169.91, 88.39)
+lineTo(171.05, 89.27)
+lineTo(172.18, 90.27)
+lineTo(173.31, 91.37)
+lineTo(174.43, 92.54)
+lineTo(175.55, 93.75)
+lineTo(176.66, 94.97)
+lineTo(177.78, 96.17)
+lineTo(178.89, 97.32)
+lineTo(180, 98.4)
+lineTo(181.11, 99.36)
+lineTo(182.22, 100.2)
+lineTo(183.34, 100.88)
+lineTo(184.45, 101.4)
+lineTo(185.57, 101.72)
+lineTo(186.69, 101.86)
+lineTo(187.82, 101.79)
+lineTo(188.95, 101.51)
+lineTo(190.09, 101.04)
+lineTo(191.24, 100.37)
+lineTo(192.39, 99.51)
+lineTo(193.55, 98.49)
+lineTo(194.72, 97.32)
+lineTo(195.9, 96.02)
+lineTo(197.1, 94.62)
+lineTo(198.3, 93.14)
+lineTo(199.51, 91.62)
+lineTo(200.74, 90.08)
+lineTo(201.98, 88.55)
+lineTo(203.24, 87.08)
+lineTo(204.51, 85.67)
+lineTo(205.8, 84.38)
+lineTo(207.1, 83.21)
+lineTo(208.42, 82.19)
+lineTo(209.76, 81.35)
+lineTo(211.12, 80.71)
+lineTo(212.5, 80.26)
+lineTo(213.9, 80.03)
+lineTo(215.32, 80.02)
+lineTo(216.76, 80.23)
+lineTo(218.23, 80.66)
+lineTo(219.72, 81.29)
+lineTo(221.23, 82.11)
+lineTo(222.77, 83.12)
+lineTo(224.33, 84.28)
+lineTo(225.93, 85.57)
+lineTo(227.54, 86.97)
+lineTo(229.19, 88.45)
+lineTo(230.87, 89.98)
+lineTo(232.57, 91.53)
+lineTo(234.31, 93.07)
+lineTo(236.08, 94.56)
+lineTo(237.88, 95.99)
+lineTo(239.71, 97.31)
+lineTo(241.57, 98.52)
+lineTo(243.47, 99.57)
+lineTo(245.41, 100.46)
+lineTo(247.38, 101.17)
+lineTo(249.39, 101.68)
+lineTo(251.43, 102)
+lineTo(253.52, 102.11)
+lineTo(255.64, 102.01)
+lineTo(257.8, 101.72)
+lineTo(260, 101.24)
+strokeStyle = #fb00ff
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 89.5)
+lineTo(102.2, 89.95)
+lineTo(104.36, 90.51)
+lineTo(106.48, 91.17)
+lineTo(108.57, 91.92)
+lineTo(110.61, 92.74)
+lineTo(112.62, 93.6)
+lineTo(114.59, 94.49)
+lineTo(116.53, 95.38)
+lineTo(118.43, 96.26)
+lineTo(120.29, 97.09)
+lineTo(122.12, 97.87)
+lineTo(123.92, 98.57)
+lineTo(125.69, 99.18)
+lineTo(127.43, 99.68)
+lineTo(129.13, 100.06)
+lineTo(130.81, 100.31)
+lineTo(132.46, 100.42)
+lineTo(134.07, 100.39)
+lineTo(135.67, 100.22)
+lineTo(137.23, 99.91)
+lineTo(138.77, 99.46)
+lineTo(140.28, 98.89)
+lineTo(141.77, 98.2)
+lineTo(143.24, 97.41)
+lineTo(144.68, 96.54)
+lineTo(146.1, 95.6)
+lineTo(147.5, 94.61)
+lineTo(148.88, 93.59)
+lineTo(150.24, 92.57)
+lineTo(151.58, 91.56)
+lineTo(152.9, 90.58)
+lineTo(154.2, 89.67)
+lineTo(155.49, 88.83)
+lineTo(156.76, 88.09)
+lineTo(158.02, 87.45)
+lineTo(159.26, 86.95)
+lineTo(160.49, 86.57)
+lineTo(161.7, 86.35)
+lineTo(162.9, 86.27)
+lineTo(164.1, 86.35)
+lineTo(165.28, 86.58)
+lineTo(166.45, 86.95)
+lineTo(167.61, 87.48)
+lineTo(168.76, 88.13)
+lineTo(169.91, 88.91)
+lineTo(171.05, 89.79)
+lineTo(172.18, 90.76)
+lineTo(173.31, 91.8)
+lineTo(174.43, 92.9)
+lineTo(175.55, 94.02)
+lineTo(176.66, 95.15)
+lineTo(177.78, 96.27)
+lineTo(178.89, 97.36)
+lineTo(180, 98.39)
+lineTo(181.11, 99.34)
+lineTo(182.22, 100.21)
+lineTo(183.34, 100.97)
+lineTo(184.45, 101.61)
+lineTo(185.57, 102.12)
+lineTo(186.69, 102.49)
+lineTo(187.82, 102.72)
+lineTo(188.95, 102.8)
+lineTo(190.09, 102.75)
+lineTo(191.24, 102.55)
+lineTo(192.39, 102.22)
+lineTo(193.55, 101.78)
+lineTo(194.72, 101.22)
+lineTo(195.9, 100.58)
+lineTo(197.1, 99.86)
+lineTo(198.3, 99.08)
+lineTo(199.51, 98.27)
+lineTo(200.74, 97.45)
+lineTo(201.98, 96.63)
+lineTo(203.24, 95.84)
+lineTo(204.51, 95.1)
+lineTo(205.8, 94.42)
+lineTo(207.1, 93.84)
+lineTo(208.42, 93.35)
+lineTo(209.76, 92.99)
+lineTo(211.12, 92.75)
+lineTo(212.5, 92.65)
+lineTo(213.9, 92.69)
+lineTo(215.32, 92.89)
+lineTo(216.76, 93.23)
+lineTo(218.23, 93.71)
+lineTo(219.72, 94.34)
+lineTo(221.23, 95.09)
+lineTo(222.77, 95.96)
+lineTo(224.33, 96.93)
+lineTo(225.93, 98)
+lineTo(227.54, 99.12)
+lineTo(229.19, 100.3)
+lineTo(230.87, 101.51)
+lineTo(232.57, 102.72)
+lineTo(234.31, 103.92)
+lineTo(236.08, 105.08)
+lineTo(237.88, 106.18)
+lineTo(239.71, 107.21)
+lineTo(241.57, 108.14)
+lineTo(243.47, 108.96)
+lineTo(245.41, 109.66)
+lineTo(247.38, 110.22)
+lineTo(249.39, 110.64)
+lineTo(251.43, 110.91)
+lineTo(253.52, 111.03)
+lineTo(255.64, 111)
+lineTo(257.8, 110.82)
+lineTo(260, 110.5)
+grad1 = createLinearGradient(100, 100, 260, 100)
+grad1.addColorStop(0, #ffb300)
+grad1.addColorStop(0.497, #fb00ff)
+grad1.addColorStop(1, #9d00ff)
+globalAlpha = 1
+strokeStyle = grad1
+lineWidth = 15
+lineCap = round
+shadowColor = #fb00ff
+shadowBlur = 15
+stroke()
+beginPath()
+arc(236.39, 98.2, 1.13, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(240.41, 97.83, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(244.59, 97.29, 1.22, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(248.93, 96.6, 1.8, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.798
+fill()
+beginPath()
+arc(253.43, 95.8, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.999
+fill()
+beginPath()
+arc(258.09, 94.94, 1.85, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.834
+fill()
+beginPath()
+arc(102.86, 105.89, 1.28, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.453
+fill()
+beginPath()
+arc(107.49, 106.64, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.208
+fill()
+beginPath()
+arc(111.96, 107.24, 1.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.323
+fill()
+beginPath()
+arc(116.26, 107.62, 1.64, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.693
+fill()
+beginPath()
+arc(120.41, 107.73, 2.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.977
+fill()
+beginPath()
+arc(124.4, 107.55, 1.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.915
+fill()
+beginPath()
+arc(128.23, 107.05, 1.44, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.563
+fill()
+beginPath()
+arc(131.91, 106.25, 0.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.245
+fill()
+beginPath()
+arc(135.43, 105.19, 0.98, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.253
+fill()
+beginPath()
+arc(138.81, 103.92, 1.47, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.58
+fill()
+beginPath()
+arc(142.05, 102.5, 1.99, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.925
+fill()
+beginPath()
+arc(145.14, 101.03, 2.06, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.972
+fill()
+beginPath()
+arc(148.1, 99.58, 1.61, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.676
+fill()
+beginPath()
+arc(150.93, 98.25, 1.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.311
+fill()
+beginPath()
+arc(153.63, 97.11, 0.92, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.211
+fill()
+beginPath()
+arc(156.22, 96.24, 1.3, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.469
+fill()
+beginPath()
+arc(158.69, 95.68, 1.87, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.848
+fill()
+beginPath()
+arc(161.07, 95.45, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.998
+fill()
+beginPath()
+arc(163.34, 95.57, 1.77, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.783
+fill()
+beginPath()
+arc(165.53, 96, 1.2, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.399
+fill()
+beginPath()
+arc(167.65, 96.71, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.2
+fill()
+beginPath()
+arc(169.69, 97.62, 1.15, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.369
+fill()
+beginPath()
+arc(171.68, 98.68, 1.72, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.75
+fill()
+beginPath()
+arc(173.62, 99.79, 2.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.993
+fill()
+beginPath()
+arc(175.52, 100.88, 1.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.875
+fill()
+beginPath()
+arc(177.4, 101.85, 1.36, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.504
+fill()
+beginPath()
+arc(179.26, 102.65, 0.93, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.221
+fill()
+beginPath()
+arc(181.11, 103.22, 1.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.287
+fill()
+beginPath()
+arc(182.98, 103.52, 1.56, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.64
+fill()
+beginPath()
+arc(184.86, 103.56, 2.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.957
+fill()
+beginPath()
+arc(186.77, 103.33, 2.02, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.945
+fill()
+beginPath()
+arc(188.71, 102.88, 1.52, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.616
+fill()
+beginPath()
+arc(190.71, 102.23, 1.01, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.272
+fill()
+beginPath()
+arc(192.77, 101.47, 0.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.23
+fill()
+beginPath()
+arc(194.9, 100.64, 1.39, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.527
+fill()
+beginPath()
+arc(197.11, 99.82, 1.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.892
+fill()
+beginPath()
+arc(199.4, 99.07, 2.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.988
+fill()
+beginPath()
+arc(201.79, 98.44, 1.69, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.727
+fill()
+beginPath()
+arc(204.29, 97.96, 1.12, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.35
+fill()
+beginPath()
+arc(206.9, 97.65, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(209.63, 97.51, 1.23, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.42
+fill()
+beginPath()
+arc(212.48, 97.53, 1.81, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.804
+fill()
+beginPath()
+arc(215.47, 97.67, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 1
+fill()
+beginPath()
+arc(218.59, 97.88, 1.84, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.828
+fill()
+beginPath()
+arc(221.85, 98.12, 1.27, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.447
+fill()
+beginPath()
+arc(225.26, 98.31, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.206
+fill()
+beginPath()
+arc(228.82, 98.42, 1.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.328
+fill()
+beginPath()
+arc(232.53, 98.39, 1.65, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.699
+fill()
+globalAlpha = 1
+strokeStyle = #ffb300
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 218.76)
+lineTo(102.87, 219.49)
+lineTo(105.92, 220.52)
+lineTo(109.15, 221.84)
+lineTo(112.56, 223.41)
+lineTo(116.13, 225.21)
+lineTo(119.88, 227.21)
+lineTo(123.79, 229.36)
+lineTo(127.86, 231.65)
+lineTo(132.08, 234.03)
+lineTo(136.47, 236.47)
+lineTo(141, 238.95)
+lineTo(145.68, 241.42)
+lineTo(150.5, 243.87)
+lineTo(155.47, 246.28)
+lineTo(160.57, 248.61)
+lineTo(165.81, 250.86)
+lineTo(171.17, 253.01)
+lineTo(176.67, 255.05)
+lineTo(182.28, 256.98)
+lineTo(188.02, 258.8)
+lineTo(193.87, 260.52)
+lineTo(199.84, 262.14)
+lineTo(205.92, 263.68)
+lineTo(212.1, 265.15)
+lineTo(218.38, 266.58)
+lineTo(224.77, 267.99)
+lineTo(231.25, 269.39)
+lineTo(237.82, 270.83)
+lineTo(244.49, 272.33)
+lineTo(251.23, 273.9)
+lineTo(258.07, 275.59)
+lineTo(264.97, 277.43)
+lineTo(271.96, 279.42)
+lineTo(279.02, 281.6)
+lineTo(286.14, 284)
+lineTo(293.33, 286.61)
+lineTo(300.59, 289.47)
+lineTo(307.9, 292.58)
+lineTo(315.26, 295.94)
+lineTo(322.68, 299.56)
+lineTo(330.14, 303.43)
+lineTo(337.65, 307.55)
+lineTo(345.21, 311.9)
+lineTo(352.79, 316.47)
+lineTo(360.42, 321.24)
+lineTo(368.07, 326.18)
+lineTo(375.75, 331.26)
+lineTo(383.46, 336.47)
+lineTo(391.18, 341.76)
+lineTo(398.93, 347.11)
+lineTo(406.68, 352.48)
+lineTo(414.45, 357.84)
+lineTo(422.22, 363.16)
+lineTo(430, 368.4)
+lineTo(437.78, 373.53)
+lineTo(445.55, 378.53)
+lineTo(453.32, 383.37)
+lineTo(461.07, 388.03)
+lineTo(468.82, 392.5)
+lineTo(476.54, 396.75)
+lineTo(484.25, 400.79)
+lineTo(491.93, 404.6)
+lineTo(499.58, 408.19)
+lineTo(507.21, 411.56)
+lineTo(514.79, 414.71)
+lineTo(522.35, 417.67)
+lineTo(529.86, 420.44)
+lineTo(537.32, 423.04)
+lineTo(544.74, 425.51)
+lineTo(552.1, 427.85)
+lineTo(559.41, 430.11)
+lineTo(566.67, 432.3)
+lineTo(573.86, 434.45)
+lineTo(580.98, 436.6)
+lineTo(588.04, 438.76)
+lineTo(595.03, 440.97)
+lineTo(601.93, 443.25)
+lineTo(608.77, 445.61)
+lineTo(615.51, 448.08)
+lineTo(622.18, 450.67)
+lineTo(628.75, 453.39)
+lineTo(635.23, 456.25)
+lineTo(641.62, 459.24)
+lineTo(647.9, 462.37)
+lineTo(654.08, 465.64)
+lineTo(660.16, 469.02)
+lineTo(666.13, 472.5)
+lineTo(671.98, 476.06)
+lineTo(677.72, 479.69)
+lineTo(683.33, 483.35)
+lineTo(688.83, 487.01)
+lineTo(694.19, 490.65)
+lineTo(699.43, 494.23)
+lineTo(704.53, 497.71)
+lineTo(709.5, 501.07)
+lineTo(714.32, 504.27)
+lineTo(719, 507.29)
+lineTo(723.53, 510.08)
+lineTo(727.92, 512.61)
+lineTo(732.14, 514.88)
+lineTo(736.21, 516.85)
+lineTo(740.12, 518.5)
+lineTo(743.87, 519.82)
+lineTo(747.44, 520.79)
+lineTo(750.85, 521.42)
+lineTo(754.08, 521.71)
+lineTo(757.13, 521.64)
+lineTo(760, 521.24)
+strokeStyle = #fb00ff
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 209.5)
+lineTo(102.87, 210.02)
+lineTo(105.92, 210.81)
+lineTo(109.15, 211.85)
+lineTo(112.56, 213.13)
+lineTo(116.13, 214.61)
+lineTo(119.88, 216.28)
+lineTo(123.79, 218.11)
+lineTo(127.86, 220.08)
+lineTo(132.08, 222.16)
+lineTo(136.47, 224.33)
+lineTo(141, 226.57)
+lineTo(145.68, 228.86)
+lineTo(150.5, 231.18)
+lineTo(155.47, 233.5)
+lineTo(160.57, 235.82)
+lineTo(165.81, 238.11)
+lineTo(171.17, 240.38)
+lineTo(176.67, 242.61)
+lineTo(182.28, 244.81)
+lineTo(188.02, 246.96)
+lineTo(193.87, 249.08)
+lineTo(199.84, 251.16)
+lineTo(205.92, 253.22)
+lineTo(212.1, 255.27)
+lineTo(218.38, 257.32)
+lineTo(224.77, 259.39)
+lineTo(231.25, 261.48)
+lineTo(237.82, 263.63)
+lineTo(244.49, 265.84)
+lineTo(251.23, 268.14)
+lineTo(258.07, 270.55)
+lineTo(264.97, 273.07)
+lineTo(271.96, 275.74)
+lineTo(279.02, 278.56)
+lineTo(286.14, 281.55)
+lineTo(293.33, 284.72)
+lineTo(300.59, 288.08)
+lineTo(307.9, 291.63)
+lineTo(315.26, 295.38)
+lineTo(322.68, 299.32)
+lineTo(330.14, 303.46)
+lineTo(337.65, 307.78)
+lineTo(345.21, 312.28)
+lineTo(352.79, 316.94)
+lineTo(360.42, 321.75)
+lineTo(368.07, 326.7)
+lineTo(375.75, 331.76)
+lineTo(383.46, 336.91)
+lineTo(391.18, 342.12)
+lineTo(398.93, 347.38)
+lineTo(406.68, 352.66)
+lineTo(414.45, 357.94)
+lineTo(422.22, 363.19)
+lineTo(430, 368.39)
+lineTo(437.78, 373.51)
+lineTo(445.55, 378.54)
+lineTo(453.32, 383.46)
+lineTo(461.07, 388.25)
+lineTo(468.82, 392.89)
+lineTo(476.54, 397.39)
+lineTo(484.25, 401.72)
+lineTo(491.93, 405.89)
+lineTo(499.58, 409.9)
+lineTo(507.21, 413.74)
+lineTo(514.79, 417.42)
+lineTo(522.35, 420.95)
+lineTo(529.86, 424.34)
+lineTo(537.32, 427.6)
+lineTo(544.74, 430.75)
+lineTo(552.1, 433.8)
+lineTo(559.41, 436.76)
+lineTo(566.67, 439.67)
+lineTo(573.86, 442.53)
+lineTo(580.98, 445.36)
+lineTo(588.04, 448.18)
+lineTo(595.03, 451.02)
+lineTo(601.93, 453.87)
+lineTo(608.77, 456.77)
+lineTo(615.51, 459.71)
+lineTo(622.18, 462.71)
+lineTo(628.75, 465.77)
+lineTo(635.23, 468.91)
+lineTo(641.62, 472.1)
+lineTo(647.9, 475.37)
+lineTo(654.08, 478.69)
+lineTo(660.16, 482.06)
+lineTo(666.13, 485.47)
+lineTo(671.98, 488.91)
+lineTo(677.72, 492.35)
+lineTo(683.33, 495.77)
+lineTo(688.83, 499.17)
+lineTo(694.19, 502.5)
+lineTo(699.43, 505.75)
+lineTo(704.53, 508.9)
+lineTo(709.5, 511.92)
+lineTo(714.32, 514.79)
+lineTo(719, 517.48)
+lineTo(723.53, 519.97)
+lineTo(727.92, 522.24)
+lineTo(732.14, 524.27)
+lineTo(736.21, 526.04)
+lineTo(740.12, 527.55)
+lineTo(743.87, 528.77)
+lineTo(747.44, 529.7)
+lineTo(750.85, 530.35)
+lineTo(754.08, 530.69)
+lineTo(757.13, 530.74)
+lineTo(760, 530.5)
+grad2 = createLinearGradient(100, 220, 760, 520)
+grad2.addColorStop(0, #ffb300)
+grad2.addColorStop(0.497, #fb00ff)
+grad2.addColorStop(1, #9d00ff)
+globalAlpha = 1
+strokeStyle = grad2
+lineWidth = 15
+lineCap = round
+shadowColor = #fb00ff
+shadowBlur = 15
+stroke()
+beginPath()
+arc(718.07, 509.8, 1.13, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(727.23, 512.18, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(735.8, 513.87, 1.22, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(743.73, 514.87, 1.8, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.798
+fill()
+beginPath()
+arc(751, 515.2, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.999
+fill()
+beginPath()
+arc(757.57, 514.9, 1.85, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.834
+fill()
+beginPath()
+arc(103.69, 226, 1.28, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.453
+fill()
+beginPath()
+arc(110.4, 227.42, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.208
+fill()
+beginPath()
+arc(117.81, 229.26, 1.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.323
+fill()
+beginPath()
+arc(125.87, 231.44, 1.64, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.693
+fill()
+beginPath()
+arc(134.55, 233.89, 2.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.977
+fill()
+beginPath()
+arc(143.83, 236.56, 1.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.915
+fill()
+beginPath()
+arc(153.67, 239.4, 1.44, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.563
+fill()
+beginPath()
+arc(164.04, 242.41, 0.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.245
+fill()
+beginPath()
+arc(174.91, 245.59, 0.98, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.253
+fill()
+beginPath()
+arc(186.25, 248.99, 1.47, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.58
+fill()
+beginPath()
+arc(198.03, 252.64, 1.99, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.925
+fill()
+beginPath()
+arc(210.22, 256.61, 2.06, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.972
+fill()
+beginPath()
+arc(222.79, 260.96, 1.61, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.676
+fill()
+beginPath()
+arc(235.71, 265.75, 1.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.311
+fill()
+beginPath()
+arc(248.95, 271.04, 0.92, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.211
+fill()
+beginPath()
+arc(262.5, 276.89, 1.3, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.469
+fill()
+beginPath()
+arc(276.31, 283.3, 1.87, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.848
+fill()
+beginPath()
+arc(290.37, 290.28, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.998
+fill()
+beginPath()
+arc(304.65, 297.83, 1.77, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.783
+fill()
+beginPath()
+arc(319.13, 305.88, 1.2, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.399
+fill()
+beginPath()
+arc(333.78, 314.37, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.2
+fill()
+beginPath()
+arc(348.57, 323.22, 1.15, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.369
+fill()
+beginPath()
+arc(363.49, 332.34, 1.72, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.75
+fill()
+beginPath()
+arc(378.5, 341.61, 2.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.993
+fill()
+beginPath()
+arc(393.6, 350.93, 1.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.875
+fill()
+beginPath()
+arc(408.75, 360.19, 1.36, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.504
+fill()
+beginPath()
+arc(423.92, 369.31, 0.93, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.221
+fill()
+beginPath()
+arc(439.11, 378.21, 1.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.287
+fill()
+beginPath()
+arc(454.29, 386.84, 1.56, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.64
+fill()
+beginPath()
+arc(469.43, 395.16, 2.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.957
+fill()
+beginPath()
+arc(484.51, 403.15, 2.02, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.945
+fill()
+beginPath()
+arc(499.5, 410.84, 1.52, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.616
+fill()
+beginPath()
+arc(514.4, 418.23, 1.01, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.272
+fill()
+beginPath()
+arc(529.16, 425.37, 0.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.23
+fill()
+beginPath()
+arc(543.78, 432.3, 1.39, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.527
+fill()
+beginPath()
+arc(558.22, 439.07, 1.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.892
+fill()
+beginPath()
+arc(572.46, 445.7, 2.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.988
+fill()
+beginPath()
+arc(586.47, 452.23, 1.69, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.727
+fill()
+beginPath()
+arc(600.23, 458.68, 1.12, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.35
+fill()
+beginPath()
+arc(613.72, 465.03, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(626.9, 471.26, 1.23, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.42
+fill()
+beginPath()
+arc(639.76, 477.34, 1.81, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.804
+fill()
+beginPath()
+arc(652.25, 483.2, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 1
+fill()
+beginPath()
+arc(664.36, 488.79, 1.84, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.828
+fill()
+beginPath()
+arc(676.05, 494.01, 1.27, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.447
+fill()
+beginPath()
+arc(687.3, 498.79, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.206
+fill()
+beginPath()
+arc(698.07, 503.06, 1.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.328
+fill()
+beginPath()
+arc(708.34, 506.75, 1.65, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.699
+fill()
+globalAlpha = 1
+strokeStyle = #ffb300
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(420, 138.76)
+lineTo(422.69, 139.54)
+lineTo(425.21, 140.75)
+lineTo(427.56, 142.34)
+lineTo(429.75, 144.3)
+lineTo(431.77, 146.59)
+lineTo(433.64, 149.17)
+lineTo(435.34, 152.02)
+lineTo(436.9, 155.09)
+lineTo(438.31, 158.36)
+lineTo(439.57, 161.78)
+lineTo(440.69, 165.33)
+lineTo(441.67, 168.97)
+lineTo(442.52, 172.67)
+lineTo(443.23, 176.41)
+lineTo(443.81, 180.16)
+lineTo(444.27, 183.91)
+lineTo(444.6, 187.64)
+lineTo(444.81, 191.35)
+lineTo(444.91, 195.01)
+lineTo(444.89, 198.64)
+lineTo(444.77, 202.24)
+lineTo(444.53, 205.81)
+lineTo(444.2, 209.36)
+lineTo(443.76, 212.92)
+lineTo(443.22, 216.49)
+lineTo(442.59, 220.1)
+lineTo(441.88, 223.77)
+lineTo(441.07, 227.53)
+lineTo(440.18, 231.39)
+lineTo(439.2, 235.4)
+lineTo(438.15, 239.57)
+lineTo(437.03, 243.92)
+lineTo(435.83, 248.49)
+lineTo(434.57, 253.29)
+lineTo(433.24, 258.34)
+lineTo(431.85, 263.65)
+lineTo(430.4, 269.24)
+lineTo(428.9, 275.12)
+lineTo(427.34, 281.29)
+lineTo(425.74, 287.74)
+lineTo(424.09, 294.48)
+lineTo(422.4, 301.49)
+lineTo(420.67, 308.76)
+lineTo(418.9, 316.26)
+lineTo(417.11, 323.99)
+lineTo(415.28, 331.91)
+lineTo(413.43, 340)
+lineTo(411.55, 348.21)
+lineTo(409.65, 356.53)
+lineTo(407.74, 364.91)
+lineTo(405.82, 373.33)
+lineTo(403.88, 381.73)
+lineTo(401.94, 390.1)
+lineTo(400, 398.4)
+lineTo(398.06, 406.58)
+lineTo(396.12, 414.64)
+lineTo(394.18, 422.53)
+lineTo(392.26, 430.23)
+lineTo(390.35, 437.73)
+lineTo(388.45, 445.01)
+lineTo(386.57, 452.06)
+lineTo(384.72, 458.87)
+lineTo(382.89, 465.44)
+lineTo(381.1, 471.76)
+lineTo(379.33, 477.86)
+lineTo(377.6, 483.73)
+lineTo(375.91, 489.39)
+lineTo(374.26, 494.86)
+lineTo(372.66, 500.16)
+lineTo(371.1, 505.31)
+lineTo(369.6, 510.34)
+lineTo(368.15, 515.26)
+lineTo(366.76, 520.11)
+lineTo(365.43, 524.92)
+lineTo(364.17, 529.7)
+lineTo(362.97, 534.47)
+lineTo(361.85, 539.27)
+lineTo(360.8, 544.11)
+lineTo(359.82, 549.01)
+lineTo(358.93, 553.97)
+lineTo(358.13, 559.01)
+lineTo(357.41, 564.13)
+lineTo(356.78, 569.33)
+lineTo(356.24, 574.61)
+lineTo(355.8, 579.95)
+lineTo(355.47, 585.35)
+lineTo(355.23, 590.78)
+lineTo(355.11, 596.22)
+lineTo(355.09, 601.66)
+lineTo(355.19, 607.05)
+lineTo(355.4, 612.37)
+lineTo(355.73, 617.59)
+lineTo(356.19, 622.67)
+lineTo(356.77, 627.58)
+lineTo(357.48, 632.28)
+lineTo(358.33, 636.73)
+lineTo(359.31, 640.9)
+lineTo(360.43, 644.77)
+lineTo(361.69, 648.29)
+lineTo(363.1, 651.44)
+lineTo(364.66, 654.19)
+lineTo(366.36, 656.53)
+lineTo(368.23, 658.44)
+lineTo(370.25, 659.91)
+lineTo(372.44, 660.92)
+lineTo(374.79, 661.48)
+lineTo(377.31, 661.59)
+lineTo(380, 661.24)
+strokeStyle = #fb00ff
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(420, 129.5)
+lineTo(422.69, 130.08)
+lineTo(425.21, 131.04)
+lineTo(427.56, 132.35)
+lineTo(429.75, 134.01)
+lineTo(431.77, 135.98)
+lineTo(433.64, 138.24)
+lineTo(435.34, 140.76)
+lineTo(436.9, 143.52)
+lineTo(438.31, 146.49)
+lineTo(439.57, 149.64)
+lineTo(440.69, 152.96)
+lineTo(441.67, 156.41)
+lineTo(442.52, 159.97)
+lineTo(443.23, 163.63)
+lineTo(443.81, 167.37)
+lineTo(444.27, 171.17)
+lineTo(444.6, 175.02)
+lineTo(444.81, 178.91)
+lineTo(444.91, 182.84)
+lineTo(444.89, 186.8)
+lineTo(444.77, 190.8)
+lineTo(444.53, 194.83)
+lineTo(444.2, 198.91)
+lineTo(443.76, 203.04)
+lineTo(443.22, 207.23)
+lineTo(442.59, 211.5)
+lineTo(441.88, 215.86)
+lineTo(441.07, 220.32)
+lineTo(440.18, 224.91)
+lineTo(439.2, 229.64)
+lineTo(438.15, 234.52)
+lineTo(437.03, 239.57)
+lineTo(435.83, 244.81)
+lineTo(434.57, 250.25)
+lineTo(433.24, 255.89)
+lineTo(431.85, 261.76)
+lineTo(430.4, 267.85)
+lineTo(428.9, 274.17)
+lineTo(427.34, 280.72)
+lineTo(425.74, 287.5)
+lineTo(424.09, 294.5)
+lineTo(422.4, 301.71)
+lineTo(420.67, 309.13)
+lineTo(418.9, 316.73)
+lineTo(417.11, 324.51)
+lineTo(415.28, 332.43)
+lineTo(413.43, 340.49)
+lineTo(411.55, 348.65)
+lineTo(409.65, 356.89)
+lineTo(407.74, 365.18)
+lineTo(405.82, 373.51)
+lineTo(403.88, 381.83)
+lineTo(401.94, 390.14)
+lineTo(400, 398.39)
+lineTo(398.06, 406.57)
+lineTo(396.12, 414.65)
+lineTo(394.18, 422.61)
+lineTo(392.26, 430.45)
+lineTo(390.35, 438.13)
+lineTo(388.45, 445.65)
+lineTo(386.57, 452.99)
+lineTo(384.72, 460.16)
+lineTo(382.89, 467.14)
+lineTo(381.1, 473.95)
+lineTo(379.33, 480.57)
+lineTo(377.6, 487.02)
+lineTo(375.91, 493.3)
+lineTo(374.26, 499.42)
+lineTo(372.66, 505.41)
+lineTo(371.1, 511.26)
+lineTo(369.6, 516.99)
+lineTo(368.15, 522.63)
+lineTo(366.76, 528.19)
+lineTo(365.43, 533.68)
+lineTo(364.17, 539.12)
+lineTo(362.97, 544.52)
+lineTo(361.85, 549.9)
+lineTo(360.8, 555.27)
+lineTo(359.82, 560.64)
+lineTo(358.93, 566.02)
+lineTo(358.13, 571.4)
+lineTo(357.41, 576.79)
+lineTo(356.78, 582.2)
+lineTo(356.24, 587.6)
+lineTo(355.8, 593.01)
+lineTo(355.47, 598.4)
+lineTo(355.23, 603.75)
+lineTo(355.11, 609.07)
+lineTo(355.09, 614.32)
+lineTo(355.19, 619.48)
+lineTo(355.4, 624.53)
+lineTo(355.73, 629.45)
+lineTo(356.19, 634.2)
+lineTo(356.77, 638.77)
+lineTo(357.48, 643.13)
+lineTo(358.33, 647.25)
+lineTo(359.31, 651.1)
+lineTo(360.43, 654.66)
+lineTo(361.69, 657.91)
+lineTo(363.1, 660.82)
+lineTo(364.66, 663.39)
+lineTo(366.36, 665.58)
+lineTo(368.23, 667.4)
+lineTo(370.25, 668.82)
+lineTo(372.44, 669.85)
+lineTo(374.79, 670.47)
+lineTo(377.31, 670.69)
+lineTo(380, 670.5)
+grad3 = createLinearGradient(420, 140, 380, 660)
+grad3.addColorStop(0, #ffb300)
+grad3.addColorStop(0.497, #fb00ff)
+grad3.addColorStop(1, #9d00ff)
+globalAlpha = 1
+strokeStyle = grad3
+lineWidth = 15
+lineCap = round
+shadowColor = #fb00ff
+shadowBlur = 15
+stroke()
+beginPath()
+arc(357.67, 643.64, 1.13, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(360.42, 648.04, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(363.77, 651.36, 1.22, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(367.75, 653.61, 1.8, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.798
+fill()
+beginPath()
+arc(372.39, 654.77, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.999
+fill()
+beginPath()
+arc(377.69, 654.86, 1.85, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.834
+fill()
+beginPath()
+arc(423.43, 146.08, 1.28, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.453
+fill()
+beginPath()
+arc(428.59, 147.99, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.208
+fill()
+beginPath()
+arc(433.09, 150.74, 1.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.323
+fill()
+beginPath()
+arc(436.95, 154.25, 1.64, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.693
+fill()
+beginPath()
+arc(440.18, 158.41, 2.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.977
+fill()
+beginPath()
+arc(442.81, 163.16, 1.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.915
+fill()
+beginPath()
+arc(444.86, 168.45, 1.44, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.563
+fill()
+beginPath()
+arc(446.35, 174.25, 0.97, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.245
+fill()
+beginPath()
+arc(447.31, 180.56, 0.98, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.253
+fill()
+beginPath()
+arc(447.75, 187.38, 1.47, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.58
+fill()
+beginPath()
+arc(447.7, 194.74, 1.99, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.925
+fill()
+beginPath()
+arc(447.19, 202.7, 2.06, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.972
+fill()
+beginPath()
+arc(446.24, 211.3, 1.61, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.676
+fill()
+beginPath()
+arc(444.87, 220.58, 1.07, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.311
+fill()
+beginPath()
+arc(443.11, 230.59, 0.92, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.211
+fill()
+beginPath()
+arc(440.99, 241.36, 1.3, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.469
+fill()
+beginPath()
+arc(438.53, 252.89, 1.87, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.848
+fill()
+beginPath()
+arc(435.77, 265.16, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.998
+fill()
+beginPath()
+arc(432.72, 278.15, 1.77, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.783
+fill()
+beginPath()
+arc(429.42, 291.79, 1.2, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.399
+fill()
+beginPath()
+arc(425.89, 305.99, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.2
+fill()
+beginPath()
+arc(422.17, 320.66, 1.15, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.369
+fill()
+beginPath()
+arc(418.29, 335.69, 1.72, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.75
+fill()
+beginPath()
+arc(414.27, 350.94, 2.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.993
+fill()
+beginPath()
+arc(410.14, 366.3, 1.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.875
+fill()
+beginPath()
+arc(405.94, 381.65, 1.36, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.504
+fill()
+beginPath()
+arc(401.7, 396.87, 0.93, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.221
+fill()
+beginPath()
+arc(397.45, 411.88, 1.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.287
+fill()
+beginPath()
+arc(393.21, 426.61, 1.56, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.64
+fill()
+beginPath()
+arc(389.03, 441, 2.03, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.957
+fill()
+beginPath()
+arc(384.92, 455.02, 2.02, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.945
+fill()
+beginPath()
+arc(380.92, 468.68, 1.52, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.616
+fill()
+beginPath()
+arc(377.07, 481.96, 1.01, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.272
+fill()
+beginPath()
+arc(373.39, 494.9, 0.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.23
+fill()
+beginPath()
+arc(369.9, 507.52, 1.39, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.527
+fill()
+beginPath()
+arc(366.65, 519.85, 1.94, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.892
+fill()
+beginPath()
+arc(363.66, 531.9, 2.08, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.988
+fill()
+beginPath()
+arc(360.95, 543.68, 1.69, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.727
+fill()
+beginPath()
+arc(358.56, 555.2, 1.12, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.35
+fill()
+beginPath()
+arc(356.51, 566.44, 0.9, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(354.82, 577.34, 1.23, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.42
+fill()
+beginPath()
+arc(353.54, 587.87, 1.81, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.804
+fill()
+beginPath()
+arc(352.67, 597.93, 2.1, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 1
+fill()
+beginPath()
+arc(352.25, 607.45, 1.84, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.828
+fill()
+beginPath()
+arc(352.3, 616.33, 1.27, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.447
+fill()
+beginPath()
+arc(352.84, 624.48, 0.91, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.206
+fill()
+beginPath()
+arc(353.9, 631.8, 1.09, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.328
+fill()
+beginPath()
+arc(355.51, 638.21, 1.65, 0, 6.28)
+fillStyle = #9d00ff
+globalAlpha = 0.699
+fill()
+globalAlpha = 1
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# straight links: t=1.9s phase=-4.97 totalTime=3.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 100)
+lineTo(260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 98.76)
+lineTo(104.44, 101.16)
+lineTo(108.89, 104.53)
+lineTo(113.33, 108.13)
+lineTo(117.78, 111.13)
+lineTo(122.22, 112.86)
+lineTo(126.67, 112.83)
+lineTo(131.11, 110.9)
+lineTo(135.56, 107.29)
+lineTo(140, 102.52)
+lineTo(144.44, 97.32)
+lineTo(148.89, 92.51)
+lineTo(153.33, 88.84)
+lineTo(157.78, 86.83)
+lineTo(162.22, 86.73)
+lineTo(166.67, 88.39)
+lineTo(171.11, 91.37)
+lineTo(175.56, 94.97)
+lineTo(180, 98.4)
+lineTo(184.44, 100.88)
+lineTo(188.89, 101.86)
+lineTo(193.33, 101.04)
+lineTo(197.78, 98.49)
+lineTo(202.22, 94.62)
+lineTo(206.67, 90.08)
+lineTo(211.11, 85.67)
+lineTo(215.56, 82.19)
+lineTo(220, 80.26)
+lineTo(224.44, 80.23)
+lineTo(228.89, 82.11)
+lineTo(233.33, 85.57)
+lineTo(237.78, 89.98)
+lineTo(242.22, 94.56)
+lineTo(246.67, 98.52)
+lineTo(251.11, 101.17)
+lineTo(255.56, 102.11)
+lineTo(260, 101.24)
+strokeStyle = #64b5f6
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 89.5)
+lineTo(104.44, 91.17)
+lineTo(108.89, 93.6)
+lineTo(113.33, 96.26)
+lineTo(117.78, 98.57)
+lineTo(122.22, 100.06)
+lineTo(126.67, 100.39)
+lineTo(131.11, 99.46)
+lineTo(135.56, 97.41)
+lineTo(140, 94.61)
+lineTo(144.44, 91.56)
+lineTo(148.89, 88.83)
+lineTo(153.33, 86.95)
+lineTo(157.78, 86.27)
+lineTo(162.22, 86.95)
+lineTo(166.67, 88.91)
+lineTo(171.11, 91.8)
+lineTo(175.56, 95.15)
+lineTo(180, 98.39)
+lineTo(184.44, 100.97)
+lineTo(188.89, 102.49)
+lineTo(193.33, 102.75)
+lineTo(197.78, 101.78)
+lineTo(202.22, 99.86)
+lineTo(206.67, 97.45)
+lineTo(211.11, 95.1)
+lineTo(215.56, 93.35)
+lineTo(220, 92.65)
+lineTo(224.44, 93.23)
+lineTo(228.89, 95.09)
+lineTo(233.33, 98)
+lineTo(237.78, 101.51)
+lineTo(242.22, 105.08)
+lineTo(246.67, 108.14)
+lineTo(251.11, 110.22)
+lineTo(255.56, 111.03)
+lineTo(260, 110.5)
+grad4 = createLinearGradient(100, 100, 260, 100)
+grad4.addColorStop(0, #64b5f6)
+grad4.addColorStop(0.497, #64b5f6)
+grad4.addColorStop(1, #64b5f6)
+globalAlpha = 1
+strokeStyle = grad4
+lineWidth = 15
+lineCap = round
+shadowColor = #64b5f6
+shadowBlur = 15
+stroke()
+beginPath()
+arc(242.15, 98.2, 1.13, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(126.55, 105.75, 0.9, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(165.85, 97.62, 1.22, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(201.45, 100.23, 1.8, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 220)
+lineTo(760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 218.76)
+lineTo(118.33, 229.49)
+lineTo(136.67, 241.2)
+lineTo(155, 253.13)
+lineTo(173.33, 264.47)
+lineTo(191.67, 274.52)
+lineTo(210, 282.83)
+lineTo(228.33, 289.24)
+lineTo(246.67, 293.96)
+lineTo(265, 297.52)
+lineTo(283.33, 300.65)
+lineTo(301.67, 304.18)
+lineTo(320, 308.84)
+lineTo(338.33, 315.17)
+lineTo(356.67, 323.39)
+lineTo(375, 333.39)
+lineTo(393.33, 344.7)
+lineTo(411.67, 356.64)
+lineTo(430, 368.4)
+lineTo(448.33, 379.22)
+lineTo(466.67, 388.52)
+lineTo(485, 396.04)
+lineTo(503.33, 401.82)
+lineTo(521.67, 406.28)
+lineTo(540, 410.08)
+lineTo(558.33, 414.01)
+lineTo(576.67, 418.86)
+lineTo(595, 425.26)
+lineTo(613.33, 433.57)
+lineTo(631.67, 443.78)
+lineTo(650, 455.57)
+lineTo(668.33, 468.31)
+lineTo(686.67, 481.23)
+lineTo(705, 493.52)
+lineTo(723.33, 504.5)
+lineTo(741.67, 513.77)
+lineTo(760, 521.24)
+strokeStyle = #ff9cf9
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 209.5)
+lineTo(118.33, 219.51)
+lineTo(136.67, 230.27)
+lineTo(155, 241.26)
+lineTo(173.33, 251.91)
+lineTo(191.67, 261.73)
+lineTo(210, 270.39)
+lineTo(228.33, 277.79)
+lineTo(246.67, 284.08)
+lineTo(265, 289.61)
+lineTo(283.33, 294.89)
+lineTo(301.67, 300.5)
+lineTo(320, 306.95)
+lineTo(338.33, 314.6)
+lineTo(356.67, 323.62)
+lineTo(375, 333.91)
+lineTo(393.33, 345.14)
+lineTo(411.67, 356.82)
+lineTo(430, 368.39)
+lineTo(448.33, 379.3)
+lineTo(466.67, 389.16)
+lineTo(485, 397.75)
+lineTo(503.33, 405.11)
+lineTo(521.67, 411.52)
+lineTo(540, 417.45)
+lineTo(558.33, 423.43)
+lineTo(576.67, 430.02)
+lineTo(595, 437.65)
+lineTo(613.33, 446.56)
+lineTo(631.67, 456.76)
+lineTo(650, 468)
+lineTo(668.33, 479.84)
+lineTo(686.67, 491.74)
+lineTo(705, 503.14)
+lineTo(723.33, 513.55)
+lineTo(741.67, 522.69)
+lineTo(760, 530.5)
+grad5 = createLinearGradient(100, 220, 760, 520)
+grad5.addColorStop(0, #ff9cf9)
+grad5.addColorStop(0.497, #ff9cf9)
+grad5.addColorStop(1, #ff9cf9)
+globalAlpha = 1
+strokeStyle = grad5
+lineWidth = 15
+lineCap = round
+shadowColor = #ff9cf9
+shadowBlur = 15
+stroke()
+beginPath()
+arc(692.15, 488.2, 1.13, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(201.55, 270.75, 0.9, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(365.85, 337.62, 1.22, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(526.45, 415.23, 1.8, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(420, 140)
+lineTo(380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(420, 138.76)
+lineTo(418.89, 155.6)
+lineTo(417.78, 173.42)
+lineTo(416.67, 191.46)
+lineTo(415.56, 208.91)
+lineTo(414.44, 225.08)
+lineTo(413.33, 239.49)
+lineTo(412.22, 252.01)
+lineTo(411.11, 262.85)
+lineTo(410, 272.52)
+lineTo(408.89, 281.76)
+lineTo(407.78, 291.4)
+lineTo(406.67, 302.17)
+lineTo(405.56, 314.61)
+lineTo(404.44, 328.95)
+lineTo(403.33, 345.06)
+lineTo(402.22, 362.48)
+lineTo(401.11, 380.53)
+lineTo(400, 398.4)
+lineTo(398.89, 415.33)
+lineTo(397.78, 430.75)
+lineTo(396.67, 444.37)
+lineTo(395.56, 456.27)
+lineTo(394.44, 466.84)
+lineTo(393.33, 476.74)
+lineTo(392.22, 486.79)
+lineTo(391.11, 497.75)
+lineTo(390, 510.26)
+lineTo(388.89, 524.68)
+lineTo(387.78, 541)
+lineTo(386.67, 558.9)
+lineTo(385.56, 577.76)
+lineTo(384.44, 596.79)
+lineTo(383.33, 615.18)
+lineTo(382.22, 632.28)
+lineTo(381.11, 647.66)
+lineTo(380, 661.24)
+strokeStyle = #b39ddb
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(420, 129.5)
+lineTo(418.89, 145.62)
+lineTo(417.78, 162.49)
+lineTo(416.67, 179.59)
+lineTo(415.56, 196.35)
+lineTo(414.44, 212.28)
+lineTo(413.33, 227.06)
+lineTo(412.22, 240.57)
+lineTo(411.11, 252.97)
+lineTo(410, 264.61)
+lineTo(408.89, 276)
+lineTo(407.78, 287.72)
+lineTo(406.67, 300.28)
+lineTo(405.56, 314.05)
+lineTo(404.44, 329.18)
+lineTo(403.33, 345.57)
+lineTo(402.22, 362.91)
+lineTo(401.11, 380.71)
+lineTo(400, 398.39)
+lineTo(398.89, 415.41)
+lineTo(397.78, 431.38)
+lineTo(396.67, 446.08)
+lineTo(395.56, 459.56)
+lineTo(394.44, 472.08)
+lineTo(393.33, 484.11)
+lineTo(392.22, 496.21)
+lineTo(391.11, 508.91)
+lineTo(390, 522.65)
+lineTo(388.89, 537.67)
+lineTo(387.78, 553.98)
+lineTo(386.67, 571.33)
+lineTo(385.56, 589.29)
+lineTo(384.44, 607.3)
+lineTo(383.33, 624.81)
+lineTo(382.22, 641.33)
+lineTo(381.11, 656.58)
+lineTo(380, 670.5)
+grad6 = createLinearGradient(420, 140, 380, 660)
+grad6.addColorStop(0, #b39ddb)
+grad6.addColorStop(0.497, #b39ddb)
+grad6.addColorStop(1, #b39ddb)
+globalAlpha = 1
+strokeStyle = grad6
+lineWidth = 15
+lineCap = round
+shadowColor = #b39ddb
+shadowBlur = 15
+stroke()
+beginPath()
+arc(382.15, 606.2, 1.13, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(416.55, 223.75, 0.9, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(405.85, 345.62, 1.22, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(391.45, 478.23, 1.8, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# linear links: t=1.9s phase=-4.97 totalTime=3.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 100)
+lineTo(180, 100)
+lineTo(180, 100)
+lineTo(260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 98.76)
+lineTo(106.73, 101.16)
+lineTo(113.47, 104.53)
+lineTo(120.2, 108.13)
+lineTo(126.94, 111.13)
+lineTo(133.67, 112.86)
+lineTo(140.4, 112.83)
+lineTo(147.14, 110.9)
+lineTo(153.87, 107.29)
+lineTo(160.61, 102.52)
+lineTo(167.34, 97.32)
+lineTo(174.07, 92.51)
+lineTo(180, 88.84)
+lineTo(180, 86.83)
+lineTo(180, 86.73)
+lineTo(180, 88.39)
+lineTo(180, 91.37)
+lineTo(180, 94.97)
+lineTo(180, 98.4)
+lineTo(180, 100.88)
+lineTo(180, 101.86)
+lineTo(180, 101.04)
+lineTo(180, 98.49)
+lineTo(180, 94.62)
+lineTo(180, 90.08)
+lineTo(185.93, 85.67)
+lineTo(192.66, 82.19)
+lineTo(199.39, 80.26)
+lineTo(206.13, 80.23)
+lineTo(212.86, 82.11)
+lineTo(219.6, 85.57)
+lineTo(226.33, 89.98)
+lineTo(233.06, 94.56)
+lineTo(239.8, 98.52)
+lineTo(246.53, 101.17)
+lineTo(253.27, 102.11)
+lineTo(260, 101.24)
+strokeStyle = #64b5f6
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 89.5)
+lineTo(106.73, 91.17)
+lineTo(113.47, 93.6)
+lineTo(120.2, 96.26)
+lineTo(126.94, 98.57)
+lineTo(133.67, 100.06)
+lineTo(140.4, 100.39)
+lineTo(147.14, 99.46)
+lineTo(153.87, 97.41)
+lineTo(160.61, 94.61)
+lineTo(167.34, 91.56)
+lineTo(174.07, 88.83)
+lineTo(180, 86.95)
+lineTo(180, 86.27)
+lineTo(180, 86.95)
+lineTo(180, 88.91)
+lineTo(180, 91.8)
+lineTo(180, 95.15)
+lineTo(180, 98.39)
+lineTo(180, 100.97)
+lineTo(180, 102.49)
+lineTo(180, 102.75)
+lineTo(180, 101.78)
+lineTo(180, 99.86)
+lineTo(180, 97.45)
+lineTo(185.93, 95.1)
+lineTo(192.66, 93.35)
+lineTo(199.39, 92.65)
+lineTo(206.13, 93.23)
+lineTo(212.86, 95.09)
+lineTo(219.6, 98)
+lineTo(226.33, 101.51)
+lineTo(233.06, 105.08)
+lineTo(239.8, 108.14)
+lineTo(246.53, 110.22)
+lineTo(253.27, 111.03)
+lineTo(260, 110.5)
+grad7 = createLinearGradient(100, 100, 260, 100)
+grad7.addColorStop(0, #64b5f6)
+grad7.addColorStop(0.497, #64b5f6)
+grad7.addColorStop(1, #64b5f6)
+globalAlpha = 1
+strokeStyle = grad7
+lineWidth = 15
+lineCap = round
+shadowColor = #64b5f6
+shadowBlur = 15
+stroke()
+beginPath()
+arc(233.91, 98.2, 1.13, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(138.91, 105.75, 0.9, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(181.85, 97.62, 1.22, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(177.45, 100.23, 1.8, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 220)
+lineTo(430, 220)
+lineTo(430, 520)
+lineTo(760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 218.76)
+lineTo(127.78, 221.16)
+lineTo(155.56, 224.53)
+lineTo(183.33, 228.13)
+lineTo(211.11, 231.13)
+lineTo(238.89, 232.86)
+lineTo(266.67, 232.83)
+lineTo(294.44, 230.9)
+lineTo(322.22, 227.29)
+lineTo(350, 222.52)
+lineTo(377.78, 217.32)
+lineTo(405.56, 212.51)
+lineTo(430, 211.78)
+lineTo(430, 234.29)
+lineTo(430, 258.69)
+lineTo(430, 284.86)
+lineTo(430, 312.35)
+lineTo(430, 340.46)
+lineTo(430, 368.4)
+lineTo(430, 395.39)
+lineTo(430, 420.88)
+lineTo(430, 444.57)
+lineTo(430, 466.53)
+lineTo(430, 487.16)
+lineTo(430, 507.14)
+lineTo(454.44, 505.67)
+lineTo(482.22, 502.19)
+lineTo(510, 500.26)
+lineTo(537.78, 500.23)
+lineTo(565.56, 502.11)
+lineTo(593.33, 505.57)
+lineTo(621.11, 509.98)
+lineTo(648.89, 514.56)
+lineTo(676.67, 518.52)
+lineTo(704.44, 521.17)
+lineTo(732.22, 522.11)
+lineTo(760, 521.24)
+strokeStyle = #ff9cf9
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 209.5)
+lineTo(127.78, 211.17)
+lineTo(155.56, 213.6)
+lineTo(183.33, 216.26)
+lineTo(211.11, 218.57)
+lineTo(238.89, 220.06)
+lineTo(266.67, 220.39)
+lineTo(294.44, 219.46)
+lineTo(322.22, 217.41)
+lineTo(350, 214.61)
+lineTo(377.78, 211.56)
+lineTo(405.56, 208.83)
+lineTo(430, 209.89)
+lineTo(430, 233.72)
+lineTo(430, 258.92)
+lineTo(430, 285.38)
+lineTo(430, 312.78)
+lineTo(430, 340.64)
+lineTo(430, 368.39)
+lineTo(430, 395.48)
+lineTo(430, 421.51)
+lineTo(430, 446.28)
+lineTo(430, 469.82)
+lineTo(430, 492.41)
+lineTo(430, 514.51)
+lineTo(454.44, 515.1)
+lineTo(482.22, 513.35)
+lineTo(510, 512.65)
+lineTo(537.78, 513.23)
+lineTo(565.56, 515.09)
+lineTo(593.33, 518)
+lineTo(621.11, 521.51)
+lineTo(648.89, 525.08)
+lineTo(676.67, 528.14)
+lineTo(704.44, 530.22)
+lineTo(732.22, 531.03)
+lineTo(760, 530.5)
+grad8 = createLinearGradient(100, 220, 760, 520)
+grad8.addColorStop(0, #ff9cf9)
+grad8.addColorStop(0.497, #ff9cf9)
+grad8.addColorStop(1, #ff9cf9)
+globalAlpha = 1
+strokeStyle = grad8
+lineWidth = 15
+lineCap = round
+shadowColor = #ff9cf9
+shadowBlur = 15
+stroke()
+beginPath()
+arc(658.15, 518.2, 1.13, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(252.55, 225.75, 0.9, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(431.85, 279.39, 1.22, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(427.45, 502.58, 1.8, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(420, 140)
+lineTo(400, 140)
+lineTo(400, 660)
+lineTo(380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(420, 138.76)
+lineTo(418.32, 141.16)
+lineTo(416.63, 144.53)
+lineTo(414.95, 148.13)
+lineTo(413.27, 151.13)
+lineTo(411.58, 152.86)
+lineTo(409.9, 152.83)
+lineTo(408.22, 150.9)
+lineTo(406.53, 147.29)
+lineTo(404.85, 142.52)
+lineTo(403.16, 137.32)
+lineTo(401.48, 132.51)
+lineTo(400, 133.93)
+lineTo(400, 174.42)
+lineTo(400, 216.79)
+lineTo(400, 260.94)
+lineTo(400, 306.4)
+lineTo(400, 352.49)
+lineTo(400, 398.4)
+lineTo(400, 443.37)
+lineTo(400, 486.82)
+lineTo(400, 528.49)
+lineTo(400, 568.42)
+lineTo(400, 607.03)
+lineTo(400, 644.98)
+lineTo(398.52, 645.67)
+lineTo(396.84, 642.19)
+lineTo(395.15, 640.26)
+lineTo(393.47, 640.23)
+lineTo(391.78, 642.11)
+lineTo(390.1, 645.57)
+lineTo(388.42, 649.98)
+lineTo(386.73, 654.56)
+lineTo(385.05, 658.52)
+lineTo(383.37, 661.17)
+lineTo(381.68, 662.11)
+lineTo(380, 661.24)
+strokeStyle = #b39ddb
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(420, 129.5)
+lineTo(418.32, 131.17)
+lineTo(416.63, 133.6)
+lineTo(414.95, 136.26)
+lineTo(413.27, 138.57)
+lineTo(411.58, 140.06)
+lineTo(409.9, 140.39)
+lineTo(408.22, 139.46)
+lineTo(406.53, 137.41)
+lineTo(404.85, 134.61)
+lineTo(403.16, 131.56)
+lineTo(401.48, 128.83)
+lineTo(400, 132.04)
+lineTo(400, 173.85)
+lineTo(400, 217.02)
+lineTo(400, 261.46)
+lineTo(400, 306.84)
+lineTo(400, 352.67)
+lineTo(400, 398.39)
+lineTo(400, 443.45)
+lineTo(400, 487.46)
+lineTo(400, 530.2)
+lineTo(400, 571.71)
+lineTo(400, 612.28)
+lineTo(400, 652.35)
+lineTo(398.52, 655.1)
+lineTo(396.84, 653.35)
+lineTo(395.15, 652.65)
+lineTo(393.47, 653.23)
+lineTo(391.78, 655.09)
+lineTo(390.1, 658)
+lineTo(388.42, 661.51)
+lineTo(386.73, 665.08)
+lineTo(385.05, 668.14)
+lineTo(383.37, 670.22)
+lineTo(381.68, 671.03)
+lineTo(380, 670.5)
+grad9 = createLinearGradient(420, 140, 380, 660)
+grad9.addColorStop(0, #b39ddb)
+grad9.addColorStop(0.497, #b39ddb)
+grad9.addColorStop(1, #b39ddb)
+globalAlpha = 1
+strokeStyle = grad9
+lineWidth = 15
+lineCap = round
+shadowColor = #b39ddb
+shadowBlur = 15
+stroke()
+beginPath()
+arc(384.21, 658.2, 1.13, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(413.46, 145.75, 0.9, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(401.85, 244.68, 1.22, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(397.45, 629.64, 1.8, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# reverse direction: t=1.9s phase=4.97 totalTime=3.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 98.76)
+lineTo(106.48, 101.16)
+lineTo(112.62, 104.53)
+lineTo(118.43, 108.13)
+lineTo(123.92, 111.13)
+lineTo(129.13, 112.86)
+lineTo(134.07, 112.83)
+lineTo(138.77, 110.9)
+lineTo(143.24, 107.29)
+lineTo(147.5, 102.52)
+lineTo(151.58, 97.32)
+lineTo(155.49, 92.51)
+lineTo(159.26, 88.84)
+lineTo(162.9, 86.83)
+lineTo(166.45, 86.73)
+lineTo(169.91, 88.39)
+lineTo(173.31, 91.37)
+lineTo(176.66, 94.97)
+lineTo(180, 98.4)
+lineTo(183.34, 100.88)
+lineTo(186.69, 101.86)
+lineTo(190.09, 101.04)
+lineTo(193.55, 98.49)
+lineTo(197.1, 94.62)
+lineTo(200.74, 90.08)
+lineTo(204.51, 85.67)
+lineTo(208.42, 82.19)
+lineTo(212.5, 80.26)
+lineTo(216.76, 80.23)
+lineTo(221.23, 82.11)
+lineTo(225.93, 85.57)
+lineTo(230.87, 89.98)
+lineTo(236.08, 94.56)
+lineTo(241.57, 98.52)
+lineTo(247.38, 101.17)
+lineTo(253.52, 102.11)
+lineTo(260, 101.24)
+strokeStyle = #64b5f6
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 89.5)
+lineTo(106.48, 91.17)
+lineTo(112.62, 93.6)
+lineTo(118.43, 96.26)
+lineTo(123.92, 98.57)
+lineTo(129.13, 100.06)
+lineTo(134.07, 100.39)
+lineTo(138.77, 99.46)
+lineTo(143.24, 97.41)
+lineTo(147.5, 94.61)
+lineTo(151.58, 91.56)
+lineTo(155.49, 88.83)
+lineTo(159.26, 86.95)
+lineTo(162.9, 86.27)
+lineTo(166.45, 86.95)
+lineTo(169.91, 88.91)
+lineTo(173.31, 91.8)
+lineTo(176.66, 95.15)
+lineTo(180, 98.39)
+lineTo(183.34, 100.97)
+lineTo(186.69, 102.49)
+lineTo(190.09, 102.75)
+lineTo(193.55, 101.78)
+lineTo(197.1, 99.86)
+lineTo(200.74, 97.45)
+lineTo(204.51, 95.1)
+lineTo(208.42, 93.35)
+lineTo(212.5, 92.65)
+lineTo(216.76, 93.23)
+lineTo(221.23, 95.09)
+lineTo(225.93, 98)
+lineTo(230.87, 101.51)
+lineTo(236.08, 105.08)
+lineTo(241.57, 108.14)
+lineTo(247.38, 110.22)
+lineTo(253.52, 111.03)
+lineTo(260, 110.5)
+grad10 = createLinearGradient(260, 100, 100, 100)
+grad10.addColorStop(0, #64b5f6)
+grad10.addColorStop(0.303, #64b5f6)
+grad10.addColorStop(1, #64b5f6)
+globalAlpha = 1
+strokeStyle = grad10
+lineWidth = 15
+lineCap = round
+shadowColor = #64b5f6
+shadowBlur = 15
+stroke()
+beginPath()
+arc(123.61, 107.61, 1.13, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(226.31, 98.35, 0.9, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(190.31, 102.38, 1.22, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(164.01, 95.66, 1.8, 0, 6.28)
+fillStyle = #64b5f6
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(100, 218.76)
+lineTo(109.15, 221.84)
+lineTo(119.88, 227.21)
+lineTo(132.08, 234.03)
+lineTo(145.68, 241.42)
+lineTo(160.57, 248.61)
+lineTo(176.67, 255.05)
+lineTo(193.87, 260.52)
+lineTo(212.1, 265.15)
+lineTo(231.25, 269.39)
+lineTo(251.23, 273.9)
+lineTo(271.96, 279.42)
+lineTo(293.33, 286.61)
+lineTo(315.26, 295.94)
+lineTo(337.65, 307.55)
+lineTo(360.42, 321.24)
+lineTo(383.46, 336.47)
+lineTo(406.68, 352.48)
+lineTo(430, 368.4)
+lineTo(453.32, 383.37)
+lineTo(476.54, 396.75)
+lineTo(499.58, 408.19)
+lineTo(522.35, 417.67)
+lineTo(544.74, 425.51)
+lineTo(566.67, 432.3)
+lineTo(588.04, 438.76)
+lineTo(608.77, 445.61)
+lineTo(628.75, 453.39)
+lineTo(647.9, 462.37)
+lineTo(666.13, 472.5)
+lineTo(683.33, 483.35)
+lineTo(699.43, 494.23)
+lineTo(714.32, 504.27)
+lineTo(727.92, 512.61)
+lineTo(740.12, 518.5)
+lineTo(750.85, 521.42)
+lineTo(760, 521.24)
+strokeStyle = #ff9cf9
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(100, 209.5)
+lineTo(109.15, 211.85)
+lineTo(119.88, 216.28)
+lineTo(132.08, 222.16)
+lineTo(145.68, 228.86)
+lineTo(160.57, 235.82)
+lineTo(176.67, 242.61)
+lineTo(193.87, 249.08)
+lineTo(212.1, 255.27)
+lineTo(231.25, 261.48)
+lineTo(251.23, 268.14)
+lineTo(271.96, 275.74)
+lineTo(293.33, 284.72)
+lineTo(315.26, 295.38)
+lineTo(337.65, 307.78)
+lineTo(360.42, 321.75)
+lineTo(383.46, 336.91)
+lineTo(406.68, 352.66)
+lineTo(430, 368.39)
+lineTo(453.32, 383.46)
+lineTo(476.54, 397.39)
+lineTo(499.58, 409.9)
+lineTo(522.35, 420.95)
+lineTo(544.74, 430.75)
+lineTo(566.67, 439.67)
+lineTo(588.04, 448.18)
+lineTo(608.77, 456.77)
+lineTo(628.75, 465.77)
+lineTo(647.9, 475.37)
+lineTo(666.13, 485.47)
+lineTo(683.33, 495.77)
+lineTo(699.43, 505.75)
+lineTo(714.32, 514.79)
+lineTo(727.92, 522.24)
+lineTo(740.12, 527.55)
+lineTo(750.85, 530.35)
+lineTo(760, 530.5)
+grad11 = createLinearGradient(760, 520, 100, 220)
+grad11.addColorStop(0, #ff9cf9)
+grad11.addColorStop(0.303, #ff9cf9)
+grad11.addColorStop(1, #ff9cf9)
+globalAlpha = 1
+strokeStyle = grad11
+lineWidth = 15
+lineCap = round
+shadowColor = #ff9cf9
+shadowBlur = 15
+stroke()
+beginPath()
+arc(141.93, 236.01, 1.13, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(690.58, 500.13, 0.9, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(511.43, 416.78, 1.22, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(308.98, 300.19, 1.8, 0, 6.28)
+fillStyle = #ff9cf9
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(420, 138.76)
+lineTo(427.56, 142.34)
+lineTo(433.64, 149.17)
+lineTo(438.31, 158.36)
+lineTo(441.67, 168.97)
+lineTo(443.81, 180.16)
+lineTo(444.81, 191.35)
+lineTo(444.77, 202.24)
+lineTo(443.76, 212.92)
+lineTo(441.88, 223.77)
+lineTo(439.2, 235.4)
+lineTo(435.83, 248.49)
+lineTo(431.85, 263.65)
+lineTo(427.34, 281.29)
+lineTo(422.4, 301.49)
+lineTo(417.11, 323.99)
+lineTo(411.55, 348.21)
+lineTo(405.82, 373.33)
+lineTo(400, 398.4)
+lineTo(394.18, 422.53)
+lineTo(388.45, 445.01)
+lineTo(382.89, 465.44)
+lineTo(377.6, 483.73)
+lineTo(372.66, 500.16)
+lineTo(368.15, 515.26)
+lineTo(364.17, 529.7)
+lineTo(360.8, 544.11)
+lineTo(358.13, 559.01)
+lineTo(356.24, 574.61)
+lineTo(355.23, 590.78)
+lineTo(355.19, 607.05)
+lineTo(356.19, 622.67)
+lineTo(358.33, 636.73)
+lineTo(361.69, 648.29)
+lineTo(366.36, 656.53)
+lineTo(372.44, 660.92)
+lineTo(380, 661.24)
+strokeStyle = #b39ddb
+globalAlpha = 0.3
+lineWidth = 21
+lineCap = round
+stroke()
+beginPath()
+moveTo(420, 129.5)
+lineTo(427.56, 132.35)
+lineTo(433.64, 138.24)
+lineTo(438.31, 146.49)
+lineTo(441.67, 156.41)
+lineTo(443.81, 167.37)
+lineTo(444.81, 178.91)
+lineTo(444.77, 190.8)
+lineTo(443.76, 203.04)
+lineTo(441.88, 215.86)
+lineTo(439.2, 229.64)
+lineTo(435.83, 244.81)
+lineTo(431.85, 261.76)
+lineTo(427.34, 280.72)
+lineTo(422.4, 301.71)
+lineTo(417.11, 324.51)
+lineTo(411.55, 348.65)
+lineTo(405.82, 373.51)
+lineTo(400, 398.39)
+lineTo(394.18, 422.61)
+lineTo(388.45, 445.65)
+lineTo(382.89, 467.14)
+lineTo(377.6, 487.02)
+lineTo(372.66, 505.41)
+lineTo(368.15, 522.63)
+lineTo(364.17, 539.12)
+lineTo(360.8, 555.27)
+lineTo(358.13, 571.4)
+lineTo(356.24, 587.6)
+lineTo(355.23, 603.75)
+lineTo(355.19, 619.48)
+lineTo(356.19, 634.2)
+lineTo(358.33, 647.25)
+lineTo(361.69, 657.91)
+lineTo(366.36, 665.58)
+lineTo(372.44, 669.85)
+lineTo(380, 670.5)
+grad12 = createLinearGradient(380, 660, 420, 140)
+grad12.addColorStop(0, #b39ddb)
+grad12.addColorStop(0.303, #b39ddb)
+grad12.addColorStop(1, #b39ddb)
+globalAlpha = 1
+strokeStyle = grad12
+lineWidth = 15
+lineCap = round
+shadowColor = #b39ddb
+shadowBlur = 15
+stroke()
+beginPath()
+arc(442.33, 162.17, 1.13, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.355
+fill()
+beginPath()
+arc(353.11, 626.76, 0.9, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.202
+fill()
+beginPath()
+arc(377.83, 479.34, 1.22, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.414
+fill()
+beginPath()
+arc(431.75, 282.17, 1.8, 0, 6.28)
+fillStyle = #b39ddb
+globalAlpha = 0.798
+fill()
+globalAlpha = 1
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0

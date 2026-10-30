@@ -1,0 +1,637 @@
+# Sacred Flow (1), static: v2 renderStaticStyle with other v1 settings
+# custom colours, Divine quality, Dense particles, pulse markers: phase=9pi/4 (first static frame)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #ffb300
+lineWidth = 4.5
+shadowColor = #ffb300
+shadowBlur = 10
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(126.55, 99.3, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.599
+fill()
+beginPath()
+arc(144.01, 97.11, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.564
+fill()
+beginPath()
+arc(157.21, 97.95, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(170.93, 100.64, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.315
+fill()
+beginPath()
+arc(186.25, 101.66, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.219
+fill()
+beginPath()
+arc(201.29, 100.55, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(216.51, 100.07, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.285
+fill()
+beginPath()
+arc(235.75, 101.22, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.417
+fill()
+beginPath()
+arc(261.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #ffb300
+lineWidth = 4.5
+shadowColor = #ffb300
+shadowBlur = 10
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 221.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(148.31, 229.58, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.599
+fill()
+beginPath()
+arc(212.87, 254.97, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.564
+fill()
+beginPath()
+arc(291.28, 295.73, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(381.08, 345.74, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.315
+fill()
+beginPath()
+arc(476.1, 396.56, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.219
+fill()
+beginPath()
+arc(567.22, 442.77, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(647.65, 482.21, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.285
+fill()
+beginPath()
+arc(713.99, 510.94, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.417
+fill()
+beginPath()
+arc(761.5, 521.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #ffb300
+lineWidth = 4.5
+shadowColor = #ffb300
+shadowBlur = 10
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #ffb300
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(421.5, 141.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(444.3, 157.13, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.599
+fill()
+beginPath()
+arc(444.53, 202.74, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.564
+fill()
+beginPath()
+arc(429.8, 272.77, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(409.18, 357.48, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.315
+fill()
+beginPath()
+arc(388, 444.82, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.219
+fill()
+beginPath()
+arc(368.7, 525.73, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(355.99, 594.44, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.285
+fill()
+beginPath()
+arc(358, 643.39, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.417
+fill()
+beginPath()
+arc(381.5, 661.5, 2.4, 0, 6.28)
+fillStyle = #9d00ff
+shadowColor = #ffb300
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=33 path2d=0
+# straight links: phase=9pi/4 (first static frame)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 4.5
+shadowColor = #64b5f6
+shadowBlur = 10
+beginPath()
+moveTo(100, 100)
+lineTo(260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(151.28, 97.95, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(207.22, 100.55, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(261.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 4.5
+shadowColor = #ff9cf9
+shadowBlur = 10
+beginPath()
+moveTo(100, 220)
+lineTo(760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 221.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(317.95, 317.95, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(540.55, 420.55, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(761.5, 521.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 4.5
+shadowColor = #b39ddb
+shadowBlur = 10
+beginPath()
+moveTo(420, 140)
+lineTo(380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(421.5, 141.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(404.62, 311.28, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(393.88, 487.22, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(381.5, 661.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=15 path2d=0
+# linear links: phase=9pi/4 (first static frame)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 4.5
+shadowColor = #64b5f6
+shadowBlur = 10
+beginPath()
+moveTo(100, 100)
+lineTo(180, 100)
+lineTo(180, 100)
+lineTo(260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(177.95, 97.95, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(180.55, 100.55, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(261.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 4.5
+shadowColor = #ff9cf9
+shadowBlur = 10
+beginPath()
+moveTo(100, 220)
+lineTo(430, 220)
+lineTo(430, 520)
+lineTo(760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 221.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(427.95, 220.89, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(430.55, 517.61, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(761.5, 521.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 4.5
+shadowColor = #b39ddb
+shadowBlur = 10
+beginPath()
+moveTo(420, 140)
+lineTo(400, 140)
+lineTo(400, 660)
+lineTo(380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(421.5, 141.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(397.95, 143.05, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(400.55, 655.45, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(381.5, 661.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=15 path2d=0
+# reverse direction: phase=9pi/4 (first static frame)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 4.5
+shadowColor = #64b5f6
+shadowBlur = 10
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(157.21, 97.95, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(201.29, 100.55, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(261.5, 101.5, 2.4, 0, 6.28)
+fillStyle = #64b5f6
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 4.5
+shadowColor = #ff9cf9
+shadowBlur = 10
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(101.5, 221.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(291.28, 295.73, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(567.22, 442.77, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(761.5, 521.5, 2.4, 0, 6.28)
+fillStyle = #ff9cf9
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 4.5
+shadowColor = #b39ddb
+shadowBlur = 10
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+beginPath()
+arc(421.5, 141.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+beginPath()
+arc(429.8, 272.77, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.452
+fill()
+beginPath()
+arc(368.7, 525.73, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.207
+fill()
+beginPath()
+arc(381.5, 661.5, 2.4, 0, 6.28)
+fillStyle = #b39ddb
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.541
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=15 path2d=0

@@ -1,0 +1,109 @@
+# v1 TextAnimator.drawAnimatedText, cyberpunk
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+shadowColor = rgba(255, 0, 128, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 0, 128, 0.7)
+fillText("Load Image", 70, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(0, 255, 255, 0.7)
+fillText("Load Image", 70, 16)
+shadowColor = rgba(255, 255, 0, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 255, 0, 0.5)
+fillText("Load Image", 70, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 5
+fillStyle = #00ffff
+fillText("Load Image", 70, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0
+# t=0.4s phase=0.17 particleTime=0.17 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+shadowColor = rgba(255, 0, 128, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 0, 128, 0.7)
+fillText("KSampler", 108.01, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(0, 255, 255, 0.7)
+fillText("KSampler", 110, 16)
+shadowColor = rgba(255, 255, 0, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 255, 0, 0.5)
+fillText("KSampler", 111.99, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 5
+fillStyle = #00ffff
+fillText("KSampler", 110, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0
+# t=0.9s phase=0.38 particleTime=0.38 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+shadowColor = rgba(255, 0, 128, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 0, 128, 0.7)
+fillText("Save Image", 161.18, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(0, 255, 255, 0.7)
+fillText("Save Image", 160, 16)
+shadowColor = rgba(255, 255, 0, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 255, 0, 0.5)
+fillText("Save Image", 158.82, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 5
+fillStyle = #00ffff
+fillText("Save Image", 160, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0
+# t=1.9s phase=0.8 particleTime=0.8 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+shadowColor = rgba(255, 0, 128, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 0, 128, 0.7)
+fillText("CLIP Text Encode", 198.01, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(0, 255, 255, 0.7)
+fillText("CLIP Text Encode", 200, 16)
+shadowColor = rgba(255, 255, 0, 0.35)
+shadowBlur = 2.5
+fillStyle = rgba(255, 255, 0, 0.5)
+fillText("CLIP Text Encode", 201.99, 16)
+shadowColor = rgba(0, 255, 255, 0.35)
+shadowBlur = 5
+fillStyle = #00ffff
+fillText("CLIP Text Encode", 200, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0

@@ -1,0 +1,445 @@
+# Cosmic Weave (4), static: v2 renderStaticStyle with v1 inputs
+# phase=9pi/4 (first static frame)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(260, 100)
+bezierCurveTo(340, 100, 20, 100, 100, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(265, 105)
+lineTo(277.13, 105)
+lineTo(265.37, 95)
+lineTo(252.5, 95)
+lineTo(241.3, 105)
+lineTo(214.54, 105)
+lineTo(175, 95)
+lineTo(145.46, 95)
+lineTo(128.7, 105)
+lineTo(107.5, 105)
+lineTo(84.63, 95)
+lineTo(82.87, 95)
+lineTo(105, 105)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(257.5, 100.67)
+lineTo(281.46, 97.5)
+lineTo(272.87, 99.33)
+lineTo(248.17, 102.5)
+lineTo(233.8, 100.67)
+lineTo(218.87, 97.5)
+lineTo(182.5, 99.33)
+lineTo(141.13, 102.5)
+lineTo(121.2, 100.67)
+lineTo(111.83, 97.5)
+lineTo(92.13, 99.33)
+lineTo(78.54, 102.5)
+lineTo(97.5, 100.67)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(257.5, 109.33)
+lineTo(272.8, 97.5)
+lineTo(272.87, 90.67)
+lineTo(256.83, 102.5)
+lineTo(233.8, 109.33)
+lineTo(210.21, 97.5)
+lineTo(182.5, 90.67)
+lineTo(149.79, 102.5)
+lineTo(121.2, 109.33)
+lineTo(103.17, 97.5)
+lineTo(92.13, 90.67)
+lineTo(87.2, 102.5)
+lineTo(97.5, 109.33)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(760, 520)
+bezierCurveTo(860, 520, 0, 220, 100, 220)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(765, 525)
+lineTo(771.11, 519.1)
+lineTo(733.89, 492.78)
+lineTo(680, 468.13)
+lineTo(616.11, 447.22)
+lineTo(528.89, 412.15)
+lineTo(425, 365)
+lineTo(331.11, 327.85)
+lineTo(253.89, 302.78)
+lineTo(180, 271.88)
+lineTo(116.11, 237.22)
+lineTo(88.89, 220.9)
+lineTo(105, 225)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(757.5, 520.67)
+lineTo(775.44, 511.6)
+lineTo(741.39, 497.11)
+lineTo(675.67, 475.63)
+lineTo(608.61, 442.89)
+lineTo(533.22, 404.65)
+lineTo(432.5, 369.33)
+lineTo(326.78, 335.35)
+lineTo(246.39, 298.45)
+lineTo(184.33, 264.38)
+lineTo(123.61, 241.55)
+lineTo(84.56, 228.4)
+lineTo(97.5, 220.67)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(757.5, 529.33)
+lineTo(766.78, 511.6)
+lineTo(741.39, 488.45)
+lineTo(684.33, 475.63)
+lineTo(608.61, 451.55)
+lineTo(524.56, 404.65)
+lineTo(432.5, 360.67)
+lineTo(335.44, 335.35)
+lineTo(246.39, 307.11)
+lineTo(175.67, 264.38)
+lineTo(123.61, 232.89)
+lineTo(93.22, 228.4)
+lineTo(97.5, 229.33)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(380, 660)
+bezierCurveTo(480, 660, 320, 140, 420, 140)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(385, 665)
+lineTo(404.88, 654.77)
+lineTo(405.74, 616.48)
+lineTo(409.38, 573.75)
+lineTo(417.59, 530.19)
+lineTo(412.2, 469.4)
+lineTo(395, 395)
+lineTo(387.8, 330.6)
+lineTo(392.41, 279.81)
+lineTo(390.63, 226.25)
+lineTo(384.26, 173.52)
+lineTo(395.12, 145.23)
+lineTo(425, 145)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(377.5, 660.67)
+lineTo(409.21, 647.27)
+lineTo(413.24, 620.81)
+lineTo(405.04, 581.25)
+lineTo(410.09, 525.86)
+lineTo(416.53, 461.9)
+lineTo(402.5, 399.33)
+lineTo(383.47, 338.1)
+lineTo(384.91, 275.48)
+lineTo(394.96, 218.75)
+lineTo(391.76, 177.85)
+lineTo(390.79, 152.73)
+lineTo(417.5, 140.67)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(377.5, 669.33)
+lineTo(400.55, 647.27)
+lineTo(413.24, 612.15)
+lineTo(413.71, 581.25)
+lineTo(410.09, 534.52)
+lineTo(407.87, 461.9)
+lineTo(402.5, 390.67)
+lineTo(392.13, 338.1)
+lineTo(384.91, 284.14)
+lineTo(386.29, 218.75)
+lineTo(391.76, 169.19)
+lineTo(399.45, 152.73)
+lineTo(417.5, 149.33)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=9 path2d=0
+# phase=pi/4 (after one style change)
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+strokeStyle = #64b5f6
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(260, 100)
+bezierCurveTo(340, 100, 20, 100, 100, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(265, 105)
+lineTo(277.13, 105)
+lineTo(265.37, 95)
+lineTo(252.5, 95)
+lineTo(241.3, 105)
+lineTo(214.54, 105)
+lineTo(175, 95)
+lineTo(145.46, 95)
+lineTo(128.7, 105)
+lineTo(107.5, 105)
+lineTo(84.63, 95)
+lineTo(82.87, 95)
+lineTo(105, 105)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(257.5, 100.67)
+lineTo(281.46, 97.5)
+lineTo(272.87, 99.33)
+lineTo(248.17, 102.5)
+lineTo(233.8, 100.67)
+lineTo(218.87, 97.5)
+lineTo(182.5, 99.33)
+lineTo(141.13, 102.5)
+lineTo(121.2, 100.67)
+lineTo(111.83, 97.5)
+lineTo(92.13, 99.33)
+lineTo(78.54, 102.5)
+lineTo(97.5, 100.67)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(257.5, 109.33)
+lineTo(272.8, 97.5)
+lineTo(272.87, 90.67)
+lineTo(256.83, 102.5)
+lineTo(233.8, 109.33)
+lineTo(210.21, 97.5)
+lineTo(182.5, 90.67)
+lineTo(149.79, 102.5)
+lineTo(121.2, 109.33)
+lineTo(103.17, 97.5)
+lineTo(92.13, 90.67)
+lineTo(87.2, 102.5)
+lineTo(97.5, 109.33)
+strokeStyle = #64b5f6
+lineWidth = 2.1
+shadowColor = #64b5f6
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+strokeStyle = #ff9cf9
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(760, 520)
+bezierCurveTo(860, 520, 0, 220, 100, 220)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(765, 525)
+lineTo(771.11, 519.1)
+lineTo(733.89, 492.78)
+lineTo(680, 468.13)
+lineTo(616.11, 447.22)
+lineTo(528.89, 412.15)
+lineTo(425, 365)
+lineTo(331.11, 327.85)
+lineTo(253.89, 302.78)
+lineTo(180, 271.88)
+lineTo(116.11, 237.22)
+lineTo(88.89, 220.9)
+lineTo(105, 225)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(757.5, 520.67)
+lineTo(775.44, 511.6)
+lineTo(741.39, 497.11)
+lineTo(675.67, 475.63)
+lineTo(608.61, 442.89)
+lineTo(533.22, 404.65)
+lineTo(432.5, 369.33)
+lineTo(326.78, 335.35)
+lineTo(246.39, 298.45)
+lineTo(184.33, 264.38)
+lineTo(123.61, 241.55)
+lineTo(84.56, 228.4)
+lineTo(97.5, 220.67)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(757.5, 529.33)
+lineTo(766.78, 511.6)
+lineTo(741.39, 488.45)
+lineTo(684.33, 475.63)
+lineTo(608.61, 451.55)
+lineTo(524.56, 404.65)
+lineTo(432.5, 360.67)
+lineTo(335.44, 335.35)
+lineTo(246.39, 307.11)
+lineTo(175.67, 264.38)
+lineTo(123.61, 232.89)
+lineTo(93.22, 228.4)
+lineTo(97.5, 229.33)
+strokeStyle = #ff9cf9
+lineWidth = 2.1
+shadowColor = #ff9cf9
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+strokeStyle = #b39ddb
+lineWidth = 3
+globalAlpha = 0
+beginPath()
+moveTo(380, 660)
+bezierCurveTo(480, 660, 320, 140, 420, 140)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+globalAlpha = 1
+beginPath()
+moveTo(385, 665)
+lineTo(404.88, 654.77)
+lineTo(405.74, 616.48)
+lineTo(409.38, 573.75)
+lineTo(417.59, 530.19)
+lineTo(412.2, 469.4)
+lineTo(395, 395)
+lineTo(387.8, 330.6)
+lineTo(392.41, 279.81)
+lineTo(390.63, 226.25)
+lineTo(384.26, 173.52)
+lineTo(395.12, 145.23)
+lineTo(425, 145)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(377.5, 660.67)
+lineTo(409.21, 647.27)
+lineTo(413.24, 620.81)
+lineTo(405.04, 581.25)
+lineTo(410.09, 525.86)
+lineTo(416.53, 461.9)
+lineTo(402.5, 399.33)
+lineTo(383.47, 338.1)
+lineTo(384.91, 275.48)
+lineTo(394.96, 218.75)
+lineTo(391.76, 177.85)
+lineTo(390.79, 152.73)
+lineTo(417.5, 140.67)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+beginPath()
+moveTo(377.5, 669.33)
+lineTo(400.55, 647.27)
+lineTo(413.24, 612.15)
+lineTo(413.71, 581.25)
+lineTo(410.09, 534.52)
+lineTo(407.87, 461.9)
+lineTo(402.5, 390.67)
+lineTo(392.13, 338.1)
+lineTo(384.91, 284.14)
+lineTo(386.29, 218.75)
+lineTo(391.76, 169.19)
+lineTo(399.45, 152.73)
+lineTo(417.5, 149.33)
+strokeStyle = #b39ddb
+lineWidth = 2.1
+shadowColor = #b39ddb
+shadowBlur = 10
+globalAlpha = 0.5
+stroke()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=9 path2d=0

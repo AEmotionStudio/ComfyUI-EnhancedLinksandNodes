@@ -1,0 +1,65 @@
+# v1 TextAnimator.drawAnimatedText, pulse
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.9
+shadowColor = #00ffff
+shadowBlur = 2.5
+fillStyle = #00ffff
+fillText("Load Image", 70, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=0.4s phase=0.17 particleTime=0.17 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.933
+shadowColor = #00ffff
+shadowBlur = 3.32
+fillStyle = #00ffff
+fillText("KSampler", 110, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=0.9s phase=0.38 particleTime=0.38 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 0.968
+shadowColor = #00ffff
+shadowBlur = 4.21
+fillStyle = #00ffff
+fillText("Save Image", 160, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0
+# t=1.9s phase=0.8 particleTime=0.8 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+save()
+font = 14px Arial
+textAlign = center
+textBaseline = middle
+globalAlpha = 1
+shadowColor = #00ffff
+shadowBlur = 5
+fillStyle = #00ffff
+fillText("CLIP Text Encode", 200, 16)
+restore()
+restore()
+# gradients=0 shadowBlurSets=2 path2d=0

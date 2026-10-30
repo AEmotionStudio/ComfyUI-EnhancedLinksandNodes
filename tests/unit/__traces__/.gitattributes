@@ -1,0 +1,2 @@
+# Traces are compared byte for byte, so keep them LF on every platform.
+* text eol=lf

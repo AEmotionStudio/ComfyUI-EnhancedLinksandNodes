@@ -1,0 +1,114 @@
+import type { GraphSpec } from '../helpers';
+
+// Nodes in a pair share a height, so the link between their first slots is a straight line.
+
+export const pair: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNInt', pos: [300, 300] },
+        target: { type: 'ELNInt', pos: [800, 300] },
+    },
+    links: { int: { from: 'source', to: 'target' } },
+};
+
+/** The input sits 300 px below the output, so each link render mode takes a different path. */
+export const diagonal: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNInt', pos: [300, 250] },
+        target: { type: 'ELNInt', pos: [800, 550] },
+    },
+    links: { int: { from: 'source', to: 'target' } },
+};
+
+/** INT, FLOAT and STRING have no palette colour. They are linked after IMAGE, whose colour a renderer could carry over. */
+export const typed: GraphSpec = {
+    nodes: {
+        image: { type: 'ELNImage', pos: [300, 100] },
+        imageTarget: { type: 'ELNImage', pos: [800, 100] },
+        int: { type: 'ELNInt', pos: [300, 250] },
+        intTarget: { type: 'ELNInt', pos: [800, 250] },
+        float: { type: 'ELNFloat', pos: [300, 400] },
+        floatTarget: { type: 'ELNFloat', pos: [800, 400] },
+        string: { type: 'ELNString', pos: [300, 550] },
+        stringTarget: { type: 'ELNString', pos: [800, 550] },
+        latent: { type: 'ELNLatent', pos: [300, 700] },
+        latentTarget: { type: 'ELNLatent', pos: [800, 700] },
+    },
+    links: {
+        image: { from: 'image', to: 'imageTarget' },
+        int: { from: 'int', to: 'intTarget' },
+        float: { from: 'float', to: 'floatTarget' },
+        string: { from: 'string', to: 'stringTarget' },
+        latent: { from: 'latent', to: 'latentTarget' },
+    },
+};
+
+export const rerouted: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNFloat', pos: [300, 300] },
+        target: { type: 'ELNFloat', pos: [800, 300] },
+    },
+    links: { float: { from: 'source', to: 'target', reroute: [640, 460] } },
+};
+
+export const floating: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNInt', pos: [300, 300] },
+        target: { type: 'ELNInt', pos: [800, 300] },
+    },
+    links: { int: { from: 'source', to: 'target', reroute: [640, 460], floating: true } },
+};
+
+export const nodeStates: GraphSpec = {
+    nodes: {
+        string: { type: 'ELNString', pos: [300, 200] },
+        collapsed: { type: 'ELNString', pos: [800, 200], collapsed: true },
+        image: { type: 'ELNImage', pos: [300, 400] },
+        bypassed: { type: 'ELNImage', pos: [800, 400], mode: 'bypass' },
+        latent: { type: 'ELNLatent', pos: [300, 600] },
+        muted: { type: 'ELNLatent', pos: [800, 600], mode: 'mute' },
+    },
+    links: {
+        collapsed: { from: 'string', to: 'collapsed' },
+        bypassed: { from: 'image', to: 'bypassed' },
+        muted: { from: 'latent', to: 'muted' },
+    },
+};
+
+export const subgraph: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNFloat', pos: [250, 300] },
+        inner: { type: 'ELNFloat', pos: [650, 300] },
+        target: { type: 'ELNFloat', pos: [1050, 300] },
+    },
+    links: {
+        in: { from: 'source', to: 'inner' },
+        out: { from: 'inner', to: 'target' },
+    },
+    subgraph: ['inner'],
+};
+
+/** Every link type the test nodes carry, with reroutes, a floating link and each node state. */
+export const mixed: GraphSpec = {
+    nodes: {
+        int: { type: 'ELNInt', pos: [300, 160] },
+        intTarget: { type: 'ELNInt', pos: [800, 160] },
+        float: { type: 'ELNFloat', pos: [300, 280] },
+        floatTarget: { type: 'ELNFloat', pos: [800, 280] },
+        string: { type: 'ELNString', pos: [300, 400] },
+        stringTarget: { type: 'ELNString', pos: [800, 400], collapsed: true },
+        image: { type: 'ELNImage', pos: [300, 520] },
+        imageTarget: { type: 'ELNImage', pos: [800, 520], mode: 'bypass' },
+        latent: { type: 'ELNLatent', pos: [300, 640] },
+        latentTarget: { type: 'ELNLatent', pos: [800, 640], mode: 'mute' },
+        floatingSource: { type: 'ELNInt', pos: [1100, 160] },
+        floatingTarget: { type: 'ELNInt', pos: [1100, 400] },
+    },
+    links: {
+        int: { from: 'int', to: 'intTarget' },
+        float: { from: 'float', to: 'floatTarget', reroute: [640, 340] },
+        string: { from: 'string', to: 'stringTarget' },
+        image: { from: 'image', to: 'imageTarget' },
+        latent: { from: 'latent', to: 'latentTarget' },
+        floating: { from: 'floatingSource', to: 'floatingTarget', reroute: [1300, 300], floating: true },
+    },
+};

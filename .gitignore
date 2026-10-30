@@ -13,6 +13,7 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+perf-baselines/
 
 # TypeScript
 *.tsbuildinfo

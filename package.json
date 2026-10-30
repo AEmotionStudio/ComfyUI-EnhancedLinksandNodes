@@ -9,7 +9,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "e2e": "playwright test",
+    "e2e:perf": "ELN_PERF=1 playwright test --grep @perf",
+    "e2e:serve": "node tests/e2e/serve.mjs",
     "type-check": "tsc --noEmit",
     "lint": "tsc --noEmit && echo 'Type check passed'"
   },

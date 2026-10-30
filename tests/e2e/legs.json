@@ -1,0 +1,7 @@
+{
+    "fe157": { "port": 8199, "frontend": "1.57.1" },
+    "fe1395": { "port": 8200, "frontend": "1.39.5", "frontendRoot": "web_custom_versions/Comfy-Org_ComfyUI_frontend/1.39.5" },
+    "v2-ref": { "port": 8202, "frontend": "1.57.1", "commit": "852af8a" },
+    "v1-ref": { "port": 8203, "frontend": "1.39.5", "frontendRoot": "web_custom_versions/Comfy-Org_ComfyUI_frontend/1.39.5", "commit": "1ecca1d" },
+    "interop": { "port": 8204, "frontend": "1.57.1", "packs": ["comfyui-kjnodes", "comfyui-magnifyglass"] }
+}

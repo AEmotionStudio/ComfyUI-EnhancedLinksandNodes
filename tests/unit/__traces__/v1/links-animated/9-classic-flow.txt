@@ -1,0 +1,1189 @@
+# Classic Flow (9), animated: v2 renderAnimatedStyle with v1 inputs
+# t=0s phase=0 totalTime=0
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 0]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #64b5f6
+lineWidth = 3
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(100, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(100, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(180, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(180, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #ff9cf9
+lineWidth = 3
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(100, 220)
+rotate(0.03)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(100, 220)
+rotate(0.03)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(430, 370)
+rotate(0.49)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(430, 370)
+rotate(0.49)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #b39ddb
+lineWidth = 3
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(420, 140)
+rotate(0.05)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(420, 140)
+rotate(0.05)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(400, 400)
+rotate(1.83)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(400, 400)
+rotate(1.83)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=18 path2d=0
+# t=0.4s phase=-1.05 totalTime=0.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 0]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #64b5f6
+lineWidth = 3
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(117.75, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(117.75, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(189.68, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(189.68, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #ff9cf9
+lineWidth = 3
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(130.54, 225.45)
+rotate(0.29)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(130.54, 225.45)
+rotate(0.29)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(496.83, 405.69)
+rotate(0.49)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(496.83, 405.69)
+rotate(0.49)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #b39ddb
+lineWidth = 3
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(437.82, 149.45)
+rotate(1.04)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(437.82, 149.45)
+rotate(1.04)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(383.55, 461.87)
+rotate(1.82)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(383.55, 461.87)
+rotate(1.82)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=18 path2d=0
+# t=0.9s phase=-2.36 totalTime=1.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 0]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #64b5f6
+lineWidth = 3
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(136.36, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(136.36, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(202.53, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(202.53, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #ff9cf9
+lineWidth = 3
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(184.79, 245.66)
+rotate(0.41)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(184.79, 245.66)
+rotate(0.41)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(577, 447.5)
+rotate(0.47)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(577, 447.5)
+rotate(0.47)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #b39ddb
+lineWidth = 3
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(444.92, 184.48)
+rotate(1.59)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(444.92, 184.48)
+rotate(1.59)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(366.17, 534.33)
+rotate(1.78)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(366.17, 534.33)
+rotate(1.78)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=18 path2d=0
+# t=1.9s phase=-4.97 totalTime=3.8
+save()
+imageSmoothingEnabled = true
+imageSmoothingQuality = high
+lineJoin = round
+lineCap = round
+miterLimit = 2
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 0]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #64b5f6
+lineWidth = 3
+beginPath()
+moveTo(100, 100)
+bezierCurveTo(180, 100, 180, 100, 260, 100)
+strokeStyle = #64b5f6
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(165.32, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(165.32, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(234.38, 100)
+rotate(0)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #64b5f6
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #64b5f6
+globalAlpha = 1
+save()
+translate(234.38, 100)
+rotate(0)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #ff9cf9
+lineWidth = 3
+beginPath()
+moveTo(100, 220)
+bezierCurveTo(200, 220, 660, 520, 760, 520)
+strokeStyle = #ff9cf9
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(330.44, 317.04)
+rotate(0.48)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(330.44, 317.04)
+rotate(0.48)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(709.69, 508.08)
+rotate(0.34)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #ff9cf9
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #ff9cf9
+globalAlpha = 1
+save()
+translate(709.69, 508.08)
+rotate(0.34)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+lineWidth = 3
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+lineWidth = 3.6
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = rgba(0, 0, 0, 0.95)
+lineWidth = 2.88
+stroke()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+strokeStyle = #b39ddb
+lineWidth = 3
+beginPath()
+moveTo(420, 140)
+bezierCurveTo(520, 140, 280, 660, 380, 660)
+strokeStyle = #b39ddb
+lineWidth = 2.4
+stroke()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(424.02, 308.2)
+rotate(1.81)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(424.02, 308.2)
+rotate(1.81)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+fillStyle = rgba(0, 0, 0, 0.95)
+strokeStyle = rgba(0, 0, 0, 0.95)
+shadowColor = rgba(0, 0, 0, 0.95)
+shadowBlur = NaN [ignored, keeps 10]
+shadowOffsetX = NaN [ignored, keeps 0]
+shadowOffsetY = NaN [ignored, keeps 0]
+globalAlpha = 1
+save()
+translate(357.51, 639.33)
+rotate(1.29)
+beginPath()
+moveTo(10.8, 0)
+lineTo(-10.8, 10.8)
+lineTo(-5.4, 0)
+lineTo(-10.8, -10.8)
+closePath()
+restore()
+fill()
+shadowColor = #b39ddb
+shadowBlur = 10
+shadowOffsetX = 0
+shadowOffsetY = 0
+fillStyle = #b39ddb
+globalAlpha = 1
+save()
+translate(357.51, 639.33)
+rotate(1.29)
+beginPath()
+moveTo(9, 0)
+lineTo(-9, 9)
+lineTo(-4.5, 0)
+lineTo(-9, -9)
+closePath()
+restore()
+fill()
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=18 path2d=0

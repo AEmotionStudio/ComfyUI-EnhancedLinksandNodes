@@ -1,0 +1,4813 @@
+# v1 AnimationEffects.neonNexus, particles only
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+lineCap = round
+lineJoin = round
+shadowColor = rgba(0, 0, 0, 0)
+save()
+translate(-7.2, -9.2)
+rotate(0)
+fillStyle = #ffb300
+globalAlpha = 0.4
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.6, 0)
+lineTo(0.97, 1.68)
+lineTo(-0.98, 1.7)
+lineTo(-1.66, 0)
+lineTo(-0.65, -1.12)
+lineTo(0.61, -1.05)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, -9.2)
+rotate(0.39)
+fillStyle = #ffb300
+globalAlpha = 0.568
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2, 0)
+lineTo(1.21, 2.1)
+lineTo(-1.23, 2.13)
+lineTo(-2.07, 0)
+lineTo(-0.81, -1.41)
+lineTo(0.76, -1.32)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, -9.2)
+rotate(0.79)
+fillStyle = #ffb300
+globalAlpha = 0.582
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.04, 0)
+lineTo(1.23, 2.13)
+lineTo(-1.25, 2.16)
+lineTo(-2.11, 0)
+lineTo(-0.83, -1.43)
+lineTo(0.77, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, -9.2)
+rotate(1.18)
+fillStyle = #ffb300
+globalAlpha = 0.428
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.67, 0)
+lineTo(1.01, 1.75)
+lineTo(-1.02, 1.77)
+lineTo(-1.73, 0)
+lineTo(-0.68, -1.17)
+lineTo(0.63, -1.1)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, -9.2)
+rotate(1.57)
+fillStyle = #ffb300
+globalAlpha = 0.249
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.24, 0)
+lineTo(0.75, 1.3)
+lineTo(-0.76, 1.31)
+lineTo(-1.28, 0)
+lineTo(-0.5, -0.87)
+lineTo(0.47, -0.81)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, -2.92)
+rotate(1.96)
+fillStyle = #ffb300
+globalAlpha = 0.208
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.14, 0)
+lineTo(0.69, 1.19)
+lineTo(-0.7, 1.21)
+lineTo(-1.18, 0)
+lineTo(-0.46, -0.8)
+lineTo(0.43, -0.75)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, -2.92)
+rotate(2.36)
+fillStyle = #ffb300
+globalAlpha = 0.344
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.47, 0)
+lineTo(0.89, 1.54)
+lineTo(-0.9, 1.56)
+lineTo(-1.52, 0)
+lineTo(-0.59, -1.03)
+lineTo(0.56, -0.97)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, -2.92)
+rotate(2.75)
+fillStyle = #ffb300
+globalAlpha = 0.531
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.92, 0)
+lineTo(1.16, 2.01)
+lineTo(-1.18, 2.04)
+lineTo(-1.98, 0)
+lineTo(-0.78, -1.34)
+lineTo(0.73, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, -2.92)
+rotate(3.14)
+fillStyle = #ffb300
+globalAlpha = 0.598
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.07, 0)
+lineTo(1.26, 2.17)
+lineTo(-1.27, 2.21)
+lineTo(-2.15, 0)
+lineTo(-0.84, -1.46)
+lineTo(0.79, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, -2.92)
+rotate(3.53)
+fillStyle = #ffb300
+globalAlpha = 0.482
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.8, 0)
+lineTo(1.09, 1.88)
+lineTo(-1.1, 1.91)
+lineTo(-1.86, 0)
+lineTo(-0.73, -1.26)
+lineTo(0.68, -1.18)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 1.82)
+rotate(3.93)
+fillStyle = #ffb300
+globalAlpha = 0.291
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.34, 0)
+lineTo(0.81, 1.4)
+lineTo(-0.82, 1.42)
+lineTo(-1.39, 0)
+lineTo(-0.54, -0.94)
+lineTo(0.51, -0.88)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 1.82)
+rotate(4.32)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.12, 0)
+lineTo(0.68, 1.17)
+lineTo(-0.69, 1.19)
+lineTo(-1.16, 0)
+lineTo(-0.45, -0.79)
+lineTo(0.43, -0.74)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 1.82)
+rotate(4.71)
+fillStyle = #ffb300
+globalAlpha = 0.293
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.34, 0)
+lineTo(0.81, 1.41)
+lineTo(-0.82, 1.43)
+lineTo(-1.39, 0)
+lineTo(-0.54, -0.94)
+lineTo(0.51, -0.88)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 1.82)
+rotate(5.11)
+fillStyle = #ffb300
+globalAlpha = 0.484
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.8, 0)
+lineTo(1.09, 1.89)
+lineTo(-1.11, 1.91)
+lineTo(-1.87, 0)
+lineTo(-0.73, -1.27)
+lineTo(0.68, -1.19)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 1.82)
+rotate(5.5)
+fillStyle = #ffb300
+globalAlpha = 0.598
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.08, 0)
+lineTo(1.26, 2.18)
+lineTo(-1.27, 2.21)
+lineTo(-2.15, 0)
+lineTo(-0.84, -1.46)
+lineTo(0.79, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 4.88)
+rotate(5.89)
+fillStyle = #ffb300
+globalAlpha = 0.53
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.91, 0)
+lineTo(1.16, 2)
+lineTo(-1.17, 2.03)
+lineTo(-1.98, 0)
+lineTo(-0.78, -1.34)
+lineTo(0.73, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 4.88)
+rotate(6.28)
+fillStyle = #ffb300
+globalAlpha = 0.342
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.46, 0)
+lineTo(0.88, 1.53)
+lineTo(-0.9, 1.55)
+lineTo(-1.51, 0)
+lineTo(-0.59, -1.03)
+lineTo(0.56, -0.96)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 4.88)
+rotate(6.68)
+fillStyle = #ffb300
+globalAlpha = 0.208
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.14, 0)
+lineTo(0.69, 1.19)
+lineTo(-0.7, 1.21)
+lineTo(-1.18, 0)
+lineTo(-0.46, -0.8)
+lineTo(0.43, -0.75)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 4.88)
+rotate(7.07)
+fillStyle = #ffb300
+globalAlpha = 0.25
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.24, 0)
+lineTo(0.75, 1.3)
+lineTo(-0.76, 1.32)
+lineTo(-1.28, 0)
+lineTo(-0.5, -0.87)
+lineTo(0.47, -0.82)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 4.88)
+rotate(7.46)
+fillStyle = #ffb300
+globalAlpha = 0.43
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.67, 0)
+lineTo(1.01, 1.75)
+lineTo(-1.03, 1.78)
+lineTo(-1.73, 0)
+lineTo(-0.68, -1.17)
+lineTo(0.64, -1.1)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 7.69)
+rotate(7.85)
+fillStyle = #ffb300
+globalAlpha = 0.583
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.04, 0)
+lineTo(1.23, 2.14)
+lineTo(-1.25, 2.17)
+lineTo(-2.11, 0)
+lineTo(-0.83, -1.43)
+lineTo(0.77, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 7.69)
+rotate(8.25)
+fillStyle = #ffb300
+globalAlpha = 0.567
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2, 0)
+lineTo(1.21, 2.1)
+lineTo(-1.23, 2.13)
+lineTo(-2.07, 0)
+lineTo(-0.81, -1.41)
+lineTo(0.76, -1.32)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 7.69)
+rotate(8.64)
+fillStyle = #ffb300
+globalAlpha = 0.398
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.6, 0)
+lineTo(0.97, 1.67)
+lineTo(-0.98, 1.7)
+lineTo(-1.65, 0)
+lineTo(-0.65, -1.12)
+lineTo(0.61, -1.05)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 7.69)
+rotate(9.03)
+fillStyle = #ffb300
+globalAlpha = 0.231
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.19, 0)
+lineTo(0.72, 1.25)
+lineTo(-0.73, 1.27)
+lineTo(-1.24, 0)
+lineTo(-0.48, -0.84)
+lineTo(0.45, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 7.69)
+rotate(9.42)
+fillStyle = #ffb300
+globalAlpha = 0.219
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.17, 0)
+lineTo(0.71, 1.22)
+lineTo(-0.72, 1.24)
+lineTo(-1.21, 0)
+lineTo(-0.47, -0.82)
+lineTo(0.44, -0.77)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 11.88)
+rotate(9.82)
+fillStyle = #ffb300
+globalAlpha = 0.374
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.54, 0)
+lineTo(0.93, 1.61)
+lineTo(-0.94, 1.63)
+lineTo(-1.59, 0)
+lineTo(-0.62, -1.08)
+lineTo(0.58, -1.01)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 11.88)
+rotate(10.21)
+fillStyle = #ffb300
+globalAlpha = 0.553
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.97, 0)
+lineTo(1.19, 2.06)
+lineTo(-1.21, 2.09)
+lineTo(-2.04, 0)
+lineTo(-0.8, -1.38)
+lineTo(0.75, -1.29)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 11.88)
+rotate(10.6)
+fillStyle = #ffb300
+globalAlpha = 0.591
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.06, 0)
+lineTo(1.25, 2.16)
+lineTo(-1.26, 2.19)
+lineTo(-2.13, 0)
+lineTo(-0.83, -1.45)
+lineTo(0.78, -1.36)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 11.88)
+rotate(11)
+fillStyle = #ffb300
+globalAlpha = 0.454
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.73, 0)
+lineTo(1.05, 1.81)
+lineTo(-1.06, 1.84)
+lineTo(-1.79, 0)
+lineTo(-0.7, -1.21)
+lineTo(0.66, -1.14)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 11.88)
+rotate(11.39)
+fillStyle = #ffb300
+globalAlpha = 0.267
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.28, 0)
+lineTo(0.78, 1.34)
+lineTo(-0.79, 1.36)
+lineTo(-1.33, 0)
+lineTo(-0.52, -0.9)
+lineTo(0.49, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 17.84)
+rotate(11.78)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.13, 0)
+lineTo(0.68, 1.18)
+lineTo(-0.69, 1.2)
+lineTo(-1.17, 0)
+lineTo(-0.46, -0.79)
+lineTo(0.43, -0.74)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 17.84)
+rotate(12.17)
+fillStyle = #ffb300
+globalAlpha = 0.319
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.41, 0)
+lineTo(0.85, 1.47)
+lineTo(-0.86, 1.49)
+lineTo(-1.46, 0)
+lineTo(-0.57, -0.99)
+lineTo(0.53, -0.93)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 17.84)
+rotate(12.57)
+fillStyle = #ffb300
+globalAlpha = 0.51
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.86, 0)
+lineTo(1.13, 1.95)
+lineTo(-1.14, 1.98)
+lineTo(-1.93, 0)
+lineTo(-0.76, -1.31)
+lineTo(0.71, -1.23)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 17.84)
+rotate(12.96)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.08, 0)
+lineTo(1.26, 2.18)
+lineTo(-1.28, 2.21)
+lineTo(-2.15, 0)
+lineTo(-0.84, -1.46)
+lineTo(0.79, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 17.84)
+rotate(13.35)
+fillStyle = #ffb300
+globalAlpha = 0.506
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.85, 0)
+lineTo(1.12, 1.94)
+lineTo(-1.14, 1.97)
+lineTo(-1.92, 0)
+lineTo(-0.75, -1.3)
+lineTo(0.7, -1.22)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 24.31)
+rotate(13.74)
+fillStyle = #ffb300
+globalAlpha = 0.314
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.39, 0)
+lineTo(0.84, 1.46)
+lineTo(-0.86, 1.48)
+lineTo(-1.44, 0)
+lineTo(-0.57, -0.98)
+lineTo(0.53, -0.92)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 24.31)
+rotate(14.14)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.12, 0)
+lineTo(0.68, 1.18)
+lineTo(-0.69, 1.19)
+lineTo(-1.16, 0)
+lineTo(-0.46, -0.79)
+lineTo(0.43, -0.74)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 24.31)
+rotate(14.53)
+fillStyle = #ffb300
+globalAlpha = 0.271
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.29, 0)
+lineTo(0.78, 1.35)
+lineTo(-0.79, 1.37)
+lineTo(-1.34, 0)
+lineTo(-0.52, -0.91)
+lineTo(0.49, -0.85)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 24.31)
+rotate(14.92)
+fillStyle = #ffb300
+globalAlpha = 0.459
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.74, 0)
+lineTo(1.05, 1.83)
+lineTo(-1.07, 1.85)
+lineTo(-1.8, 0)
+lineTo(-0.71, -1.22)
+lineTo(0.66, -1.15)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 24.31)
+rotate(15.32)
+fillStyle = #ffb300
+globalAlpha = 0.593
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.06, 0)
+lineTo(1.25, 2.16)
+lineTo(-1.27, 2.19)
+lineTo(-2.14, 0)
+lineTo(-0.84, -1.45)
+lineTo(0.78, -1.36)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 29.58)
+rotate(15.71)
+fillStyle = #ffb300
+globalAlpha = 0.549
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.96, 0)
+lineTo(1.18, 2.05)
+lineTo(-1.2, 2.08)
+lineTo(-2.03, 0)
+lineTo(-0.79, -1.37)
+lineTo(0.74, -1.29)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 29.58)
+rotate(16.1)
+fillStyle = #ffb300
+globalAlpha = 0.368
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.52, 0)
+lineTo(0.92, 1.6)
+lineTo(-0.94, 1.62)
+lineTo(-1.58, 0)
+lineTo(-0.62, -1.07)
+lineTo(0.58, -1)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 29.58)
+rotate(16.49)
+fillStyle = #ffb300
+globalAlpha = 0.217
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.16, 0)
+lineTo(0.7, 1.22)
+lineTo(-0.71, 1.23)
+lineTo(-1.2, 0)
+lineTo(-0.47, -0.81)
+lineTo(0.44, -0.76)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 29.58)
+rotate(16.89)
+fillStyle = #ffb300
+globalAlpha = 0.234
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.2, 0)
+lineTo(0.73, 1.26)
+lineTo(-0.74, 1.28)
+lineTo(-1.24, 0)
+lineTo(-0.49, -0.84)
+lineTo(0.46, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 29.58)
+rotate(17.28)
+fillStyle = #ffb300
+globalAlpha = 0.404
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.61, 0)
+lineTo(0.97, 1.69)
+lineTo(-0.99, 1.71)
+lineTo(-1.67, 0)
+lineTo(-0.65, -1.13)
+lineTo(0.61, -1.06)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 33.02)
+rotate(17.67)
+fillStyle = #ffb300
+globalAlpha = 0.57
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.01, 0)
+lineTo(1.22, 2.11)
+lineTo(-1.23, 2.13)
+lineTo(-2.08, 0)
+lineTo(-0.81, -1.41)
+lineTo(0.76, -1.32)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 33.02)
+rotate(18.06)
+fillStyle = #ffb300
+globalAlpha = 0.58
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.03, 0)
+lineTo(1.23, 2.13)
+lineTo(-1.25, 2.16)
+lineTo(-2.1, 0)
+lineTo(-0.82, -1.43)
+lineTo(0.77, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 33.02)
+rotate(18.46)
+fillStyle = #ffb300
+globalAlpha = 0.425
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.66, 0)
+lineTo(1, 1.74)
+lineTo(-1.02, 1.76)
+lineTo(-1.72, 0)
+lineTo(-0.67, -1.17)
+lineTo(0.63, -1.09)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 33.02)
+rotate(18.85)
+fillStyle = #ffb300
+globalAlpha = 0.246
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.23, 0)
+lineTo(0.75, 1.29)
+lineTo(-0.76, 1.31)
+lineTo(-1.27, 0)
+lineTo(-0.5, -0.86)
+lineTo(0.47, -0.81)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 33.02)
+rotate(19.24)
+fillStyle = #ffb300
+globalAlpha = 0.209
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.14, 0)
+lineTo(0.69, 1.2)
+lineTo(-0.7, 1.21)
+lineTo(-1.18, 0)
+lineTo(-0.46, -0.8)
+lineTo(0.43, -0.75)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 35.71)
+rotate(19.63)
+fillStyle = #ffb300
+globalAlpha = 0.348
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.47, 0)
+lineTo(0.89, 1.55)
+lineTo(-0.9, 1.57)
+lineTo(-1.53, 0)
+lineTo(-0.6, -1.04)
+lineTo(0.56, -0.97)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 35.71)
+rotate(20.03)
+fillStyle = #ffb300
+globalAlpha = 0.534
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.92, 0)
+lineTo(1.16, 2.01)
+lineTo(-1.18, 2.04)
+lineTo(-1.99, 0)
+lineTo(-0.78, -1.35)
+lineTo(0.73, -1.27)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 35.71)
+rotate(20.42)
+fillStyle = #ffb300
+globalAlpha = 0.597
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.07, 0)
+lineTo(1.25, 2.17)
+lineTo(-1.27, 2.2)
+lineTo(-2.15, 0)
+lineTo(-0.84, -1.46)
+lineTo(0.79, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 35.71)
+rotate(20.81)
+fillStyle = #ffb300
+globalAlpha = 0.479
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.79, 0)
+lineTo(1.08, 1.88)
+lineTo(-1.1, 1.9)
+lineTo(-1.85, 0)
+lineTo(-0.73, -1.26)
+lineTo(0.68, -1.18)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 35.71)
+rotate(21.21)
+fillStyle = #ffb300
+globalAlpha = 0.288
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.33, 0)
+lineTo(0.81, 1.4)
+lineTo(-0.82, 1.42)
+lineTo(-1.38, 0)
+lineTo(-0.54, -0.94)
+lineTo(0.51, -0.88)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 39.4)
+rotate(21.6)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.12, 0)
+lineTo(0.68, 1.17)
+lineTo(-0.69, 1.19)
+lineTo(-1.16, 0)
+lineTo(-0.45, -0.79)
+lineTo(0.43, -0.74)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 39.4)
+rotate(21.99)
+fillStyle = #ffb300
+globalAlpha = 0.296
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.35, 0)
+lineTo(0.82, 1.41)
+lineTo(-0.83, 1.43)
+lineTo(-1.4, 0)
+lineTo(-0.55, -0.95)
+lineTo(0.51, -0.89)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 39.4)
+rotate(22.38)
+fillStyle = #ffb300
+globalAlpha = 0.487
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.81, 0)
+lineTo(1.09, 1.9)
+lineTo(-1.11, 1.92)
+lineTo(-1.87, 0)
+lineTo(-0.73, -1.27)
+lineTo(0.69, -1.19)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 39.4)
+rotate(22.78)
+fillStyle = #ffb300
+globalAlpha = 0.599
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.08, 0)
+lineTo(1.26, 2.18)
+lineTo(-1.27, 2.21)
+lineTo(-2.15, 0)
+lineTo(-0.84, -1.46)
+lineTo(0.79, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 39.4)
+rotate(23.17)
+fillStyle = #ffb300
+globalAlpha = 0.527
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.91, 0)
+lineTo(1.15, 2)
+lineTo(-1.17, 2.03)
+lineTo(-1.97, 0)
+lineTo(-0.77, -1.34)
+lineTo(0.72, -1.25)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 44.93)
+rotate(23.56)
+fillStyle = #ffb300
+globalAlpha = 0.339
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.45, 0)
+lineTo(0.88, 1.52)
+lineTo(-0.89, 1.55)
+lineTo(-1.5, 0)
+lineTo(-0.59, -1.02)
+lineTo(0.55, -0.96)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 44.93)
+rotate(23.95)
+fillStyle = #ffb300
+globalAlpha = 0.207
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.14, 0)
+lineTo(0.69, 1.19)
+lineTo(-0.7, 1.21)
+lineTo(-1.18, 0)
+lineTo(-0.46, -0.8)
+lineTo(0.43, -0.75)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 44.93)
+rotate(24.35)
+fillStyle = #ffb300
+globalAlpha = 0.252
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.25, 0)
+lineTo(0.75, 1.31)
+lineTo(-0.76, 1.32)
+lineTo(-1.29, 0)
+lineTo(-0.5, -0.87)
+lineTo(0.47, -0.82)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 44.93)
+rotate(24.74)
+fillStyle = #ffb300
+globalAlpha = 0.433
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.68, 0)
+lineTo(1.02, 1.76)
+lineTo(-1.03, 1.79)
+lineTo(-1.74, 0)
+lineTo(-0.68, -1.18)
+lineTo(0.64, -1.11)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 44.93)
+rotate(25.13)
+fillStyle = #ffb300
+globalAlpha = 0.584
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.04, 0)
+lineTo(1.24, 2.14)
+lineTo(-1.25, 2.17)
+lineTo(-2.11, 0)
+lineTo(-0.83, -1.43)
+lineTo(0.78, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(-7.2, 51.44)
+rotate(25.53)
+fillStyle = #ffb300
+globalAlpha = 0.565
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2, 0)
+lineTo(1.21, 2.09)
+lineTo(-1.23, 2.12)
+lineTo(-2.07, 0)
+lineTo(-0.81, -1.4)
+lineTo(0.76, -1.31)
+closePath()
+fill()
+restore()
+save()
+translate(-3.52, 51.44)
+rotate(25.92)
+fillStyle = #ffb300
+globalAlpha = 0.395
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.59, 0)
+lineTo(0.96, 1.66)
+lineTo(-0.97, 1.69)
+lineTo(-1.64, 0)
+lineTo(-0.64, -1.11)
+lineTo(0.6, -1.05)
+closePath()
+fill()
+restore()
+save()
+translate(-0.83, 51.44)
+rotate(26.31)
+fillStyle = #ffb300
+globalAlpha = 0.229
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.19, 0)
+lineTo(0.72, 1.25)
+lineTo(-0.73, 1.26)
+lineTo(-1.23, 0)
+lineTo(-0.48, -0.84)
+lineTo(0.45, -0.78)
+closePath()
+fill()
+restore()
+save()
+translate(2.62, 51.44)
+rotate(26.7)
+fillStyle = #ffb300
+globalAlpha = 0.22
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.17, 0)
+lineTo(0.71, 1.23)
+lineTo(-0.72, 1.24)
+lineTo(-1.21, 0)
+lineTo(-0.47, -0.82)
+lineTo(0.44, -0.77)
+closePath()
+fill()
+restore()
+save()
+translate(7.89, 51.44)
+rotate(27.1)
+fillStyle = #ffb300
+globalAlpha = 0.377
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.54, 0)
+lineTo(0.93, 1.62)
+lineTo(-0.95, 1.64)
+lineTo(-1.6, 0)
+lineTo(-0.63, -1.08)
+lineTo(0.59, -1.02)
+closePath()
+fill()
+restore()
+globalAlpha = 1
+setLineDash([])
+shadowBlur = 0
+globalCompositeOperation = source-over
+restore()
+# gradients=0 shadowBlurSets=72 path2d=0
+# t=0.4s phase=0.17 particleTime=0.17 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+lineCap = round
+lineJoin = round
+shadowColor = rgba(0, 0, 0, 0)
+save()
+translate(-22.03, -23.67)
+rotate(0.17)
+fillStyle = #ffb300
+globalAlpha = 0.496
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.06, 0.35)
+lineTo(0.76, 2.04)
+lineTo(-1.2, 1.46)
+lineTo(-1.46, -0.25)
+lineTo(-0.46, -1.24)
+lineTo(1, -1.21)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, -23.67)
+rotate(0.56)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.42, 0.41)
+lineTo(0.89, 2.4)
+lineTo(-1.42, 1.71)
+lineTo(-1.71, -0.29)
+lineTo(-0.54, -1.46)
+lineTo(1.18, -1.42)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, -23.67)
+rotate(0.95)
+fillStyle = #ffb300
+globalAlpha = 0.519
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.28, 0.38)
+lineTo(0.84, 2.26)
+lineTo(-1.33, 1.61)
+lineTo(-1.61, -0.27)
+lineTo(-0.51, -1.37)
+lineTo(1.11, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(10, -23.67)
+rotate(1.35)
+fillStyle = #ffb300
+globalAlpha = 0.329
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.76, 0.3)
+lineTo(0.65, 1.75)
+lineTo(-1.03, 1.25)
+lineTo(-1.25, -0.21)
+lineTo(-0.4, -1.06)
+lineTo(0.86, -1.04)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, -23.67)
+rotate(1.74)
+fillStyle = #ffb300
+globalAlpha = 0.204
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.35, 0.23)
+lineTo(0.5, 1.34)
+lineTo(-0.79, 0.96)
+lineTo(-0.96, -0.16)
+lineTo(-0.3, -0.81)
+lineTo(0.66, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, -10.16)
+rotate(2.13)
+fillStyle = #ffb300
+globalAlpha = 0.259
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.41, 0.24)
+lineTo(0.52, 1.41)
+lineTo(-0.83, 1)
+lineTo(-1, -0.17)
+lineTo(-0.32, -0.85)
+lineTo(0.69, -0.83)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, -10.16)
+rotate(2.52)
+fillStyle = #ffb300
+globalAlpha = 0.444
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.9, 0.32)
+lineTo(0.7, 1.89)
+lineTo(-1.11, 1.35)
+lineTo(-1.35, -0.23)
+lineTo(-0.43, -1.15)
+lineTo(0.92, -1.12)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, -10.16)
+rotate(2.92)
+fillStyle = #ffb300
+globalAlpha = 0.588
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.4)
+lineTo(0.87, 2.35)
+lineTo(-1.38, 1.67)
+lineTo(-1.67, -0.28)
+lineTo(-0.53, -1.42)
+lineTo(1.15, -1.39)
+closePath()
+fill()
+restore()
+save()
+translate(10, -10.16)
+rotate(3.31)
+fillStyle = #ffb300
+globalAlpha = 0.559
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.37, 0.4)
+lineTo(0.88, 2.36)
+lineTo(-1.39, 1.68)
+lineTo(-1.68, -0.28)
+lineTo(-0.53, -1.43)
+lineTo(1.15, -1.39)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, -10.16)
+rotate(3.7)
+fillStyle = #ffb300
+globalAlpha = 0.384
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.92, 0.32)
+lineTo(0.71, 1.91)
+lineTo(-1.13, 1.36)
+lineTo(-1.36, -0.23)
+lineTo(-0.43, -1.16)
+lineTo(0.93, -1.13)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 1.65)
+rotate(4.09)
+fillStyle = #ffb300
+globalAlpha = 0.224
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.43, 0.24)
+lineTo(0.53, 1.42)
+lineTo(-0.84, 1.01)
+lineTo(-1.01, -0.17)
+lineTo(-0.32, -0.86)
+lineTo(0.69, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 1.65)
+rotate(4.49)
+fillStyle = #ffb300
+globalAlpha = 0.225
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.34, 0.23)
+lineTo(0.5, 1.33)
+lineTo(-0.79, 0.95)
+lineTo(-0.95, -0.16)
+lineTo(-0.3, -0.81)
+lineTo(0.65, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 1.65)
+rotate(4.88)
+fillStyle = #ffb300
+globalAlpha = 0.387
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.74, 0.29)
+lineTo(0.64, 1.73)
+lineTo(-1.02, 1.23)
+lineTo(-1.23, -0.21)
+lineTo(-0.39, -1.05)
+lineTo(0.85, -1.02)
+closePath()
+fill()
+restore()
+save()
+translate(10, 1.65)
+rotate(5.27)
+fillStyle = #ffb300
+globalAlpha = 0.561
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.26, 0.38)
+lineTo(0.84, 2.25)
+lineTo(-1.32, 1.6)
+lineTo(-1.6, -0.27)
+lineTo(-0.51, -1.36)
+lineTo(1.1, -1.33)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 1.65)
+rotate(5.67)
+fillStyle = #ffb300
+globalAlpha = 0.587
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.42, 0.41)
+lineTo(0.9, 2.41)
+lineTo(-1.42, 1.71)
+lineTo(-1.71, -0.29)
+lineTo(-0.54, -1.46)
+lineTo(1.18, -1.42)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 11.95)
+rotate(6.06)
+fillStyle = #ffb300
+globalAlpha = 0.441
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.08, 0.35)
+lineTo(0.77, 2.06)
+lineTo(-1.22, 1.47)
+lineTo(-1.47, -0.25)
+lineTo(-0.47, -1.25)
+lineTo(1.01, -1.22)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 11.95)
+rotate(6.45)
+fillStyle = #ffb300
+globalAlpha = 0.257
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.54, 0.26)
+lineTo(0.57, 1.53)
+lineTo(-0.9, 1.09)
+lineTo(-1.09, -0.18)
+lineTo(-0.35, -0.93)
+lineTo(0.75, -0.91)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 11.95)
+rotate(6.84)
+fillStyle = #ffb300
+globalAlpha = 0.205
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.31, 0.22)
+lineTo(0.48, 1.3)
+lineTo(-0.77, 0.93)
+lineTo(-0.93, -0.16)
+lineTo(-0.29, -0.79)
+lineTo(0.64, -0.77)
+closePath()
+fill()
+restore()
+save()
+translate(10, 11.95)
+rotate(7.24)
+fillStyle = #ffb300
+globalAlpha = 0.332
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.59, 0.27)
+lineTo(0.59, 1.59)
+lineTo(-0.93, 1.13)
+lineTo(-1.13, -0.19)
+lineTo(-0.36, -0.96)
+lineTo(0.78, -0.94)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 11.95)
+rotate(7.63)
+fillStyle = #ffb300
+globalAlpha = 0.522
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.13, 0.36)
+lineTo(0.79, 2.12)
+lineTo(-1.25, 1.51)
+lineTo(-1.51, -0.26)
+lineTo(-0.48, -1.29)
+lineTo(1.04, -1.25)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 22.29)
+rotate(8.02)
+fillStyle = #ffb300
+globalAlpha = 0.599
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.43, 0.41)
+lineTo(0.9, 2.42)
+lineTo(-1.42, 1.72)
+lineTo(-1.72, -0.29)
+lineTo(-0.54, -1.46)
+lineTo(1.18, -1.43)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 22.29)
+rotate(8.41)
+fillStyle = #ffb300
+globalAlpha = 0.494
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.21, 0.37)
+lineTo(0.82, 2.2)
+lineTo(-1.3, 1.57)
+lineTo(-1.57, -0.27)
+lineTo(-0.5, -1.33)
+lineTo(1.08, -1.3)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 22.29)
+rotate(8.81)
+fillStyle = #ffb300
+globalAlpha = 0.302
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.68, 0.28)
+lineTo(0.62, 1.67)
+lineTo(-0.99, 1.19)
+lineTo(-1.19, -0.2)
+lineTo(-0.38, -1.01)
+lineTo(0.82, -0.99)
+closePath()
+fill()
+restore()
+save()
+translate(10, 22.29)
+rotate(9.2)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.32, 0.22)
+lineTo(0.49, 1.32)
+lineTo(-0.78, 0.94)
+lineTo(-0.94, -0.16)
+lineTo(-0.3, -0.8)
+lineTo(0.64, -0.78)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 22.29)
+rotate(9.59)
+fillStyle = #ffb300
+globalAlpha = 0.282
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.47, 0.25)
+lineTo(0.54, 1.46)
+lineTo(-0.86, 1.04)
+lineTo(-1.04, -0.18)
+lineTo(-0.33, -0.89)
+lineTo(0.71, -0.86)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 34.2)
+rotate(9.99)
+fillStyle = #ffb300
+globalAlpha = 0.472
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.98, 0.34)
+lineTo(0.73, 1.97)
+lineTo(-1.16, 1.4)
+lineTo(-1.4, -0.24)
+lineTo(-0.44, -1.2)
+lineTo(0.96, -1.17)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 34.2)
+rotate(10.38)
+fillStyle = #ffb300
+globalAlpha = 0.596
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.39, 0.4)
+lineTo(0.89, 2.38)
+lineTo(-1.4, 1.7)
+lineTo(-1.7, -0.29)
+lineTo(-0.54, -1.44)
+lineTo(1.16, -1.41)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 34.2)
+rotate(10.77)
+fillStyle = #ffb300
+globalAlpha = 0.539
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.32, 0.39)
+lineTo(0.86, 2.31)
+lineTo(-1.36, 1.65)
+lineTo(-1.65, -0.28)
+lineTo(-0.52, -1.4)
+lineTo(1.13, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(10, 34.2)
+rotate(11.16)
+fillStyle = #ffb300
+globalAlpha = 0.355
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.84, 0.31)
+lineTo(0.68, 1.83)
+lineTo(-1.08, 1.3)
+lineTo(-1.3, -0.22)
+lineTo(-0.41, -1.11)
+lineTo(0.89, -1.08)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 34.2)
+rotate(11.56)
+fillStyle = #ffb300
+globalAlpha = 0.212
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.38, 0.23)
+lineTo(0.51, 1.37)
+lineTo(-0.81, 0.98)
+lineTo(-0.98, -0.17)
+lineTo(-0.31, -0.83)
+lineTo(0.67, -0.81)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 47.77)
+rotate(11.95)
+fillStyle = #ffb300
+globalAlpha = 0.242
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.38, 0.23)
+lineTo(0.51, 1.37)
+lineTo(-0.81, 0.97)
+lineTo(-0.97, -0.16)
+lineTo(-0.31, -0.83)
+lineTo(0.67, -0.81)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 47.77)
+rotate(12.34)
+fillStyle = #ffb300
+globalAlpha = 0.417
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.83, 0.31)
+lineTo(0.68, 1.82)
+lineTo(-1.07, 1.29)
+lineTo(-1.29, -0.22)
+lineTo(-0.41, -1.1)
+lineTo(0.89, -1.07)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 47.77)
+rotate(12.73)
+fillStyle = #ffb300
+globalAlpha = 0.577
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.32, 0.39)
+lineTo(0.86, 2.31)
+lineTo(-1.36, 1.64)
+lineTo(-1.64, -0.28)
+lineTo(-0.52, -1.4)
+lineTo(1.13, -1.36)
+closePath()
+fill()
+restore()
+save()
+translate(10, 47.77)
+rotate(13.13)
+fillStyle = #ffb300
+globalAlpha = 0.574
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.4, 0.41)
+lineTo(0.89, 2.39)
+lineTo(-1.41, 1.7)
+lineTo(-1.7, -0.29)
+lineTo(-0.54, -1.45)
+lineTo(1.17, -1.41)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 47.77)
+rotate(13.52)
+fillStyle = #ffb300
+globalAlpha = 0.411
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.99, 0.34)
+lineTo(0.74, 1.98)
+lineTo(-1.17, 1.41)
+lineTo(-1.41, -0.24)
+lineTo(-0.45, -1.2)
+lineTo(0.97, -1.17)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 61.55)
+rotate(13.91)
+fillStyle = #ffb300
+globalAlpha = 0.238
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.48, 0.25)
+lineTo(0.55, 1.47)
+lineTo(-0.87, 1.05)
+lineTo(-1.05, -0.18)
+lineTo(-0.33, -0.89)
+lineTo(0.72, -0.87)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 61.55)
+rotate(14.3)
+fillStyle = #ffb300
+globalAlpha = 0.214
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.32, 0.22)
+lineTo(0.49, 1.31)
+lineTo(-0.77, 0.94)
+lineTo(-0.94, -0.16)
+lineTo(-0.3, -0.8)
+lineTo(0.64, -0.78)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 61.55)
+rotate(14.7)
+fillStyle = #ffb300
+globalAlpha = 0.361
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.67, 0.28)
+lineTo(0.62, 1.66)
+lineTo(-0.98, 1.18)
+lineTo(-1.18, -0.2)
+lineTo(-0.37, -1.01)
+lineTo(0.81, -0.98)
+closePath()
+fill()
+restore()
+save()
+translate(10, 61.55)
+rotate(15.09)
+fillStyle = #ffb300
+globalAlpha = 0.544
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.2, 0.37)
+lineTo(0.82, 2.19)
+lineTo(-1.29, 1.56)
+lineTo(-1.56, -0.26)
+lineTo(-0.49, -1.33)
+lineTo(1.07, -1.3)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 61.55)
+rotate(15.48)
+fillStyle = #ffb300
+globalAlpha = 0.595
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.43, 0.41)
+lineTo(0.9, 2.42)
+lineTo(-1.42, 1.72)
+lineTo(-1.72, -0.29)
+lineTo(-0.54, -1.47)
+lineTo(1.18, -1.43)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 73.9)
+rotate(15.88)
+fillStyle = #ffb300
+globalAlpha = 0.466
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.14, 0.36)
+lineTo(0.79, 2.13)
+lineTo(-1.26, 1.52)
+lineTo(-1.52, -0.26)
+lineTo(-0.48, -1.29)
+lineTo(1.04, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 73.9)
+rotate(16.27)
+fillStyle = #ffb300
+globalAlpha = 0.277
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.6, 0.27)
+lineTo(0.59, 1.6)
+lineTo(-0.94, 1.14)
+lineTo(-1.14, -0.19)
+lineTo(-0.36, -0.97)
+lineTo(0.78, -0.94)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 73.9)
+rotate(16.66)
+fillStyle = #ffb300
+globalAlpha = 0.201
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.31, 0.22)
+lineTo(0.49, 1.3)
+lineTo(-0.77, 0.93)
+lineTo(-0.93, -0.16)
+lineTo(-0.29, -0.79)
+lineTo(0.64, -0.77)
+closePath()
+fill()
+restore()
+save()
+translate(10, 73.9)
+rotate(17.05)
+fillStyle = #ffb300
+globalAlpha = 0.308
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.53, 0.26)
+lineTo(0.57, 1.52)
+lineTo(-0.9, 1.09)
+lineTo(-1.09, -0.18)
+lineTo(-0.34, -0.92)
+lineTo(0.75, -0.9)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 73.9)
+rotate(17.45)
+fillStyle = #ffb300
+globalAlpha = 0.499
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.06, 0.35)
+lineTo(0.76, 2.05)
+lineTo(-1.21, 1.46)
+lineTo(-1.46, -0.25)
+lineTo(-0.46, -1.24)
+lineTo(1, -1.21)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 84.51)
+rotate(17.84)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.42, 0.41)
+lineTo(0.89, 2.41)
+lineTo(-1.42, 1.71)
+lineTo(-1.71, -0.29)
+lineTo(-0.54, -1.46)
+lineTo(1.18, -1.42)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 84.51)
+rotate(18.23)
+fillStyle = #ffb300
+globalAlpha = 0.516
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.27, 0.38)
+lineTo(0.84, 2.26)
+lineTo(-1.33, 1.61)
+lineTo(-1.61, -0.27)
+lineTo(-0.51, -1.37)
+lineTo(1.1, -1.33)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 84.51)
+rotate(18.62)
+fillStyle = #ffb300
+globalAlpha = 0.326
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.75, 0.3)
+lineTo(0.65, 1.74)
+lineTo(-1.03, 1.24)
+lineTo(-1.24, -0.21)
+lineTo(-0.39, -1.06)
+lineTo(0.85, -1.03)
+closePath()
+fill()
+restore()
+save()
+translate(10, 84.51)
+rotate(19.02)
+fillStyle = #ffb300
+globalAlpha = 0.204
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.35, 0.23)
+lineTo(0.5, 1.34)
+lineTo(-0.79, 0.95)
+lineTo(-0.95, -0.16)
+lineTo(-0.3, -0.81)
+lineTo(0.65, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 84.51)
+rotate(19.41)
+fillStyle = #ffb300
+globalAlpha = 0.262
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.42, 0.24)
+lineTo(0.53, 1.41)
+lineTo(-0.83, 1.01)
+lineTo(-1.01, -0.17)
+lineTo(-0.32, -0.86)
+lineTo(0.69, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 94.65)
+rotate(19.8)
+fillStyle = #ffb300
+globalAlpha = 0.447
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.91, 0.32)
+lineTo(0.71, 1.9)
+lineTo(-1.12, 1.35)
+lineTo(-1.35, -0.23)
+lineTo(-0.43, -1.15)
+lineTo(0.93, -1.12)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 94.65)
+rotate(20.2)
+fillStyle = #ffb300
+globalAlpha = 0.589
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.4)
+lineTo(0.87, 2.35)
+lineTo(-1.38, 1.67)
+lineTo(-1.67, -0.28)
+lineTo(-0.53, -1.42)
+lineTo(1.15, -1.39)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 94.65)
+rotate(20.59)
+fillStyle = #ffb300
+globalAlpha = 0.557
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.4)
+lineTo(0.87, 2.35)
+lineTo(-1.38, 1.67)
+lineTo(-1.67, -0.28)
+lineTo(-0.53, -1.42)
+lineTo(1.15, -1.39)
+closePath()
+fill()
+restore()
+save()
+translate(10, 94.65)
+rotate(20.98)
+fillStyle = #ffb300
+globalAlpha = 0.381
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.91, 0.32)
+lineTo(0.71, 1.9)
+lineTo(-1.12, 1.35)
+lineTo(-1.35, -0.23)
+lineTo(-0.43, -1.15)
+lineTo(0.93, -1.12)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 94.65)
+rotate(21.37)
+fillStyle = #ffb300
+globalAlpha = 0.222
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.42, 0.24)
+lineTo(0.53, 1.41)
+lineTo(-0.83, 1.01)
+lineTo(-1.01, -0.17)
+lineTo(-0.32, -0.86)
+lineTo(0.69, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 106.03)
+rotate(21.77)
+fillStyle = #ffb300
+globalAlpha = 0.227
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.34, 0.23)
+lineTo(0.5, 1.34)
+lineTo(-0.79, 0.95)
+lineTo(-0.95, -0.16)
+lineTo(-0.3, -0.81)
+lineTo(0.65, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 106.03)
+rotate(22.16)
+fillStyle = #ffb300
+globalAlpha = 0.391
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.75, 0.3)
+lineTo(0.65, 1.74)
+lineTo(-1.03, 1.24)
+lineTo(-1.24, -0.21)
+lineTo(-0.39, -1.06)
+lineTo(0.85, -1.03)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 106.03)
+rotate(22.55)
+fillStyle = #ffb300
+globalAlpha = 0.563
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.27, 0.38)
+lineTo(0.84, 2.26)
+lineTo(-1.33, 1.61)
+lineTo(-1.61, -0.27)
+lineTo(-0.51, -1.37)
+lineTo(1.1, -1.33)
+closePath()
+fill()
+restore()
+save()
+translate(10, 106.03)
+rotate(22.94)
+fillStyle = #ffb300
+globalAlpha = 0.585
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.42, 0.41)
+lineTo(0.9, 2.41)
+lineTo(-1.42, 1.71)
+lineTo(-1.71, -0.29)
+lineTo(-0.54, -1.46)
+lineTo(1.18, -1.42)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 106.03)
+rotate(23.34)
+fillStyle = #ffb300
+globalAlpha = 0.437
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.07, 0.35)
+lineTo(0.76, 2.06)
+lineTo(-1.21, 1.46)
+lineTo(-1.46, -0.25)
+lineTo(-0.46, -1.25)
+lineTo(1, -1.21)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 119.22)
+rotate(23.73)
+fillStyle = #ffb300
+globalAlpha = 0.255
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.53, 0.26)
+lineTo(0.57, 1.53)
+lineTo(-0.9, 1.09)
+lineTo(-1.09, -0.18)
+lineTo(-0.34, -0.92)
+lineTo(0.75, -0.9)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 119.22)
+rotate(24.12)
+fillStyle = #ffb300
+globalAlpha = 0.206
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.31, 0.22)
+lineTo(0.49, 1.3)
+lineTo(-0.77, 0.93)
+lineTo(-0.93, -0.16)
+lineTo(-0.29, -0.79)
+lineTo(0.64, -0.77)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 119.22)
+rotate(24.51)
+fillStyle = #ffb300
+globalAlpha = 0.335
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.6, 0.27)
+lineTo(0.59, 1.6)
+lineTo(-0.94, 1.14)
+lineTo(-1.14, -0.19)
+lineTo(-0.36, -0.97)
+lineTo(0.78, -0.94)
+closePath()
+fill()
+restore()
+save()
+translate(10, 119.22)
+rotate(24.91)
+fillStyle = #ffb300
+globalAlpha = 0.524
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.14, 0.36)
+lineTo(0.79, 2.13)
+lineTo(-1.25, 1.52)
+lineTo(-1.52, -0.26)
+lineTo(-0.48, -1.29)
+lineTo(1.04, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 119.22)
+rotate(25.3)
+fillStyle = #ffb300
+globalAlpha = 0.599
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.43, 0.41)
+lineTo(0.9, 2.42)
+lineTo(-1.42, 1.72)
+lineTo(-1.72, -0.29)
+lineTo(-0.54, -1.47)
+lineTo(1.18, -1.43)
+closePath()
+fill()
+restore()
+save()
+translate(-22.03, 133.13)
+rotate(25.69)
+fillStyle = #ffb300
+globalAlpha = 0.491
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.21, 0.37)
+lineTo(0.82, 2.19)
+lineTo(-1.29, 1.56)
+lineTo(-1.56, -0.26)
+lineTo(-0.49, -1.33)
+lineTo(1.07, -1.3)
+closePath()
+fill()
+restore()
+save()
+translate(-11.22, 133.13)
+rotate(26.09)
+fillStyle = #ffb300
+globalAlpha = 0.299
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.67, 0.28)
+lineTo(0.62, 1.66)
+lineTo(-0.98, 1.18)
+lineTo(-1.18, -0.2)
+lineTo(-0.37, -1.01)
+lineTo(0.81, -0.98)
+closePath()
+fill()
+restore()
+save()
+translate(-1.12, 133.13)
+rotate(26.48)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.32, 0.22)
+lineTo(0.49, 1.32)
+lineTo(-0.77, 0.94)
+lineTo(-0.94, -0.16)
+lineTo(-0.3, -0.8)
+lineTo(0.64, -0.78)
+closePath()
+fill()
+restore()
+save()
+translate(10, 133.13)
+rotate(26.87)
+fillStyle = #ffb300
+globalAlpha = 0.285
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.48, 0.25)
+lineTo(0.55, 1.47)
+lineTo(-0.86, 1.05)
+lineTo(-1.05, -0.18)
+lineTo(-0.33, -0.89)
+lineTo(0.72, -0.87)
+closePath()
+fill()
+restore()
+save()
+translate(22.96, 133.13)
+rotate(27.26)
+fillStyle = #ffb300
+globalAlpha = 0.476
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.99, 0.34)
+lineTo(0.74, 1.98)
+lineTo(-1.17, 1.41)
+lineTo(-1.41, -0.24)
+lineTo(-0.45, -1.2)
+lineTo(0.97, -1.17)
+closePath()
+fill()
+restore()
+globalAlpha = 1
+setLineDash([])
+shadowBlur = 0
+globalCompositeOperation = source-over
+restore()
+# gradients=0 shadowBlurSets=72 path2d=0
+# t=0.9s phase=0.38 particleTime=0.38 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+lineCap = round
+lineJoin = round
+shadowColor = rgba(0, 0, 0, 0)
+save()
+translate(-50.14, -51.26)
+rotate(0.38)
+fillStyle = #ffb300
+globalAlpha = 0.581
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.22, 0.88)
+lineTo(0.3, 2.03)
+lineTo(-1.26, 1)
+lineTo(-1.35, -0.54)
+lineTo(-0.25, -1.72)
+lineTo(1.73, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, -51.26)
+rotate(0.77)
+fillStyle = #ffb300
+globalAlpha = 0.569
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.38, 0.94)
+lineTo(0.32, 2.18)
+lineTo(-1.35, 1.07)
+lineTo(-1.45, -0.57)
+lineTo(-0.27, -1.85)
+lineTo(1.85, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, -51.26)
+rotate(1.16)
+fillStyle = #ffb300
+globalAlpha = 0.402
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.05, 0.81)
+lineTo(0.28, 1.87)
+lineTo(-1.16, 0.92)
+lineTo(-1.25, -0.49)
+lineTo(-0.24, -1.59)
+lineTo(1.59, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, -51.26)
+rotate(1.56)
+fillStyle = #ffb300
+globalAlpha = 0.233
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.52, 0.6)
+lineTo(0.21, 1.39)
+lineTo(-0.86, 0.68)
+lineTo(-0.93, -0.37)
+lineTo(-0.17, -1.18)
+lineTo(1.18, -0.94)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, -51.26)
+rotate(1.95)
+fillStyle = #ffb300
+globalAlpha = 0.217
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.29, 0.51)
+lineTo(0.17, 1.18)
+lineTo(-0.73, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1)
+lineTo(1, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, -24.04)
+rotate(2.34)
+fillStyle = #ffb300
+globalAlpha = 0.37
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.56, 0.62)
+lineTo(0.21, 1.43)
+lineTo(-0.88, 0.7)
+lineTo(-0.95, -0.38)
+lineTo(-0.18, -1.21)
+lineTo(1.21, -0.96)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, -24.04)
+rotate(2.73)
+fillStyle = #ffb300
+globalAlpha = 0.55
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.09, 0.83)
+lineTo(0.28, 1.91)
+lineTo(-1.18, 0.94)
+lineTo(-1.27, -0.5)
+lineTo(-0.24, -1.62)
+lineTo(1.63, -1.29)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, -24.04)
+rotate(3.13)
+fillStyle = #ffb300
+globalAlpha = 0.592
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.39, 0.95)
+lineTo(0.32, 2.19)
+lineTo(-1.35, 1.07)
+lineTo(-1.46, -0.58)
+lineTo(-0.27, -1.86)
+lineTo(1.86, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, -24.04)
+rotate(3.52)
+fillStyle = #ffb300
+globalAlpha = 0.458
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.18, 0.86)
+lineTo(0.29, 2)
+lineTo(-1.24, 0.98)
+lineTo(-1.33, -0.53)
+lineTo(-0.25, -1.7)
+lineTo(1.7, -1.35)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, -24.04)
+rotate(3.91)
+fillStyle = #ffb300
+globalAlpha = 0.27
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.66, 0.66)
+lineTo(0.22, 1.52)
+lineTo(-0.94, 0.75)
+lineTo(-1.01, -0.4)
+lineTo(-0.19, -1.29)
+lineTo(1.29, -1.02)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 1.38)
+rotate(4.3)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.3, 0.52)
+lineTo(0.18, 1.19)
+lineTo(-0.74, 0.59)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1.01)
+lineTo(1.01, -0.8)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 1.38)
+rotate(4.7)
+fillStyle = #ffb300
+globalAlpha = 0.316
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.44, 0.57)
+lineTo(0.19, 1.32)
+lineTo(-0.81, 0.65)
+lineTo(-0.88, -0.35)
+lineTo(-0.17, -1.12)
+lineTo(1.12, -0.89)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 1.38)
+rotate(5.09)
+fillStyle = #ffb300
+globalAlpha = 0.507
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.94, 0.77)
+lineTo(0.26, 1.78)
+lineTo(-1.1, 0.87)
+lineTo(-1.18, -0.47)
+lineTo(-0.22, -1.51)
+lineTo(1.51, -1.2)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 1.38)
+rotate(5.48)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.35, 0.93)
+lineTo(0.32, 2.15)
+lineTo(-1.33, 1.06)
+lineTo(-1.43, -0.57)
+lineTo(-0.27, -1.83)
+lineTo(1.83, -1.45)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 1.38)
+rotate(5.87)
+fillStyle = #ffb300
+globalAlpha = 0.509
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.29, 0.91)
+lineTo(0.31, 2.1)
+lineTo(-1.3, 1.03)
+lineTo(-1.4, -0.55)
+lineTo(-0.26, -1.78)
+lineTo(1.78, -1.41)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 25.53)
+rotate(6.27)
+fillStyle = #ffb300
+globalAlpha = 0.318
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.82, 0.72)
+lineTo(0.25, 1.66)
+lineTo(-1.03, 0.81)
+lineTo(-1.11, -0.44)
+lineTo(-0.21, -1.41)
+lineTo(1.41, -1.12)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 25.53)
+rotate(6.66)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.36, 0.54)
+lineTo(0.18, 1.25)
+lineTo(-0.77, 0.61)
+lineTo(-0.83, -0.33)
+lineTo(-0.16, -1.06)
+lineTo(1.06, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 25.53)
+rotate(7.05)
+fillStyle = #ffb300
+globalAlpha = 0.268
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.35, 0.53)
+lineTo(0.18, 1.23)
+lineTo(-0.76, 0.61)
+lineTo(-0.82, -0.33)
+lineTo(-0.15, -1.05)
+lineTo(1.05, -0.83)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 25.53)
+rotate(7.45)
+fillStyle = #ffb300
+globalAlpha = 0.456
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.79, 0.71)
+lineTo(0.24, 1.64)
+lineTo(-1.01, 0.8)
+lineTo(-1.09, -0.43)
+lineTo(-0.21, -1.39)
+lineTo(1.39, -1.1)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 25.53)
+rotate(7.84)
+fillStyle = #ffb300
+globalAlpha = 0.592
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.28, 0.9)
+lineTo(0.31, 2.08)
+lineTo(-1.29, 1.02)
+lineTo(-1.39, -0.55)
+lineTo(-0.26, -1.77)
+lineTo(1.77, -1.4)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 50.11)
+rotate(8.23)
+fillStyle = #ffb300
+globalAlpha = 0.552
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.94)
+lineTo(0.32, 2.16)
+lineTo(-1.34, 1.06)
+lineTo(-1.44, -0.57)
+lineTo(-0.27, -1.83)
+lineTo(1.84, -1.46)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 50.11)
+rotate(8.62)
+fillStyle = #ffb300
+globalAlpha = 0.372
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.97, 0.78)
+lineTo(0.27, 1.8)
+lineTo(-1.12, 0.88)
+lineTo(-1.2, -0.48)
+lineTo(-0.23, -1.53)
+lineTo(1.53, -1.21)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 50.11)
+rotate(9.02)
+fillStyle = #ffb300
+globalAlpha = 0.218
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.46, 0.58)
+lineTo(0.2, 1.33)
+lineTo(-0.83, 0.65)
+lineTo(-0.89, -0.35)
+lineTo(-0.17, -1.13)
+lineTo(1.13, -0.9)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 50.11)
+rotate(9.41)
+fillStyle = #ffb300
+globalAlpha = 0.232
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.3, 0.51)
+lineTo(0.18, 1.19)
+lineTo(-0.73, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1.01)
+lineTo(1.01, -0.8)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 50.11)
+rotate(9.8)
+fillStyle = #ffb300
+globalAlpha = 0.4
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.64, 0.65)
+lineTo(0.22, 1.5)
+lineTo(-0.93, 0.73)
+lineTo(-1, -0.39)
+lineTo(-0.19, -1.27)
+lineTo(1.27, -1.01)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 76.43)
+rotate(10.19)
+fillStyle = #ffb300
+globalAlpha = 0.568
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.16, 0.86)
+lineTo(0.29, 1.98)
+lineTo(-1.22, 0.97)
+lineTo(-1.32, -0.52)
+lineTo(-0.25, -1.68)
+lineTo(1.68, -1.33)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 76.43)
+rotate(10.59)
+fillStyle = #ffb300
+globalAlpha = 0.582
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.39, 0.95)
+lineTo(0.32, 2.19)
+lineTo(-1.35, 1.07)
+lineTo(-1.46, -0.58)
+lineTo(-0.27, -1.86)
+lineTo(1.86, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 76.43)
+rotate(10.98)
+fillStyle = #ffb300
+globalAlpha = 0.429
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.12, 0.84)
+lineTo(0.29, 1.93)
+lineTo(-1.2, 0.95)
+lineTo(-1.29, -0.51)
+lineTo(-0.24, -1.64)
+lineTo(1.64, -1.3)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 76.43)
+rotate(11.37)
+fillStyle = #ffb300
+globalAlpha = 0.249
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.59, 0.63)
+lineTo(0.21, 1.45)
+lineTo(-0.9, 0.71)
+lineTo(-0.97, -0.38)
+lineTo(-0.18, -1.23)
+lineTo(1.23, -0.98)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 76.43)
+rotate(11.77)
+fillStyle = #ffb300
+globalAlpha = 0.208
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.29, 0.51)
+lineTo(0.17, 1.18)
+lineTo(-0.73, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1)
+lineTo(1, -0.8)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 104.19)
+rotate(12.16)
+fillStyle = #ffb300
+globalAlpha = 0.344
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.5, 0.59)
+lineTo(0.2, 1.37)
+lineTo(-0.85, 0.67)
+lineTo(-0.91, -0.36)
+lineTo(-0.17, -1.17)
+lineTo(1.17, -0.93)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 104.19)
+rotate(12.55)
+fillStyle = #ffb300
+globalAlpha = 0.531
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.02, 0.8)
+lineTo(0.27, 1.85)
+lineTo(-1.15, 0.91)
+lineTo(-1.23, -0.49)
+lineTo(-0.23, -1.57)
+lineTo(1.57, -1.25)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 104.19)
+rotate(12.94)
+fillStyle = #ffb300
+globalAlpha = 0.598
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.38, 0.94)
+lineTo(0.32, 2.17)
+lineTo(-1.35, 1.07)
+lineTo(-1.45, -0.57)
+lineTo(-0.27, -1.85)
+lineTo(1.85, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 104.19)
+rotate(13.34)
+fillStyle = #ffb300
+globalAlpha = 0.483
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.24, 0.89)
+lineTo(0.3, 2.05)
+lineTo(-1.27, 1)
+lineTo(-1.36, -0.54)
+lineTo(-0.26, -1.74)
+lineTo(1.74, -1.38)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 104.19)
+rotate(13.73)
+fillStyle = #ffb300
+globalAlpha = 0.291
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.73, 0.69)
+lineTo(0.23, 1.58)
+lineTo(-0.98, 0.78)
+lineTo(-1.06, -0.42)
+lineTo(-0.2, -1.35)
+lineTo(1.35, -1.07)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 131.78)
+rotate(14.12)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.33, 0.53)
+lineTo(0.18, 1.21)
+lineTo(-0.75, 0.6)
+lineTo(-0.81, -0.32)
+lineTo(-0.15, -1.03)
+lineTo(1.03, -0.82)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 131.78)
+rotate(14.51)
+fillStyle = #ffb300
+globalAlpha = 0.292
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.39, 0.55)
+lineTo(0.19, 1.27)
+lineTo(-0.79, 0.62)
+lineTo(-0.85, -0.34)
+lineTo(-0.16, -1.08)
+lineTo(1.08, -0.86)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 131.78)
+rotate(14.91)
+fillStyle = #ffb300
+globalAlpha = 0.484
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.87, 0.74)
+lineTo(0.25, 1.71)
+lineTo(-1.06, 0.84)
+lineTo(-1.14, -0.45)
+lineTo(-0.21, -1.45)
+lineTo(1.45, -1.15)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 131.78)
+rotate(15.3)
+fillStyle = #ffb300
+globalAlpha = 0.598
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.32, 0.92)
+lineTo(0.31, 2.12)
+lineTo(-1.31, 1.04)
+lineTo(-1.41, -0.56)
+lineTo(-0.27, -1.8)
+lineTo(1.8, -1.43)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 131.78)
+rotate(15.69)
+fillStyle = #ffb300
+globalAlpha = 0.53
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.33, 0.92)
+lineTo(0.31, 2.13)
+lineTo(-1.32, 1.04)
+lineTo(-1.42, -0.56)
+lineTo(-0.27, -1.81)
+lineTo(1.81, -1.44)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 157.73)
+rotate(16.08)
+fillStyle = #ffb300
+globalAlpha = 0.343
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.89, 0.75)
+lineTo(0.26, 1.73)
+lineTo(-1.07, 0.85)
+lineTo(-1.15, -0.46)
+lineTo(-0.22, -1.47)
+lineTo(1.47, -1.16)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 157.73)
+rotate(16.48)
+fillStyle = #ffb300
+globalAlpha = 0.208
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.4, 0.56)
+lineTo(0.19, 1.28)
+lineTo(-0.79, 0.63)
+lineTo(-0.86, -0.34)
+lineTo(-0.16, -1.09)
+lineTo(1.09, -0.87)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 157.73)
+rotate(16.87)
+fillStyle = #ffb300
+globalAlpha = 0.25
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.32, 0.52)
+lineTo(0.18, 1.21)
+lineTo(-0.75, 0.59)
+lineTo(-0.8, -0.32)
+lineTo(-0.15, -1.03)
+lineTo(1.03, -0.81)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 157.73)
+rotate(17.26)
+fillStyle = #ffb300
+globalAlpha = 0.43
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.72, 0.68)
+lineTo(0.23, 1.57)
+lineTo(-0.97, 0.77)
+lineTo(-1.05, -0.41)
+lineTo(-0.2, -1.33)
+lineTo(1.33, -1.06)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 157.73)
+rotate(17.66)
+fillStyle = #ffb300
+globalAlpha = 0.582
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.23, 0.88)
+lineTo(0.3, 2.04)
+lineTo(-1.26, 1)
+lineTo(-1.36, -0.54)
+lineTo(-0.26, -1.73)
+lineTo(1.73, -1.37)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 182.1)
+rotate(18.05)
+fillStyle = #ffb300
+globalAlpha = 0.568
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.38, 0.94)
+lineTo(0.32, 2.18)
+lineTo(-1.35, 1.07)
+lineTo(-1.45, -0.57)
+lineTo(-0.27, -1.85)
+lineTo(1.85, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 182.1)
+rotate(18.44)
+fillStyle = #ffb300
+globalAlpha = 0.399
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.04, 0.81)
+lineTo(0.28, 1.87)
+lineTo(-1.15, 0.92)
+lineTo(-1.24, -0.49)
+lineTo(-0.23, -1.58)
+lineTo(1.59, -1.26)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 182.1)
+rotate(18.83)
+fillStyle = #ffb300
+globalAlpha = 0.231
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.52, 0.6)
+lineTo(0.2, 1.39)
+lineTo(-0.86, 0.68)
+lineTo(-0.92, -0.37)
+lineTo(-0.17, -1.18)
+lineTo(1.18, -0.93)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 182.1)
+rotate(19.23)
+fillStyle = #ffb300
+globalAlpha = 0.219
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.29, 0.51)
+lineTo(0.17, 1.18)
+lineTo(-0.73, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1)
+lineTo(1, -0.79)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 182.1)
+rotate(19.62)
+fillStyle = #ffb300
+globalAlpha = 0.373
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.57, 0.62)
+lineTo(0.21, 1.44)
+lineTo(-0.89, 0.7)
+lineTo(-0.96, -0.38)
+lineTo(-0.18, -1.22)
+lineTo(1.22, -0.97)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 206.37)
+rotate(20.01)
+fillStyle = #ffb300
+globalAlpha = 0.552
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.1, 0.83)
+lineTo(0.28, 1.92)
+lineTo(-1.19, 0.94)
+lineTo(-1.28, -0.51)
+lineTo(-0.24, -1.63)
+lineTo(1.63, -1.29)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 206.37)
+rotate(20.4)
+fillStyle = #ffb300
+globalAlpha = 0.591
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.39, 0.95)
+lineTo(0.32, 2.19)
+lineTo(-1.35, 1.07)
+lineTo(-1.46, -0.58)
+lineTo(-0.27, -1.86)
+lineTo(1.86, -1.47)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 206.37)
+rotate(20.8)
+fillStyle = #ffb300
+globalAlpha = 0.455
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.18, 0.86)
+lineTo(0.29, 1.99)
+lineTo(-1.23, 0.98)
+lineTo(-1.33, -0.52)
+lineTo(-0.25, -1.69)
+lineTo(1.69, -1.34)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 206.37)
+rotate(21.19)
+fillStyle = #ffb300
+globalAlpha = 0.268
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.65, 0.65)
+lineTo(0.22, 1.51)
+lineTo(-0.94, 0.74)
+lineTo(-1.01, -0.4)
+lineTo(-0.19, -1.28)
+lineTo(1.29, -1.02)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 206.37)
+rotate(21.58)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.3, 0.52)
+lineTo(0.18, 1.19)
+lineTo(-0.74, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1.01)
+lineTo(1.01, -0.8)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 232.14)
+rotate(21.98)
+fillStyle = #ffb300
+globalAlpha = 0.319
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.45, 0.57)
+lineTo(0.2, 1.32)
+lineTo(-0.82, 0.65)
+lineTo(-0.88, -0.35)
+lineTo(-0.17, -1.12)
+lineTo(1.12, -0.89)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 232.14)
+rotate(22.37)
+fillStyle = #ffb300
+globalAlpha = 0.51
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.95, 0.77)
+lineTo(0.26, 1.79)
+lineTo(-1.11, 0.88)
+lineTo(-1.19, -0.47)
+lineTo(-0.22, -1.52)
+lineTo(1.52, -1.2)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 232.14)
+rotate(22.76)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.93)
+lineTo(0.32, 2.15)
+lineTo(-1.33, 1.06)
+lineTo(-1.44, -0.57)
+lineTo(-0.27, -1.83)
+lineTo(1.83, -1.45)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 232.14)
+rotate(23.15)
+fillStyle = #ffb300
+globalAlpha = 0.506
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.29, 0.91)
+lineTo(0.31, 2.09)
+lineTo(-1.29, 1.03)
+lineTo(-1.39, -0.55)
+lineTo(-0.26, -1.77)
+lineTo(1.78, -1.41)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 232.14)
+rotate(23.55)
+fillStyle = #ffb300
+globalAlpha = 0.315
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.81, 0.72)
+lineTo(0.24, 1.65)
+lineTo(-1.02, 0.81)
+lineTo(-1.1, -0.44)
+lineTo(-0.21, -1.4)
+lineTo(1.4, -1.11)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 259.62)
+rotate(23.94)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.36, 0.54)
+lineTo(0.18, 1.24)
+lineTo(-0.77, 0.61)
+lineTo(-0.83, -0.33)
+lineTo(-0.16, -1.05)
+lineTo(1.06, -0.84)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 259.62)
+rotate(24.33)
+fillStyle = #ffb300
+globalAlpha = 0.271
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.35, 0.54)
+lineTo(0.18, 1.24)
+lineTo(-0.77, 0.61)
+lineTo(-0.82, -0.33)
+lineTo(-0.16, -1.05)
+lineTo(1.05, -0.83)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 259.62)
+rotate(24.72)
+fillStyle = #ffb300
+globalAlpha = 0.459
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.8, 0.71)
+lineTo(0.24, 1.64)
+lineTo(-1.02, 0.81)
+lineTo(-1.1, -0.43)
+lineTo(-0.21, -1.4)
+lineTo(1.4, -1.11)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 259.62)
+rotate(25.12)
+fillStyle = #ffb300
+globalAlpha = 0.593
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.28, 0.9)
+lineTo(0.31, 2.09)
+lineTo(-1.29, 1.02)
+lineTo(-1.39, -0.55)
+lineTo(-0.26, -1.77)
+lineTo(1.77, -1.41)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 259.62)
+rotate(25.51)
+fillStyle = #ffb300
+globalAlpha = 0.549
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.36, 0.93)
+lineTo(0.32, 2.16)
+lineTo(-1.34, 1.06)
+lineTo(-1.44, -0.57)
+lineTo(-0.27, -1.83)
+lineTo(1.83, -1.45)
+closePath()
+fill()
+restore()
+save()
+translate(-50.14, 287.45)
+rotate(25.9)
+fillStyle = #ffb300
+globalAlpha = 0.369
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.96, 0.78)
+lineTo(0.26, 1.79)
+lineTo(-1.11, 0.88)
+lineTo(-1.19, -0.47)
+lineTo(-0.22, -1.52)
+lineTo(1.52, -1.21)
+closePath()
+fill()
+restore()
+save()
+translate(-25.61, 287.45)
+rotate(26.3)
+fillStyle = #ffb300
+globalAlpha = 0.217
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.45, 0.58)
+lineTo(0.2, 1.33)
+lineTo(-0.82, 0.65)
+lineTo(-0.88, -0.35)
+lineTo(-0.17, -1.13)
+lineTo(1.13, -0.9)
+closePath()
+fill()
+restore()
+save()
+translate(-1.44, 287.45)
+rotate(26.69)
+fillStyle = #ffb300
+globalAlpha = 0.233
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.3, 0.52)
+lineTo(0.18, 1.19)
+lineTo(-0.74, 0.58)
+lineTo(-0.79, -0.31)
+lineTo(-0.15, -1.01)
+lineTo(1.01, -0.8)
+closePath()
+fill()
+restore()
+save()
+translate(24.06, 287.45)
+rotate(27.08)
+fillStyle = #ffb300
+globalAlpha = 0.403
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.65, 0.65)
+lineTo(0.22, 1.5)
+lineTo(-0.93, 0.74)
+lineTo(-1, -0.4)
+lineTo(-0.19, -1.28)
+lineTo(1.28, -1.01)
+closePath()
+fill()
+restore()
+save()
+translate(51.34, 287.45)
+rotate(27.47)
+fillStyle = #ffb300
+globalAlpha = 0.57
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(2.17, 0.86)
+lineTo(0.29, 1.98)
+lineTo(-1.23, 0.97)
+lineTo(-1.32, -0.52)
+lineTo(-0.25, -1.69)
+lineTo(1.69, -1.34)
+closePath()
+fill()
+restore()
+globalAlpha = 1
+setLineDash([])
+shadowBlur = 0
+globalCompositeOperation = source-over
+restore()
+# gradients=0 shadowBlurSets=72 path2d=0
+# t=1.9s phase=0.8 particleTime=0.8 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+lineCap = round
+lineJoin = round
+shadowColor = rgba(0, 0, 0, 0)
+save()
+translate(-14.6, -14.57)
+rotate(0.8)
+fillStyle = #ffb300
+globalAlpha = 0.537
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.52)
+lineTo(-1.86, 0.48)
+lineTo(-1.69, -1.72)
+lineTo(0.7, -2.5)
+lineTo(2.23, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, -14.57)
+rotate(1.19)
+fillStyle = #ffb300
+globalAlpha = 0.351
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.05, 1.08)
+lineTo(-0.38, 1.35)
+lineTo(-1.66, 0.43)
+lineTo(-1.5, -1.53)
+lineTo(0.62, -2.22)
+lineTo(1.99, -0.51)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, -14.57)
+rotate(1.58)
+fillStyle = #ffb300
+globalAlpha = 0.21
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.79, 0.81)
+lineTo(-0.28, 1.02)
+lineTo(-1.25, 0.32)
+lineTo(-1.13, -1.15)
+lineTo(0.47, -1.67)
+lineTo(1.49, -0.38)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, -14.57)
+rotate(1.97)
+fillStyle = #ffb300
+globalAlpha = 0.244
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.64, 0.65)
+lineTo(-0.23, 0.82)
+lineTo(-1.01, 0.26)
+lineTo(-0.91, -0.93)
+lineTo(0.38, -1.35)
+lineTo(1.21, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, -14.57)
+rotate(2.37)
+fillStyle = #ffb300
+globalAlpha = 0.421
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.74, 0.75)
+lineTo(-0.26, 0.95)
+lineTo(-1.16, 0.3)
+lineTo(-1.05, -1.07)
+lineTo(0.43, -1.56)
+lineTo(1.39, -0.36)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, -6.05)
+rotate(2.76)
+fillStyle = #ffb300
+globalAlpha = 0.579
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.99, 1.02)
+lineTo(-0.36, 1.28)
+lineTo(-1.56, 0.4)
+lineTo(-1.42, -1.45)
+lineTo(0.59, -2.1)
+lineTo(1.87, -0.48)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, -6.05)
+rotate(3.15)
+fillStyle = #ffb300
+globalAlpha = 0.572
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.2)
+lineTo(-0.42, 1.51)
+lineTo(-1.85, 0.47)
+lineTo(-1.68, -1.71)
+lineTo(0.69, -2.48)
+lineTo(2.21, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, -6.05)
+rotate(3.54)
+fillStyle = #ffb300
+globalAlpha = 0.407
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.11, 1.14)
+lineTo(-0.4, 1.43)
+lineTo(-1.75, 0.45)
+lineTo(-1.59, -1.62)
+lineTo(0.66, -2.35)
+lineTo(2.1, -0.54)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, -6.05)
+rotate(3.94)
+fillStyle = #ffb300
+globalAlpha = 0.236
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.87, 0.88)
+lineTo(-0.31, 1.11)
+lineTo(-1.36, 0.35)
+lineTo(-1.23, -1.26)
+lineTo(0.51, -1.83)
+lineTo(1.63, -0.42)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, -6.05)
+rotate(4.33)
+fillStyle = #ffb300
+globalAlpha = 0.215
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.66, 0.67)
+lineTo(-0.24, 0.85)
+lineTo(-1.04, 0.27)
+lineTo(-0.94, -0.96)
+lineTo(0.39, -1.39)
+lineTo(1.24, -0.32)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 0.68)
+rotate(4.72)
+fillStyle = #ffb300
+globalAlpha = 0.364
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.69, 0.7)
+lineTo(-0.25, 0.88)
+lineTo(-1.08, 0.28)
+lineTo(-0.98, -1)
+lineTo(0.4, -1.45)
+lineTo(1.29, -0.33)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 0.68)
+rotate(5.12)
+fillStyle = #ffb300
+globalAlpha = 0.546
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.92, 0.94)
+lineTo(-0.33, 1.18)
+lineTo(-1.44, 0.37)
+lineTo(-1.31, -1.34)
+lineTo(0.54, -1.94)
+lineTo(1.73, -0.44)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 0.68)
+rotate(5.51)
+fillStyle = #ffb300
+globalAlpha = 0.594
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.15, 1.17)
+lineTo(-0.41, 1.47)
+lineTo(-1.8, 0.46)
+lineTo(-1.63, -1.67)
+lineTo(0.67, -2.42)
+lineTo(2.16, -0.55)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 0.68)
+rotate(5.9)
+fillStyle = #ffb300
+globalAlpha = 0.463
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.16, 1.18)
+lineTo(-0.41, 1.48)
+lineTo(-1.82, 0.47)
+lineTo(-1.65, -1.68)
+lineTo(0.68, -2.44)
+lineTo(2.18, -0.56)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 0.68)
+rotate(6.29)
+fillStyle = #ffb300
+globalAlpha = 0.274
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.94, 0.96)
+lineTo(-0.34, 1.21)
+lineTo(-1.48, 0.38)
+lineTo(-1.34, -1.37)
+lineTo(0.56, -1.99)
+lineTo(1.78, -0.46)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 6.78)
+rotate(6.69)
+fillStyle = #ffb300
+globalAlpha = 0.201
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.7, 0.71)
+lineTo(-0.25, 0.9)
+lineTo(-1.1, 0.28)
+lineTo(-1, -1.02)
+lineTo(0.41, -1.48)
+lineTo(1.32, -0.34)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 6.78)
+rotate(7.08)
+fillStyle = #ffb300
+globalAlpha = 0.311
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.65, 0.67)
+lineTo(-0.23, 0.84)
+lineTo(-1.02, 0.26)
+lineTo(-0.93, -0.95)
+lineTo(0.38, -1.37)
+lineTo(1.23, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 6.78)
+rotate(7.47)
+fillStyle = #ffb300
+globalAlpha = 0.502
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.84, 0.86)
+lineTo(-0.3, 1.08)
+lineTo(-1.32, 0.34)
+lineTo(-1.2, -1.22)
+lineTo(0.5, -1.78)
+lineTo(1.59, -0.41)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 6.78)
+rotate(7.86)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.1, 1.12)
+lineTo(-0.39, 1.41)
+lineTo(-1.72, 0.44)
+lineTo(-1.56, -1.6)
+lineTo(0.65, -2.31)
+lineTo(2.06, -0.53)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 6.78)
+rotate(8.26)
+fillStyle = #ffb300
+globalAlpha = 0.514
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.52)
+lineTo(-1.86, 0.48)
+lineTo(-1.68, -1.72)
+lineTo(0.7, -2.49)
+lineTo(2.22, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 14.01)
+rotate(8.65)
+fillStyle = #ffb300
+globalAlpha = 0.323
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.02, 1.04)
+lineTo(-0.36, 1.31)
+lineTo(-1.6, 0.41)
+lineTo(-1.45, -1.48)
+lineTo(0.6, -2.15)
+lineTo(1.92, -0.49)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 14.01)
+rotate(9.04)
+fillStyle = #ffb300
+globalAlpha = 0.203
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.76, 0.77)
+lineTo(-0.27, 0.97)
+lineTo(-1.19, 0.31)
+lineTo(-1.08, -1.1)
+lineTo(0.45, -1.6)
+lineTo(1.43, -0.37)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 14.01)
+rotate(9.44)
+fillStyle = #ffb300
+globalAlpha = 0.264
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.64, 0.65)
+lineTo(-0.23, 0.82)
+lineTo(-1, 0.26)
+lineTo(-0.91, -0.93)
+lineTo(0.38, -1.35)
+lineTo(1.2, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 14.01)
+rotate(9.83)
+fillStyle = #ffb300
+globalAlpha = 0.45
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.77, 0.79)
+lineTo(-0.28, 0.99)
+lineTo(-1.21, 0.31)
+lineTo(-1.1, -1.12)
+lineTo(0.45, -1.63)
+lineTo(1.45, -0.37)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 14.01)
+rotate(10.22)
+fillStyle = #ffb300
+globalAlpha = 0.59
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.03, 1.05)
+lineTo(-0.37, 1.32)
+lineTo(-1.62, 0.42)
+lineTo(-1.47, -1.5)
+lineTo(0.61, -2.18)
+lineTo(1.94, -0.5)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 23.06)
+rotate(10.61)
+fillStyle = #ffb300
+globalAlpha = 0.555
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.52)
+lineTo(-1.86, 0.48)
+lineTo(-1.69, -1.72)
+lineTo(0.7, -2.5)
+lineTo(2.23, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 23.06)
+rotate(11.01)
+fillStyle = #ffb300
+globalAlpha = 0.377
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.08, 1.11)
+lineTo(-0.39, 1.39)
+lineTo(-1.71, 0.44)
+lineTo(-1.54, -1.58)
+lineTo(0.64, -2.29)
+lineTo(2.04, -0.52)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 23.06)
+rotate(11.4)
+fillStyle = #ffb300
+globalAlpha = 0.221
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.83, 0.84)
+lineTo(-0.3, 1.06)
+lineTo(-1.3, 0.33)
+lineTo(-1.18, -1.2)
+lineTo(0.49, -1.74)
+lineTo(1.56, -0.4)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 23.06)
+rotate(11.79)
+fillStyle = #ffb300
+globalAlpha = 0.229
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.65, 0.66)
+lineTo(-0.23, 0.83)
+lineTo(-1.02, 0.26)
+lineTo(-0.92, -0.94)
+lineTo(0.38, -1.36)
+lineTo(1.22, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 23.06)
+rotate(12.18)
+fillStyle = #ffb300
+globalAlpha = 0.394
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.71, 0.73)
+lineTo(-0.25, 0.91)
+lineTo(-1.12, 0.29)
+lineTo(-1.01, -1.03)
+lineTo(0.42, -1.5)
+lineTo(1.34, -0.34)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 32.98)
+rotate(12.58)
+fillStyle = #ffb300
+globalAlpha = 0.565
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.96, 0.98)
+lineTo(-0.34, 1.23)
+lineTo(-1.51, 0.39)
+lineTo(-1.37, -1.4)
+lineTo(0.57, -2.02)
+lineTo(1.81, -0.46)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 32.98)
+rotate(12.97)
+fillStyle = #ffb300
+globalAlpha = 0.584
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.16, 1.19)
+lineTo(-0.42, 1.49)
+lineTo(-1.83, 0.47)
+lineTo(-1.66, -1.69)
+lineTo(0.69, -2.46)
+lineTo(2.19, -0.56)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 32.98)
+rotate(13.36)
+fillStyle = #ffb300
+globalAlpha = 0.434
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.14, 1.16)
+lineTo(-0.41, 1.46)
+lineTo(-1.79, 0.46)
+lineTo(-1.62, -1.65)
+lineTo(0.67, -2.4)
+lineTo(2.14, -0.55)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 32.98)
+rotate(13.75)
+fillStyle = #ffb300
+globalAlpha = 0.252
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.9, 0.92)
+lineTo(-0.32, 1.16)
+lineTo(-1.42, 0.36)
+lineTo(-1.29, -1.31)
+lineTo(0.53, -1.9)
+lineTo(1.7, -0.44)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 32.98)
+rotate(14.15)
+fillStyle = #ffb300
+globalAlpha = 0.207
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.68, 0.69)
+lineTo(-0.24, 0.87)
+lineTo(-1.06, 0.27)
+lineTo(-0.96, -0.98)
+lineTo(0.4, -1.43)
+lineTo(1.27, -0.33)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 42)
+rotate(14.54)
+fillStyle = #ffb300
+globalAlpha = 0.339
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.67, 0.68)
+lineTo(-0.24, 0.86)
+lineTo(-1.05, 0.27)
+lineTo(-0.95, -0.97)
+lineTo(0.39, -1.41)
+lineTo(1.26, -0.32)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 42)
+rotate(14.93)
+fillStyle = #ffb300
+globalAlpha = 0.527
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.88, 0.9)
+lineTo(-0.32, 1.13)
+lineTo(-1.39, 0.36)
+lineTo(-1.26, -1.28)
+lineTo(0.52, -1.86)
+lineTo(1.66, -0.43)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 42)
+rotate(15.33)
+fillStyle = #ffb300
+globalAlpha = 0.599
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.12, 1.15)
+lineTo(-0.4, 1.44)
+lineTo(-1.77, 0.45)
+lineTo(-1.6, -1.64)
+lineTo(0.66, -2.37)
+lineTo(2.12, -0.54)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 42)
+rotate(15.72)
+fillStyle = #ffb300
+globalAlpha = 0.488
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.17, 1.2)
+lineTo(-0.42, 1.5)
+lineTo(-1.84, 0.47)
+lineTo(-1.67, -1.7)
+lineTo(0.69, -2.47)
+lineTo(2.21, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 42)
+rotate(16.11)
+fillStyle = #ffb300
+globalAlpha = 0.296
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.98, 1)
+lineTo(-0.35, 1.26)
+lineTo(-1.54, 0.4)
+lineTo(-1.39, -1.42)
+lineTo(0.58, -2.07)
+lineTo(1.84, -0.47)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 49.18)
+rotate(16.5)
+fillStyle = #ffb300
+globalAlpha = 0.2
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.72, 0.74)
+lineTo(-0.26, 0.93)
+lineTo(-1.14, 0.29)
+lineTo(-1.03, -1.05)
+lineTo(0.43, -1.53)
+lineTo(1.37, -0.35)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 49.18)
+rotate(16.9)
+fillStyle = #ffb300
+globalAlpha = 0.288
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.64, 0.66)
+lineTo(-0.23, 0.82)
+lineTo(-1.01, 0.26)
+lineTo(-0.92, -0.93)
+lineTo(0.38, -1.36)
+lineTo(1.21, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 49.18)
+rotate(17.29)
+fillStyle = #ffb300
+globalAlpha = 0.479
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.81, 0.82)
+lineTo(-0.29, 1.04)
+lineTo(-1.27, 0.33)
+lineTo(-1.15, -1.17)
+lineTo(0.48, -1.7)
+lineTo(1.52, -0.39)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 49.18)
+rotate(17.68)
+fillStyle = #ffb300
+globalAlpha = 0.597
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.07, 1.09)
+lineTo(-0.38, 1.37)
+lineTo(-1.68, 0.43)
+lineTo(-1.52, -1.55)
+lineTo(0.63, -2.25)
+lineTo(2.01, -0.52)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 49.18)
+rotate(18.07)
+fillStyle = #ffb300
+globalAlpha = 0.534
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.52)
+lineTo(-1.86, 0.48)
+lineTo(-1.69, -1.72)
+lineTo(0.7, -2.5)
+lineTo(2.23, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 55.27)
+rotate(18.47)
+fillStyle = #ffb300
+globalAlpha = 0.348
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.05, 1.07)
+lineTo(-0.38, 1.35)
+lineTo(-1.65, 0.42)
+lineTo(-1.5, -1.53)
+lineTo(0.62, -2.22)
+lineTo(1.98, -0.51)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 55.27)
+rotate(18.86)
+fillStyle = #ffb300
+globalAlpha = 0.209
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.79, 0.8)
+lineTo(-0.28, 1.01)
+lineTo(-1.24, 0.32)
+lineTo(-1.12, -1.15)
+lineTo(0.46, -1.66)
+lineTo(1.48, -0.38)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 55.27)
+rotate(19.25)
+fillStyle = #ffb300
+globalAlpha = 0.246
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.64, 0.65)
+lineTo(-0.23, 0.82)
+lineTo(-1.01, 0.26)
+lineTo(-0.91, -0.93)
+lineTo(0.38, -1.35)
+lineTo(1.2, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 55.27)
+rotate(19.65)
+fillStyle = #ffb300
+globalAlpha = 0.424
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.74, 0.76)
+lineTo(-0.27, 0.95)
+lineTo(-1.17, 0.3)
+lineTo(-1.06, -1.08)
+lineTo(0.44, -1.56)
+lineTo(1.4, -0.36)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 55.27)
+rotate(20.04)
+fillStyle = #ffb300
+globalAlpha = 0.58
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1, 1.02)
+lineTo(-0.36, 1.28)
+lineTo(-1.57, 0.4)
+lineTo(-1.42, -1.45)
+lineTo(0.59, -2.11)
+lineTo(1.88, -0.48)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 62.04)
+rotate(20.43)
+fillStyle = #ffb300
+globalAlpha = 0.57
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.2)
+lineTo(-0.42, 1.51)
+lineTo(-1.85, 0.48)
+lineTo(-1.68, -1.71)
+lineTo(0.69, -2.48)
+lineTo(2.22, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 62.04)
+rotate(20.82)
+fillStyle = #ffb300
+globalAlpha = 0.404
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.11, 1.13)
+lineTo(-0.4, 1.42)
+lineTo(-1.75, 0.45)
+lineTo(-1.58, -1.62)
+lineTo(0.65, -2.34)
+lineTo(2.09, -0.54)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 62.04)
+rotate(21.22)
+fillStyle = #ffb300
+globalAlpha = 0.234
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.86, 0.88)
+lineTo(-0.31, 1.11)
+lineTo(-1.35, 0.35)
+lineTo(-1.23, -1.25)
+lineTo(0.51, -1.82)
+lineTo(1.62, -0.42)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 62.04)
+rotate(21.61)
+fillStyle = #ffb300
+globalAlpha = 0.217
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.66, 0.67)
+lineTo(-0.24, 0.84)
+lineTo(-1.04, 0.27)
+lineTo(-0.94, -0.96)
+lineTo(0.39, -1.39)
+lineTo(1.24, -0.32)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 62.04)
+rotate(22)
+fillStyle = #ffb300
+globalAlpha = 0.368
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.69, 0.7)
+lineTo(-0.25, 0.88)
+lineTo(-1.08, 0.28)
+lineTo(-0.98, -1)
+lineTo(0.41, -1.45)
+lineTo(1.3, -0.33)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 70.61)
+rotate(22.39)
+fillStyle = #ffb300
+globalAlpha = 0.549
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.92, 0.94)
+lineTo(-0.33, 1.18)
+lineTo(-1.45, 0.37)
+lineTo(-1.32, -1.34)
+lineTo(0.54, -1.95)
+lineTo(1.74, -0.45)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 70.61)
+rotate(22.79)
+fillStyle = #ffb300
+globalAlpha = 0.593
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.15, 1.17)
+lineTo(-0.41, 1.47)
+lineTo(-1.81, 0.46)
+lineTo(-1.64, -1.67)
+lineTo(0.68, -2.42)
+lineTo(2.16, -0.56)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 70.61)
+rotate(23.18)
+fillStyle = #ffb300
+globalAlpha = 0.46
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.15, 1.18)
+lineTo(-0.41, 1.48)
+lineTo(-1.82, 0.47)
+lineTo(-1.65, -1.68)
+lineTo(0.68, -2.44)
+lineTo(2.18, -0.56)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 70.61)
+rotate(23.57)
+fillStyle = #ffb300
+globalAlpha = 0.272
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.94, 0.96)
+lineTo(-0.34, 1.2)
+lineTo(-1.48, 0.38)
+lineTo(-1.34, -1.37)
+lineTo(0.55, -1.98)
+lineTo(1.77, -0.45)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 70.61)
+rotate(23.97)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.7, 0.71)
+lineTo(-0.25, 0.89)
+lineTo(-1.1, 0.28)
+lineTo(-0.99, -1.01)
+lineTo(0.41, -1.47)
+lineTo(1.31, -0.34)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 80.45)
+rotate(24.36)
+fillStyle = #ffb300
+globalAlpha = 0.314
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.65, 0.67)
+lineTo(-0.23, 0.84)
+lineTo(-1.03, 0.26)
+lineTo(-0.93, -0.95)
+lineTo(0.38, -1.38)
+lineTo(1.23, -0.32)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 80.45)
+rotate(24.75)
+fillStyle = #ffb300
+globalAlpha = 0.506
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.85, 0.86)
+lineTo(-0.3, 1.09)
+lineTo(-1.33, 0.34)
+lineTo(-1.21, -1.23)
+lineTo(0.5, -1.79)
+lineTo(1.59, -0.41)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 80.45)
+rotate(25.14)
+fillStyle = #ffb300
+globalAlpha = 0.6
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.1, 1.12)
+lineTo(-0.39, 1.41)
+lineTo(-1.73, 0.44)
+lineTo(-1.57, -1.6)
+lineTo(0.65, -2.32)
+lineTo(2.07, -0.53)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 80.45)
+rotate(25.54)
+fillStyle = #ffb300
+globalAlpha = 0.511
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.51)
+lineTo(-1.86, 0.48)
+lineTo(-1.68, -1.72)
+lineTo(0.7, -2.49)
+lineTo(2.22, -0.57)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 80.45)
+rotate(25.93)
+fillStyle = #ffb300
+globalAlpha = 0.32
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.01, 1.03)
+lineTo(-0.36, 1.3)
+lineTo(-1.59, 0.41)
+lineTo(-1.44, -1.47)
+lineTo(0.6, -2.14)
+lineTo(1.91, -0.49)
+closePath()
+fill()
+restore()
+save()
+translate(-14.6, 89.88)
+rotate(26.32)
+fillStyle = #ffb300
+globalAlpha = 0.202
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.75, 0.77)
+lineTo(-0.27, 0.97)
+lineTo(-1.18, 0.3)
+lineTo(-1.07, -1.1)
+lineTo(0.44, -1.59)
+lineTo(1.42, -0.36)
+closePath()
+fill()
+restore()
+save()
+translate(-8.45, 89.88)
+rotate(26.71)
+fillStyle = #ffb300
+globalAlpha = 0.267
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.64, 0.65)
+lineTo(-0.23, 0.82)
+lineTo(-1, 0.26)
+lineTo(-0.91, -0.93)
+lineTo(0.38, -1.35)
+lineTo(1.2, -0.31)
+closePath()
+fill()
+restore()
+save()
+translate(-1.88, 89.88)
+rotate(27.11)
+fillStyle = #ffb300
+globalAlpha = 0.454
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(0.77, 0.79)
+lineTo(-0.28, 0.99)
+lineTo(-1.22, 0.31)
+lineTo(-1.1, -1.13)
+lineTo(0.46, -1.63)
+lineTo(1.46, -0.37)
+closePath()
+fill()
+restore()
+save()
+translate(6.41, 89.88)
+rotate(27.5)
+fillStyle = #ffb300
+globalAlpha = 0.591
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.04, 1.06)
+lineTo(-0.37, 1.33)
+lineTo(-1.63, 0.42)
+lineTo(-1.48, -1.51)
+lineTo(0.61, -2.19)
+lineTo(1.95, -0.5)
+closePath()
+fill()
+restore()
+save()
+translate(16.17, 89.88)
+rotate(27.89)
+fillStyle = #ffb300
+globalAlpha = 0.553
+shadowColor = #ffb300
+shadowBlur = 5
+beginPath()
+lineTo(1.18, 1.21)
+lineTo(-0.42, 1.52)
+lineTo(-1.86, 0.48)
+lineTo(-1.69, -1.72)
+lineTo(0.7, -2.5)
+lineTo(2.23, -0.57)
+closePath()
+fill()
+restore()
+globalAlpha = 1
+setLineDash([])
+shadowBlur = 0
+globalCompositeOperation = source-over
+restore()
+# gradients=0 shadowBlurSets=72 path2d=0

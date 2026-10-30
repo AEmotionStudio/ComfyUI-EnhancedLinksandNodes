@@ -18,8 +18,10 @@ export default defineConfig({
         },
     },
     resolve: {
-        alias: {
-            '@': resolve(__dirname, 'src'),
-        },
+        alias: [
+            { find: '@', replacement: resolve(__dirname, 'src') },
+            // ComfyUI serves these at runtime; tests get the fake.
+            { find: /^\/scripts\/(app|api)\.js$/, replacement: resolve(__dirname, 'tests/helpers/fake-app.ts') },
+        ],
     },
 });
