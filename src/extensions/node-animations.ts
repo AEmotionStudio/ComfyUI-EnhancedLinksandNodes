@@ -15,22 +15,15 @@
  * @module extensions/node-animations
  */
 
-import type { LGraphNode } from '@comfyorg/comfyui-frontend-types';
+import type { ComfyExtension, LGraphNode } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
+import { N, nodeSettings } from '@/core/settings';
 import { createNodeState } from '@/core/state';
-import type { NodeState, ComfyExtension, ComfyApp, Color } from '@/core/types';
+import type { NodeState, Color } from '@/core/types';
 import { getNodeEffect, drawParticles } from '@/effects/node-effects';
 import { getCustomNodeColors } from '@/utils/color-manager';
 import { withAlpha, validateHexColor } from '@/utils/colors';
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
-function setting<T>(key: string, def: T): T {
-    return (app.ui.settings.getSettingValue(key) ?? def) as T;
-}
 
 // =============================================================================
 // Text Animation System
@@ -51,18 +44,18 @@ function drawAnimatedText(
     x: number, y: number,
     phase: number,
 ): void {
-    const textAnimEnabled = setting('📦 Enhanced Nodes.Text.Animation.Enabled', false);
+    const textAnimEnabled = N.textAnimationEnabled;
     if (!textAnimEnabled) return;
 
-    const baseColor = setting<string>('📦 Enhanced Nodes.Text.Color', '#00ffff');
-    const style = setting<string>('📦 Enhanced Nodes.Text.Style', 'neon');
-    const size = setting('📦 Enhanced Nodes.Text.Size', 14);
-    const glow = setting('📦 Enhanced Nodes.Text.Glow', 0.5);
-    const letterSpacing = setting('📦 Enhanced Nodes.Text.Letter.Spacing', 0);
-    const offsetY = setting('📦 Enhanced Nodes.Text.Position.Y', 0);
-    const offsetX = setting('📦 Enhanced Nodes.Text.Position.X', 0);
-    const rotationRadius = setting('📦 Enhanced Nodes.Text.Rotation.Radius', 0);
-    const rotationAngle = setting('📦 Enhanced Nodes.Text.Rotation.Angle', 0);
+    const baseColor = N.textColor;
+    const style = N.textStyle;
+    const size = N.textSize;
+    const glow = N.textGlow;
+    const letterSpacing = N.textLetterSpacing;
+    const offsetY = N.textPositionY;
+    const offsetX = N.textPositionX;
+    const rotationRadius = N.textRotationRadius;
+    const rotationAngle = N.textRotationAngle;
 
     let finalX = x + offsetX;
     let finalY = y + offsetY;
@@ -180,7 +173,7 @@ function drawAnimatedText(
 // =============================================================================
 
 function getParticleColor(index: number, time: number, _count: number): string {
-    const particleColorMode = setting<string>('📦 Enhanced Nodes.Particle.Color.Mode', 'default');
+    const particleColorMode = N.particleColorMode;
     const colors = getCustomNodeColors();
 
     switch (particleColorMode) {
@@ -218,7 +211,7 @@ function getParticleColor(index: number, time: number, _count: number): string {
             return `hsl(${120 + ap * 60}, ${80 + Math.sin(time * 3) * 20}%, ${70 + Math.sin(time * 4) * 20}%)`;
         }
         default: {
-            const customParticle = setting('📦 Enhanced Nodes.Color.Particle', colors.accent);
+            const customParticle = N.colorParticle;
             return validateHexColor(customParticle) || colors.accent;
         }
     }
@@ -230,8 +223,9 @@ function getParticleColor(index: number, time: number, _count: number): string {
 
 const ext: ComfyExtension = {
     name: 'enhanced.node.animations',
+    settings: nodeSettings,
 
-    async setup(_comfyApp: ComfyApp) {
+    async setup() {
         const state: NodeState = createNodeState();
 
         // Timing
@@ -252,8 +246,8 @@ const ext: ComfyExtension = {
             phase: 0,
             lastUpdate: 0,
             update(currentTime: number, delta: number): number {
-                const dir = setting('📦 Enhanced Nodes.Direction', 1);
-                const speed = Math.max(0.01, setting('📦 Enhanced Nodes.Particle.Speed', 1));
+                const dir = N.direction;
+                const speed = Math.max(0.01, N.particleSpeed);
                 if (currentTime - this.lastUpdate >= 16) {
                     const phaseStep = ((2 * Math.PI) / 15) * delta * speed;
                     this.phase += phaseStep * dir;
@@ -273,10 +267,10 @@ const ext: ComfyExtension = {
         // =====================================================================
 
         function renderLoop(timestamp: number) {
-            const animStyle = setting('📦 Enhanced Nodes.Animate', 0);
-            const pauseDuringRender = setting('📦 Enhanced Nodes.Pause.During.Render', true);
+            const animStyle = N.animate;
+            const pauseDuringRender = N.pauseDuringRender;
             const isRendering = state.isRunning;
-            const showParticles = setting('📦 Enhanced Nodes.Particle.Show', false);
+            const showParticles = N.particleShow;
 
             // Always update timing so particles can move independently
             const delta = Timing.update();
@@ -287,9 +281,9 @@ const ext: ComfyExtension = {
 
             // Update animation phase only when animation is active and not paused
             if (animStyle > 0 && !paused) {
-                const speed = setting('📦 Enhanced Nodes.Animation.Speed', 1);
-                const direction = setting('📦 Enhanced Nodes.Direction', 1);
-                const isStaticMode = setting('📦 Enhanced Nodes.Static.Mode', false);
+                const speed = N.animationSpeed;
+                const direction = N.direction;
+                const isStaticMode = N.staticMode;
 
                 if (!isStaticMode) {
                     state.phase += ((2 * Math.PI) / 15) * delta * speed * direction;
@@ -313,29 +307,29 @@ const ext: ComfyExtension = {
         const originalDrawNode = LGraphCanvas.prototype.drawNode;
 
         LGraphCanvas.prototype.drawNode = function (node, ctx) {
-            const animStyle = setting('📦 Enhanced Nodes.Animate', 0);
-            const animEnabled = setting('📦 Enhanced Nodes.Animations.Enabled', true);
+            const animStyle = N.animate;
+            const animEnabled = N.animationsEnabled;
 
-            const showParticles = setting('📦 Enhanced Nodes.Particle.Show', false);
+            const showParticles = N.particleShow;
 
             if (animStyle > 0 && animEnabled) {
                 const colors = getCustomNodeColors();
-                const isStaticMode = setting('📦 Enhanced Nodes.Static.Mode', false);
-                const glowIntensity = setting('📦 Enhanced Nodes.Glow', 1.0);
-                const animGlow = setting('📦 Enhanced Nodes.Animation.Glow', 0.5);
-                const quality = setting('📦 Enhanced Nodes.Quality', 1);
-                const animSize = setting('📦 Enhanced Nodes.Animation.Size', 1);
-                const intensity = setting('📦 Enhanced Nodes.Intensity', 1.0);
-                const direction = setting('📦 Enhanced Nodes.Direction', 1);
-                const animSpeed = setting('📦 Enhanced Nodes.Animation.Speed', 1);
-                const particleDensity = setting('📦 Enhanced Nodes.Particle.Density', 0.5);
-                const particleSpeed = setting('📦 Enhanced Nodes.Particle.Speed', 1);
-                const particleIntensity = setting('📦 Enhanced Nodes.Particle.Intensity', 1.0);
-                const particleSize = setting('📦 Enhanced Nodes.Particle.Size', 1.0);
-                const particleGlow = setting('📦 Enhanced Nodes.Particle.Glow', 1.0);
-                const showGlow = setting('📦 Enhanced Nodes.Glow.Show', true);
-                const hoverColor = setting('📦 Enhanced Nodes.Color.Hover', '#00ff15');
-                const showHover = setting('📦 Enhanced Nodes.Color.Hover.Show', false);
+                const isStaticMode = N.staticMode;
+                const glowIntensity = N.glow;
+                const animGlow = N.animationGlow;
+                const quality = N.quality;
+                const animSize = N.animationSize;
+                const intensity = N.intensity;
+                const direction = N.direction;
+                const animSpeed = N.animationSpeed;
+                const particleDensity = N.particleDensity;
+                const particleSpeed = N.particleSpeed;
+                const particleIntensity = N.particleIntensity;
+                const particleSize = N.particleSize;
+                const particleGlow = N.particleGlow;
+                const showGlow = N.glowShow;
+                const hoverColor = N.colorHover;
+                const showHover = N.colorHoverShow;
 
                 const effect = getNodeEffect(animStyle);
                 if (effect) {
@@ -385,14 +379,14 @@ const ext: ComfyExtension = {
             } else if (showParticles) {
                 // Particles-only mode (no animation style selected)
                 const colors = getCustomNodeColors();
-                const particleDensity = setting('📦 Enhanced Nodes.Particle.Density', 0.5);
-                const particleSpeed = setting('📦 Enhanced Nodes.Particle.Speed', 1);
-                const particleIntensity = setting('📦 Enhanced Nodes.Particle.Intensity', 1.0);
-                const particleSize = setting('📦 Enhanced Nodes.Particle.Size', 1.0);
-                const particleGlow = setting('📦 Enhanced Nodes.Particle.Glow', 1.0);
-                const quality = setting('📦 Enhanced Nodes.Quality', 1);
-                const animSize = setting('📦 Enhanced Nodes.Animation.Size', 1);
-                const direction = setting('📦 Enhanced Nodes.Direction', 1);
+                const particleDensity = N.particleDensity;
+                const particleSpeed = N.particleSpeed;
+                const particleIntensity = N.particleIntensity;
+                const particleSize = N.particleSize;
+                const particleGlow = N.particleGlow;
+                const quality = N.quality;
+                const animSize = N.animationSize;
+                const direction = N.direction;
 
                 ctx.save();
                 ctx.translate(node.size[0] / 2, node.size[1] / 2);
@@ -443,7 +437,7 @@ const ext: ComfyExtension = {
             originalDrawNode.call(this, node, ctx);
 
             // Text animation (drawn on top of node)
-            if (setting('📦 Enhanced Nodes.Text.Animation.Enabled', false) && node.title) {
+            if (N.textAnimationEnabled && node.title) {
                 ctx.save();
                 drawAnimatedText(
                     ctx,
@@ -465,12 +459,12 @@ const ext: ComfyExtension = {
             LGraphCanvas.prototype.drawNodeShape = function (node, ctx, ...args) {
                 originalDrawNodeShape.call(this, node, ctx, ...args);
 
-                const showHover = setting('📦 Enhanced Nodes.Color.Hover.Show', false);
-                const animStyle = setting('📦 Enhanced Nodes.Animate', 0);
+                const showHover = N.colorHoverShow;
+                const animStyle = N.animate;
 
                 if (showHover && animStyle > 0 && (node.mouseOver || (this.selected_nodes && this.selected_nodes[node.id]))) {
-                    const hoverColor = setting('📦 Enhanced Nodes.Color.Hover', '#00ff15');
-                    const glowIntensity = setting('📦 Enhanced Nodes.Glow', 1.0);
+                    const hoverColor = N.colorHover;
+                    const glowIntensity = N.glow;
                     const outlineGlowSize = 15 * glowIntensity;
 
                     ctx.save();

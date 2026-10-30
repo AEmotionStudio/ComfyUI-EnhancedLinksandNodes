@@ -19,7 +19,8 @@ const Icons = {
 // =============================================================================
 
 /**
- * Creates a slider control with label, value display, and live preview.
+ * Creates a slider control with label, value display, and live preview:
+ * onInput gets every step of a drag, onChange the value where it ends.
  */
 export function createSlider(
     label: string,
@@ -28,6 +29,7 @@ export function createSlider(
     max: number,
     step: number,
     unit: string,
+    onInput: (value: number) => void,
     onChange: (value: number) => void,
     tooltip?: string
 ): HTMLElement {
@@ -72,8 +74,10 @@ export function createSlider(
         valueEl.textContent = `${newValue}${unit}`;
         slider.setAttribute('aria-valuetext', `${newValue}${unit}`);
         // Live preview — apply immediately
-        onChange(newValue);
+        onInput(newValue);
     });
+
+    slider.addEventListener('change', () => onChange(parseFloat(slider.value)));
 
     row.appendChild(labelRow);
     row.appendChild(slider);
@@ -207,11 +211,13 @@ export function createSelect(
 // =============================================================================
 
 /**
- * Creates a color picker with hex text input.
+ * Creates a color picker with hex text input. onInput gets each colour the
+ * picker passes through, onChange the one it closes on and each valid hex code.
  */
 export function createColorPicker(
     label: string,
     value: string,
+    onInput: (value: string) => void,
     onChange: (value: string) => void,
     tooltip?: string
 ): HTMLElement {
@@ -264,8 +270,9 @@ export function createColorPicker(
 
     colorInput.addEventListener('input', () => {
         colorPreview.value = colorInput.value;
-        onChange(colorInput.value);
+        onInput(colorInput.value);
     });
+    colorInput.addEventListener('change', () => onChange(colorInput.value));
 
     colorWrapper.appendChild(colorInput);
     colorWrapper.appendChild(colorPreview);

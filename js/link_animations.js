@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
-import { e as enhanceColor, g as getLinkColor, a as getCustomLinkColors, v as validateHexColor, b as getSecondaryColor, c as getAccentColor } from "./chunks/color-manager-BxBlhZuL.js";
+import { L, e as enhanceColor, g as getLinkColor, a as getCustomLinkColors, v as validateHexColor, b as getSecondaryColor, c as getAccentColor, r as reset, S as SETTINGS, s as snapshotOf, d as commit, p as preview, l as linkSettings } from "./chunks/color-manager-CtPq5NfG.js";
 const SACRED = Object.freeze({
   /** Base pattern foundation - used for trinity-based patterns */
   TRINITY: 3,
@@ -14,142 +14,6 @@ const SACRED = Object.freeze({
   QUANTUM: 5,
   /** Infinite pattern cycles */
   INFINITY: 8
-});
-const LINK_DEFAULTS = Object.freeze({
-  "🔗 Enhanced Links.Animate": 9,
-  // Classic Flow
-  "🔗 Enhanced Links.Animation.Speed": 1,
-  // Normal speed
-  "🔗 Enhanced Links.Color.Mode": "default",
-  // Default colors
-  "🔗 Enhanced Links.Color.Accent": "#9d00ff",
-  // Purple
-  "🔗 Enhanced Links.Color.Secondary": "#fb00ff",
-  // Pink
-  "🔗 Enhanced Links.Color.Primary": "#ffb300",
-  // Orange
-  "🔗 Enhanced Links.Color.Scheme": "default",
-  // Original colors
-  "🔗 Enhanced Links.Direction": 1,
-  // Forward
-  "🔗 Enhanced Links.Glow.Intensity": 10,
-  // Medium glow
-  "🔗 Enhanced Links.Link.Style": "spline",
-  // Spline style
-  "🔗 Enhanced Links.Marker.Enabled": true,
-  // Markers enabled
-  "🔗 Enhanced Links.Marker.Effects": "none",
-  // No effects
-  "🔗 Enhanced Links.Marker.Glow": 10,
-  // Medium glow
-  "🔗 Enhanced Links.Marker.Color": "#00fff7",
-  // Cyan
-  "🔗 Enhanced Links.Marker.Color.Mode": "default",
-  // Default colors
-  "🔗 Enhanced Links.Marker.Size": 3,
-  // Large size
-  "🔗 Enhanced Links.Marker.Shape": "arrow",
-  // Arrow shape
-  "🔗 Enhanced Links.Particle.Density": 0.5,
-  // Minimal
-  "🔗 Enhanced Links.Quality": 1,
-  // Basic (Fast)
-  "🔗 Enhanced Links.Link.Shadow.Enabled": false,
-  // Link shadows off by default
-  "🔗 Enhanced Links.Marker.Shadow.Enabled": false,
-  // Marker shadows off by default
-  "🔗 Enhanced Links.Thickness": 3,
-  // Medium thickness
-  "🔗 Enhanced Links.UI & Æmotion Studio About": 0,
-  // Closed panel
-  "🔗 Enhanced Links.Static.Mode": false,
-  // Animated mode
-  "🔗 Enhanced Links.Pause.During.Render": true,
-  // Pause during render
-  "🔗 Enhanced Links.Shadow.Blur": 5,
-  // Shadow blur
-  "🔗 Enhanced Links.Shadow.Offset": 3
-  // Shadow offset
-});
-const NODE_DEFAULTS = Object.freeze({
-  "📦 Enhanced Nodes.Animate": 0,
-  // None (off by default)
-  "📦 Enhanced Nodes.Animation.Glow": 0.5,
-  // Medium glow
-  "📦 Enhanced Nodes.Animation.Size": 1,
-  // Normal size
-  "📦 Enhanced Nodes.Animation.Speed": 1,
-  // Normal speed
-  "📦 Enhanced Nodes.Animations.Enabled": true,
-  // Animations on
-  "📦 Enhanced Nodes.Color.Accent": "#0088ff",
-  // Deep blue
-  "📦 Enhanced Nodes.Color.Hover": "#00ff15",
-  // Green hover outline
-  "📦 Enhanced Nodes.Color.Hover.Show": false,
-  // Hide hover outline
-  "📦 Enhanced Nodes.Color.Mode": "default",
-  // Default colors
-  "📦 Enhanced Nodes.Color.Particle": "#ffff00",
-  // Yellow
-  "📦 Enhanced Nodes.Color.Primary": "#44aaff",
-  // Bright blue
-  "📦 Enhanced Nodes.Color.Scheme": "default",
-  // Original colors
-  "📦 Enhanced Nodes.Color.Secondary": "#88ccff",
-  // Light blue
-  "📦 Enhanced Nodes.Direction": 1,
-  // Forward
-  "📦 Enhanced Nodes.End Animation.Enabled": false,
-  // No end animation
-  "📦 Enhanced Nodes.Glow": 0.5,
-  // Medium glow
-  "📦 Enhanced Nodes.Glow.Show": true,
-  // Show glow
-  "📦 Enhanced Nodes.Intensity": 1,
-  // Normal intensity
-  "📦 Enhanced Nodes.Particle.Color.Mode": "default",
-  // Default particle colors
-  "📦 Enhanced Nodes.Particle.Density": 1,
-  // Normal density
-  "📦 Enhanced Nodes.Particle.Glow": 0.5,
-  // Medium particle glow
-  "📦 Enhanced Nodes.Particle.Intensity": 1,
-  // Normal intensity
-  "📦 Enhanced Nodes.Particle.Show": false,
-  // Particles off by default
-  "📦 Enhanced Nodes.Particle.Size": 1,
-  // Normal size
-  "📦 Enhanced Nodes.Particle.Speed": 1,
-  // Normal speed
-  "📦 Enhanced Nodes.Quality": 2,
-  // Balanced
-  "📦 Enhanced Nodes.Static.Mode": false,
-  // Animated mode
-  "📦 Enhanced Nodes.Pause.During.Render": true,
-  // Pause during render
-  "📦 Enhanced Nodes.Text.Animation.Enabled": false,
-  // No text animation
-  "📦 Enhanced Nodes.Text.Color": "#00ffff",
-  // Cyan
-  "📦 Enhanced Nodes.Text.Glow": 0.5,
-  // Medium text glow
-  "📦 Enhanced Nodes.Text.Size": 14,
-  // 14px text
-  "📦 Enhanced Nodes.Text.Style": "neon",
-  // Neon style
-  "📦 Enhanced Nodes.Text.Letter.Spacing": 0,
-  // Normal spacing
-  "📦 Enhanced Nodes.Text.Position.X": 0,
-  // Centered X
-  "📦 Enhanced Nodes.Text.Position.Y": 0,
-  // Centered Y
-  "📦 Enhanced Nodes.Text.Rotation.Radius": 0,
-  // No orbit
-  "📦 Enhanced Nodes.Text.Rotation.Angle": 0,
-  // No rotation
-  "📦 Enhanced Nodes.UI & Æmotion Studio About": 0
-  // Closed panel
 });
 function createFlowField(t, phase) {
   return {
@@ -722,17 +586,14 @@ const MarkerShapes = {
 function shapeNeedsFill(name) {
   return name !== "cross" && name !== "none";
 }
-function setting$2(key, def) {
-  return app.ui.settings.getSettingValue(key) ?? def;
-}
 function renderSacredFlow(ctx, items, phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
-  const colorScheme = setting$2("🔗 Enhanced Links.Color.Scheme", "default");
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
+  const animSpeed = L.animationSpeed;
+  const colorScheme = L.colorScheme;
   const speedReductionFactor = 0.25;
   const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
   ctx.shadowBlur = glowIntensity;
@@ -786,11 +647,11 @@ function renderSacredFlow(ctx, items, phase, state) {
 }
 function renderCrystalStream(ctx, items, _phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
+  const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   const createCrystal2 = (cx, x, y, size, rotation, color) => {
     cx.save();
@@ -833,10 +694,10 @@ function renderCrystalStream(ctx, items, _phase, state) {
   });
 }
 function renderQuantumField(ctx, items, phase, _state) {
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -872,10 +733,10 @@ function renderQuantumField(ctx, items, phase, _state) {
   });
 }
 function renderCosmicWeave(ctx, items, _phase, state) {
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   const direction = state.direction;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
@@ -916,10 +777,10 @@ function renderCosmicWeave(ctx, items, _phase, state) {
 }
 function renderEnergyPulse(ctx, items, _phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const animSpeed = L.animationSpeed;
   const speedReductionFactor = 0.25;
   const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
@@ -953,10 +814,10 @@ function renderEnergyPulse(ctx, items, _phase, state) {
 }
 function renderDNAHelix(ctx, items, _phase, state) {
   const direction = -state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
     const r = getLinkRenderer(linkStyle);
@@ -1013,11 +874,11 @@ function renderDNAHelix(ctx, items, _phase, state) {
 }
 function renderLavaFlow(ctx, items, phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
+  const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
     const r = getLinkRenderer(linkStyle);
@@ -1095,11 +956,11 @@ function renderLavaFlow(ctx, items, phase, state) {
 }
 function renderStellarPlasma(ctx, items, _phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
+  const animSpeed = L.animationSpeed;
   const continuousPhase = -(state.totalTime || 0) * animSpeed;
   items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
     const r = getLinkRenderer(linkStyle);
@@ -1147,21 +1008,21 @@ function renderStellarPlasma(ctx, items, _phase, state) {
 }
 function renderClassicFlow(ctx, items, phase, state) {
   const direction = state.direction;
-  const quality = setting$2("🔗 Enhanced Links.Quality", 2);
-  const thickness = setting$2("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$2("🔗 Enhanced Links.Glow.Intensity", 10);
-  const particleDensity = setting$2("🔗 Enhanced Links.Particle.Density", 1);
-  const animSpeed = setting$2("🔗 Enhanced Links.Animation.Speed", 1);
-  const markerEnabled = setting$2("🔗 Enhanced Links.Marker.Enabled", true);
-  const markerShape = setting$2("🔗 Enhanced Links.Marker.Shape", "diamond");
-  const markerSize = setting$2("🔗 Enhanced Links.Marker.Size", 1.5);
-  const markerColorMode = setting$2("🔗 Enhanced Links.Marker.Color.Mode", "inherit");
-  const markerColor = setting$2("🔗 Enhanced Links.Marker.Color", "#ffffff");
-  const markerGlow = setting$2("🔗 Enhanced Links.Marker.Glow", 10);
-  const markerEffect = setting$2("🔗 Enhanced Links.Marker.Effects", "none");
-  const colorScheme = setting$2("🔗 Enhanced Links.Color.Scheme", "default");
-  const shadowBlur = setting$2("🔗 Enhanced Links.Shadow.Blur", 5);
-  const shadowOffset = setting$2("🔗 Enhanced Links.Shadow.Offset", 3);
+  const quality = L.quality;
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const particleDensity = L.particleDensity;
+  const animSpeed = L.animationSpeed;
+  const markerEnabled = L.markerEnabled;
+  const markerShape = L.markerShape;
+  const markerSize = L.markerSize;
+  const markerColorMode = L.markerColorMode;
+  const markerColor = L.markerColor;
+  const markerGlow = L.markerGlow;
+  const markerEffect = L.markerEffects;
+  const colorScheme = L.colorScheme;
+  const shadowBlur = L.shadowBlur;
+  const shadowOffset = L.shadowOffset;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
@@ -1170,7 +1031,7 @@ function renderClassicFlow(ctx, items, phase, state) {
       const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
       const enhancedColor = enhanceColor(linkColor, colorScheme);
       ctx.lineWidth = thickness;
-      const linkShadowEnabled = setting$2("🔗 Enhanced Links.Link.Shadow.Enabled", false);
+      const linkShadowEnabled = L.linkShadowEnabled;
       if (linkShadowEnabled) {
         ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
         ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
@@ -1229,7 +1090,7 @@ function renderClassicFlow(ctx, items, phase, state) {
         }
         const shapeFn = MarkerShapes[markerShape];
         if (shapeFn) {
-          const markerShadowEnabled = setting$2("🔗 Enhanced Links.Marker.Shadow.Enabled", false);
+          const markerShadowEnabled = L.markerShadowEnabled;
           if (markerShadowEnabled) {
             ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
             ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
@@ -1273,13 +1134,10 @@ function renderAnimatedStyle(ctx, items, style, phase, state) {
     renderer(ctx, items, phase, state);
   }
 }
-function setting$1(key, def) {
-  return app.ui.settings.getSettingValue(key) ?? def;
-}
 function renderStatic1(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1310,9 +1168,9 @@ function renderStatic1(ctx, items, phase) {
   });
 }
 function renderStatic2(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1332,9 +1190,9 @@ function renderStatic2(ctx, items, phase) {
   });
 }
 function renderStatic3(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1370,10 +1228,10 @@ function renderStatic3(ctx, items, phase) {
   });
 }
 function renderStatic4(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
-  const direction = setting$1("🔗 Enhanced Links.Direction", 1);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
+  const direction = L.direction;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1411,9 +1269,9 @@ function renderStatic4(ctx, items, phase) {
   });
 }
 function renderStatic5(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1442,9 +1300,9 @@ function renderStatic5(ctx, items, phase) {
   });
 }
 function renderStatic6(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1494,9 +1352,9 @@ function renderStatic6(ctx, items, phase) {
   });
 }
 function renderStatic7(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1543,9 +1401,9 @@ function renderStatic7(ctx, items, phase) {
   });
 }
 function renderStatic8(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = getLinkColor(defaultColor);
@@ -1590,20 +1448,20 @@ function renderStatic8(ctx, items, phase) {
   });
 }
 function renderStatic9(ctx, items, phase) {
-  const thickness = setting$1("🔗 Enhanced Links.Thickness", 2);
-  const glowIntensity = setting$1("🔗 Enhanced Links.Glow.Intensity", 10);
-  const quality = setting$1("🔗 Enhanced Links.Quality", 2);
-  const markerEnabled = setting$1("🔗 Enhanced Links.Marker.Enabled", true);
-  const markerShape = setting$1("🔗 Enhanced Links.Marker.Shape", "diamond");
-  const markerSize = setting$1("🔗 Enhanced Links.Marker.Size", 1.5);
-  const markerColorMode = setting$1("🔗 Enhanced Links.Marker.Color.Mode", "inherit");
-  const markerColor = setting$1("🔗 Enhanced Links.Marker.Color", "#ffffff");
-  const markerGlow = setting$1("🔗 Enhanced Links.Marker.Glow", 10);
-  const markerEffect = setting$1("🔗 Enhanced Links.Marker.Effects", "none");
-  const colorScheme = setting$1("🔗 Enhanced Links.Color.Scheme", "default");
-  const particleDensity = setting$1("🔗 Enhanced Links.Particle.Density", 1);
-  const shadowBlur = setting$1("🔗 Enhanced Links.Shadow.Blur", 5);
-  const shadowOffset = setting$1("🔗 Enhanced Links.Shadow.Offset", 3);
+  const thickness = L.thickness;
+  const glowIntensity = L.glowIntensity;
+  const quality = L.quality;
+  const markerEnabled = L.markerEnabled;
+  const markerShape = L.markerShape;
+  const markerSize = L.markerSize;
+  const markerColorMode = L.markerColorMode;
+  const markerColor = L.markerColor;
+  const markerGlow = L.markerGlow;
+  const markerEffect = L.markerEffects;
+  const colorScheme = L.colorScheme;
+  const particleDensity = L.particleDensity;
+  const shadowBlur = L.shadowBlur;
+  const shadowOffset = L.shadowOffset;
   items.forEach(({ start, end, defaultColor, linkStyle }) => {
     const r = getLinkRenderer(linkStyle);
     const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
@@ -1611,7 +1469,7 @@ function renderStatic9(ctx, items, phase) {
       const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
       const enhancedColor = enhanceColor(linkColor, colorScheme);
       ctx.lineWidth = thickness;
-      const linkShadowEnabled = setting$1("🔗 Enhanced Links.Link.Shadow.Enabled", false);
+      const linkShadowEnabled = L.linkShadowEnabled;
       if (linkShadowEnabled) {
         ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
         ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
@@ -1667,7 +1525,7 @@ function renderStatic9(ctx, items, phase) {
         }
         const shapeFn = MarkerShapes[markerShape];
         if (shapeFn) {
-          const markerShadowEnabled = setting$1("🔗 Enhanced Links.Marker.Shadow.Enabled", false);
+          const markerShadowEnabled = L.markerShadowEnabled;
           if (markerShadowEnabled) {
             ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
             ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
@@ -1711,80 +1569,10 @@ function renderStaticStyle(ctx, items, style, phase) {
     renderer(ctx, items, phase);
   }
 }
-const LINK_ANIMATION_OPTIONS = [
-  { value: 0, text: "⭘️ Off" },
-  { value: 9, text: "🔄 Classic Flow" },
-  { value: 1, text: "✨ Sacred Flow" },
-  { value: 2, text: "💎 Crystal Stream" },
-  { value: 3, text: "🔬 Quantum Field" },
-  { value: 4, text: "🌌 Cosmic Weave" },
-  { value: 5, text: "⚡ Energy Pulse" },
-  { value: 6, text: "🧬 DNA Helix" },
-  { value: 7, text: "🌋 Lava Flow" },
-  { value: 8, text: "🌠 Stellar Plasma" }
-];
-const LINK_STYLE_OPTIONS = [
-  { value: "spline", text: "🔗 Spline (Default)" },
-  { value: "straight", text: "📏 Straight" },
-  { value: "linear", text: "📐 Linear (Right Angle)" },
-  { value: "hidden", text: "👻 Hidden" },
-  { value: "dotted", text: "⚪ Dotted" },
-  { value: "dashed", text: "➖ Dashed" },
-  { value: "double", text: "= Double" },
-  { value: "stepped", text: "📶 Stepped" },
-  { value: "zigzag", text: "⚡ Zigzag" },
-  { value: "rope", text: "🧵 Rope" },
-  { value: "glowpath", text: "✨ Glow Path" },
-  { value: "chain", text: "⛓️ Chain" },
-  { value: "pulse", text: "💓 Pulse" },
-  { value: "holographic", text: "🌈 Holographic" }
-];
-const MARKER_SHAPE_OPTIONS = [
-  { value: "none", text: "⭘️ None" },
-  { value: "arrow", text: "➤ Arrow" },
-  { value: "diamond", text: "◇ Diamond" },
-  { value: "circle", text: "● Circle" },
-  { value: "square", text: "■ Square" },
-  { value: "triangle", text: "▲ Triangle" },
-  { value: "star", text: "★ Star" },
-  { value: "heart", text: "♥ Heart" },
-  { value: "cross", text: "✚ Cross" },
-  { value: "hexagon", text: "⬡ Hexagon" },
-  { value: "flower", text: "✿ Flower" },
-  { value: "spiral", text: "🌀 Spiral" }
-];
-const NODE_ANIMATION_OPTIONS = [
-  { value: 0, text: "⭘️ Off" },
-  { value: 1, text: "💫 Gentle Pulse" },
-  { value: 2, text: "⚡ Neon Nexus" },
-  { value: 3, text: "🌌 Cosmic Ripple" },
-  { value: 4, text: "✿ Flower of Life" }
-];
-const DIRECTION_OPTIONS = [
-  { value: 1, text: "➡️ Forward" },
-  { value: -1, text: "⬅️ Reverse" }
-];
-const COLOR_MODE_OPTIONS = [
-  { value: "default", text: "🎨 Default" },
-  { value: "custom", text: "🖌️ Custom" }
-];
-const COLOR_SCHEME_OPTIONS = [
-  { value: "default", text: "🎨 Original" },
-  { value: "saturated", text: "🌈 Saturated" },
-  { value: "vivid", text: "💥 Vivid" },
-  { value: "contrast", text: "⚡ High Contrast" },
-  { value: "bright", text: "☀️ Bright" },
-  { value: "muted", text: "🌙 Muted" }
-];
-const QUALITY_OPTIONS = [
-  { value: 1, text: "🚀 Basic (Fast)" },
-  { value: 2, text: "⚖️ Balanced" },
-  { value: 3, text: "💎 Enhanced" }
-];
 const Icons = {
   chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`
 };
-function createSlider(label, value, min, max, step, unit, onChange, tooltip) {
+function createSlider(label, value, min, max, step, unit, onInput, onChange, tooltip) {
   const row = document.createElement("div");
   row.className = "enh-control-row";
   if (tooltip) row.title = tooltip;
@@ -1816,8 +1604,9 @@ function createSlider(label, value, min, max, step, unit, onChange, tooltip) {
     const newValue = parseFloat(slider.value);
     valueEl.textContent = `${newValue}${unit}`;
     slider.setAttribute("aria-valuetext", `${newValue}${unit}`);
-    onChange(newValue);
+    onInput(newValue);
   });
+  slider.addEventListener("change", () => onChange(parseFloat(slider.value)));
   row.appendChild(labelRow);
   row.appendChild(slider);
   return row;
@@ -1890,7 +1679,7 @@ function createSelect(label, currentValue, options, onChange, tooltip) {
   row.appendChild(select);
   return row;
 }
-function createColorPicker(label, value, onChange, tooltip) {
+function createColorPicker(label, value, onInput, onChange, tooltip) {
   const row = document.createElement("div");
   row.className = "enh-control-row enh-color-row";
   if (tooltip) row.title = tooltip;
@@ -1929,8 +1718,9 @@ function createColorPicker(label, value, onChange, tooltip) {
   colorPreview.addEventListener("change", updateFromText);
   colorInput.addEventListener("input", () => {
     colorPreview.value = colorInput.value;
-    onChange(colorInput.value);
+    onInput(colorInput.value);
   });
+  colorInput.addEventListener("change", () => onChange(colorInput.value));
   colorWrapper.appendChild(colorInput);
   colorWrapper.appendChild(colorPreview);
   row.appendChild(labelEl);
@@ -1977,468 +1767,322 @@ function createSection(title, defaultCollapsed = true) {
   section.appendChild(body);
   return { section, body };
 }
-function getLinkSetting(key) {
-  const defaultValue = LINK_DEFAULTS[key];
-  const val = app.ui.settings.getSettingValue(key);
-  return val ?? defaultValue;
-}
-function getNodeSetting(key) {
-  const defaultValue = NODE_DEFAULTS[key];
-  const val = app.ui.settings.getSettingValue(key);
-  return val ?? defaultValue;
-}
-function setSetting(key, value) {
-  app.ui.settings.setSettingValue(key, value);
-  forceCanvasRedraw();
-}
-function forceCanvasRedraw() {
-  if (app.graph && app.graph.canvas) {
-    app.graph.canvas.dirty_canvas = true;
-    app.graph.canvas.dirty_bgcanvas = true;
-    app.graph.canvas.draw(true, true);
+function control(label, id, tooltip, unit = "") {
+  const s = SETTINGS.find((e) => e.id === id);
+  const value = snapshotOf(id)[s.key];
+  switch (s.type) {
+    case "slider":
+      return createSlider(label, value, s.min, s.max, s.step, unit, (v) => preview(id, v), (v) => commit(id, v), tooltip);
+    case "boolean":
+      return createToggle(label, value, (v) => commit(id, v), tooltip);
+    case "combo":
+      return createSelect(label, value, s.options, (v) => commit(id, v), tooltip);
+    case "color":
+      return createColorPicker(label, value, (v) => preview(id, v), (v) => commit(id, v), tooltip);
   }
 }
-const MARKER_EFFECT_OPTIONS = [
-  { value: "none", text: "⭘️ None" },
-  { value: "pulse", text: "💓 Pulse" },
-  { value: "fade", text: "🌫️ Fade" },
-  { value: "rainbow", text: "🌈 Rainbow" }
-];
-const PARTICLE_COLOR_MODE_OPTIONS = [
-  { value: "default", text: "🎨 Default" },
-  { value: "rainbow", text: "🌈 Rainbow" },
-  { value: "complementary", text: "🔄 Complementary" },
-  { value: "energy", text: "⚡ Energy" },
-  { value: "quantum", text: "🔬 Quantum" },
-  { value: "aurora", text: "🌌 Aurora" }
-];
 function renderLinkAnimationSection(container) {
   const { section, body } = createSection("🎬 Animation", true);
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Animation Style",
-    getLinkSetting("🔗 Enhanced Links.Animate"),
-    LINK_ANIMATION_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Animate", v),
+    "🔗 Enhanced Links.Animate",
     "Select the animation effect for link connections"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Static Mode",
-    getLinkSetting("🔗 Enhanced Links.Static.Mode"),
-    (v) => setSetting("🔗 Enhanced Links.Static.Mode", v),
+    "🔗 Enhanced Links.Static.Mode",
     "Display a static snapshot of the animation"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Speed",
-    getLinkSetting("🔗 Enhanced Links.Animation.Speed"),
-    0.1,
-    5,
-    0.1,
-    "x",
-    (v) => setSetting("🔗 Enhanced Links.Animation.Speed", v),
-    "Animation playback speed"
+    "🔗 Enhanced Links.Animation.Speed",
+    "Animation playback speed",
+    "x"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Direction",
-    getLinkSetting("🔗 Enhanced Links.Direction"),
-    DIRECTION_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Direction", v),
+    "🔗 Enhanced Links.Direction",
     "Flow direction along links"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Pause During Render",
-    getLinkSetting("🔗 Enhanced Links.Pause.During.Render"),
-    (v) => setSetting("🔗 Enhanced Links.Pause.During.Render", v),
+    "🔗 Enhanced Links.Pause.During.Render",
     "Pause animations while ComfyUI is processing"
   ));
   container.appendChild(section);
 }
 function renderLinkStyleSection(container) {
   const { section, body } = createSection("🔗 Link Style", true);
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Link Style",
-    getLinkSetting("🔗 Enhanced Links.Link.Style"),
-    LINK_STYLE_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Link.Style", v),
+    "🔗 Enhanced Links.Link.Style",
     "Visual style for link connections"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Thickness",
-    getLinkSetting("🔗 Enhanced Links.Thickness"),
-    1,
-    10,
-    0.5,
-    "px",
-    (v) => setSetting("🔗 Enhanced Links.Thickness", v),
-    "Link line thickness"
+    "🔗 Enhanced Links.Thickness",
+    "Link line thickness",
+    "px"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Quality",
-    getLinkSetting("🔗 Enhanced Links.Quality"),
-    QUALITY_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Quality", v),
+    "🔗 Enhanced Links.Quality",
     "Rendering quality — higher uses more GPU"
   ));
   container.appendChild(section);
 }
 function renderLinkColorSection(container) {
   const { section, body } = createSection("🎨 Colors", true);
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Mode",
-    getLinkSetting("🔗 Enhanced Links.Color.Mode"),
-    COLOR_MODE_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Color.Mode", v),
+    "🔗 Enhanced Links.Color.Mode",
     "How colors are determined for link animations"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Scheme",
-    getLinkSetting("🔗 Enhanced Links.Color.Scheme"),
-    COLOR_SCHEME_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Color.Scheme", v),
+    "🔗 Enhanced Links.Color.Scheme",
     "Preset color scheme for link types"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Primary Color",
-    getLinkSetting("🔗 Enhanced Links.Color.Primary"),
-    (v) => setSetting("🔗 Enhanced Links.Color.Primary", v),
+    "🔗 Enhanced Links.Color.Primary",
     "Primary animation color"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Secondary Color",
-    getLinkSetting("🔗 Enhanced Links.Color.Secondary"),
-    (v) => setSetting("🔗 Enhanced Links.Color.Secondary", v),
+    "🔗 Enhanced Links.Color.Secondary",
     "Secondary animation color"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Accent Color",
-    getLinkSetting("🔗 Enhanced Links.Color.Accent"),
-    (v) => setSetting("🔗 Enhanced Links.Color.Accent", v),
+    "🔗 Enhanced Links.Color.Accent",
     "Accent animation color"
   ));
   container.appendChild(section);
 }
 function renderLinkEffectsSection(container) {
   const { section, body } = createSection("✨ Effects", true);
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Glow Intensity",
-    getLinkSetting("🔗 Enhanced Links.Glow.Intensity"),
-    0,
-    20,
-    1,
-    "",
-    (v) => setSetting("🔗 Enhanced Links.Glow.Intensity", v),
+    "🔗 Enhanced Links.Glow.Intensity",
     "Intensity of the glow effect around links"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Particle Density",
-    getLinkSetting("🔗 Enhanced Links.Particle.Density"),
-    0,
-    2,
-    0.1,
-    "",
-    (v) => setSetting("🔗 Enhanced Links.Particle.Density", v),
+    "🔗 Enhanced Links.Particle.Density",
     "Number of particles along links"
   ));
   container.appendChild(section);
 }
 function renderLinkMarkerSection(container) {
   const { section, body } = createSection("➤ Markers", true);
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Enabled",
-    getLinkSetting("🔗 Enhanced Links.Marker.Enabled"),
-    (v) => setSetting("🔗 Enhanced Links.Marker.Enabled", v),
+    "🔗 Enhanced Links.Marker.Enabled",
     "Show flow direction markers on links"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Shape",
-    getLinkSetting("🔗 Enhanced Links.Marker.Shape"),
-    MARKER_SHAPE_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Marker.Shape", v),
+    "🔗 Enhanced Links.Marker.Shape",
     "Shape of the flow markers"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Size",
-    getLinkSetting("🔗 Enhanced Links.Marker.Size"),
-    1,
-    5,
-    0.5,
-    "",
-    (v) => setSetting("🔗 Enhanced Links.Marker.Size", v),
+    "🔗 Enhanced Links.Marker.Size",
     "Size of flow markers"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Mode",
-    getLinkSetting("🔗 Enhanced Links.Marker.Color.Mode"),
-    COLOR_MODE_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Marker.Color.Mode", v),
+    "🔗 Enhanced Links.Marker.Color.Mode",
     "How marker colors are determined"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Custom Color",
-    getLinkSetting("🔗 Enhanced Links.Marker.Color"),
-    (v) => setSetting("🔗 Enhanced Links.Marker.Color", v),
+    "🔗 Enhanced Links.Marker.Color",
     "Custom marker color (when Color Mode is Custom)"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Glow",
-    getLinkSetting("🔗 Enhanced Links.Marker.Glow"),
-    0,
-    20,
-    1,
-    "",
-    (v) => setSetting("🔗 Enhanced Links.Marker.Glow", v),
+    "🔗 Enhanced Links.Marker.Glow",
     "Glow intensity for markers"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Effects",
-    getLinkSetting("🔗 Enhanced Links.Marker.Effects"),
-    MARKER_EFFECT_OPTIONS,
-    (v) => setSetting("🔗 Enhanced Links.Marker.Effects", v),
+    "🔗 Enhanced Links.Marker.Effects",
     "Additional marker animation effects"
   ));
   container.appendChild(section);
 }
 function renderLinkShadowSection(container) {
   const { section, body } = createSection("🌑 Shadows", true);
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Link Shadows",
-    getLinkSetting("🔗 Enhanced Links.Link.Shadow.Enabled"),
-    (v) => setSetting("🔗 Enhanced Links.Link.Shadow.Enabled", v),
+    "🔗 Enhanced Links.Link.Shadow.Enabled",
     "Enable drop shadows on links"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Marker Shadows",
-    getLinkSetting("🔗 Enhanced Links.Marker.Shadow.Enabled"),
-    (v) => setSetting("🔗 Enhanced Links.Marker.Shadow.Enabled", v),
+    "🔗 Enhanced Links.Marker.Shadow.Enabled",
     "Enable drop shadows on markers"
   ));
   container.appendChild(section);
 }
 function renderNodeAnimationSection(container) {
   const { section, body } = createSection("🎬 Animation", true);
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Animation Style",
-    getNodeSetting("📦 Enhanced Nodes.Animate"),
-    NODE_ANIMATION_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Animate", v),
+    "📦 Enhanced Nodes.Animate",
     "Select the animation effect for nodes"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Animations Enabled",
-    getNodeSetting("📦 Enhanced Nodes.Animations.Enabled"),
-    (v) => setSetting("📦 Enhanced Nodes.Animations.Enabled", v),
+    "📦 Enhanced Nodes.Animations.Enabled",
     "Master toggle for all node animations"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Speed",
-    getNodeSetting("📦 Enhanced Nodes.Animation.Speed"),
-    0.1,
-    5,
-    0.1,
-    "x",
-    (v) => setSetting("📦 Enhanced Nodes.Animation.Speed", v),
-    "Animation playback speed"
+    "📦 Enhanced Nodes.Animation.Speed",
+    "Animation playback speed",
+    "x"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Direction",
-    getNodeSetting("📦 Enhanced Nodes.Direction"),
-    DIRECTION_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Direction", v),
+    "📦 Enhanced Nodes.Direction",
     "Animation direction"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Static Mode",
-    getNodeSetting("📦 Enhanced Nodes.Static.Mode"),
-    (v) => setSetting("📦 Enhanced Nodes.Static.Mode", v),
+    "📦 Enhanced Nodes.Static.Mode",
     "Display a static snapshot of the animation"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "End Animation",
-    getNodeSetting("📦 Enhanced Nodes.End Animation.Enabled"),
-    (v) => setSetting("📦 Enhanced Nodes.End Animation.Enabled", v),
+    "📦 Enhanced Nodes.End Animation.Enabled",
     "Play completion animation when a node finishes processing"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Pause During Render",
-    getNodeSetting("📦 Enhanced Nodes.Pause.During.Render"),
-    (v) => setSetting("📦 Enhanced Nodes.Pause.During.Render", v),
+    "📦 Enhanced Nodes.Pause.During.Render",
     "Pause animations while ComfyUI is processing"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Animation Size",
-    getNodeSetting("📦 Enhanced Nodes.Animation.Size"),
-    0.5,
-    3,
-    0.1,
-    "x",
-    (v) => setSetting("📦 Enhanced Nodes.Animation.Size", v),
-    "Scale of the animation effect area"
+    "📦 Enhanced Nodes.Animation.Size",
+    "Scale of the animation effect area",
+    "x"
   ));
   container.appendChild(section);
 }
 function renderNodeColorSection(container) {
   const { section, body } = createSection("🎨 Colors", true);
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Mode",
-    getNodeSetting("📦 Enhanced Nodes.Color.Mode"),
-    COLOR_MODE_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Color.Mode", v),
+    "📦 Enhanced Nodes.Color.Mode",
     "How colors are determined for node animations"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Scheme",
-    getNodeSetting("📦 Enhanced Nodes.Color.Scheme"),
-    COLOR_SCHEME_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Color.Scheme", v),
+    "📦 Enhanced Nodes.Color.Scheme",
     "Preset color scheme"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Primary Color",
-    getNodeSetting("📦 Enhanced Nodes.Color.Primary"),
-    (v) => setSetting("📦 Enhanced Nodes.Color.Primary", v),
+    "📦 Enhanced Nodes.Color.Primary",
     "Primary animation color"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Secondary Color",
-    getNodeSetting("📦 Enhanced Nodes.Color.Secondary"),
-    (v) => setSetting("📦 Enhanced Nodes.Color.Secondary", v),
+    "📦 Enhanced Nodes.Color.Secondary",
     "Secondary animation color"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Accent Color",
-    getNodeSetting("📦 Enhanced Nodes.Color.Accent"),
-    (v) => setSetting("📦 Enhanced Nodes.Color.Accent", v),
+    "📦 Enhanced Nodes.Color.Accent",
     "Accent animation color"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Hover Color",
-    getNodeSetting("📦 Enhanced Nodes.Color.Hover") ?? "#ffffff",
-    (v) => setSetting("📦 Enhanced Nodes.Color.Hover", v),
+    "📦 Enhanced Nodes.Color.Hover",
     "Color shown on node hover"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Show Hover Effect",
-    getNodeSetting("📦 Enhanced Nodes.Color.Hover.Show") ?? true,
-    (v) => setSetting("📦 Enhanced Nodes.Color.Hover.Show", v),
+    "📦 Enhanced Nodes.Color.Hover.Show",
     "Show hover highlight on nodes"
   ));
   container.appendChild(section);
 }
 function renderNodeGlowSection(container) {
   const { section, body } = createSection("✨ Glow", true);
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Glow Level",
-    getNodeSetting("📦 Enhanced Nodes.Glow"),
-    0,
-    2,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Glow", v),
+    "📦 Enhanced Nodes.Glow",
     "Base glow intensity"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Animation Glow",
-    getNodeSetting("📦 Enhanced Nodes.Animation.Glow"),
-    0,
-    2,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Animation.Glow", v),
+    "📦 Enhanced Nodes.Animation.Glow",
     "Glow intensity during animation"
   ));
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Show Glow",
-    getNodeSetting("📦 Enhanced Nodes.Glow.Show"),
-    (v) => setSetting("📦 Enhanced Nodes.Glow.Show", v),
+    "📦 Enhanced Nodes.Glow.Show",
     "Toggle glow effect visibility"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Intensity",
-    getNodeSetting("📦 Enhanced Nodes.Intensity"),
-    0,
-    3,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Intensity", v),
+    "📦 Enhanced Nodes.Intensity",
     "Overall effect intensity"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Quality",
-    getNodeSetting("📦 Enhanced Nodes.Quality"),
-    QUALITY_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Quality", v),
+    "📦 Enhanced Nodes.Quality",
     "Rendering quality — higher uses more GPU"
   ));
   container.appendChild(section);
 }
 function renderNodeParticleSection(container) {
   const { section, body } = createSection("🌠 Particles", true);
-  body.appendChild(createToggle(
+  body.appendChild(control(
     "Show Particles",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Show"),
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Show", v),
+    "📦 Enhanced Nodes.Particle.Show",
     "Toggle particle display"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Density",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Density"),
-    0,
-    3,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Density", v),
+    "📦 Enhanced Nodes.Particle.Density",
     "Number of particles per node"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Speed",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Speed"),
-    0.1,
-    5,
-    0.1,
-    "x",
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Speed", v),
-    "Particle movement speed"
+    "📦 Enhanced Nodes.Particle.Speed",
+    "Particle movement speed",
+    "x"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Intensity",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Intensity"),
-    0,
-    3,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Intensity", v),
+    "📦 Enhanced Nodes.Particle.Intensity",
     "Particle brightness/opacity"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Size",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Size"),
-    0.1,
-    3,
-    0.1,
-    "x",
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Size", v),
-    "Particle size"
+    "📦 Enhanced Nodes.Particle.Size",
+    "Particle size",
+    "x"
   ));
-  body.appendChild(createSlider(
+  body.appendChild(control(
     "Glow",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Glow"),
-    0,
-    2,
-    0.1,
-    "",
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Glow", v),
+    "📦 Enhanced Nodes.Particle.Glow",
     "Particle glow intensity"
   ));
-  body.appendChild(createSelect(
+  body.appendChild(control(
     "Color Mode",
-    getNodeSetting("📦 Enhanced Nodes.Particle.Color.Mode"),
-    PARTICLE_COLOR_MODE_OPTIONS,
-    (v) => setSetting("📦 Enhanced Nodes.Particle.Color.Mode", v),
+    "📦 Enhanced Nodes.Particle.Color.Mode",
     "How particle colors are determined"
   ));
-  body.appendChild(createColorPicker(
+  body.appendChild(control(
     "Particle Color",
-    getNodeSetting("📦 Enhanced Nodes.Color.Particle"),
-    (v) => setSetting("📦 Enhanced Nodes.Color.Particle", v),
+    "📦 Enhanced Nodes.Color.Particle",
     "Custom particle color"
   ));
   container.appendChild(section);
@@ -2454,7 +2098,7 @@ function renderSettingsPanel(container) {
   renderLinkEffectsSection(container);
   renderLinkMarkerSection(container);
   renderLinkShadowSection(container);
-  container.appendChild(createResetButton("Reset Link Settings to Defaults", LINK_DEFAULTS, container));
+  container.appendChild(createResetButton("Reset Link Settings to Defaults", "🔗 Enhanced Links.", container));
   const nodeHeader = document.createElement("div");
   nodeHeader.className = "enh-section-divider";
   nodeHeader.textContent = "📦 Node Settings";
@@ -2463,7 +2107,7 @@ function renderSettingsPanel(container) {
   renderNodeColorSection(container);
   renderNodeGlowSection(container);
   renderNodeParticleSection(container);
-  container.appendChild(createResetButton("Reset Node Settings to Defaults", NODE_DEFAULTS, container));
+  container.appendChild(createResetButton("Reset Node Settings to Defaults", "📦 Enhanced Nodes.", container));
   const about = document.createElement("div");
   about.className = "enh-about";
   about.innerHTML = `
@@ -2475,7 +2119,7 @@ function renderSettingsPanel(container) {
     `;
   container.appendChild(about);
 }
-function createResetButton(label, defaults, panelContainer) {
+function createResetButton(label, prefix, panelContainer) {
   const wrapper = document.createElement("div");
   wrapper.style.cssText = "display:flex;justify-content:center;padding:8px 12px;";
   const btn = document.createElement("button");
@@ -2504,13 +2148,9 @@ function createResetButton(label, defaults, panelContainer) {
     btn.style.color = "#ff9999";
   });
   btn.addEventListener("click", () => {
-    for (const [key, defaultValue] of Object.entries(defaults)) {
-      if (key.includes("About")) continue;
-      app.ui.settings.setSettingValue(key, defaultValue);
-    }
+    reset(prefix);
     panelContainer.innerHTML = "";
     renderSettingsPanel(panelContainer);
-    forceCanvasRedraw();
   });
   wrapper.appendChild(btn);
   return wrapper;
@@ -2573,90 +2213,6 @@ function initSidebar() {
     registerSidebar();
   }, 100);
 }
-function inferType(value) {
-  if (typeof value === "boolean") return "boolean";
-  if (typeof value === "string") {
-    if (value.startsWith("#")) return "color";
-    return "combo";
-  }
-  return "slider";
-}
-const OPTION_MAP = {
-  "🔗 Enhanced Links.Animate": LINK_ANIMATION_OPTIONS,
-  "🔗 Enhanced Links.Link.Style": LINK_STYLE_OPTIONS,
-  "🔗 Enhanced Links.Marker.Shape": MARKER_SHAPE_OPTIONS,
-  "🔗 Enhanced Links.Quality": QUALITY_OPTIONS,
-  "🔗 Enhanced Links.Direction": DIRECTION_OPTIONS,
-  "🔗 Enhanced Links.Color.Mode": COLOR_MODE_OPTIONS,
-  "🔗 Enhanced Links.Color.Scheme": COLOR_SCHEME_OPTIONS,
-  "🔗 Enhanced Links.Marker.Color.Mode": COLOR_MODE_OPTIONS,
-  "📦 Enhanced Nodes.Animate": NODE_ANIMATION_OPTIONS,
-  "📦 Enhanced Nodes.Quality": QUALITY_OPTIONS,
-  "📦 Enhanced Nodes.Direction": DIRECTION_OPTIONS,
-  "📦 Enhanced Nodes.Color.Mode": COLOR_MODE_OPTIONS,
-  "📦 Enhanced Nodes.Color.Scheme": COLOR_SCHEME_OPTIONS
-};
-let registered = false;
-function registerAllSettings() {
-  if (registered) return;
-  registered = true;
-  const allDefaults = {
-    ...LINK_DEFAULTS,
-    ...NODE_DEFAULTS
-  };
-  for (const [id, defaultValue] of Object.entries(allDefaults)) {
-    if (id.includes("UI & Æmotion Studio About")) continue;
-    const type = inferType(defaultValue);
-    const options = OPTION_MAP[id];
-    try {
-      if (type === "boolean") {
-        app.ui.settings.addSetting({
-          id,
-          name: id,
-          type: "boolean",
-          defaultValue,
-          category: ["Enhanced Links & Nodes"]
-        });
-      } else if (options) {
-        app.ui.settings.addSetting({
-          id,
-          name: id,
-          type: "combo",
-          options,
-          defaultValue,
-          category: ["Enhanced Links & Nodes"]
-        });
-      } else if (type === "color") {
-        app.ui.settings.addSetting({
-          id,
-          name: id,
-          type: "color",
-          defaultValue,
-          category: ["Enhanced Links & Nodes"]
-        });
-      } else {
-        app.ui.settings.addSetting({
-          id,
-          name: id,
-          type: "slider",
-          defaultValue,
-          attrs: {
-            min: 0,
-            max: 20,
-            step: 0.1
-          },
-          category: ["Enhanced Links & Nodes"]
-        });
-      }
-    } catch (e) {
-      console.warn(`[EnhancedLinks] Failed to register setting: ${id}`, e);
-    }
-  }
-  console.log(`[EnhancedLinks] Registered ${Object.keys(allDefaults).length} settings`);
-}
-function setting(key, def) {
-  return app.ui.settings.getSettingValue(key) ?? def;
-}
 const AnimationState = {
   direction: 1,
   targetPhase: 0,
@@ -2664,8 +2220,8 @@ const AnimationState = {
   lastPhaseUpdate: 0,
   transitionSpeed: 2 * Math.PI / (10 * 1.5),
   update(delta) {
-    const dir = setting("🔗 Enhanced Links.Direction", 1);
-    const speed = Math.max(0.01, setting("🔗 Enhanced Links.Animation.Speed", 1));
+    const dir = L.direction;
+    const speed = Math.max(0.01, L.animationSpeed);
     this.direction = dir;
     return State.phase + this.transitionSpeed * delta * speed * this.direction;
   }
@@ -2700,8 +2256,8 @@ const State = {
 };
 const ext = {
   name: "enhanced.link.animations",
-  async setup(_comfyApp) {
-    registerAllSettings();
+  settings: linkSettings,
+  async setup() {
     api.addEventListener("status", ({ detail }) => {
       State.isRunning = detail?.exec_info?.queue_remaining > 0;
       app.graph?.setDirtyCanvas(true, true);
@@ -2712,12 +2268,12 @@ const ext = {
       try {
         ctx.save();
         enableAntiAliasing(ctx);
-        const animStyle = setting("🔗 Enhanced Links.Animate", 4);
-        const linkStyle = setting("🔗 Enhanced Links.Link.Style", "spline");
-        const shouldPauseDuringRender = setting("🔗 Enhanced Links.Pause.During.Render", true);
-        const isStaticMode = setting("🔗 Enhanced Links.Static.Mode", false);
-        const quality = setting("🔗 Enhanced Links.Quality", 2);
-        const particleDensity = setting("🔗 Enhanced Links.Particle.Density", 1);
+        const animStyle = L.animate;
+        const linkStyle = L.linkStyle;
+        const shouldPauseDuringRender = L.pauseDuringRender;
+        const isStaticMode = L.staticMode;
+        const quality = L.quality;
+        const particleDensity = L.particleDensity;
         if (animStyle === 0) {
           origDrawConnections.call(this, ctx);
           ctx.restore();
@@ -2739,13 +2295,6 @@ const ext = {
             State.staticPhase = (State.staticPhase + Math.PI * 2) % (Math.PI * 4);
             State.forceUpdate = false;
             State.lastAnimStyle = animStyle;
-            if (app.graph?.canvas) {
-              app.graph.canvas.dirty_canvas = true;
-              app.graph.canvas.dirty_bgcanvas = true;
-              requestAnimationFrame(() => {
-                app.graph?.canvas?.draw(true, true);
-              });
-            }
           }
           phase = State.staticPhase;
         } else {
@@ -2801,9 +2350,9 @@ const ext = {
       }
     };
     function animate() {
-      const isStaticMode = setting("🔗 Enhanced Links.Static.Mode", false);
-      const animStyle = setting("🔗 Enhanced Links.Animate", 3);
-      const shouldPauseDuringRender = setting("🔗 Enhanced Links.Pause.During.Render", true);
+      const isStaticMode = L.staticMode;
+      const animStyle = L.animate;
+      const shouldPauseDuringRender = L.pauseDuringRender;
       if (shouldPauseDuringRender && State.isRunning) {
         if (!State.lastRenderState) {
           State.lastRenderState = {

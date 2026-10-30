@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
-import { d as getCustomNodeColors } from "./chunks/color-manager-BxBlhZuL.js";
+import { n as nodeSettings, N, f as getCustomNodeColors } from "./chunks/color-manager-CtPq5NfG.js";
 function createNodeState() {
   return {
     isRunning: false,
@@ -563,9 +563,6 @@ function getNodeEffect(style) {
       return gentlePulse;
   }
 }
-function setting(key, def) {
-  return app.ui.settings.getSettingValue(key) ?? def;
-}
 function hexToRGB(hex) {
   const validated = validateHexColor(hex) || "#00ffff";
   return [
@@ -575,17 +572,17 @@ function hexToRGB(hex) {
   ];
 }
 function drawAnimatedText(ctx, text, x, y, phase) {
-  const textAnimEnabled = setting("📦 Enhanced Nodes.Text.Animation.Enabled", false);
+  const textAnimEnabled = N.textAnimationEnabled;
   if (!textAnimEnabled) return;
-  const baseColor = setting("📦 Enhanced Nodes.Text.Color", "#00ffff");
-  const style = setting("📦 Enhanced Nodes.Text.Style", "neon");
-  const size = setting("📦 Enhanced Nodes.Text.Size", 14);
-  const glow = setting("📦 Enhanced Nodes.Text.Glow", 0.5);
-  const letterSpacing = setting("📦 Enhanced Nodes.Text.Letter.Spacing", 0);
-  const offsetY = setting("📦 Enhanced Nodes.Text.Position.Y", 0);
-  const offsetX = setting("📦 Enhanced Nodes.Text.Position.X", 0);
-  const rotationRadius = setting("📦 Enhanced Nodes.Text.Rotation.Radius", 0);
-  const rotationAngle = setting("📦 Enhanced Nodes.Text.Rotation.Angle", 0);
+  const baseColor = N.textColor;
+  const style = N.textStyle;
+  const size = N.textSize;
+  const glow = N.textGlow;
+  const letterSpacing = N.textLetterSpacing;
+  const offsetY = N.textPositionY;
+  const offsetX = N.textPositionX;
+  const rotationRadius = N.textRotationRadius;
+  const rotationAngle = N.textRotationAngle;
   let finalX = x + offsetX;
   let finalY = y + offsetY;
   if (rotationRadius > 0) {
@@ -690,7 +687,7 @@ function drawAnimatedText(ctx, text, x, y, phase) {
   ctx.restore();
 }
 function getParticleColor(index, time, _count) {
-  const particleColorMode = setting("📦 Enhanced Nodes.Particle.Color.Mode", "default");
+  const particleColorMode = N.particleColorMode;
   const colors = getCustomNodeColors();
   switch (particleColorMode) {
     case "rainbow":
@@ -727,14 +724,15 @@ function getParticleColor(index, time, _count) {
       return `hsl(${120 + ap * 60}, ${80 + Math.sin(time * 3) * 20}%, ${70 + Math.sin(time * 4) * 20}%)`;
     }
     default: {
-      const customParticle = setting("📦 Enhanced Nodes.Color.Particle", colors.accent);
+      const customParticle = N.colorParticle;
       return validateHexColor(customParticle) || colors.accent;
     }
   }
 }
 const ext = {
   name: "enhanced.node.animations",
-  async setup(_comfyApp) {
+  settings: nodeSettings,
+  async setup() {
     const state = createNodeState();
     const Timing = {
       smoothDelta: 0,
@@ -751,8 +749,8 @@ const ext = {
       phase: 0,
       lastUpdate: 0,
       update(currentTime, delta) {
-        const dir = setting("📦 Enhanced Nodes.Direction", 1);
-        const speed = Math.max(0.01, setting("📦 Enhanced Nodes.Particle.Speed", 1));
+        const dir = N.direction;
+        const speed = Math.max(0.01, N.particleSpeed);
         if (currentTime - this.lastUpdate >= 16) {
           const phaseStep = 2 * Math.PI / 15 * delta * speed;
           this.phase += phaseStep * dir;
@@ -765,18 +763,18 @@ const ext = {
       state.isRunning = detail?.exec_info?.queue_remaining > 0;
     });
     function renderLoop(timestamp) {
-      const animStyle = setting("📦 Enhanced Nodes.Animate", 0);
-      const pauseDuringRender = setting("📦 Enhanced Nodes.Pause.During.Render", true);
+      const animStyle = N.animate;
+      const pauseDuringRender = N.pauseDuringRender;
       const isRendering = state.isRunning;
-      const showParticles = setting("📦 Enhanced Nodes.Particle.Show", false);
+      const showParticles = N.particleShow;
       const delta = Timing.update();
       state.totalTime = (state.totalTime || 0) + delta;
       ParticleController.update(timestamp, delta);
       const paused = isRendering && pauseDuringRender;
       if (animStyle > 0 && !paused) {
-        const speed = setting("📦 Enhanced Nodes.Animation.Speed", 1);
-        const direction = setting("📦 Enhanced Nodes.Direction", 1);
-        const isStaticMode = setting("📦 Enhanced Nodes.Static.Mode", false);
+        const speed = N.animationSpeed;
+        const direction = N.direction;
+        const isStaticMode = N.staticMode;
         if (!isStaticMode) {
           state.phase += 2 * Math.PI / 15 * delta * speed * direction;
         }
@@ -789,27 +787,27 @@ const ext = {
     requestAnimationFrame(renderLoop);
     const originalDrawNode = LGraphCanvas.prototype.drawNode;
     LGraphCanvas.prototype.drawNode = function(node, ctx) {
-      const animStyle = setting("📦 Enhanced Nodes.Animate", 0);
-      const animEnabled = setting("📦 Enhanced Nodes.Animations.Enabled", true);
-      const showParticles = setting("📦 Enhanced Nodes.Particle.Show", false);
+      const animStyle = N.animate;
+      const animEnabled = N.animationsEnabled;
+      const showParticles = N.particleShow;
       if (animStyle > 0 && animEnabled) {
         const colors = getCustomNodeColors();
-        const isStaticMode = setting("📦 Enhanced Nodes.Static.Mode", false);
-        const glowIntensity = setting("📦 Enhanced Nodes.Glow", 1);
-        const animGlow = setting("📦 Enhanced Nodes.Animation.Glow", 0.5);
-        const quality = setting("📦 Enhanced Nodes.Quality", 1);
-        const animSize = setting("📦 Enhanced Nodes.Animation.Size", 1);
-        const intensity = setting("📦 Enhanced Nodes.Intensity", 1);
-        const direction = setting("📦 Enhanced Nodes.Direction", 1);
-        const animSpeed = setting("📦 Enhanced Nodes.Animation.Speed", 1);
-        const particleDensity = setting("📦 Enhanced Nodes.Particle.Density", 0.5);
-        const particleSpeed = setting("📦 Enhanced Nodes.Particle.Speed", 1);
-        const particleIntensity = setting("📦 Enhanced Nodes.Particle.Intensity", 1);
-        const particleSize = setting("📦 Enhanced Nodes.Particle.Size", 1);
-        const particleGlow = setting("📦 Enhanced Nodes.Particle.Glow", 1);
-        const showGlow = setting("📦 Enhanced Nodes.Glow.Show", true);
-        const hoverColor = setting("📦 Enhanced Nodes.Color.Hover", "#00ff15");
-        const showHover = setting("📦 Enhanced Nodes.Color.Hover.Show", false);
+        const isStaticMode = N.staticMode;
+        const glowIntensity = N.glow;
+        const animGlow = N.animationGlow;
+        const quality = N.quality;
+        const animSize = N.animationSize;
+        const intensity = N.intensity;
+        const direction = N.direction;
+        const animSpeed = N.animationSpeed;
+        const particleDensity = N.particleDensity;
+        const particleSpeed = N.particleSpeed;
+        const particleIntensity = N.particleIntensity;
+        const particleSize = N.particleSize;
+        const particleGlow = N.particleGlow;
+        const showGlow = N.glowShow;
+        const hoverColor = N.colorHover;
+        const showHover = N.colorHoverShow;
         const effect = getNodeEffect(animStyle);
         if (effect) {
           ctx.save();
@@ -857,14 +855,14 @@ const ext = {
         }
       } else if (showParticles) {
         const colors = getCustomNodeColors();
-        const particleDensity = setting("📦 Enhanced Nodes.Particle.Density", 0.5);
-        const particleSpeed = setting("📦 Enhanced Nodes.Particle.Speed", 1);
-        const particleIntensity = setting("📦 Enhanced Nodes.Particle.Intensity", 1);
-        const particleSize = setting("📦 Enhanced Nodes.Particle.Size", 1);
-        const particleGlow = setting("📦 Enhanced Nodes.Particle.Glow", 1);
-        const quality = setting("📦 Enhanced Nodes.Quality", 1);
-        const animSize = setting("📦 Enhanced Nodes.Animation.Size", 1);
-        const direction = setting("📦 Enhanced Nodes.Direction", 1);
+        const particleDensity = N.particleDensity;
+        const particleSpeed = N.particleSpeed;
+        const particleIntensity = N.particleIntensity;
+        const particleSize = N.particleSize;
+        const particleGlow = N.particleGlow;
+        const quality = N.quality;
+        const animSize = N.animationSize;
+        const direction = N.direction;
         ctx.save();
         ctx.translate(node.size[0] / 2, node.size[1] / 2);
         try {
@@ -910,7 +908,7 @@ const ext = {
         ctx.restore();
       }
       originalDrawNode.call(this, node, ctx);
-      if (setting("📦 Enhanced Nodes.Text.Animation.Enabled", false) && node.title) {
+      if (N.textAnimationEnabled && node.title) {
         ctx.save();
         drawAnimatedText(
           ctx,
@@ -926,11 +924,11 @@ const ext = {
     if (originalDrawNodeShape) {
       LGraphCanvas.prototype.drawNodeShape = function(node, ctx, ...args) {
         originalDrawNodeShape.call(this, node, ctx, ...args);
-        const showHover = setting("📦 Enhanced Nodes.Color.Hover.Show", false);
-        const animStyle = setting("📦 Enhanced Nodes.Animate", 0);
+        const showHover = N.colorHoverShow;
+        const animStyle = N.animate;
         if (showHover && animStyle > 0 && (node.mouseOver || this.selected_nodes && this.selected_nodes[node.id])) {
-          const hoverColor = setting("📦 Enhanced Nodes.Color.Hover", "#00ff15");
-          const glowIntensity = setting("📦 Enhanced Nodes.Glow", 1);
+          const hoverColor = N.colorHover;
+          const glowIntensity = N.glow;
           const outlineGlowSize = 15 * glowIntensity;
           ctx.save();
           ctx.shadowColor = withAlpha(hoverColor, 0.5);

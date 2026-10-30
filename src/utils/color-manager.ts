@@ -9,7 +9,7 @@
  * @module utils/color-manager
  */
 
-import { app } from '/scripts/app.js';
+import { L, N } from '@/core/settings';
 
 // =============================================================================
 // HSL ↔ Hex conversion
@@ -92,15 +92,7 @@ export function enhanceColor(color: string, scheme: string): string {
 }
 
 // =============================================================================
-// Settings helper — avoids deprecated getSettingValue(key, default) signature
-// =============================================================================
-
-function s(key: string): any {
-    return app.ui.settings.getSettingValue(key);
-}
-
-// =============================================================================
-// Color Mode Resolution (reads from ComfyUI settings)
+// Color Mode Resolution (reads the settings snapshots)
 // =============================================================================
 
 /**
@@ -108,15 +100,13 @@ function s(key: string): any {
  * or null if using defaults.
  */
 export function getCustomLinkColors(): { primary: string; secondary: string; accent: string } | null {
-    const colorMode = s('🔗 Enhanced Links.Color.Mode') ?? 'default';
-    const colorScheme = s('🔗 Enhanced Links.Color.Scheme') ?? 'default';
-
-    if (colorMode === 'off') return null;
+    const colorMode = L.colorMode;
+    const colorScheme = L.colorScheme;
 
     if (colorMode === 'custom') {
-        const primary = s('🔗 Enhanced Links.Color.Primary') ?? '#ffffff';
-        const secondary = s('🔗 Enhanced Links.Color.Secondary') ?? '#ff6600';
-        const accent = s('🔗 Enhanced Links.Color.Accent') ?? '#ff8800';
+        const primary = L.colorPrimary;
+        const secondary = L.colorSecondary;
+        const accent = L.colorAccent;
 
         return {
             primary: enhanceColor(validateHexColor(primary) || '#ffffff', colorScheme),
@@ -131,21 +121,21 @@ export function getCustomLinkColors(): { primary: string; secondary: string; acc
 /** Get primary link color (custom or enhanced default) */
 export function getLinkColor(defaultColor: string): string {
     const colors = getCustomLinkColors();
-    const scheme = s('🔗 Enhanced Links.Color.Scheme') ?? 'default';
+    const scheme = L.colorScheme;
     return colors ? colors.primary : enhanceColor(defaultColor, scheme);
 }
 
 /** Get secondary link color (custom or enhanced default) */
 export function getSecondaryColor(defaultColor: string): string {
     const colors = getCustomLinkColors();
-    const scheme = s('🔗 Enhanced Links.Color.Scheme') ?? 'default';
+    const scheme = L.colorScheme;
     return colors ? colors.secondary : enhanceColor(defaultColor, scheme);
 }
 
 /** Get accent/particle link color (custom or enhanced default) */
 export function getAccentColor(defaultColor: string): string {
     const colors = getCustomLinkColors();
-    const scheme = s('🔗 Enhanced Links.Color.Scheme') ?? 'default';
+    const scheme = L.colorScheme;
     return colors ? colors.accent : enhanceColor(defaultColor, scheme);
 }
 
@@ -163,9 +153,9 @@ const NODE_ANIMATION_COLORS = Object.freeze({
 
 /** Get custom node colors (respects custom mode + per-animation fallback colors) */
 export function getCustomNodeColors(): { primary: string; secondary: string; accent: string } {
-    const colorMode = s('📦 Enhanced Nodes.Color.Mode') ?? 'default';
-    const colorScheme = s('📦 Enhanced Nodes.Color.Scheme') ?? 'default';
-    const animStyle = s('📦 Enhanced Nodes.Animate') ?? 1;
+    const colorMode = N.colorMode;
+    const colorScheme = N.colorScheme;
+    const animStyle = N.animate;
 
     // Get animation-specific defaults
     const animColors = (() => {
@@ -178,9 +168,9 @@ export function getCustomNodeColors(): { primary: string; secondary: string; acc
     })();
 
     if (colorMode === 'custom') {
-        const primary = s('📦 Enhanced Nodes.Color.Primary') ?? animColors.primary;
-        const secondary = s('📦 Enhanced Nodes.Color.Secondary') ?? animColors.secondary;
-        const accent = s('📦 Enhanced Nodes.Color.Accent') ?? animColors.accent;
+        const primary = N.colorPrimary;
+        const secondary = N.colorSecondary;
+        const accent = N.colorAccent;
 
         return {
             primary: enhanceColor(validateHexColor(primary) || animColors.primary, colorScheme),

@@ -1,0 +1,17 @@
+{
+  "settingsCategories": {
+    "Enhanced Links & Nodes": "Enhanced Links & Nodes",
+    "Links · Effect": "Links · Effect",
+    "Links · Path": "Links · Path",
+    "Links · Color": "Links · Color",
+    "Links · Markers": "Links · Markers",
+    "Links · Shadows": "Links · Shadows",
+    "Nodes · Effect": "Nodes · Effect",
+    "Nodes · Glow & hover": "Nodes · Glow & hover",
+    "Nodes · Color": "Nodes · Color",
+    "Nodes · Particles": "Nodes · Particles",
+    "Nodes · Titles": "Nodes · Titles",
+    "Runs · During a run": "Runs · During a run",
+    "Runs · Completion": "Runs · Completion"
+  }
+}

@@ -9,6 +9,7 @@
 import type { RenderItem } from '@/effects/animated-renderers';
 import { gentlePulse, neonNexus, cosmicRipple, flowerOfLife } from '@/effects/node-effects';
 import type { NodeEffectSettings } from '@/effects/types';
+import { SETTINGS, snapshotOf } from '@/core/settings';
 import type { ComfyNode } from '@/core/types';
 import { CanvasRecorder, fmt } from '../../helpers/recording-context';
 import { fake } from '../../helpers/fake-app';
@@ -103,6 +104,16 @@ export const V1_LINK_SETTINGS: Record<string, unknown> = {
     '🔗 Enhanced Links.Shadow.Blur': NaN,
     '🔗 Enhanced Links.Shadow.Offset': NaN,
 };
+
+/**
+ * Stores `settings` for v1, which reads them through getSettingValue, and puts them in v2's snapshots as
+ * they are: unmigrated, so V1_LINK_SETTINGS' NaN shadows reach the v2 renderers too. Every other setting
+ * gets its default.
+ */
+export function storeSettings(settings: Record<string, unknown>): void {
+    fake.settings = new Map(Object.entries(settings));
+    for (const s of SETTINGS) snapshotOf(s.id)[s.key] = s.id in settings ? settings[s.id] : s.default;
+}
 
 /**
  * Other v1 options, one frame each in the links-rich traces: custom colour roles (the default
@@ -204,7 +215,7 @@ function traceSettings(
         const clock = isStatic ? { phase: STATIC_POSES[0][1], totalTime: 0 } : linkClock(RICH_TIME, direction);
         const when = isStatic ? `phase=${STATIC_POSES[0][0]}` : `t=${RICH_TIME}s phase=${fmt(clock.phase)} totalTime=${fmt(clock.totalTime)}`;
         return [`${label}: ${when}`, linkPass((ctx) => {
-            fake.settings = new Map(Object.entries({ ...base, ...overlay }));
+            storeSettings({ ...base, ...overlay });
             draw(ctx, { items: linkItems(isStatic, linkStyle), ...clock, direction });
         })];
     }));

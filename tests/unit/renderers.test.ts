@@ -5,12 +5,15 @@
 import { describe, it, expect } from 'vitest';
 import { getLinkRenderer } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
-import { LINK_STYLE_OPTIONS, MARKER_SHAPE_OPTIONS } from '@/ui/settings';
+import { SETTINGS } from '@/core/settings';
 import { CanvasRecorder } from '../helpers/recording-context';
+
+/** The option values of a combo setting. */
+const options = (id: string) => SETTINGS.flatMap((s) => (s.id === id && s.type === 'combo' ? s.options.map((o) => String(o.value)) : []));
 
 describe('MarkerShapes', () => {
     it('has a shape for each Marker.Shape option', () => {
-        expect(Object.keys(MarkerShapes).sort()).toEqual(MARKER_SHAPE_OPTIONS.map((o) => o.value).sort());
+        expect(Object.keys(MarkerShapes).sort()).toEqual(options('🔗 Enhanced Links.Marker.Shape').sort());
         for (const shape of Object.values(MarkerShapes)) {
             expect(typeof shape).toBe('function');
         }
@@ -42,7 +45,7 @@ describe('MarkerShapes', () => {
 
 describe('getLinkRenderer', () => {
     it('gives each Link.Style option its own renderer', () => {
-        const styles = LINK_STYLE_OPTIONS.map((o) => o.value);
+        const styles = options('🔗 Enhanced Links.Link.Style');
         expect(new Set(styles.map(getLinkRenderer)).size).toBe(styles.length);
     });
 

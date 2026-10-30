@@ -140,7 +140,7 @@ git clone https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes.git
 
 ## ⚙️ Settings
 
-All settings are accessible via the context menu or specific extension settings.
+Every setting is in ComfyUI's settings dialog under **Enhanced Links & Nodes**, and most are in the Enhanced sidebar panel too; [docs/SETTINGS.md](docs/SETTINGS.md) lists each one with its id, options or range, and default.
 
 <details>
 <summary><b>🔄 Link Animation Settings</b></summary>

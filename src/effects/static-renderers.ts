@@ -10,30 +10,22 @@
  * @module effects/static-renderers
  */
 
-import { app } from '/scripts/app.js';
 import { getLinkRenderer } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
 import { createFlowField, createCrystal } from '@/renderers/render-utils';
 import { getLinkColor, getSecondaryColor, getAccentColor, enhanceColor, validateHexColor, getCustomLinkColors } from '@/utils/color-manager';
 import { SACRED } from '@/core/config';
+import { L } from '@/core/settings';
 import type { RenderItem } from './animated-renderers';
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
-function setting<T>(key: string, def: T): T {
-    return (app.ui.settings.getSettingValue(key) ?? def) as T;
-}
 
 // =============================================================================
 // 1. Sacred Flow Static
 // =============================================================================
 
 function renderStatic1(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -73,9 +65,9 @@ function renderStatic1(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic2(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -104,9 +96,9 @@ function renderStatic2(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic3(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -153,10 +145,10 @@ function renderStatic3(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic4(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const direction = setting('🔗 Enhanced Links.Direction', 1);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
+    const direction = L.direction;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -205,9 +197,9 @@ function renderStatic4(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic5(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -245,9 +237,9 @@ function renderStatic5(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic6(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -309,9 +301,9 @@ function renderStatic6(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic7(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -371,9 +363,9 @@ function renderStatic7(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic8(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -429,20 +421,20 @@ function renderStatic8(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 // =============================================================================
 
 function renderStatic9(ctx: CanvasRenderingContext2D, items: RenderItem[], phase: number): void {
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const markerEnabled = setting('🔗 Enhanced Links.Marker.Enabled', true);
-    const markerShape = setting<string>('🔗 Enhanced Links.Marker.Shape', 'diamond');
-    const markerSize = setting('🔗 Enhanced Links.Marker.Size', 1.5);
-    const markerColorMode = setting<string>('🔗 Enhanced Links.Marker.Color.Mode', 'inherit');
-    const markerColor = setting<string>('🔗 Enhanced Links.Marker.Color', '#ffffff');
-    const markerGlow = setting('🔗 Enhanced Links.Marker.Glow', 10);
-    const markerEffect = setting<string>('🔗 Enhanced Links.Marker.Effects', 'none');
-    const colorScheme = setting<string>('🔗 Enhanced Links.Color.Scheme', 'default');
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const shadowBlur = setting('🔗 Enhanced Links.Shadow.Blur', 5);
-    const shadowOffset = setting('🔗 Enhanced Links.Shadow.Offset', 3);
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const quality = L.quality;
+    const markerEnabled = L.markerEnabled;
+    const markerShape = L.markerShape;
+    const markerSize = L.markerSize;
+    const markerColorMode = L.markerColorMode;
+    const markerColor = L.markerColor;
+    const markerGlow = L.markerGlow;
+    const markerEffect = L.markerEffects;
+    const colorScheme = L.colorScheme;
+    const particleDensity = L.particleDensity;
+    const shadowBlur = L.shadowBlur;
+    const shadowOffset = L.shadowOffset;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
         const r = getLinkRenderer(linkStyle);
@@ -453,7 +445,7 @@ function renderStatic9(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
             const enhancedColor = enhanceColor(linkColor, colorScheme);
             ctx.lineWidth = thickness;
 
-            const linkShadowEnabled = setting('🔗 Enhanced Links.Link.Shadow.Enabled', false);
+            const linkShadowEnabled = L.linkShadowEnabled;
             if (linkShadowEnabled) {
                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.95)';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
@@ -517,7 +509,7 @@ function renderStatic9(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
 
                 const shapeFn = MarkerShapes[markerShape];
                 if (shapeFn) {
-                    const markerShadowEnabled = setting('🔗 Enhanced Links.Marker.Shadow.Enabled', false);
+                    const markerShadowEnabled = L.markerShadowEnabled;
                     if (markerShadowEnabled) {
                         ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
                         ctx.strokeStyle = 'rgba(0, 0, 0, 0.95)';

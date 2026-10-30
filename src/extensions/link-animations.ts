@@ -12,23 +12,14 @@
  * @module extensions/link-animations
  */
 
-import type { LLink, Point } from '@comfyorg/comfyui-frontend-types';
+import type { ComfyExtension, LLink, Point } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import type { ComfyExtension, ComfyApp } from '@/core/types';
+import { L, linkSettings } from '@/core/settings';
 import { enableAntiAliasing } from '@/renderers/render-utils';
 import { renderAnimatedStyle, type RenderItem } from '@/effects/animated-renderers';
 import { renderStaticStyle } from '@/effects/static-renderers';
 import { initSidebar } from '@/sidebar/sidebar';
-import { registerAllSettings } from '@/ui/register-settings';
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
-function setting<T>(key: string, def: T): T {
-    return (app.ui.settings.getSettingValue(key) ?? def) as T;
-}
 
 // =============================================================================
 // Animation State
@@ -42,8 +33,8 @@ const AnimationState = {
     transitionSpeed: (2 * Math.PI) / (10 * 1.5),
 
     update(delta: number): number {
-        const dir = setting('🔗 Enhanced Links.Direction', 1);
-        const speed = Math.max(0.01, setting('🔗 Enhanced Links.Animation.Speed', 1));
+        const dir = L.direction;
+        const speed = Math.max(0.01, L.animationSpeed);
         this.direction = dir;
         return State.phase + (this.transitionSpeed * delta * speed * this.direction);
     },
@@ -96,11 +87,9 @@ type LinksCanvas = InstanceType<typeof LGraphCanvas> & { graph: { links: Record<
 
 const ext: ComfyExtension = {
     name: 'enhanced.link.animations',
+    settings: linkSettings,
 
-    async setup(_comfyApp: ComfyApp) {
-        // Register all settings with ComfyUI
-        registerAllSettings();
-
+    async setup() {
         // Monitor execution status
         api.addEventListener('status', ({ detail }: any) => {
             State.isRunning = detail?.exec_info?.queue_remaining > 0;
@@ -121,12 +110,12 @@ const ext: ComfyExtension = {
                 ctx.save();
                 enableAntiAliasing(ctx);
 
-                const animStyle = setting<number>('🔗 Enhanced Links.Animate', 4);
-                const linkStyle = setting<string>('🔗 Enhanced Links.Link.Style', 'spline');
-                const shouldPauseDuringRender = setting('🔗 Enhanced Links.Pause.During.Render', true);
-                const isStaticMode = setting('🔗 Enhanced Links.Static.Mode', false);
-                const quality = setting('🔗 Enhanced Links.Quality', 2);
-                const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
+                const animStyle = L.animate;
+                const linkStyle = L.linkStyle;
+                const shouldPauseDuringRender = L.pauseDuringRender;
+                const isStaticMode = L.staticMode;
+                const quality = L.quality;
+                const particleDensity = L.particleDensity;
 
                 // Style 0 = off — fall through to original
                 if (animStyle === 0) {
@@ -157,14 +146,6 @@ const ext: ComfyExtension = {
                         State.staticPhase = (State.staticPhase + Math.PI * 2) % (Math.PI * 4);
                         State.forceUpdate = false;
                         State.lastAnimStyle = animStyle;
-
-                        if (app.graph?.canvas) {
-                            app.graph.canvas.dirty_canvas = true;
-                            app.graph.canvas.dirty_bgcanvas = true;
-                            requestAnimationFrame(() => {
-                                app.graph?.canvas?.draw(true, true);
-                            });
-                        }
                     }
                     phase = State.staticPhase;
                 } else {
@@ -246,9 +227,9 @@ const ext: ComfyExtension = {
         // =====================================================================
 
         function animate() {
-            const isStaticMode = setting('🔗 Enhanced Links.Static.Mode', false);
-            const animStyle = setting('🔗 Enhanced Links.Animate', 3);
-            const shouldPauseDuringRender = setting('🔗 Enhanced Links.Pause.During.Render', true);
+            const isStaticMode = L.staticMode;
+            const animStyle = L.animate;
+            const shouldPauseDuringRender = L.pauseDuringRender;
 
             // Pause during rendering
             if (shouldPauseDuringRender && State.isRunning) {

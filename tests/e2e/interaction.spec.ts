@@ -367,13 +367,12 @@ test.describe('redraws', () => {
         expect(painted).toMatchObject({ front: 0, back: 0 });
     });
 
-    test('paints read no settings', async ({ page, profile }) => {
+    test('paints read no settings', async ({ page }) => {
         await buildGraph(page, graphs.mixed);
         await resetProbe(page);
         for (let i = 0; i < 5; i++) await redraw(page);
         const { front, reads } = await readProbe(page);
         expect(front).toBeGreaterThan(0);
-        test.fail(enabled(profile), 'v2.0.1 reads its settings per link and node inside every paint');
         expect(reads.inPaint).toBe(0);
     });
 

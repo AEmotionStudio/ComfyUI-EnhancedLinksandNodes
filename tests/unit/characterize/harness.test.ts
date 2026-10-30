@@ -143,6 +143,8 @@ describe('fake app', () => {
         expect(app.extensionManager.setting.get('a.registered')).toBe('x');
         expect(app.ui.settings.getSettingValue('a.missing', 5)).toBeUndefined();
         expect(fake.reads).toBe(3);
+        // addSetting and both getSettingValue calls went through the deprecated API.
+        expect(fake.legacyCalls).toBe(3);
     });
 });
 

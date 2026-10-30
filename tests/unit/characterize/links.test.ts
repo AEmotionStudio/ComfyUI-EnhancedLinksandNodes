@@ -8,8 +8,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { renderAnimatedStyle } from '@/effects/animated-renderers';
 import { renderStaticStyle } from '@/effects/static-renderers';
-import { resetFakeApp } from '../../helpers/fake-app';
-import { LINK_STYLES, V1_LINK_SETTINGS, traceLinkVariants, traceLinks, tracePathStyles, traceStaticLinks, type LinkDraw } from './v1-inputs';
+import { LINK_STYLES, V1_LINK_SETTINGS, storeSettings, traceLinkVariants, traceLinks, tracePathStyles, traceStaticLinks, type LinkDraw } from './v1-inputs';
 
 const v2Animated = (style: number): LinkDraw => (ctx, { items, phase, totalTime, direction }) =>
     renderAnimatedStyle(ctx, items, style, phase, { direction, totalTime, phase });
@@ -20,7 +19,7 @@ afterEach(() => {
 });
 
 function animated(style: number, name: string) {
-    resetFakeApp(V1_LINK_SETTINGS);
+    storeSettings(V1_LINK_SETTINGS);
     return traceLinks(`${name} (${style}), animated: v2 renderAnimatedStyle with v1 inputs`, v2Animated(style));
 }
 
@@ -33,7 +32,7 @@ describe('v1 link traces', () => {
 
     for (const [style, slug, name] of LINK_STYLES) {
         it(`static ${style} ${name}`, async () => {
-            resetFakeApp(V1_LINK_SETTINGS);
+            storeSettings(V1_LINK_SETTINGS);
             const rec = traceStaticLinks(`${name} (${style}), static: v2 renderStaticStyle with v1 inputs`, v2Static(style));
             await expect(rec.trace()).toMatchFileSnapshot(`../__traces__/v1/links-static/${style}-${slug}.txt`);
         });

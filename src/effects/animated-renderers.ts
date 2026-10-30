@@ -10,12 +10,12 @@
  * @module effects/animated-renderers
  */
 
-import { app } from '/scripts/app.js';
 import { getLinkRenderer, type LinkPoint } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
 import { createFlowField } from '@/renderers/render-utils';
 import { getLinkColor, getSecondaryColor, getAccentColor, enhanceColor, validateHexColor, getCustomLinkColors } from '@/utils/color-manager';
 import { SACRED } from '@/core/config';
+import { L } from '@/core/settings';
 
 // =============================================================================
 // Types
@@ -38,14 +38,6 @@ interface AnimationState {
 }
 
 // =============================================================================
-// Helpers
-// =============================================================================
-
-function setting<T>(key: string, def: T): T {
-    return (app.ui.settings.getSettingValue(key) ?? def) as T;
-}
-
-// =============================================================================
 // 1. Sacred Flow
 // =============================================================================
 
@@ -56,12 +48,12 @@ function renderSacredFlow(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
-    const colorScheme = setting<string>('🔗 Enhanced Links.Color.Scheme', 'default');
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
+    const animSpeed = L.animationSpeed;
+    const colorScheme = L.colorScheme;
     const speedReductionFactor = 0.25;
     const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
 
@@ -135,11 +127,11 @@ function renderCrystalStream(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
+    const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
     // Import createCrystal inline to avoid circular deps
@@ -200,10 +192,10 @@ function renderQuantumField(
     phase: number,
     _state: AnimationState,
 ): void {
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
 
     items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
         const r = getLinkRenderer(linkStyle);
@@ -255,10 +247,10 @@ function renderCosmicWeave(
     _phase: number,
     state: AnimationState,
 ): void {
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
     const direction = state.direction;
 
@@ -315,10 +307,10 @@ function renderEnergyPulse(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const animSpeed = L.animationSpeed;
     const speedReductionFactor = 0.25;
     const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
 
@@ -368,10 +360,10 @@ function renderDNAHelix(
     state: AnimationState,
 ): void {
     const direction = -state.direction; // Negate to reverse flow
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
     items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
@@ -449,11 +441,11 @@ function renderLavaFlow(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
+    const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
     items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
@@ -556,11 +548,11 @@ function renderStellarPlasma(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
+    const animSpeed = L.animationSpeed;
     const continuousPhase = -(state.totalTime || 0) * animSpeed;
 
     items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
@@ -626,21 +618,21 @@ function renderClassicFlow(
     state: AnimationState,
 ): void {
     const direction = state.direction;
-    const quality = setting('🔗 Enhanced Links.Quality', 2);
-    const thickness = setting('🔗 Enhanced Links.Thickness', 2);
-    const glowIntensity = setting('🔗 Enhanced Links.Glow.Intensity', 10);
-    const particleDensity = setting('🔗 Enhanced Links.Particle.Density', 1);
-    const animSpeed = setting('🔗 Enhanced Links.Animation.Speed', 1);
-    const markerEnabled = setting('🔗 Enhanced Links.Marker.Enabled', true);
-    const markerShape = setting<string>('🔗 Enhanced Links.Marker.Shape', 'diamond');
-    const markerSize = setting('🔗 Enhanced Links.Marker.Size', 1.5);
-    const markerColorMode = setting<string>('🔗 Enhanced Links.Marker.Color.Mode', 'inherit');
-    const markerColor = setting<string>('🔗 Enhanced Links.Marker.Color', '#ffffff');
-    const markerGlow = setting('🔗 Enhanced Links.Marker.Glow', 10);
-    const markerEffect = setting<string>('🔗 Enhanced Links.Marker.Effects', 'none');
-    const colorScheme = setting<string>('🔗 Enhanced Links.Color.Scheme', 'default');
-    const shadowBlur = setting('🔗 Enhanced Links.Shadow.Blur', 5);
-    const shadowOffset = setting('🔗 Enhanced Links.Shadow.Offset', 3);
+    const quality = L.quality;
+    const thickness = L.thickness;
+    const glowIntensity = L.glowIntensity;
+    const particleDensity = L.particleDensity;
+    const animSpeed = L.animationSpeed;
+    const markerEnabled = L.markerEnabled;
+    const markerShape = L.markerShape;
+    const markerSize = L.markerSize;
+    const markerColorMode = L.markerColorMode;
+    const markerColor = L.markerColor;
+    const markerGlow = L.markerGlow;
+    const markerEffect = L.markerEffects;
+    const colorScheme = L.colorScheme;
+    const shadowBlur = L.shadowBlur;
+    const shadowOffset = L.shadowOffset;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
     items.forEach(({ start, end, defaultColor, linkStyle }) => {
@@ -654,7 +646,7 @@ function renderClassicFlow(
             ctx.lineWidth = thickness;
 
             // Shadow
-            const linkShadowEnabled = setting('🔗 Enhanced Links.Link.Shadow.Enabled', false);
+            const linkShadowEnabled = L.linkShadowEnabled;
             if (linkShadowEnabled) {
                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.95)';
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
@@ -724,7 +716,7 @@ function renderClassicFlow(
                 const shapeFn = MarkerShapes[markerShape];
                 if (shapeFn) {
                     // Shadow
-                    const markerShadowEnabled = setting('🔗 Enhanced Links.Marker.Shadow.Enabled', false);
+                    const markerShadowEnabled = L.markerShadowEnabled;
                     if (markerShadowEnabled) {
                         ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
                         ctx.strokeStyle = 'rgba(0, 0, 0, 0.95)';

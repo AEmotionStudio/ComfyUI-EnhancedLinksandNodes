@@ -1,25 +1,14 @@
 /**
  * Sidebar Settings Panel — renders all link and node animation settings.
  *
- * Each control reads/writes via app.ui.settings and triggers
- * canvas redraws for live preview.
+ * Each control takes its range or options from the settings schema and its
+ * value from the live snapshots. Sliders and colour wells preview while they
+ * move and commit where they stop; the other controls commit at once.
  *
  * @module sidebar/SidebarSettings
  */
 
-import { app } from '/scripts/app.js';
-
-import { LINK_DEFAULTS, NODE_DEFAULTS } from '@/core/config';
-import {
-    LINK_ANIMATION_OPTIONS,
-    LINK_STYLE_OPTIONS,
-    MARKER_SHAPE_OPTIONS,
-    NODE_ANIMATION_OPTIONS,
-    COLOR_SCHEME_OPTIONS,
-    COLOR_MODE_OPTIONS,
-    QUALITY_OPTIONS,
-    DIRECTION_OPTIONS,
-} from '@/ui/settings';
+import { SETTINGS, commit, preview, reset, snapshotOf } from '@/core/settings';
 
 import { createSlider, createToggle, createSelect, createColorPicker, createSection } from './controls';
 
@@ -27,51 +16,21 @@ import { createSlider, createToggle, createSelect, createColorPicker, createSect
 // Helpers
 // =============================================================================
 
-/** Get a setting value with fallback to defaults */
-function getLinkSetting<T>(key: string): T {
-    const defaultValue = LINK_DEFAULTS[key as keyof typeof LINK_DEFAULTS];
-    const val = app.ui.settings.getSettingValue(key);
-    return (val ?? defaultValue) as T;
-}
-
-function getNodeSetting<T>(key: string): T {
-    const defaultValue = NODE_DEFAULTS[key as keyof typeof NODE_DEFAULTS];
-    const val = app.ui.settings.getSettingValue(key);
-    return (val ?? defaultValue) as T;
-}
-
-/** Set a setting value and force canvas redraw */
-function setSetting(key: string, value: unknown): void {
-    app.ui.settings.setSettingValue(key, value);
-    forceCanvasRedraw();
-}
-
-/** Force the ComfyUI canvas to redraw */
-function forceCanvasRedraw(): void {
-    if (app.graph && app.graph.canvas) {
-        app.graph.canvas.dirty_canvas = true;
-        app.graph.canvas.dirty_bgcanvas = true;
-        app.graph.canvas.draw(true, true);
+/** The control for a setting, of the kind its schema type asks for. */
+function control(label: string, id: string, tooltip: string, unit = ''): HTMLElement {
+    const s = SETTINGS.find((e) => e.id === id)!;
+    const value = snapshotOf(id)[s.key];
+    switch (s.type) {
+        case 'slider':
+            return createSlider(label, value as number, s.min, s.max, s.step, unit, (v) => preview(id, v), (v) => commit(id, v), tooltip);
+        case 'boolean':
+            return createToggle(label, value as boolean, (v) => commit(id, v), tooltip);
+        case 'combo':
+            return createSelect(label, value, s.options, (v) => commit(id, v), tooltip);
+        case 'color':
+            return createColorPicker(label, value as string, (v) => preview(id, v), (v) => commit(id, v), tooltip);
     }
 }
-
-/** Marker effect options */
-const MARKER_EFFECT_OPTIONS = [
-    { value: 'none', text: '⭘️ None' },
-    { value: 'pulse', text: '💓 Pulse' },
-    { value: 'fade', text: '🌫️ Fade' },
-    { value: 'rainbow', text: '🌈 Rainbow' },
-] as const;
-
-/** Particle color mode options for nodes */
-const PARTICLE_COLOR_MODE_OPTIONS = [
-    { value: 'default', text: '🎨 Default' },
-    { value: 'rainbow', text: '🌈 Rainbow' },
-    { value: 'complementary', text: '🔄 Complementary' },
-    { value: 'energy', text: '⚡ Energy' },
-    { value: 'quantum', text: '🔬 Quantum' },
-    { value: 'aurora', text: '🌌 Aurora' },
-] as const;
 
 // =============================================================================
 // Link Settings Sections
@@ -80,41 +39,34 @@ const PARTICLE_COLOR_MODE_OPTIONS = [
 function renderLinkAnimationSection(container: HTMLElement): void {
     const { section, body } = createSection('🎬 Animation', true);
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Animation Style',
-        getLinkSetting<number>('🔗 Enhanced Links.Animate'),
-        LINK_ANIMATION_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Animate', v),
+        '🔗 Enhanced Links.Animate',
         'Select the animation effect for link connections'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Static Mode',
-        getLinkSetting<boolean>('🔗 Enhanced Links.Static.Mode'),
-        (v) => setSetting('🔗 Enhanced Links.Static.Mode', v),
+        '🔗 Enhanced Links.Static.Mode',
         'Display a static snapshot of the animation'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Speed',
-        getLinkSetting<number>('🔗 Enhanced Links.Animation.Speed'),
-        0.1, 5, 0.1, 'x',
-        (v) => setSetting('🔗 Enhanced Links.Animation.Speed', v),
-        'Animation playback speed'
+        '🔗 Enhanced Links.Animation.Speed',
+        'Animation playback speed',
+        'x'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Direction',
-        getLinkSetting<number>('🔗 Enhanced Links.Direction'),
-        DIRECTION_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Direction', v),
+        '🔗 Enhanced Links.Direction',
         'Flow direction along links'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Pause During Render',
-        getLinkSetting<boolean>('🔗 Enhanced Links.Pause.During.Render'),
-        (v) => setSetting('🔗 Enhanced Links.Pause.During.Render', v),
+        '🔗 Enhanced Links.Pause.During.Render',
         'Pause animations while ComfyUI is processing'
     ));
 
@@ -124,27 +76,22 @@ function renderLinkAnimationSection(container: HTMLElement): void {
 function renderLinkStyleSection(container: HTMLElement): void {
     const { section, body } = createSection('🔗 Link Style', true);
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Link Style',
-        getLinkSetting<string>('🔗 Enhanced Links.Link.Style'),
-        LINK_STYLE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Link.Style', v),
+        '🔗 Enhanced Links.Link.Style',
         'Visual style for link connections'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Thickness',
-        getLinkSetting<number>('🔗 Enhanced Links.Thickness'),
-        1, 10, 0.5, 'px',
-        (v) => setSetting('🔗 Enhanced Links.Thickness', v),
-        'Link line thickness'
+        '🔗 Enhanced Links.Thickness',
+        'Link line thickness',
+        'px'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Quality',
-        getLinkSetting<number>('🔗 Enhanced Links.Quality'),
-        QUALITY_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Quality', v),
+        '🔗 Enhanced Links.Quality',
         'Rendering quality — higher uses more GPU'
     ));
 
@@ -154,40 +101,33 @@ function renderLinkStyleSection(container: HTMLElement): void {
 function renderLinkColorSection(container: HTMLElement): void {
     const { section, body } = createSection('🎨 Colors', true);
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Mode',
-        getLinkSetting<string>('🔗 Enhanced Links.Color.Mode'),
-        COLOR_MODE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Color.Mode', v),
+        '🔗 Enhanced Links.Color.Mode',
         'How colors are determined for link animations'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Scheme',
-        getLinkSetting<string>('🔗 Enhanced Links.Color.Scheme'),
-        COLOR_SCHEME_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Color.Scheme', v),
+        '🔗 Enhanced Links.Color.Scheme',
         'Preset color scheme for link types'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Primary Color',
-        getLinkSetting<string>('🔗 Enhanced Links.Color.Primary'),
-        (v) => setSetting('🔗 Enhanced Links.Color.Primary', v),
+        '🔗 Enhanced Links.Color.Primary',
         'Primary animation color'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Secondary Color',
-        getLinkSetting<string>('🔗 Enhanced Links.Color.Secondary'),
-        (v) => setSetting('🔗 Enhanced Links.Color.Secondary', v),
+        '🔗 Enhanced Links.Color.Secondary',
         'Secondary animation color'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Accent Color',
-        getLinkSetting<string>('🔗 Enhanced Links.Color.Accent'),
-        (v) => setSetting('🔗 Enhanced Links.Color.Accent', v),
+        '🔗 Enhanced Links.Color.Accent',
         'Accent animation color'
     ));
 
@@ -197,19 +137,15 @@ function renderLinkColorSection(container: HTMLElement): void {
 function renderLinkEffectsSection(container: HTMLElement): void {
     const { section, body } = createSection('✨ Effects', true);
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Glow Intensity',
-        getLinkSetting<number>('🔗 Enhanced Links.Glow.Intensity'),
-        0, 20, 1, '',
-        (v) => setSetting('🔗 Enhanced Links.Glow.Intensity', v),
+        '🔗 Enhanced Links.Glow.Intensity',
         'Intensity of the glow effect around links'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Particle Density',
-        getLinkSetting<number>('🔗 Enhanced Links.Particle.Density'),
-        0, 2, 0.1, '',
-        (v) => setSetting('🔗 Enhanced Links.Particle.Density', v),
+        '🔗 Enhanced Links.Particle.Density',
         'Number of particles along links'
     ));
 
@@ -219,57 +155,45 @@ function renderLinkEffectsSection(container: HTMLElement): void {
 function renderLinkMarkerSection(container: HTMLElement): void {
     const { section, body } = createSection('➤ Markers', true);
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Enabled',
-        getLinkSetting<boolean>('🔗 Enhanced Links.Marker.Enabled'),
-        (v) => setSetting('🔗 Enhanced Links.Marker.Enabled', v),
+        '🔗 Enhanced Links.Marker.Enabled',
         'Show flow direction markers on links'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Shape',
-        getLinkSetting<string>('🔗 Enhanced Links.Marker.Shape'),
-        MARKER_SHAPE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Marker.Shape', v),
+        '🔗 Enhanced Links.Marker.Shape',
         'Shape of the flow markers'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Size',
-        getLinkSetting<number>('🔗 Enhanced Links.Marker.Size'),
-        1, 5, 0.5, '',
-        (v) => setSetting('🔗 Enhanced Links.Marker.Size', v),
+        '🔗 Enhanced Links.Marker.Size',
         'Size of flow markers'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Mode',
-        getLinkSetting<string>('🔗 Enhanced Links.Marker.Color.Mode'),
-        COLOR_MODE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Marker.Color.Mode', v),
+        '🔗 Enhanced Links.Marker.Color.Mode',
         'How marker colors are determined'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Custom Color',
-        getLinkSetting<string>('🔗 Enhanced Links.Marker.Color'),
-        (v) => setSetting('🔗 Enhanced Links.Marker.Color', v),
+        '🔗 Enhanced Links.Marker.Color',
         'Custom marker color (when Color Mode is Custom)'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Glow',
-        getLinkSetting<number>('🔗 Enhanced Links.Marker.Glow'),
-        0, 20, 1, '',
-        (v) => setSetting('🔗 Enhanced Links.Marker.Glow', v),
+        '🔗 Enhanced Links.Marker.Glow',
         'Glow intensity for markers'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Effects',
-        getLinkSetting<string>('🔗 Enhanced Links.Marker.Effects'),
-        MARKER_EFFECT_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('🔗 Enhanced Links.Marker.Effects', v),
+        '🔗 Enhanced Links.Marker.Effects',
         'Additional marker animation effects'
     ));
 
@@ -279,17 +203,15 @@ function renderLinkMarkerSection(container: HTMLElement): void {
 function renderLinkShadowSection(container: HTMLElement): void {
     const { section, body } = createSection('🌑 Shadows', true);
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Link Shadows',
-        getLinkSetting<boolean>('🔗 Enhanced Links.Link.Shadow.Enabled'),
-        (v) => setSetting('🔗 Enhanced Links.Link.Shadow.Enabled', v),
+        '🔗 Enhanced Links.Link.Shadow.Enabled',
         'Enable drop shadows on links'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Marker Shadows',
-        getLinkSetting<boolean>('🔗 Enhanced Links.Marker.Shadow.Enabled'),
-        (v) => setSetting('🔗 Enhanced Links.Marker.Shadow.Enabled', v),
+        '🔗 Enhanced Links.Marker.Shadow.Enabled',
         'Enable drop shadows on markers'
     ));
 
@@ -303,64 +225,54 @@ function renderLinkShadowSection(container: HTMLElement): void {
 function renderNodeAnimationSection(container: HTMLElement): void {
     const { section, body } = createSection('🎬 Animation', true);
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Animation Style',
-        getNodeSetting<number>('📦 Enhanced Nodes.Animate'),
-        NODE_ANIMATION_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Animate', v),
+        '📦 Enhanced Nodes.Animate',
         'Select the animation effect for nodes'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Animations Enabled',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Animations.Enabled'),
-        (v) => setSetting('📦 Enhanced Nodes.Animations.Enabled', v),
+        '📦 Enhanced Nodes.Animations.Enabled',
         'Master toggle for all node animations'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Speed',
-        getNodeSetting<number>('📦 Enhanced Nodes.Animation.Speed'),
-        0.1, 5, 0.1, 'x',
-        (v) => setSetting('📦 Enhanced Nodes.Animation.Speed', v),
-        'Animation playback speed'
+        '📦 Enhanced Nodes.Animation.Speed',
+        'Animation playback speed',
+        'x'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Direction',
-        getNodeSetting<number>('📦 Enhanced Nodes.Direction'),
-        DIRECTION_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Direction', v),
+        '📦 Enhanced Nodes.Direction',
         'Animation direction'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Static Mode',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Static.Mode'),
-        (v) => setSetting('📦 Enhanced Nodes.Static.Mode', v),
+        '📦 Enhanced Nodes.Static.Mode',
         'Display a static snapshot of the animation'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'End Animation',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.End Animation.Enabled'),
-        (v) => setSetting('📦 Enhanced Nodes.End Animation.Enabled', v),
+        '📦 Enhanced Nodes.End Animation.Enabled',
         'Play completion animation when a node finishes processing'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Pause During Render',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Pause.During.Render'),
-        (v) => setSetting('📦 Enhanced Nodes.Pause.During.Render', v),
+        '📦 Enhanced Nodes.Pause.During.Render',
         'Pause animations while ComfyUI is processing'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Animation Size',
-        getNodeSetting<number>('📦 Enhanced Nodes.Animation.Size'),
-        0.5, 3, 0.1, 'x',
-        (v) => setSetting('📦 Enhanced Nodes.Animation.Size', v),
-        'Scale of the animation effect area'
+        '📦 Enhanced Nodes.Animation.Size',
+        'Scale of the animation effect area',
+        'x'
     ));
 
     container.appendChild(section);
@@ -369,54 +281,45 @@ function renderNodeAnimationSection(container: HTMLElement): void {
 function renderNodeColorSection(container: HTMLElement): void {
     const { section, body } = createSection('🎨 Colors', true);
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Mode',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Mode'),
-        COLOR_MODE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Color.Mode', v),
+        '📦 Enhanced Nodes.Color.Mode',
         'How colors are determined for node animations'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Scheme',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Scheme'),
-        COLOR_SCHEME_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Color.Scheme', v),
+        '📦 Enhanced Nodes.Color.Scheme',
         'Preset color scheme'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Primary Color',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Primary'),
-        (v) => setSetting('📦 Enhanced Nodes.Color.Primary', v),
+        '📦 Enhanced Nodes.Color.Primary',
         'Primary animation color'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Secondary Color',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Secondary'),
-        (v) => setSetting('📦 Enhanced Nodes.Color.Secondary', v),
+        '📦 Enhanced Nodes.Color.Secondary',
         'Secondary animation color'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Accent Color',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Accent'),
-        (v) => setSetting('📦 Enhanced Nodes.Color.Accent', v),
+        '📦 Enhanced Nodes.Color.Accent',
         'Accent animation color'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Hover Color',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Hover') ?? '#ffffff',
-        (v) => setSetting('📦 Enhanced Nodes.Color.Hover', v),
+        '📦 Enhanced Nodes.Color.Hover',
         'Color shown on node hover'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Show Hover Effect',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Color.Hover.Show') ?? true,
-        (v) => setSetting('📦 Enhanced Nodes.Color.Hover.Show', v),
+        '📦 Enhanced Nodes.Color.Hover.Show',
         'Show hover highlight on nodes'
     ));
 
@@ -426,42 +329,33 @@ function renderNodeColorSection(container: HTMLElement): void {
 function renderNodeGlowSection(container: HTMLElement): void {
     const { section, body } = createSection('✨ Glow', true);
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Glow Level',
-        getNodeSetting<number>('📦 Enhanced Nodes.Glow'),
-        0, 2, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Glow', v),
+        '📦 Enhanced Nodes.Glow',
         'Base glow intensity'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Animation Glow',
-        getNodeSetting<number>('📦 Enhanced Nodes.Animation.Glow'),
-        0, 2, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Animation.Glow', v),
+        '📦 Enhanced Nodes.Animation.Glow',
         'Glow intensity during animation'
     ));
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Show Glow',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Glow.Show'),
-        (v) => setSetting('📦 Enhanced Nodes.Glow.Show', v),
+        '📦 Enhanced Nodes.Glow.Show',
         'Toggle glow effect visibility'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Intensity',
-        getNodeSetting<number>('📦 Enhanced Nodes.Intensity'),
-        0, 3, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Intensity', v),
+        '📦 Enhanced Nodes.Intensity',
         'Overall effect intensity'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Quality',
-        getNodeSetting<number>('📦 Enhanced Nodes.Quality'),
-        QUALITY_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Quality', v),
+        '📦 Enhanced Nodes.Quality',
         'Rendering quality — higher uses more GPU'
     ));
 
@@ -471,65 +365,53 @@ function renderNodeGlowSection(container: HTMLElement): void {
 function renderNodeParticleSection(container: HTMLElement): void {
     const { section, body } = createSection('🌠 Particles', true);
 
-    body.appendChild(createToggle(
+    body.appendChild(control(
         'Show Particles',
-        getNodeSetting<boolean>('📦 Enhanced Nodes.Particle.Show'),
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Show', v),
+        '📦 Enhanced Nodes.Particle.Show',
         'Toggle particle display'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Density',
-        getNodeSetting<number>('📦 Enhanced Nodes.Particle.Density'),
-        0, 3, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Density', v),
+        '📦 Enhanced Nodes.Particle.Density',
         'Number of particles per node'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Speed',
-        getNodeSetting<number>('📦 Enhanced Nodes.Particle.Speed'),
-        0.1, 5, 0.1, 'x',
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Speed', v),
-        'Particle movement speed'
+        '📦 Enhanced Nodes.Particle.Speed',
+        'Particle movement speed',
+        'x'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Intensity',
-        getNodeSetting<number>('📦 Enhanced Nodes.Particle.Intensity'),
-        0, 3, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Intensity', v),
+        '📦 Enhanced Nodes.Particle.Intensity',
         'Particle brightness/opacity'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Size',
-        getNodeSetting<number>('📦 Enhanced Nodes.Particle.Size'),
-        0.1, 3, 0.1, 'x',
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Size', v),
-        'Particle size'
+        '📦 Enhanced Nodes.Particle.Size',
+        'Particle size',
+        'x'
     ));
 
-    body.appendChild(createSlider(
+    body.appendChild(control(
         'Glow',
-        getNodeSetting<number>('📦 Enhanced Nodes.Particle.Glow'),
-        0, 2, 0.1, '',
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Glow', v),
+        '📦 Enhanced Nodes.Particle.Glow',
         'Particle glow intensity'
     ));
 
-    body.appendChild(createSelect(
+    body.appendChild(control(
         'Color Mode',
-        getNodeSetting<string>('📦 Enhanced Nodes.Particle.Color.Mode'),
-        PARTICLE_COLOR_MODE_OPTIONS as unknown as Array<{ value: unknown; text: string }>,
-        (v) => setSetting('📦 Enhanced Nodes.Particle.Color.Mode', v),
+        '📦 Enhanced Nodes.Particle.Color.Mode',
         'How particle colors are determined'
     ));
 
-    body.appendChild(createColorPicker(
+    body.appendChild(control(
         'Particle Color',
-        getNodeSetting<string>('📦 Enhanced Nodes.Color.Particle'),
-        (v) => setSetting('📦 Enhanced Nodes.Color.Particle', v),
+        '📦 Enhanced Nodes.Color.Particle',
         'Custom particle color'
     ));
 
@@ -556,7 +438,7 @@ export function renderSettingsPanel(container: HTMLElement): void {
     renderLinkEffectsSection(container);
     renderLinkMarkerSection(container);
     renderLinkShadowSection(container);
-    container.appendChild(createResetButton('Reset Link Settings to Defaults', LINK_DEFAULTS, container));
+    container.appendChild(createResetButton('Reset Link Settings to Defaults', '🔗 Enhanced Links.', container));
 
     // --- Node Settings ---
     const nodeHeader = document.createElement('div');
@@ -568,7 +450,7 @@ export function renderSettingsPanel(container: HTMLElement): void {
     renderNodeColorSection(container);
     renderNodeGlowSection(container);
     renderNodeParticleSection(container);
-    container.appendChild(createResetButton('Reset Node Settings to Defaults', NODE_DEFAULTS, container));
+    container.appendChild(createResetButton('Reset Node Settings to Defaults', '📦 Enhanced Nodes.', container));
 
     // --- About ---
     const about = document.createElement('div');
@@ -589,7 +471,7 @@ export function renderSettingsPanel(container: HTMLElement): void {
 
 function createResetButton(
     label: string,
-    defaults: Record<string, unknown>,
+    prefix: string,
     panelContainer: HTMLElement,
 ): HTMLElement {
     const wrapper = document.createElement('div');
@@ -623,16 +505,11 @@ function createResetButton(
     });
 
     btn.addEventListener('click', () => {
-        for (const [key, defaultValue] of Object.entries(defaults)) {
-            // Skip non-setting entries
-            if (key.includes('About')) continue;
-            app.ui.settings.setSettingValue(key, defaultValue);
-        }
+        reset(prefix);
 
         // Rebuild panel so controls reflect the reset values
         panelContainer.innerHTML = '';
         renderSettingsPanel(panelContainer);
-        forceCanvasRedraw();
     });
 
     wrapper.appendChild(btn);

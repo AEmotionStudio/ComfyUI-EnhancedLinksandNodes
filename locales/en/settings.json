@@ -1,0 +1,344 @@
+{
+  "🔗 Enhanced Links_Animate": {
+    "name": "Link animation",
+    "tooltip": "Effect drawn along every link.",
+    "options": {
+      "None": "None",
+      "Classic Flow": "Classic Flow",
+      "Sacred Flow": "Sacred Flow",
+      "Crystal Stream": "Crystal Stream",
+      "Quantum Field": "Quantum Field",
+      "Cosmic Weave": "Cosmic Weave",
+      "Energy Pulse": "Energy Pulse",
+      "DNA Helix": "DNA Helix",
+      "Lava Flow": "Lava Flow",
+      "Stellar Plasma": "Stellar Plasma"
+    }
+  },
+  "🔗 Enhanced Links_Animation_Speed": {
+    "name": "Link animation speed"
+  },
+  "🔗 Enhanced Links_Direction": {
+    "name": "Link flow direction",
+    "tooltip": "Which way effects travel.",
+    "options": {
+      "Forward": "Forward",
+      "Reverse": "Reverse"
+    }
+  },
+  "🔗 Enhanced Links_Static_Mode": {
+    "name": "Freeze link animation",
+    "tooltip": "Keep the look but stop the motion."
+  },
+  "🔗 Enhanced Links_Link_Style": {
+    "name": "Link path shape",
+    "options": {
+      "Spline": "Spline",
+      "Direct (diagonal)": "Direct (diagonal)",
+      "Right-angle": "Right-angle",
+      "Effect only": "Effect only",
+      "Dotted": "Dotted",
+      "Dashed": "Dashed",
+      "Double": "Double",
+      "Stepped": "Stepped",
+      "Zigzag": "Zigzag",
+      "Rope": "Rope",
+      "Glow path": "Glow path",
+      "Chain": "Chain",
+      "Pulse": "Pulse",
+      "Holographic": "Holographic"
+    }
+  },
+  "🔗 Enhanced Links_Thickness": {
+    "name": "Link thickness"
+  },
+  "🔗 Enhanced Links_Quality": {
+    "name": "Link effect quality",
+    "tooltip": "More detail, more GPU.",
+    "options": {
+      "Fast": "Fast",
+      "Balanced": "Balanced",
+      "Rich": "Rich"
+    }
+  },
+  "🔗 Enhanced Links_Particle_Density": {
+    "name": "Link particle density",
+    "tooltip": "How many particles or markers each link carries."
+  },
+  "🔗 Enhanced Links_Color_Mode": {
+    "name": "Link colors",
+    "tooltip": "Type colors follow your palette.",
+    "options": {
+      "Link type colors": "Link type colors",
+      "Custom": "Custom"
+    }
+  },
+  "🔗 Enhanced Links_Color_Primary": {
+    "name": "Link primary color",
+    "tooltip": "Used when Link colors is Custom."
+  },
+  "🔗 Enhanced Links_Color_Secondary": {
+    "name": "Link secondary color",
+    "tooltip": "Used when Link colors is Custom."
+  },
+  "🔗 Enhanced Links_Color_Accent": {
+    "name": "Link accent color",
+    "tooltip": "Used when Link colors is Custom."
+  },
+  "🔗 Enhanced Links_Color_Scheme": {
+    "name": "Link color boost",
+    "tooltip": "Filter applied on top of the colors.",
+    "options": {
+      "Off": "Off",
+      "Saturated": "Saturated",
+      "Vivid": "Vivid",
+      "High contrast": "High contrast",
+      "Bright": "Bright",
+      "Muted": "Muted"
+    }
+  },
+  "🔗 Enhanced Links_Glow_Intensity": {
+    "name": "Link glow"
+  },
+  "🔗 Enhanced Links_Marker_Enabled": {
+    "name": "Flow markers",
+    "tooltip": "Shapes gliding along links in Classic Flow."
+  },
+  "🔗 Enhanced Links_Marker_Shape": {
+    "name": "Marker shape",
+    "options": {
+      "None": "None",
+      "Arrow": "Arrow",
+      "Diamond": "Diamond",
+      "Circle": "Circle",
+      "Square": "Square",
+      "Triangle": "Triangle",
+      "Star": "Star",
+      "Heart": "Heart",
+      "Cross": "Cross",
+      "Hexagon": "Hexagon",
+      "Flower": "Flower",
+      "Spiral": "Spiral"
+    }
+  },
+  "🔗 Enhanced Links_Marker_Size": {
+    "name": "Marker size"
+  },
+  "🔗 Enhanced Links_Marker_Color_Mode": {
+    "name": "Marker color",
+    "options": {
+      "Link type color": "Link type color",
+      "Custom": "Custom"
+    }
+  },
+  "🔗 Enhanced Links_Marker_Color": {
+    "name": "Marker custom color",
+    "tooltip": "Used when Marker color is Custom."
+  },
+  "🔗 Enhanced Links_Marker_Glow": {
+    "name": "Marker glow"
+  },
+  "🔗 Enhanced Links_Marker_Effects": {
+    "name": "Marker effect",
+    "options": {
+      "None": "None",
+      "Pulse": "Pulse",
+      "Fade": "Fade",
+      "Rainbow": "Rainbow"
+    }
+  },
+  "🔗 Enhanced Links_Link_Shadow_Enabled": {
+    "name": "Link shadow",
+    "tooltip": "Drop shadow under links in Classic Flow."
+  },
+  "🔗 Enhanced Links_Marker_Shadow_Enabled": {
+    "name": "Marker shadow",
+    "tooltip": "Drop shadow under flow markers."
+  },
+  "🔗 Enhanced Links_Shadow_Blur": {
+    "name": "Drop shadow blur"
+  },
+  "🔗 Enhanced Links_Shadow_Offset": {
+    "name": "Drop shadow offset"
+  },
+  "📦 Enhanced Nodes_Animate": {
+    "name": "Node effect",
+    "tooltip": "Effect drawn around every node.",
+    "options": {
+      "None": "None",
+      "Gentle Pulse": "Gentle Pulse",
+      "Neon Nexus": "Neon Nexus",
+      "Cosmic Ripple": "Cosmic Ripple",
+      "Flower of Life": "Flower of Life"
+    }
+  },
+  "📦 Enhanced Nodes_Animations_Enabled": {
+    "name": "Show base effect",
+    "tooltip": "Off hides the effect but keeps node particles."
+  },
+  "📦 Enhanced Nodes_Animation_Speed": {
+    "name": "Node effect speed"
+  },
+  "📦 Enhanced Nodes_Direction": {
+    "name": "Node effect direction",
+    "options": {
+      "Forward": "Forward",
+      "Reverse": "Reverse"
+    }
+  },
+  "📦 Enhanced Nodes_Static_Mode": {
+    "name": "Freeze node effects"
+  },
+  "📦 Enhanced Nodes_Intensity": {
+    "name": "Node effect energy"
+  },
+  "📦 Enhanced Nodes_Animation_Size": {
+    "name": "Node effect size"
+  },
+  "📦 Enhanced Nodes_Animation_Glow": {
+    "name": "Node effect bloom",
+    "tooltip": "Multiplies Node effect energy."
+  },
+  "📦 Enhanced Nodes_Quality": {
+    "name": "Node effect quality",
+    "tooltip": "More detail, more GPU.",
+    "options": {
+      "Fast": "Fast",
+      "Balanced": "Balanced",
+      "Rich": "Rich"
+    }
+  },
+  "📦 Enhanced Nodes_Glow_Show": {
+    "name": "Node effect glow",
+    "tooltip": "Off draws node effects without glow."
+  },
+  "📦 Enhanced Nodes_Glow": {
+    "name": "Node glow strength",
+    "tooltip": "Glow of node effects and the hover outline."
+  },
+  "📦 Enhanced Nodes_Color_Hover_Show": {
+    "name": "Hover outline",
+    "tooltip": "Outlines animated nodes while hovered or selected."
+  },
+  "📦 Enhanced Nodes_Color_Hover": {
+    "name": "Hover outline color"
+  },
+  "📦 Enhanced Nodes_Color_Mode": {
+    "name": "Node effect colors",
+    "options": {
+      "Style colors": "Style colors",
+      "Custom": "Custom"
+    }
+  },
+  "📦 Enhanced Nodes_Color_Primary": {
+    "name": "Node primary color",
+    "tooltip": "Used when Node effect colors is Custom."
+  },
+  "📦 Enhanced Nodes_Color_Secondary": {
+    "name": "Node secondary color",
+    "tooltip": "Used when Node effect colors is Custom."
+  },
+  "📦 Enhanced Nodes_Color_Accent": {
+    "name": "Node accent color",
+    "tooltip": "Used when Node effect colors is Custom."
+  },
+  "📦 Enhanced Nodes_Color_Scheme": {
+    "name": "Node color boost",
+    "tooltip": "Filter applied on top of the colors.",
+    "options": {
+      "Off": "Off",
+      "Saturated": "Saturated",
+      "Vivid": "Vivid",
+      "High contrast": "High contrast",
+      "Bright": "Bright",
+      "Muted": "Muted"
+    }
+  },
+  "📦 Enhanced Nodes_Particle_Show": {
+    "name": "Node particles",
+    "tooltip": "Also drawn when Node effect is None."
+  },
+  "📦 Enhanced Nodes_Particle_Density": {
+    "name": "Node particle density"
+  },
+  "📦 Enhanced Nodes_Particle_Size": {
+    "name": "Node particle size"
+  },
+  "📦 Enhanced Nodes_Particle_Speed": {
+    "name": "Node particle speed"
+  },
+  "📦 Enhanced Nodes_Particle_Intensity": {
+    "name": "Node particle motion",
+    "tooltip": "How energetic the motion is."
+  },
+  "📦 Enhanced Nodes_Particle_Glow": {
+    "name": "Node particle glow"
+  },
+  "📦 Enhanced Nodes_Particle_Color_Mode": {
+    "name": "Node particle colors",
+    "tooltip": "Complementary is the opposite hue of the node accent color.",
+    "options": {
+      "Particle color": "Particle color",
+      "Rainbow": "Rainbow",
+      "Complementary": "Complementary",
+      "Energy": "Energy",
+      "Quantum": "Quantum",
+      "Aurora": "Aurora"
+    }
+  },
+  "📦 Enhanced Nodes_Color_Particle": {
+    "name": "Node particle color",
+    "tooltip": "Used when Node particle colors is Particle color."
+  },
+  "📦 Enhanced Nodes_Text_Animation_Enabled": {
+    "name": "Animated titles",
+    "tooltip": "Draws a styled copy of each node title."
+  },
+  "📦 Enhanced Nodes_Text_Style": {
+    "name": "Title style",
+    "options": {
+      "Neon pulse": "Neon pulse",
+      "Glitch": "Glitch",
+      "Retro": "Retro",
+      "Simple pulse": "Simple pulse",
+      "Minimal": "Minimal"
+    }
+  },
+  "📦 Enhanced Nodes_Text_Color": {
+    "name": "Title color"
+  },
+  "📦 Enhanced Nodes_Text_Size": {
+    "name": "Title size"
+  },
+  "📦 Enhanced Nodes_Text_Glow": {
+    "name": "Title glow"
+  },
+  "📦 Enhanced Nodes_Text_Letter_Spacing": {
+    "name": "Title letter spacing"
+  },
+  "📦 Enhanced Nodes_Text_Position_X": {
+    "name": "Title offset X"
+  },
+  "📦 Enhanced Nodes_Text_Position_Y": {
+    "name": "Title offset Y"
+  },
+  "📦 Enhanced Nodes_Text_Rotation_Radius": {
+    "name": "Title orbit radius",
+    "tooltip": "Circles the title around its position."
+  },
+  "📦 Enhanced Nodes_Text_Rotation_Angle": {
+    "name": "Title rotation"
+  },
+  "🔗 Enhanced Links_Pause_During_Render": {
+    "name": "Pause link animation during runs",
+    "tooltip": "Links hold a still frame while the queue is running."
+  },
+  "📦 Enhanced Nodes_Pause_During_Render": {
+    "name": "Pause node effects during runs",
+    "tooltip": "Node effects hold still while the queue is running; their particles keep moving."
+  },
+  "📦 Enhanced Nodes_End Animation_Enabled": {
+    "name": "Completion effect",
+    "tooltip": "Has no effect yet."
+  }
+}
