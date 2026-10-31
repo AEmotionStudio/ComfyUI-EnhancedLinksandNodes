@@ -161,9 +161,18 @@
   "🔗 Enhanced Links_Shadow_Offset": {
     "name": "Drop shadow offset"
   },
+  "🔗 Enhanced Links_Coexist": {
+    "name": "Other link extensions",
+    "tooltip": "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.",
+    "options": {
+      "Step aside if one is found": "Step aside if one is found",
+      "Keep Enhanced link effects": "Keep Enhanced link effects",
+      "Always step aside": "Always step aside"
+    }
+  },
   "📦 Enhanced Nodes_Animate": {
     "name": "Node effect",
-    "tooltip": "Effect drawn around every node.",
+    "tooltip": "Effect drawn on and around every node.",
     "options": {
       "None": "None",
       "Gentle Pulse": "Gentle Pulse",
@@ -292,7 +301,7 @@
   },
   "📦 Enhanced Nodes_Text_Animation_Enabled": {
     "name": "Animated titles",
-    "tooltip": "Draws a styled copy of each node title."
+    "tooltip": "Draws each node title in the chosen style."
   },
   "📦 Enhanced Nodes_Text_Style": {
     "name": "Title style",

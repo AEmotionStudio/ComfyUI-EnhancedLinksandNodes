@@ -1,8 +1,8 @@
 /**
  * Animated Link Renderers — 9 animation effects for link connections.
  *
- * Each function renders one animation style onto the canvas, using
- * LinkRenderers for path geometry and ColorManager for color resolution.
+ * Each function renders one animation style onto the canvas, along each item's
+ * path, using ColorManager for color resolution.
  *
  * Ported from original link_animations.js renderSacredFlow..renderClassicFlow
  * (lines 2553–3359).
@@ -10,7 +10,7 @@
  * @module effects/animated-renderers
  */
 
-import { getLinkRenderer, type LinkPoint } from '@/renderers/link-renderers';
+import type { LinkPoint, LinkRenderer } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
 import { createFlowField } from '@/renderers/render-utils';
 import { getLinkColor, getSecondaryColor, getAccentColor, enhanceColor, validateHexColor, getCustomLinkColors } from '@/utils/color-manager';
@@ -24,11 +24,11 @@ import { L } from '@/core/settings';
 export interface RenderItem {
     start: LinkPoint;
     end: LinkPoint;
-    color: string;
     defaultColor: string;
     linkStyle: string;
-    linkId: string;
     isStatic: boolean;
+    /** The path the effect follows, which starts at `start` and ends at `end`. */
+    path: Pick<LinkRenderer, 'getLength' | 'getPoint' | 'draw'>;
 }
 
 interface AnimationState {
@@ -61,8 +61,7 @@ function renderSacredFlow(
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, isStatic, path: r }) => {
         const baseColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
         const primaryColor = enhanceColor(baseColor, colorScheme);
         const accentColor = enhanceColor(getAccentColor(defaultColor), colorScheme);
@@ -152,8 +151,7 @@ function renderCrystalStream(
         cx.restore();
     };
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -197,8 +195,7 @@ function renderQuantumField(
     const glowIntensity = L.glowIntensity;
     const particleDensity = L.particleDensity;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -254,8 +251,7 @@ function renderCosmicWeave(
     const continuousPhase = (state.totalTime || 0) * animSpeed;
     const direction = state.direction;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -314,8 +310,7 @@ function renderEnergyPulse(
     const speedReductionFactor = 0.25;
     const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -366,8 +361,7 @@ function renderDNAHelix(
     const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, isStatic, path: r }) => {
         const points = Math.floor(SACRED.COMPLETION * quality * 2);
         const helixRadius = 10;
         const rotations = 4;
@@ -448,8 +442,7 @@ function renderLavaFlow(
     const animSpeed = L.animationSpeed;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -555,8 +548,7 @@ function renderStellarPlasma(
     const animSpeed = L.animationSpeed;
     const continuousPhase = -(state.totalTime || 0) * animSpeed;
 
-    items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, isStatic, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -635,8 +627,7 @@ function renderClassicFlow(
     const shadowOffset = L.shadowOffset;
     const continuousPhase = (state.totalTime || 0) * animSpeed;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
 
         // Draw base link

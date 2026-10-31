@@ -3,9 +3,10 @@
  * behave like a browser canvas where traces depend on it.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { CanvasRecorder, parseColor } from '../../helpers/recording-context';
 import { app, api, fake, resetFakeApp } from '../../helpers/fake-app';
+import { frames, start } from '../../helpers/fake-litegraph';
 import { mulberry32 } from '../../helpers/rng';
 
 function thrown(fn: () => unknown): string {
@@ -145,6 +146,41 @@ describe('fake app', () => {
         expect(fake.reads).toBe(3);
         // addSetting and both getSettingValue calls went through the deprecated API.
         expect(fake.legacyCalls).toBe(3);
+    });
+});
+
+describe('fake LiteGraph', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('draws a frame in native order, with a renderLink per segment', async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Animate': 0 }, {
+            nodes: [{ pos: [100, 100] }, { pos: [600, 100] }, { pos: [600, 400], collapsed: true }],
+            links: [
+                { from: 0, to: 1, reroutes: [[350, 300]] },
+                { from: 0, to: 2 },
+                { from: 0, to: 1, reroutes: [[350, 500]], floating: true },
+            ],
+        });
+        const renderLink = vi.spyOn(canvas, 'renderLink');
+        frames(1);
+        // A collapsed node has no widgets.
+        const node = ['drawNode', 'drawNodeShape', 'drawTitleText'];
+        expect(canvas.calls).toEqual([
+            'drawBackCanvas', 'drawConnections', 'renderLink', 'renderLink', 'renderLink', 'renderLink',
+            'drawFrontCanvas', 'onRender', ...node, 'drawWidgets', ...node, 'drawWidgets', ...node, 'onDrawForeground',
+        ]);
+        const [LEFT, RIGHT, CENTER] = [3, 4, 5];
+        expect(renderLink.mock.calls.map(([, a, b, link, , , , startDir, endDir, extras]) => [link?.id, a, b, startDir, endDir, extras])).toEqual([
+            // Into the reroute with its control point, then out of it with the start control the next segment needs.
+            [1, [311, 114], [350, 300], RIGHT, CENTER, { startControl: undefined, endControl: expect.any(Array), reroute: expect.objectContaining({ pos: [350, 300] }), disabled: false }],
+            [1, [350, 300], [610, 114], CENTER, LEFT, { startControl: expect.any(Array), disabled: false }],
+            // A collapsed node takes its link at the left end of its title bar.
+            [2, [311, 114], [600, 385], RIGHT, LEFT, undefined],
+            // The floating link: disabled, and only up to its reroute.
+            [3, [311, 114], [350, 500], RIGHT, CENTER, expect.objectContaining({ disabled: true })],
+        ]);
     });
 });
 

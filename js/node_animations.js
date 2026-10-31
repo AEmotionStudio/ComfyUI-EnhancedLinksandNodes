@@ -1,34 +1,5 @@
 import { app } from "/scripts/app.js";
-import { api } from "/scripts/api.js";
-import { n as nodeSettings, N, f as getCustomNodeColors } from "./chunks/color-manager-CtPq5NfG.js";
-function createNodeState() {
-  return {
-    isRunning: false,
-    phase: 0,
-    particlePhase: 0,
-    lastFrame: performance.now(),
-    lastRAFTime: 0,
-    animationFrame: null,
-    totalTime: 0,
-    speedMultiplier: 1,
-    staticPhase: Math.PI / 4,
-    forceUpdate: false,
-    forceRedraw: false,
-    lastRenderState: null,
-    nodeEffects: /* @__PURE__ */ new Map(),
-    isAnimating: false,
-    frameSkipCount: 0,
-    maxFrameSkips: 3,
-    lastAnimStyle: null,
-    particlePool: /* @__PURE__ */ new Map(),
-    activeParticles: /* @__PURE__ */ new Set(),
-    playCompletionAnimation: false,
-    completionPhase: 0,
-    completingNodes: /* @__PURE__ */ new Set(),
-    disabledCompletionNodes: /* @__PURE__ */ new Set(),
-    primaryCompletionNode: null
-  };
-}
+import { o as nodeSettings, n as install, i as layers, d as guard, N, h as dummy, f as env, l as live, w as wake, j as clock, q as getCustomNodeColors } from "./chunks/color-manager-BWKJQb2w.js";
 function validateHexColor(color) {
   if (!color || typeof color !== "string") return null;
   const normalized = color.startsWith("#") ? color : `#${color}`;
@@ -254,8 +225,8 @@ function neonNexus(ctx, node, settings, particleTime, getParticleColor2) {
     ctx.restore();
   }
   const neonFlicker = isStatic ? 1 : 0.95 + 0.05 * Math.sin(phase * 0.3 * direction);
-  const layers = 4;
-  for (let i = 0; i < layers; i++) {
+  const layers2 = 4;
+  for (let i = 0; i < layers2; i++) {
     ctx.save();
     ctx.lineWidth = baseLineWidth * (1 + i * 0.3);
     const layerColor = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent : "rgba(255, 255, 255, 0.4)";
@@ -448,14 +419,14 @@ function flowerOfLife(ctx, node, settings, particleTime, getParticleColor2) {
   const centerX = node.size[0] / 2;
   const centerY = node.size[1] / 2;
   const baseRadius = Math.min(node.size[0], node.size[1]) * 0.056 * intensity * animationSize;
-  const layers = Math.max(2, Math.floor(quality * 2));
+  const layers2 = Math.max(2, Math.floor(quality * 2));
   const rotationSpeed = 0.2;
   const pulseSpeed = 1.5;
   ctx.save();
   const rotation = phase * rotationSpeed;
   const pulse = 0.8 + Math.sin(phase * pulseSpeed) * 0.2;
   const patternPoints = [{ x: centerX, y: centerY }];
-  for (let layer = 1; layer <= layers; layer++) {
+  for (let layer = 1; layer <= layers2; layer++) {
     const numCircles = layer * 6;
     const layerRadius = baseRadius * 2;
     for (let i = 0; i < numCircles; i++) {
@@ -488,14 +459,14 @@ function flowerOfLife(ctx, node, settings, particleTime, getParticleColor2) {
     ctx.beginPath();
     ctx.arc(point.x, point.y, baseRadius * pulse, 0, Math.PI * 2);
     ctx.strokeStyle = index % 2 === 0 ? secondary : accent;
-    ctx.globalAlpha = 1 - layer / (layers + 1);
+    ctx.globalAlpha = 1 - layer / (layers2 + 1);
     ctx.stroke();
   }
   ctx.beginPath();
   for (let i = 0; i < 6; i++) {
     const angle = i / 6 * Math.PI * 2 + rotation;
-    const x = centerX + Math.cos(angle) * baseRadius * layers * 2;
-    const y = centerY + Math.sin(angle) * baseRadius * layers * 2;
+    const x = centerX + Math.cos(angle) * baseRadius * layers2 * 2;
+    const y = centerY + Math.sin(angle) * baseRadius * layers2 * 2;
     i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
   }
   ctx.closePath();
@@ -563,6 +534,10 @@ function getNodeEffect(style) {
       return gentlePulse;
   }
 }
+const EFFECT = "Node effect";
+const PARTICLES = "Node particles";
+const TITLES = "Animated titles";
+const OUTLINE = "Hover outline";
 function hexToRGB(hex) {
   const validated = validateHexColor(hex) || "#00ffff";
   return [
@@ -729,208 +704,209 @@ function getParticleColor(index, time, _count) {
     }
   }
 }
+const [ROUND, CIRCLE, CARD] = [2, 3, 4];
+const [NEVER, BYPASS] = [2, 4];
+const NO_TITLE = 1;
+function effectSettings() {
+  const colors = getCustomNodeColors();
+  return {
+    animation: {
+      phase: clock.nodePhase,
+      intensity: N.intensity * N.animationGlow,
+      direction: N.direction,
+      animSpeed: N.animationSpeed,
+      isStaticMode: N.staticMode,
+      isPaused: false
+    },
+    quality: { quality: N.quality, animationSize: N.animationSize, glowIntensity: N.glowShow ? N.glow : 0 },
+    particles: {
+      showParticles: N.particleShow,
+      density: N.particleDensity,
+      speed: N.particleSpeed,
+      intensity: N.particleIntensity,
+      size: N.particleSize,
+      glowIntensity: N.particleGlow
+    },
+    colors: { primary: colors.primary, secondary: colors.secondary, accent: colors.accent, hoverColor: N.colorHover, showHover: N.colorHoverShow }
+  };
+}
+function particleSettings() {
+  const colors = getCustomNodeColors();
+  return {
+    animation: { phase: clock.nodePhase, intensity: 1, direction: N.direction, animSpeed: 1, isStaticMode: false, isPaused: false },
+    quality: { quality: N.quality, animationSize: N.animationSize, glowIntensity: 0 },
+    particles: {
+      showParticles: true,
+      density: N.particleDensity,
+      speed: N.particleSpeed,
+      intensity: N.particleIntensity,
+      size: N.particleSize,
+      glowIntensity: N.particleGlow
+    },
+    colors: { primary: colors.primary, secondary: colors.secondary, accent: colors.accent, hoverColor: "#00ff15", showHover: false }
+  };
+}
+function fireflies(w, h) {
+  const radius = Math.max(w, h) * (0.5 + N.quality * 0.1) * N.animationSize;
+  return 1.7 * radius + 4.5 * N.particleIntensity + 17 + 20 * N.animationSize * N.particleSize;
+}
+function effectReach(w, h) {
+  const long = Math.max(w, h);
+  const short = Math.min(w, h);
+  const size = N.animationSize;
+  const intensity = N.intensity * N.animationGlow;
+  const glow = N.glowShow ? N.glow : 0;
+  const { particleShow: particles, particleIntensity: motion, particleSize: dot, particleGlow: dotGlow } = N;
+  switch (N.animate) {
+    case 2: {
+      const line = long * 75e-4 * size;
+      return Math.max(10, line + 48 * intensity * glow, line + 15 * intensity, particles ? 1.1 * short * size + 3 * dot + 5 * dotGlow + 2 : 0);
+    }
+    case 3: {
+      const rings = 0.7 * short * size + 1.5 * intensity + 1 + Math.max(2, 15 * glow);
+      const corona = 0.7 * long * (0.8 + 0.2 * motion) + 4 * dot + 3 * motion + 2 + 15 * dotGlow;
+      return Math.max(rings, particles ? corona : 0) - short / 2;
+    }
+    case 4: {
+      const radius = short * 0.056 * intensity * size;
+      const rings = 2 * radius * Math.max(2, Math.floor(N.quality * 2));
+      const dots = rings + 0.5 * radius * motion + 1.5 * dot + 0.5 + 5 * dotGlow;
+      return Math.max(rings + radius + 1 + 15 * intensity * glow, particles ? dots : 0) - short / 2;
+    }
+    default: {
+      const radius = long * (0.5 + N.quality * 0.1) * size;
+      const halo = Math.max(radius * (1.2 + 0.4 * glow) * (0.4 + 0.3 * intensity), particles ? fireflies(w, h) + 15 * glow : 0);
+      return Math.max(halo - short / 2, N.colorHoverShow ? 1 + 22.5 * glow : 0);
+    }
+  }
+}
+const particlesReach = (w, h) => fireflies(w, h) - Math.min(w, h) / 2;
+const drawEffect = (ctx, node, settings) => getNodeEffect(N.animate)(ctx, node, settings, clock.particlePhase, getParticleColor);
+const drawParticlesAlone = (ctx, node, settings) => {
+  ctx.translate(node.size[0] / 2, node.size[1] / 2);
+  drawParticles(ctx, node, settings, clock.particlePhase, getParticleColor);
+};
+function fx() {
+  if (N.animate > 0 && N.animationsEnabled) {
+    return guard.off(EFFECT) ? void 0 : { key: EFFECT, draw: drawEffect, settings: effectSettings(), reach: effectReach };
+  }
+  if (!N.particleShow || guard.off(PARTICLES)) return void 0;
+  return { key: PARTICLES, draw: drawParticlesAlone, settings: particleSettings(), reach: particlesReach };
+}
+function modeAlpha(canvas, node) {
+  if (node.flags.ghost) return 0.3;
+  return node.mode === BYPASS ? 0.2 : node.mode === NEVER ? 0.4 : canvas.editor_alpha;
+}
+function faded(ctx, alpha) {
+  ctx.globalAlpha = alpha;
+  if (alpha === 1) return ctx;
+  return new Proxy(ctx, {
+    get: (target, key) => {
+      const value = Reflect.get(target, key);
+      if (key === "globalAlpha") return value / alpha;
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+    set: (target, key, value) => {
+      if (key !== "globalAlpha") return Reflect.set(target, key, value);
+      if (value >= 0 && value <= 1) target.globalAlpha = value * alpha;
+      return true;
+    }
+  });
+}
+function body(canvas, ctx, node) {
+  const box = node.boundingRect;
+  const left = box[0] - node.pos[0];
+  const top = box[1] - node.pos[1];
+  const shape = node.renderingShape;
+  const r = LiteGraph.ROUND_RADIUS;
+  if (canvas.low_quality) ctx.rect(left, top, box[2], box[3]);
+  else if (shape === ROUND || shape === CARD) ctx.roundRect(left, top, box[2], box[3], shape === CARD ? [r, r, 0, 0] : [r]);
+  else if (shape === CIRCLE) ctx.arc(node.size[0] / 2, node.size[1] / 2, node.size[0] / 2, 0, Math.PI * 2);
+  else ctx.rect(left, top, box[2], box[3]);
+}
+function drawFx(canvas, ctx, node, f) {
+  ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  f.draw(faded(ctx, modeAlpha(canvas, node)), node, f.settings);
+}
+const overlaps = (box, area, margin) => box[0] - margin <= area[0] + area[2] && box[0] + box[2] + margin >= area[0] && box[1] - margin <= area[1] + area[3] && box[1] + box[3] + margin >= area[1];
+function under(canvas, ctx) {
+  const { graph } = canvas;
+  if (!graph || LiteGraph.vueNodesMode) return;
+  const f = fx();
+  const moves = N.animate > 0 && !N.staticMode && !(N.pauseDuringRender && env.running) && !env.reducedMotion;
+  const titles = N.textAnimationEnabled && moves && !canvas.low_quality && !guard.off(TITLES);
+  if (!f && !titles) return;
+  const particles = N.particleShow && !env.reducedMotion;
+  const area = canvas.visible_area;
+  for (const node of graph.nodes) {
+    const shown = node.flags.collapsed ? void 0 : f;
+    const reach = shown ? shown.reach(node.size[0], node.size[1]) : 0;
+    if (!overlaps(node.renderArea, area, Math.max(0, reach))) continue;
+    if (titles && node.title && !node.onDrawTitleText && node.title_mode !== NO_TITLE) live.nodes++;
+    if (!shown) continue;
+    if (shown.key === EFFECT && moves) live.nodes++;
+    if (particles) live.particles++;
+    if (reach <= 0) continue;
+    ctx.save();
+    try {
+      ctx.translate(node.pos[0], node.pos[1]);
+      ctx.beginPath();
+      ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
+      body(canvas, ctx, node);
+      ctx.clip("evenodd");
+      drawFx(canvas, ctx, node, shown);
+    } catch (error) {
+      guard.fail(shown.key, error);
+    } finally {
+      ctx.restore();
+    }
+  }
+  if (live.nodes || live.particles) wake();
+}
+function styledTitle(ctx, node) {
+  const alpha = ctx.globalAlpha;
+  ctx.save();
+  try {
+    drawAnimatedText(faded(ctx, alpha), node.title, node.renderingSize[0] / 2, -15, clock.nodePhase);
+    return true;
+  } catch (error) {
+    guard.fail(TITLES, error);
+    return false;
+  } finally {
+    ctx.restore();
+  }
+}
 const ext = {
   name: "enhanced.node.animations",
   settings: nodeSettings,
   async setup() {
-    const state = createNodeState();
-    const Timing = {
-      smoothDelta: 0,
-      lastTime: performance.now(),
-      update() {
-        const now = performance.now();
-        const raw = Math.min((now - this.lastTime) / 1e3, 1 / 30);
-        this.lastTime = now;
-        this.smoothDelta = this.smoothDelta * 0.9 + raw * 0.1;
-        return this.smoothDelta;
-      }
-    };
-    const ParticleController = {
-      phase: 0,
-      lastUpdate: 0,
-      update(currentTime, delta) {
-        const dir = N.direction;
-        const speed = Math.max(0.01, N.particleSpeed);
-        if (currentTime - this.lastUpdate >= 16) {
-          const phaseStep = 2 * Math.PI / 15 * delta * speed;
-          this.phase += phaseStep * dir;
-          this.lastUpdate = currentTime;
-        }
-        return this.phase;
-      }
-    };
-    api.addEventListener("status", ({ detail }) => {
-      state.isRunning = detail?.exec_info?.queue_remaining > 0;
-    });
-    function renderLoop(timestamp) {
-      const animStyle = N.animate;
-      const pauseDuringRender = N.pauseDuringRender;
-      const isRendering = state.isRunning;
-      const showParticles = N.particleShow;
-      const delta = Timing.update();
-      state.totalTime = (state.totalTime || 0) + delta;
-      ParticleController.update(timestamp, delta);
-      const paused = isRendering && pauseDuringRender;
-      if (animStyle > 0 && !paused) {
-        const speed = N.animationSpeed;
-        const direction = N.direction;
-        const isStaticMode = N.staticMode;
-        if (!isStaticMode) {
-          state.phase += 2 * Math.PI / 15 * delta * speed * direction;
-        }
-      }
-      if (animStyle > 0 || showParticles) {
-        app.graph?.setDirtyCanvas(true, false);
-      }
-      requestAnimationFrame(renderLoop);
-    }
-    requestAnimationFrame(renderLoop);
-    const originalDrawNode = LGraphCanvas.prototype.drawNode;
-    LGraphCanvas.prototype.drawNode = function(node, ctx) {
-      const animStyle = N.animate;
-      const animEnabled = N.animationsEnabled;
-      const showParticles = N.particleShow;
-      if (animStyle > 0 && animEnabled) {
-        const colors = getCustomNodeColors();
-        const isStaticMode = N.staticMode;
-        const glowIntensity = N.glow;
-        const animGlow = N.animationGlow;
-        const quality = N.quality;
-        const animSize = N.animationSize;
-        const intensity = N.intensity;
-        const direction = N.direction;
-        const animSpeed = N.animationSpeed;
-        const particleDensity = N.particleDensity;
-        const particleSpeed = N.particleSpeed;
-        const particleIntensity = N.particleIntensity;
-        const particleSize = N.particleSize;
-        const particleGlow = N.particleGlow;
-        const showGlow = N.glowShow;
-        const hoverColor = N.colorHover;
-        const showHover = N.colorHoverShow;
-        const effect = getNodeEffect(animStyle);
-        if (effect) {
-          ctx.save();
-          try {
-            effect(
-              ctx,
-              node,
-              {
-                animation: {
-                  phase: state.phase,
-                  intensity: intensity * animGlow,
-                  direction,
-                  animSpeed,
-                  isStaticMode,
-                  isPaused: false
-                },
-                quality: {
-                  quality,
-                  animationSize: animSize,
-                  glowIntensity: showGlow ? glowIntensity : 0
-                },
-                particles: {
-                  showParticles,
-                  density: particleDensity,
-                  speed: particleSpeed,
-                  intensity: particleIntensity,
-                  size: particleSize,
-                  glowIntensity: particleGlow
-                },
-                colors: {
-                  primary: colors.primary,
-                  secondary: colors.secondary,
-                  accent: colors.accent,
-                  hoverColor,
-                  showHover
-                }
-              },
-              ParticleController.phase,
-              getParticleColor
-            );
-          } catch (e) {
-            console.warn("[EnhancedNodes] Effect error:", e);
-          }
+    install();
+    layers.nodes = under;
+    const drawNodeShape = LGraphCanvas.prototype.drawNodeShape;
+    LGraphCanvas.prototype.drawNodeShape = function(...args) {
+      drawNodeShape.apply(this, args);
+      const [node, ctx] = args;
+      if (node.flags.collapsed) return;
+      const f = fx();
+      if (f) {
+        ctx.save();
+        try {
+          ctx.beginPath();
+          body(this, ctx, node);
+          ctx.clip();
+          drawFx(this, ctx, node, f);
+        } catch (error) {
+          guard.fail(f.key, error);
+        } finally {
           ctx.restore();
         }
-      } else if (showParticles) {
-        const colors = getCustomNodeColors();
-        const particleDensity = N.particleDensity;
-        const particleSpeed = N.particleSpeed;
-        const particleIntensity = N.particleIntensity;
-        const particleSize = N.particleSize;
-        const particleGlow = N.particleGlow;
-        const quality = N.quality;
-        const animSize = N.animationSize;
-        const direction = N.direction;
+      }
+      if (N.colorHoverShow && N.animate > 0 && (node.mouseOver || this.selected_nodes && this.selected_nodes[node.id]) && !guard.off(OUTLINE)) {
+        const hoverColor = N.colorHover;
+        const outlineGlowSize = 15 * N.glow;
         ctx.save();
-        ctx.translate(node.size[0] / 2, node.size[1] / 2);
         try {
-          drawParticles(
-            ctx,
-            node,
-            {
-              animation: {
-                phase: state.phase,
-                intensity: 1,
-                direction,
-                animSpeed: 1,
-                isStaticMode: false,
-                isPaused: false
-              },
-              quality: {
-                quality,
-                animationSize: animSize,
-                glowIntensity: 0
-              },
-              particles: {
-                showParticles: true,
-                density: particleDensity,
-                speed: particleSpeed,
-                intensity: particleIntensity,
-                size: particleSize,
-                glowIntensity: particleGlow
-              },
-              colors: {
-                primary: colors.primary,
-                secondary: colors.secondary,
-                accent: colors.accent,
-                hoverColor: "#00ff15",
-                showHover: false
-              }
-            },
-            ParticleController.phase,
-            getParticleColor
-          );
-        } catch (e) {
-          console.warn("[EnhancedNodes] Particle error:", e);
-        }
-        ctx.restore();
-      }
-      originalDrawNode.call(this, node, ctx);
-      if (N.textAnimationEnabled && node.title) {
-        ctx.save();
-        drawAnimatedText(
-          ctx,
-          node.title,
-          node.size[0] / 2,
-          -15,
-          state.phase
-        );
-        ctx.restore();
-      }
-    };
-    const originalDrawNodeShape = LGraphCanvas.prototype.drawNodeShape;
-    if (originalDrawNodeShape) {
-      LGraphCanvas.prototype.drawNodeShape = function(node, ctx, ...args) {
-        originalDrawNodeShape.call(this, node, ctx, ...args);
-        const showHover = N.colorHoverShow;
-        const animStyle = N.animate;
-        if (showHover && animStyle > 0 && (node.mouseOver || this.selected_nodes && this.selected_nodes[node.id])) {
-          const hoverColor = N.colorHover;
-          const glowIntensity = N.glow;
-          const outlineGlowSize = 15 * glowIntensity;
-          ctx.save();
+          ctx.globalAlpha = modeAlpha(this, node);
           ctx.shadowColor = withAlpha(hoverColor, 0.5);
           ctx.shadowBlur = node.mouseOver ? outlineGlowSize : outlineGlowSize * 1.5;
           ctx.strokeStyle = withAlpha(hoverColor, 0.7);
@@ -944,10 +920,19 @@ const ext = {
           } else {
             ctx.strokeRect(0, 0, node.size[0], node.size[1]);
           }
+        } catch (error) {
+          guard.fail(OUTLINE, error);
+        } finally {
           ctx.restore();
         }
-      };
-    }
+      }
+    };
+    const drawTitleText = LGraphNode.prototype.drawTitleText;
+    LGraphNode.prototype.drawTitleText = function(...args) {
+      if (!N.textAnimationEnabled || !this.title || this.onDrawTitleText || args[1].low_quality || guard.off(TITLES)) return drawTitleText.apply(this, args);
+      if (styledTitle(args[0], this)) args[0] = dummy();
+      return drawTitleText.apply(this, args);
+    };
     console.log("[EnhancedNodes] Extension registered with full animation pipeline.");
   }
 };

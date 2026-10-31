@@ -15,6 +15,9 @@
 
 type Rgba = [number, number, number, number];
 
+/** Left, top, right and bottom on the canvas. */
+type Box = [number, number, number, number];
+
 interface Paint {
     op: string;
     style: string;
@@ -25,6 +28,11 @@ interface Paint {
     shadowOffsetX: number;
     shadowOffsetY: number;
     composite: string;
+    /**
+     * What a path or rectangle covers, before its line width and shadow: the box of its points under the
+     * transform, with curves bounded by their control points and arcs by their square. None for text and images.
+     */
+    box?: Box;
 }
 
 // =============================================================================
@@ -394,6 +402,8 @@ export class CanvasRecorder {
     private props = initialProps();
     private lineDash: number[] = [];
     private matrix = [1, 0, 0, 1, 0, 0];
+    private path: Box = [Infinity, Infinity, -Infinity, -Infinity];
+    private covered?: Box;
     private stack: Array<{ props: Record<string, unknown>; lineDash: number[]; matrix: number[] }> = [];
     private emptyRestores = 0;
     private gradients = 0;
@@ -509,8 +519,57 @@ export class CanvasRecorder {
         }
         const created = result instanceof RecordingGradient || result instanceof RecordingPattern ? result.label : '';
         this.lines.push(created ? `${created} = ${head}` : head);
+        this.track(name, args.map(Number), args[0] instanceof RecordingPath2D);
         if (PAINTS.has(name)) this.paint(name);
         return result;
+    }
+
+    /** Keeps the current path's box, which save() and restore() leave alone as canvas does, and what the next paint covers. */
+    private track(name: string, n: number[], ofPath2D: boolean): void {
+        switch (name) {
+            case 'beginPath':
+                this.path = [Infinity, Infinity, -Infinity, -Infinity];
+                return;
+            case 'moveTo':
+            case 'lineTo':
+            case 'quadraticCurveTo':
+            case 'bezierCurveTo':
+                return this.cover(this.path, n);
+            case 'arcTo':
+                return this.cover(this.path, n.slice(0, 4));
+            case 'arc':
+            case 'ellipse': {
+                const r = name === 'arc' ? n[2] : Math.max(n[2], n[3]);
+                return this.cover(this.path, [n[0] - r, n[1] - r, n[0] + r, n[1] - r, n[0] - r, n[1] + r, n[0] + r, n[1] + r]);
+            }
+            case 'rect':
+            case 'roundRect':
+                return this.cover(this.path, corners(n));
+            case 'fill':
+            case 'stroke':
+                this.covered = ofPath2D || this.path[0] > this.path[2] ? undefined : [...this.path];
+                return;
+            case 'fillRect':
+            case 'strokeRect':
+                this.covered = [Infinity, Infinity, -Infinity, -Infinity];
+                return this.cover(this.covered, corners(n));
+            case 'fillText':
+            case 'strokeText':
+            case 'drawImage':
+                this.covered = undefined;
+        }
+    }
+
+    /** Grows `box` by the points [x0, y0, x1, y1, ...] under the transform. */
+    private cover(box: Box, xy: number[]): void {
+        const [a, b, c, d, e, f] = this.matrix;
+        for (let i = 0; i + 1 < xy.length; i += 2) {
+            const [x, y] = [a * xy[i] + c * xy[i + 1] + e, b * xy[i] + d * xy[i + 1] + f];
+            box[0] = Math.min(box[0], x);
+            box[1] = Math.min(box[1], y);
+            box[2] = Math.max(box[2], x);
+            box[3] = Math.max(box[3], y);
+        }
     }
 
     private run(name: string, args: unknown[]): unknown {
@@ -655,6 +714,10 @@ export class CanvasRecorder {
             shadowOffsetX: p.shadowOffsetX as number,
             shadowOffsetY: p.shadowOffsetY as number,
             composite: p.globalCompositeOperation as string,
+            box: this.covered,
         });
     }
 }
+
+/** The corners of the rectangle x, y, w, h. */
+const corners = ([x, y, w, h]: number[]) => [x, y, x + w, y, x, y + h, x + w, y + h];

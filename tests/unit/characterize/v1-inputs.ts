@@ -7,6 +7,7 @@
  */
 
 import type { RenderItem } from '@/effects/animated-renderers';
+import { getLinkRenderer } from '@/renderers/link-renderers';
 import { gentlePulse, neonNexus, cosmicRipple, flowerOfLife } from '@/effects/node-effects';
 import type { NodeEffectSettings } from '@/effects/types';
 import { SETTINGS, snapshotOf } from '@/core/settings';
@@ -153,8 +154,8 @@ const LINKS: Array<[start: [number, number], end: [number, number], color: strin
     [[420, 140], [380, 660], '#B39DDB'], // MODEL
 ];
 
-/** The queue items v1's drawConnections built: Float32Array endpoints from getConnectionPos. */
-export function linkItems(isStatic: boolean, linkStyle = 'spline'): RenderItem[] {
+/** The queue items v1's drawConnections built, with Float32Array endpoints from getConnectionPos, along v2's own path for the style. */
+function linkItems(isStatic: boolean, linkStyle = 'spline'): RenderItem[] {
     return LINKS.map(([start, end, color], i) => ({
         start: Float32Array.from(start),
         end: Float32Array.from(end),
@@ -163,6 +164,7 @@ export function linkItems(isStatic: boolean, linkStyle = 'spline'): RenderItem[]
         linkStyle,
         linkId: String(i + 1),
         isStatic,
+        path: getLinkRenderer(linkStyle),
     }));
 }
 

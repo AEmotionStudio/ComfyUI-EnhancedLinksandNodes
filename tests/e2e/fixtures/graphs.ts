@@ -112,3 +112,47 @@ export const mixed: GraphSpec = {
         floating: { from: 'floatingSource', to: 'floatingTarget', reroute: [1300, 300], floating: true },
     },
 };
+
+/** A legacy Reroute node, the frontend's node from before native reroutes, between two IMAGE links. */
+export const legacyReroute: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNImage', pos: [300, 300] },
+        reroute: { type: 'Reroute', pos: [600, 400] },
+        target: { type: 'ELNImage', pos: [900, 300] },
+    },
+    links: {
+        in: { from: 'source', to: 'reroute' },
+        out: { from: 'reroute', to: 'target' },
+    },
+};
+
+/** KJNodes' Set and Get nodes under one name, which its Show links setting joins with a virtual link (interop leg only). */
+export const setGet: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNFloat', pos: [200, 200] },
+        set: { type: 'SetNode', pos: [450, 200], widgets: ['eln'] },
+        get: { type: 'GetNode', pos: [850, 500], widgets: ['eln'] },
+        target: { type: 'ELNFloat', pos: [1150, 500] },
+    },
+    links: {
+        set: { from: 'source', to: 'set' },
+        get: { from: 'get', to: 'target' },
+    },
+};
+
+/** For the gallery: an IMAGE link, a diagonal LATENT link and an INT link through a reroute. */
+export const gallery: GraphSpec = {
+    nodes: {
+        image: { type: 'ELNImage', pos: [200, 120] },
+        imageTarget: { type: 'ELNImage', pos: [700, 120] },
+        latent: { type: 'ELNLatent', pos: [200, 300] },
+        latentTarget: { type: 'ELNLatent', pos: [700, 420] },
+        int: { type: 'ELNInt', pos: [200, 580] },
+        intTarget: { type: 'ELNInt', pos: [700, 580] },
+    },
+    links: {
+        image: { from: 'image', to: 'imageTarget' },
+        latent: { from: 'latent', to: 'latentTarget' },
+        int: { from: 'int', to: 'intTarget', reroute: [500, 720] },
+    },
+};

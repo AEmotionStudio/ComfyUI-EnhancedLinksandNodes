@@ -14,8 +14,10 @@ const legs: Record<string, Leg> = JSON.parse(readFileSync(new URL('./tests/e2e/l
 // @perf baselines are slow and want the CPU to themselves, so they only run with ELN_PERF=1 (pnpm e2e:perf),
 // which also runs every test in one worker.
 const perf = process.env.ELN_PERF === '1';
+// @gallery screenshots are for looking at, not checks, so they only run with ELN_GALLERY=1 (pnpm e2e:gallery).
+const gallery = process.env.ELN_GALLERY === '1';
 
-// The reference builds and interop only run the tests tagged for them.
+// The reference builds and interop only run the tests tagged for them, and only interop runs @interop tests.
 const projects: { name: string; leg: string; profile: string; only?: string }[] = [
     { name: 'fe157-native', leg: 'fe157', profile: 'native' },
     { name: 'fe157', leg: 'fe157', profile: 'default' },
@@ -36,7 +38,7 @@ function requestedProjects(argv: string[]): RegExp[] {
     return names.map((name) => new RegExp(`^${name.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '.*')}$`, 'i'));
 }
 
-// Without --project, a tagged project only counts when its tests can run; there are no @interop tests yet.
+// Without --project, the reference builds count only with ELN_PERF=1, and interop only when asked for (--project interop).
 const requested = requestedProjects(process.argv);
 const selected = projects.filter((p) =>
     requested.length ? requested.some((r) => r.test(p.name)) : !p.only || (p.only === '@perf' && perf),
@@ -66,8 +68,11 @@ export default defineConfig<LegOptions>({
         trace: 'off',
         screenshot: 'only-on-failure',
     },
-    projects: projects.map(({ name, leg, profile, only }) => {
-        const skipped = [profile === 'native' ? '' : '@native', perf ? '' : '@perf'].filter(Boolean);
+    projects: projects.map((project) => {
+        const { name, leg, profile, only } = project;
+        // Interop tests need the interop server, which only starts when that project is selected.
+        const interop = only === '@interop' && selected.includes(project);
+        const skipped = [profile === 'native' ? '' : '@native', perf ? '' : '@perf', gallery ? '' : '@gallery', interop ? '' : '@interop'].filter(Boolean);
         return {
             name,
             workers: 1,

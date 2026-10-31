@@ -6,12 +6,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { preview } from '@/core/settings';
 import { renderAnimatedStyle } from '@/effects/animated-renderers';
-import { CanvasRecorder } from '../../helpers/recording-context';
-import { fake } from '../../helpers/fake-app';
-import { canvasWithLinks, setupV2 } from './v2-hooks';
+import { renderStaticStyle } from '@/effects/static-renderers';
+import { frames, start, type FakeCanvas } from '../../helpers/fake-litegraph';
 
-/** The settings each drawNode hands the node effect or the particles. */
+/** The settings the node layers hand the node effect or the particles. */
 const handed = vi.hoisted(() => ({ effect: [] as unknown[], particles: [] as unknown[] }));
 
 vi.mock('@/effects/node-effects', async (importOriginal) => ({
@@ -23,6 +23,11 @@ vi.mock('@/effects/node-effects', async (importOriginal) => ({
 vi.mock('@/effects/animated-renderers', async (importOriginal) => {
     const renderers = await importOriginal<typeof import('@/effects/animated-renderers')>();
     return { ...renderers, renderAnimatedStyle: vi.fn(renderers.renderAnimatedStyle) };
+});
+
+vi.mock('@/effects/static-renderers', async (importOriginal) => {
+    const renderers = await importOriginal<typeof import('@/effects/static-renderers')>();
+    return { ...renderers, renderStaticStyle: vi.fn(renderers.renderStaticStyle) };
 });
 
 beforeEach(() => {
@@ -48,15 +53,17 @@ const PARTICLES = {
     '📦 Enhanced Nodes.Direction': -1,
 };
 
-function drawNode(): CanvasRecorder {
-    const rec = new CanvasRecorder();
-    new fake.LGraphCanvas().drawNode({ id: 1, title: 'KSampler', size: [220, 120], flags: {} }, rec.ctx);
-    return rec;
+/** A 220×120 KSampler node's first frame, hovered or not, with link effects off. */
+async function drawNode(settings: Record<string, unknown>, hovered = false): Promise<FakeCanvas> {
+    const canvas = await start({ ...settings, '🔗 Enhanced Links.Animate': 0 }, { nodes: [{ pos: [100, 100], size: [220, 120], title: 'KSampler' }] });
+    canvas.graph._nodes[0].mouseOver = hovered;
+    frames(1);
+    return canvas;
 }
 
 describe('node settings', () => {
     it('reach the node effect', async () => {
-        await setupV2({
+        await drawNode({
             ...PARTICLES,
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Intensity': 1.3,
@@ -67,41 +74,41 @@ describe('node settings', () => {
             '📦 Enhanced Nodes.Color.Hover': '#123456',
             '📦 Enhanced Nodes.Color.Hover.Show': true,
         });
-        drawNode();
-        expect(handed.effect).toMatchObject([{
+        const settings = {
             animation: { intensity: 1.3 * 0.7, direction: -1, animSpeed: 2.5, isStaticMode: true },
             quality: { quality: 3, animationSize: 1.7, glowIntensity: 1.2 },
             particles: { showParticles: true, density: 2.2, speed: 3.1, intensity: 0.4, size: 2.6, glowIntensity: 1.9 },
             colors: { hoverColor: '#123456', showHover: true },
-        }]);
+        };
+        // Around the node and on it.
+        expect(handed.effect).toMatchObject([settings, settings]);
     });
 
     it('reach the particles of a node without an effect', async () => {
-        await setupV2(PARTICLES);
-        drawNode();
-        expect(handed.particles).toMatchObject([{
+        await drawNode(PARTICLES);
+        const settings = {
             animation: { direction: -1 },
             quality: { quality: 3, animationSize: 1.7 },
             particles: { density: 2.2, speed: 3.1, intensity: 0.4, size: 2.6, glowIntensity: 1.9 },
-        }]);
+        };
+        expect(handed.particles).toMatchObject([settings, settings]);
     });
 
     // Colours are stored without '#', as both frontends' colour pickers save them. v2.0.1 passed such a
     // value to the canvas as is, which ignored it, for the hover outline and every title style but neon.
     it('outline a hovered node', async () => {
-        await setupV2({
+        const canvas = await drawNode({
             '📦 Enhanced Nodes.Animate': 1,
             '📦 Enhanced Nodes.Color.Hover.Show': true,
             '📦 Enhanced Nodes.Color.Hover': '00ff00',
             '📦 Enhanced Nodes.Glow': 1.2,
-        });
-        const rec = new CanvasRecorder();
-        new fake.LGraphCanvas().drawNodeShape({ id: 1, size: [220, 120], mouseOver: true }, rec.ctx);
-        expect(rec.paints.map((p) => [p.op, p.style, p.shadowColor, p.shadowBlur])).toEqual([['strokeRect', 'rgba(0, 255, 0, 0.7)', 'rgba(0, 255, 0, 0.5)', 15 * 1.2]]);
+        }, true);
+        const outlines = canvas.front.paints.filter((p) => p.op === 'strokeRect');
+        expect(outlines.map((p) => [p.style, p.shadowColor, p.shadowBlur])).toEqual([['rgba(0, 255, 0, 0.7)', 'rgba(0, 255, 0, 0.5)', 15 * 1.2]]);
     });
 
     it('style and place the animated title', async () => {
-        await setupV2({
+        const canvas = await drawNode({
             '📦 Enhanced Nodes.Text.Animation.Enabled': true,
             '📦 Enhanced Nodes.Text.Style': 'retro',
             '📦 Enhanced Nodes.Text.Color': 'ff0000',
@@ -110,18 +117,26 @@ describe('node settings', () => {
             '📦 Enhanced Nodes.Text.Position.X': 7,
             '📦 Enhanced Nodes.Text.Position.Y': -4,
         });
-        const rec = drawNode();
-        expect(rec.trace()).toContain('font = 18px Arial');
+        const trace = canvas.front.trace();
+        expect(trace).toContain('font = 18px Arial');
         // Retro draws two offset copies, then the title itself: centred over the node, 15 px above it.
-        expect(rec.trace()).toContain('fillText("KSampler", 117, -19)');
-        expect(rec.paints.at(-1)).toMatchObject({ op: 'fillText', style: '#ff0000', shadowColor: '#ff0000', shadowBlur: 3 * 0.8 });
+        expect(trace).toContain('fillText("KSampler", 117, -19)');
+        expect(canvas.front.paints.filter((p) => p.op === 'fillText').at(-1)).toMatchObject({ style: '#ff0000', shadowColor: '#ff0000', shadowBlur: 3 * 0.8 });
     });
 });
+
+/** An IMAGE link from (311, 94) to (410, 94), its first frame drawn. */
+async function drawLink(settings: Record<string, unknown>): Promise<FakeCanvas> {
+    const canvas = await start(settings, { nodes: [{ pos: [100, 80] }, { pos: [400, 80] }], links: [{ from: 0, to: 1, type: 'IMAGE' }] });
+    Object.assign((globalThis as unknown as { LGraphCanvas: { link_type_colors: Record<string, string> } }).LGraphCanvas.link_type_colors, { IMAGE: '#64B5F6' });
+    frames(1);
+    return canvas;
+}
 
 describe('link settings', () => {
     for (const still of [false, true]) {
         it(`reach Classic Flow ${still ? 'held still' : 'animated'}`, async () => {
-            await setupV2({
+            const canvas = await drawLink({
                 '🔗 Enhanced Links.Static.Mode': still,
                 '🔗 Enhanced Links.Direction': -1,
                 '🔗 Enhanced Links.Animation.Speed': 2,
@@ -136,14 +151,41 @@ describe('link settings', () => {
                 '🔗 Enhanced Links.Marker.Color.Mode': 'custom',
                 '🔗 Enhanced Links.Marker.Color': '#123456',
             });
-            const rec = new CanvasRecorder();
-            canvasWithLinks([{ start: [100, 100], end: [400, 100], type: 'IMAGE' }]).drawConnections(rec.ctx);
-            const strokes = rec.paints.filter((p) => p.op === 'stroke').map((p) => [p.style, p.lineWidth, p.shadowBlur, p.shadowOffsetX]);
-            const marks = rec.paints.filter((p) => p.op === 'fill').map((p) => [p.style, p.shadowBlur, p.shadowOffsetX]);
-            // The spline strokes at 0.8 × the width it is handed; floor(3 × Quality × Marker.Size × density × 0.5) markers.
+            // Still links are drawn into the background, moving ones over it; the node bodies are #353535.
+            const paints = (still ? canvas.back : canvas.front).paints;
+            const strokes = paints.filter((p) => p.op === 'stroke').map((p) => [p.style, p.lineWidth, p.shadowBlur, p.shadowOffsetX]);
+            const marks = paints.filter((p) => p.op === 'fill' && p.style !== '#353535').map((p) => [p.style, p.shadowBlur, p.shadowOffsetX]);
+            // The path strokes at 0.8 × the width it is handed; floor(3 × Quality × Marker.Size × density × 0.5) markers, then the native centre marker.
             expect(strokes).toEqual([['rgba(0, 0, 0, 0.95)', 2.5 * 1.2 * 0.8, 2 * 4, 6 * 3], ['#64b5f6', 2.5 * 0.8, 7, 0]]);
-            expect(marks).toEqual(Array(3).fill(['#123456', 13, 0]));
+            expect(marks).toEqual([...Array(3).fill(['#123456', 13, 0]), ['#64b5f6', 0, 0]]);
             if (!still) expect(vi.mocked(renderAnimatedStyle).mock.lastCall?.[4].direction).toBe(-1);
         });
     }
+
+    it("hold v2's still pose, which moves when Animate, Link.Style, Quality or Particle.Density changed", async () => {
+        const canvas = await drawLink({ '🔗 Enhanced Links.Static.Mode': true });
+        const draw = () => {
+            canvas.setDirty(true, true);
+            frames(1);
+        };
+        const pose = () => {
+            draw();
+            return vi.mocked(renderStaticStyle).mock.lastCall?.[3];
+        };
+        const [first, again] = [pose(), pose()];
+        preview('🔗 Enhanced Links.Thickness', 5);
+        const afterThickness = pose();
+        preview('🔗 Enhanced Links.Quality', 2);
+        const afterQuality = pose();
+        // A change that a moving frame saw still moves the next still pose.
+        preview('🔗 Enhanced Links.Static.Mode', false);
+        preview('🔗 Enhanced Links.Link.Style', 'dotted');
+        draw();
+        preview('🔗 Enhanced Links.Static.Mode', true);
+        const afterStyle = pose();
+        // In eighths of a turn: the pose is π/4 or 9π/4, depending on how often it moved before.
+        const eighths = [first, again, afterThickness, afterQuality, afterStyle].map((phase) => Math.round(phase! / (Math.PI / 4)));
+        const [held, moved] = eighths[0] === 9 ? [9, 1] : [1, 9];
+        expect(eighths).toEqual([held, held, held, moved, held]);
+    });
 });

@@ -141,6 +141,12 @@ const DIRECTION_OPTIONS = [
     { value: -1, text: 'Reverse' },
 ] as const;
 
+const COEXIST_OPTIONS = [
+    { value: 'auto', text: 'Step aside if one is found' },
+    { value: 'ours', text: 'Keep Enhanced link effects' },
+    { value: 'defer', text: 'Always step aside' },
+] as const;
+
 // =============================================================================
 // Schema
 // =============================================================================
@@ -180,7 +186,9 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Shadow.Blur', key: 'shadowBlur', name: 'Drop shadow blur', type: 'slider', min: 0, max: 10, step: 0.5, default: 5, group: 'Links · Shadows' },
     { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows' },
 
-    { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', tooltip: 'Effect drawn around every node.' },
+    { id: '🔗 Enhanced Links.Coexist', key: 'coexist', name: 'Other link extensions', type: 'combo', options: COEXIST_OPTIONS, default: 'auto', group: 'Links · Compatibility', tooltip: 'When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.' },
+
+    { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', tooltip: 'Effect drawn on and around every node.' },
     { id: '📦 Enhanced Nodes.Animations.Enabled', key: 'animationsEnabled', name: 'Show base effect', type: 'boolean', default: true, group: 'Nodes · Effect', tooltip: 'Off hides the effect but keeps node particles.' },
     { id: '📦 Enhanced Nodes.Animation.Speed', key: 'animationSpeed', name: 'Node effect speed', type: 'slider', min: 0.1, max: 5, step: 0.1, default: 1, group: 'Nodes · Effect' },
     { id: '📦 Enhanced Nodes.Direction', key: 'direction', name: 'Node effect direction', type: 'combo', options: DIRECTION_OPTIONS, default: 1, group: 'Nodes · Effect' },
@@ -210,7 +218,7 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Particle.Color.Mode', key: 'particleColorMode', name: 'Node particle colors', type: 'combo', options: PARTICLE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Particles', tooltip: 'Complementary is the opposite hue of the node accent color.' },
     { id: '📦 Enhanced Nodes.Color.Particle', key: 'colorParticle', name: 'Node particle color', type: 'color', default: '#ffff00', group: 'Nodes · Particles', tooltip: 'Used when Node particle colors is Particle color.' },
 
-    { id: '📦 Enhanced Nodes.Text.Animation.Enabled', key: 'textAnimationEnabled', name: 'Animated titles', type: 'boolean', default: false, group: 'Nodes · Titles', tooltip: 'Draws a styled copy of each node title.' },
+    { id: '📦 Enhanced Nodes.Text.Animation.Enabled', key: 'textAnimationEnabled', name: 'Animated titles', type: 'boolean', default: false, group: 'Nodes · Titles', tooltip: 'Draws each node title in the chosen style.' },
     { id: '📦 Enhanced Nodes.Text.Style', key: 'textStyle', name: 'Title style', type: 'combo', options: TEXT_STYLE_OPTIONS, default: 'neon', group: 'Nodes · Titles' },
     { id: '📦 Enhanced Nodes.Text.Color', key: 'textColor', name: 'Title color', type: 'color', default: '#00ffff', group: 'Nodes · Titles' },
     { id: '📦 Enhanced Nodes.Text.Size', key: 'textSize', name: 'Title size', type: 'slider', min: 8, max: 24, step: 1, default: 14, group: 'Nodes · Titles' },
@@ -275,6 +283,9 @@ export const L = snapshot(LINKS) as Snapshot<typeof LINKS>;
 /** The node settings' live values, kept like L. */
 export const N = snapshot(NODES) as Snapshot<typeof NODES>;
 
+/** Counts the changes to L and N, so what any setting can affect can tell that one changed. */
+export let revision = 0;
+
 /** The snapshot that holds a setting's live value: L for link ids, N for node ids. */
 export function snapshotOf(id: string): Record<string, unknown> {
     return id.startsWith(LINKS) ? L : N;
@@ -287,6 +298,7 @@ function show(s: Setting, value: unknown): void {
     // commit() shows a value before the store hands it back through onChange.
     if (values[s.key] === shown) return;
     values[s.key] = shown;
+    revision++;
     // app.canvas does not exist yet while the extensions register.
     app.canvas?.setDirty(true, true);
 }

@@ -1,9 +1,10 @@
 /**
  * Test double for ComfyUI's '/scripts/app.js' and '/scripts/api.js' (both are
  * aliased to this file in vitest.config.ts) and for the LiteGraph globals that
- * src code expects. Settings behave like the frontend's settingStore
- * (platform/settings/settingStore.ts, the same in 1.39.5 and 1.57.1) where M2
- * relies on it; tests can also fill the stored values directly.
+ * src code expects, plus matchMedia, which jsdom lacks. Settings behave like
+ * the frontend's settingStore (platform/settings/settingStore.ts, the same in
+ * 1.39.5 and 1.57.1) where M2 relies on it; tests can also fill the stored
+ * values directly.
  *
  * @module tests/helpers/fake-app
  */
@@ -34,12 +35,17 @@ export const fake = {
     legacyCalls: 0,
     /** The settings each set() sent to the server, in order. */
     posts: [] as Array<[id: string, value: unknown]>,
-    /** Calls that reached the fake LiteGraph originals. */
-    native: [] as string[],
     extensions: [] as Extension[],
+    /** What app.extensionManager.toast.add showed, in order. */
+    toasts: [] as unknown[],
+    /** What matchMedia('(prefers-reduced-motion: reduce)') returns: tests set matches, then dispatch 'change'. */
+    reducedMotion: Object.assign(new EventTarget(), { matches: false }),
     /** The LGraphCanvas global, a new class after every resetFakeApp(). */
     LGraphCanvas: installLiteGraph(),
 };
+
+// src asks matchMedia about reduced motion only.
+Object.assign(globalThis, { matchMedia: () => fake.reducedMotion });
 
 /** settingStore.get: the stored value, else the registered default. */
 function value(id: string): unknown {
@@ -107,6 +113,7 @@ export const app = {
     extensionManager: {
         setting: { get: read, set },
         registerSidebarTab: () => {},
+        toast: { add: (message: unknown) => void fake.toasts.push(message) },
     },
     canvas,
     graph: {
@@ -120,10 +127,8 @@ export const app = {
     },
 };
 
-export const api = {
-    addEventListener(): void {},
-    removeEventListener(): void {},
-};
+/** ComfyApi is an EventTarget; tests dispatch its events, such as 'status', as ComfyUI does. */
+export const api = new EventTarget();
 
 /** Installs fresh LiteGraph globals and returns their LGraphCanvas; a new class drops prototype patches from earlier setups. */
 function installLiteGraph() {
@@ -134,18 +139,6 @@ function installLiteGraph() {
         default_link_color = LiteGraph.LINK_COLOR;
         default_connection_color = { input_off: '#778899', input_on: '#7F7F7F', output_off: '#778899', output_on: '#7F7F7F' };
         graph: unknown = null;
-
-        drawConnections(_ctx: CanvasRenderingContext2D): void {
-            fake.native.push('drawConnections');
-        }
-
-        drawNode(_node: unknown, _ctx: CanvasRenderingContext2D): void {
-            fake.native.push('drawNode');
-        }
-
-        drawNodeShape(..._args: unknown[]): void {
-            fake.native.push('drawNodeShape');
-        }
     }
 
     Object.assign(globalThis, { LiteGraph, LGraphCanvas });
@@ -163,7 +156,7 @@ export function resetFakeApp(settings: Record<string, unknown> = {}): void {
     fake.legacyCalls = 0;
     fake.duplicates = [];
     fake.posts = [];
-    fake.native = [];
+    fake.toasts = [];
     fake.LGraphCanvas = installLiteGraph();
     fake.registered.forEach(load);
 }

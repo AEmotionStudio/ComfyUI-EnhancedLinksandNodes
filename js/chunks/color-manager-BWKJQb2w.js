@@ -1,4 +1,5 @@
 import { app } from "/scripts/app.js";
+import { api } from "/scripts/api.js";
 const LINK_ANIMATION_OPTIONS = [
   { value: 0, text: "None" },
   { value: 9, text: "Classic Flow" },
@@ -98,6 +99,11 @@ const DIRECTION_OPTIONS = [
   { value: 1, text: "Forward" },
   { value: -1, text: "Reverse" }
 ];
+const COEXIST_OPTIONS = [
+  { value: "auto", text: "Step aside if one is found" },
+  { value: "ours", text: "Keep Enhanced link effects" },
+  { value: "defer", text: "Always step aside" }
+];
 const LINKS = "🔗 Enhanced Links.";
 const NODES = "📦 Enhanced Nodes.";
 const SETTINGS = [
@@ -126,7 +132,8 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Marker.Shadow.Enabled", key: "markerShadowEnabled", name: "Marker shadow", type: "boolean", default: false, group: "Links · Shadows", tooltip: "Drop shadow under flow markers." },
   { id: "🔗 Enhanced Links.Shadow.Blur", key: "shadowBlur", name: "Drop shadow blur", type: "slider", min: 0, max: 10, step: 0.5, default: 5, group: "Links · Shadows" },
   { id: "🔗 Enhanced Links.Shadow.Offset", key: "shadowOffset", name: "Drop shadow offset", type: "slider", min: 0, max: 10, step: 0.5, default: 3, group: "Links · Shadows" },
-  { id: "📦 Enhanced Nodes.Animate", key: "animate", name: "Node effect", type: "combo", options: NODE_ANIMATION_OPTIONS, default: 0, group: "Nodes · Effect", tooltip: "Effect drawn around every node." },
+  { id: "🔗 Enhanced Links.Coexist", key: "coexist", name: "Other link extensions", type: "combo", options: COEXIST_OPTIONS, default: "auto", group: "Links · Compatibility", tooltip: "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working." },
+  { id: "📦 Enhanced Nodes.Animate", key: "animate", name: "Node effect", type: "combo", options: NODE_ANIMATION_OPTIONS, default: 0, group: "Nodes · Effect", tooltip: "Effect drawn on and around every node." },
   { id: "📦 Enhanced Nodes.Animations.Enabled", key: "animationsEnabled", name: "Show base effect", type: "boolean", default: true, group: "Nodes · Effect", tooltip: "Off hides the effect but keeps node particles." },
   { id: "📦 Enhanced Nodes.Animation.Speed", key: "animationSpeed", name: "Node effect speed", type: "slider", min: 0.1, max: 5, step: 0.1, default: 1, group: "Nodes · Effect" },
   { id: "📦 Enhanced Nodes.Direction", key: "direction", name: "Node effect direction", type: "combo", options: DIRECTION_OPTIONS, default: 1, group: "Nodes · Effect" },
@@ -152,7 +159,7 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Particle.Glow", key: "particleGlow", name: "Node particle glow", type: "slider", min: 0, max: 2, step: 0.1, default: 0.5, group: "Nodes · Particles" },
   { id: "📦 Enhanced Nodes.Particle.Color.Mode", key: "particleColorMode", name: "Node particle colors", type: "combo", options: PARTICLE_COLOR_MODE_OPTIONS, default: "default", group: "Nodes · Particles", tooltip: "Complementary is the opposite hue of the node accent color." },
   { id: "📦 Enhanced Nodes.Color.Particle", key: "colorParticle", name: "Node particle color", type: "color", default: "#ffff00", group: "Nodes · Particles", tooltip: "Used when Node particle colors is Particle color." },
-  { id: "📦 Enhanced Nodes.Text.Animation.Enabled", key: "textAnimationEnabled", name: "Animated titles", type: "boolean", default: false, group: "Nodes · Titles", tooltip: "Draws a styled copy of each node title." },
+  { id: "📦 Enhanced Nodes.Text.Animation.Enabled", key: "textAnimationEnabled", name: "Animated titles", type: "boolean", default: false, group: "Nodes · Titles", tooltip: "Draws each node title in the chosen style." },
   { id: "📦 Enhanced Nodes.Text.Style", key: "textStyle", name: "Title style", type: "combo", options: TEXT_STYLE_OPTIONS, default: "neon", group: "Nodes · Titles" },
   { id: "📦 Enhanced Nodes.Text.Color", key: "textColor", name: "Title color", type: "color", default: "#00ffff", group: "Nodes · Titles" },
   { id: "📦 Enhanced Nodes.Text.Size", key: "textSize", name: "Title size", type: "slider", min: 8, max: 24, step: 1, default: 14, group: "Nodes · Titles" },
@@ -186,6 +193,7 @@ function snapshot(prefix) {
 }
 const L = snapshot(LINKS);
 const N = snapshot(NODES);
+let revision = 0;
 function snapshotOf(id) {
   return id.startsWith(LINKS) ? L : N;
 }
@@ -194,6 +202,7 @@ function show(s, value) {
   const shown = s.type !== "color" || HEX.test(String(value)) ? value : s.default;
   if (values[s.key] === shown) return;
   values[s.key] = shown;
+  revision++;
   app.canvas?.setDirty(true, true);
 }
 function params(prefix) {
@@ -239,6 +248,173 @@ function reset(prefix) {
     if (s.id.startsWith(prefix) && snapshotOf(s.id)[s.key] !== s.default) commit(s.id, s.default);
   }
 }
+const TURN = 2 * Math.PI / 15;
+const MAX_FPS = 60;
+const JITTER_MS = 1;
+const GUARD_MS = 1e4;
+const FAILURES = 5;
+const clock = { linkPhase: 0, linkTime: 0, nodePhase: 0, particlePhase: 0 };
+const env = { running: false, reducedMotion: false };
+const live = { links: 0, nodes: 0, particles: 0 };
+const layers = {};
+let sink;
+function dummy() {
+  sink ??= (typeof OffscreenCanvas === "function" ? new OffscreenCanvas(1, 1) : Object.assign(document.createElement("canvas"), { width: 1, height: 1 })).getContext("2d");
+  return sink;
+}
+let frame = 0;
+let last = 0;
+function want() {
+  return !document.hidden && live.links + live.nodes + live.particles > 0;
+}
+function advance(dt) {
+  if (live.links) {
+    clock.linkPhase += TURN * Math.max(0.01, L.animationSpeed) * L.direction * dt;
+    clock.linkTime += 2 * dt;
+  }
+  if (live.nodes) clock.nodePhase += TURN * N.animationSpeed * N.direction * dt;
+  if (live.particles) clock.particlePhase += TURN * Math.max(0.01, N.particleSpeed) * N.direction * dt;
+}
+function tick(now) {
+  frame = 0;
+  if (!want()) {
+    last = 0;
+    return;
+  }
+  if (!last) {
+    last = now;
+  } else if (now - last >= 1e3 / MAX_FPS - JITTER_MS) {
+    advance(Math.min((now - last) / 1e3, 0.1));
+    last = now;
+    heal(app.canvas);
+    app.canvas.setDirty(true, false);
+  }
+  frame = requestAnimationFrame(tick);
+}
+function wake() {
+  frame ||= requestAnimationFrame(tick);
+}
+function need() {
+  app.canvas.setDirty(true, true);
+}
+const hooks = {
+  /** onRender(canvas element, ctx) starts each front pass, in screen space between the background and the nodes. */
+  onRender: {
+    ctx: 1,
+    draw(canvas, ctx) {
+      live.nodes = live.particles = 0;
+      canvas.ds.toCanvasContext(ctx);
+      layers.nodes?.(canvas, ctx);
+      layers.links?.(canvas, ctx, false);
+    },
+    installed: void 0,
+    called: false,
+    running: false
+  },
+  /** onDrawForeground(ctx, visible area), in graph space over the nodes. */
+  onDrawForeground: {
+    ctx: 0,
+    draw(canvas, ctx) {
+      layers.links?.(canvas, ctx, true);
+    },
+    installed: void 0,
+    called: false,
+    running: false
+  }
+};
+const HOOKS = Object.keys(hooks);
+function chain(canvas, name) {
+  const hook = hooks[name];
+  const handlers = canvas;
+  const previous = handlers[name];
+  hook.installed = handlers[name] = function(...args) {
+    if (hook.running) return;
+    hook.running = true;
+    hook.called = true;
+    const ctx = args[hook.ctx];
+    try {
+      ctx.save();
+      try {
+        hook.draw(this, ctx);
+      } finally {
+        ctx.restore();
+      }
+      previous?.apply(this, args);
+    } finally {
+      hook.running = false;
+    }
+  };
+}
+function heal(canvas) {
+  for (const name of HOOKS) {
+    const hook = hooks[name];
+    if (!hook.called && !canvas.dirty_canvas && canvas[name] !== hook.installed) chain(canvas, name);
+    hook.called = false;
+  }
+}
+let chained;
+let listening = false;
+function install() {
+  if (chained !== app.canvas) {
+    chained = app.canvas;
+    for (const name of HOOKS) chain(app.canvas, name);
+  }
+  if (listening) return;
+  listening = true;
+  document.addEventListener("visibilitychange", () => {
+    last = 0;
+    wake();
+  });
+  const query = matchMedia("(prefers-reduced-motion: reduce)");
+  const motion = () => {
+    const reduced = query.matches || document.body.classList.contains("disable-animations");
+    if (reduced === env.reducedMotion) return;
+    env.reducedMotion = reduced;
+    need();
+  };
+  motion();
+  query.addEventListener("change", motion);
+  new MutationObserver(motion).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  api.addEventListener("status", ({ detail }) => {
+    const running = detail?.exec_info?.queue_remaining > 0;
+    if (running === env.running) return;
+    env.running = running;
+    need();
+  });
+}
+const failures = /* @__PURE__ */ new Map();
+let failuresSince = revision;
+function failuresOf(key) {
+  if (failuresSince !== revision) {
+    failures.clear();
+    failuresSince = revision;
+  }
+  return failures.get(key);
+}
+const guard = {
+  /** Whether `key` failed too often; changing any setting turns it back on. */
+  off: (key) => failuresOf(key)?.off ?? false,
+  /** Logs at most once per key every 10 s. FAILURES within 10 s turn the key off, with one toast that says so. */
+  fail(key, error) {
+    const now = performance.now();
+    let f = failuresOf(key);
+    if (!f) failures.set(key, f = { times: [], logged: -Infinity, off: false });
+    if (now - f.logged >= GUARD_MS) {
+      f.logged = now;
+      console.warn(`[Enhanced Links & Nodes] ${key} failed:`, error);
+    }
+    f.times.push(now);
+    if (f.times.length > FAILURES) f.times.shift();
+    if (f.off || f.times.length < FAILURES || now - f.times[0] > GUARD_MS) return;
+    f.off = true;
+    app.extensionManager.toast.add({
+      severity: "warn",
+      summary: `${key} turned off`,
+      detail: `It failed ${FAILURES} times in 10 seconds. Change any Enhanced Links & Nodes setting to turn it back on.`,
+      life: 1e4
+    });
+  }
+};
 function hex2Hsl(hex) {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -374,15 +550,23 @@ export {
   getCustomLinkColors as a,
   getSecondaryColor as b,
   getAccentColor as c,
-  commit as d,
+  guard as d,
   enhanceColor as e,
-  getCustomNodeColors as f,
+  env as f,
   getLinkColor as g,
-  linkSettings as l,
-  nodeSettings as n,
+  dummy as h,
+  layers as i,
+  clock as j,
+  commit as k,
+  live as l,
+  linkSettings as m,
+  install as n,
+  nodeSettings as o,
   preview as p,
+  getCustomNodeColors as q,
   reset as r,
   snapshotOf as s,
-  validateHexColor as v
+  validateHexColor as v,
+  wake as w
 };
-//# sourceMappingURL=color-manager-CtPq5NfG.js.map
+//# sourceMappingURL=color-manager-BWKJQb2w.js.map

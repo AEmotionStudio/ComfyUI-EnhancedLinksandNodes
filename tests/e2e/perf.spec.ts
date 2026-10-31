@@ -1,8 +1,8 @@
-// M0 baselines for native ComfyUI (-native projects), the checkout (fe157 and fe1395), v2.0.1 (v2-ref)
+// Baselines for native ComfyUI (-native projects), the checkout (fe157 and fe1395), v2.0.1 (v2-ref)
 // and v1 (v1-ref), the last two built from git. They are measurements, not gates: a test fails only if
 // the page breaks. baseline-reporter.ts writes them to perf-baselines/perf-baseline.json and prints a
-// table. They only run with ELN_PERF=1, which also runs every test in one worker, so the projects do
-// not share the CPU:
+// table, with each look's front-paint overhead over native. They only run with ELN_PERF=1, which also
+// runs every test in one worker, so the projects do not share the CPU:
 //   pnpm e2e:perf
 import type { Page, TestInfo } from '@playwright/test';
 import type { PerfRow } from './baseline-reporter';
@@ -41,6 +41,7 @@ interface Sample {
     back: number;
     frontMs: number[];
     backMs: number[];
+    dirty: { setDirty: number; setDirtyCanvas: number };
     reads: number;
     readsInPaint: number;
     renderLink: number;
@@ -84,13 +85,13 @@ async function sample(page: Page, ms: number, dirty?: [front: boolean, back: boo
         longTasks += observer.takeRecords().length;
         observer.disconnect();
         const seconds = (performance.now() - start) / 1000;
-        const { front, back, frontMs, backMs, reads, renderLink } = window.__eln;
-        return { seconds, front, back, frontMs, backMs, reads: reads.getSettingValue + reads.settingGet, readsInPaint: reads.inPaint, renderLink, longTasks };
+        const { front, back, frontMs, backMs, dirty: requests, reads, renderLink } = window.__eln;
+        return { seconds, front, back, frontMs, backMs, dirty: requests, reads: reads.getSettingValue + reads.settingGet, readsInPaint: reads.inPaint, renderLink, longTasks };
     }, [ms, dirty] as const);
 }
 
-/** Paints over 3 s without input, then paint costs over 2 s with every frame dirty and 2 s with only the front dirty. */
-async function measure(page: Page): Promise<Omit<PerfRow, 'graph' | 'view' | 'look'>> {
+/** Paints and redraw requests over 3 s without input, then paint costs over 2 s with every frame dirty and 2 s with only the front dirty. */
+async function measure(page: Page): Promise<Omit<PerfRow, 'frontend' | 'graph' | 'view' | 'look'>> {
     await page.waitForTimeout(1000);
     const idle = await sample(page, 3000);
     const forced = await sample(page, 2000, [true, true]);
@@ -98,6 +99,8 @@ async function measure(page: Page): Promise<Omit<PerfRow, 'graph' | 'view' | 'lo
     return {
         idleFront: round(idle.front / idle.seconds),
         idleBack: round(idle.back / idle.seconds),
+        idleSetDirty: round(idle.dirty.setDirty / idle.seconds),
+        idleSetDirtyCanvas: round(idle.dirty.setDirtyCanvas / idle.seconds),
         idleReads: Math.round(idle.reads / idle.seconds),
         idleLongTasks: idle.longTasks,
         front: { p50: percentile(forced.frontMs, 0.5), p95: percentile(forced.frontMs, 0.95) },
@@ -151,7 +154,7 @@ test.describe('baselines', { tag: '@perf' }, () => {
         { nodes: 200, links: 500, views: ['zoom 1', 'fit'] },
         { nodes: 40, links: 100, views: ['fit'] },
     ]) {
-        test(`paints with ${links} links and ${nodes} nodes`, async ({ page, profile }, testInfo) => {
+        test(`paints with ${links} links and ${nodes} nodes`, async ({ page, profile, frontend }, testInfo) => {
             test.setTimeout(300_000);
             await buildGraph(page, perfGraph(nodes, links));
             const rows: PerfRow[] = [];
@@ -159,12 +162,42 @@ test.describe('baselines', { tag: '@perf' }, () => {
                 for (const [id, value] of Object.entries(LOOKS[look] ?? {})) await setSetting(page, id, value);
                 for (const view of views) {
                     await setView(page, view);
-                    rows.push({ graph: `${links}x${nodes}`, view, look, ...(await measure(page)) });
+                    rows.push({ frontend, graph: `${links}x${nodes}`, view, look, ...(await measure(page)) });
                 }
             }
             await record(testInfo, { perf: rows });
         });
     }
+
+    // What 120 frames of DNA Helix on every link on screen leave on the heap once garbage is collected (budget 2 MB),
+    // and how much it grew before that collection, which minor collections during the frames make a lower bound.
+    test('heap after 120 animated frames', async ({ page, profile }, testInfo) => {
+        test.setTimeout(300_000);
+        await buildGraph(page, perfGraph(200, 500));
+        if (profile !== 'native') await setSetting(page, '🔗 Enhanced Links.Animate', 6);
+        await setView(page, 'zoom 1');
+        await page.waitForTimeout(1000);
+        const cdp = await page.context().newCDPSession(page);
+        const heap = async (collect: boolean) => {
+            if (collect) await cdp.send('HeapProfiler.collectGarbage');
+            return (await cdp.send('Runtime.getHeapUsage')).usedSize / 2 ** 20;
+        };
+        const before = await heap(true);
+        // Both canvases dirty every frame until the front one has painted 120 times.
+        const seconds = await page.evaluate(() => new Promise<number>((resolve) => {
+            const probe = window.__eln;
+            const [painted, start] = [probe.front + 120, performance.now()];
+            const frame = () => {
+                if (probe.front >= painted) return resolve((performance.now() - start) / 1000);
+                window.app.canvas.setDirty(true, true);
+                requestAnimationFrame(frame);
+            };
+            frame();
+        }));
+        const grown = await heap(false);
+        const after = await heap(true);
+        await record(testInfo, { heap: { look: profile === 'native' ? 'native' : 'Animate 6', seconds: round(seconds), beforeMB: round(before), grownMB: round(grown - before), retainedMB: round(after - before) } });
+    });
 
     test('link colours', async ({ page }, testInfo) => {
         const graph = await buildGraph(page, graphs.typed);

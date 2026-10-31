@@ -54,11 +54,17 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Drop shadow blur | `🔗 Enhanced Links.Shadow.Blur` | slider | 0 to 10, step 0.5 | `5` |  |
 | Drop shadow offset | `🔗 Enhanced Links.Shadow.Offset` | slider | 0 to 10, step 0.5 | `3` |  |
 
+## Links · Compatibility
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Other link extensions | `🔗 Enhanced Links.Coexist` | combo | `auto` Step aside if one is found, `ours` Keep Enhanced link effects, `defer` Always step aside | `auto` Step aside if one is found | When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working. |
+
 ## Nodes · Effect
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Flower of Life | `0` None | Effect drawn around every node. |
+| Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Flower of Life | `0` None | Effect drawn on and around every node. |
 | Show base effect | `📦 Enhanced Nodes.Animations.Enabled` | boolean | `true`, `false` | `true` | Off hides the effect but keeps node particles. |
 | Node effect speed | `📦 Enhanced Nodes.Animation.Speed` | slider | 0.1 to 5, step 0.1 | `1` |  |
 | Node effect direction | `📦 Enhanced Nodes.Direction` | combo | `1` Forward, `-1` Reverse | `1` Forward |  |
@@ -104,7 +110,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Animated titles | `📦 Enhanced Nodes.Text.Animation.Enabled` | boolean | `true`, `false` | `false` | Draws a styled copy of each node title. |
+| Animated titles | `📦 Enhanced Nodes.Text.Animation.Enabled` | boolean | `true`, `false` | `false` | Draws each node title in the chosen style. |
 | Title style | `📦 Enhanced Nodes.Text.Style` | combo | `neon` Neon pulse, `cyberpunk` Glitch, `retro` Retro, `pulse` Simple pulse, `minimal` Minimal | `neon` Neon pulse |  |
 | Title color | `📦 Enhanced Nodes.Text.Color` | color | `#rrggbb` | `#00ffff` |  |
 | Title size | `📦 Enhanced Nodes.Text.Size` | slider | 8 to 24, step 1 | `14` |  |

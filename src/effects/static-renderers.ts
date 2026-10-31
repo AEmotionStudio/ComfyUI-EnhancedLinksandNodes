@@ -10,7 +10,6 @@
  * @module effects/static-renderers
  */
 
-import { getLinkRenderer } from '@/renderers/link-renderers';
 import { MarkerShapes, shapeNeedsFill } from '@/renderers/marker-shapes';
 import { createFlowField, createCrystal } from '@/renderers/render-utils';
 import { getLinkColor, getSecondaryColor, getAccentColor, enhanceColor, validateHexColor, getCustomLinkColors } from '@/utils/color-manager';
@@ -27,8 +26,7 @@ function renderStatic1(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
 
@@ -69,8 +67,7 @@ function renderStatic2(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -100,8 +97,7 @@ function renderStatic3(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -150,8 +146,7 @@ function renderStatic4(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const quality = L.quality;
     const direction = L.direction;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -201,8 +196,7 @@ function renderStatic5(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
 
@@ -241,8 +235,7 @@ function renderStatic6(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -305,8 +298,7 @@ function renderStatic7(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -367,8 +359,7 @@ function renderStatic8(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const glowIntensity = L.glowIntensity;
     const quality = L.quality;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = getLinkColor(defaultColor);
         const secondaryColor = getSecondaryColor(defaultColor);
         const accentColor = getAccentColor(defaultColor);
@@ -436,8 +427,7 @@ function renderStatic9(ctx: CanvasRenderingContext2D, items: RenderItem[], phase
     const shadowBlur = L.shadowBlur;
     const shadowOffset = L.shadowOffset;
 
-    items.forEach(({ start, end, defaultColor, linkStyle }) => {
-        const r = getLinkRenderer(linkStyle);
+    items.forEach(({ start, end, defaultColor, linkStyle, path: r }) => {
         const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
 
         if (linkStyle !== 'hidden') {

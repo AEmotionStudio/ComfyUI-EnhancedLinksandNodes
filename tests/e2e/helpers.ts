@@ -12,6 +12,7 @@ declare global {
     interface Window {
         app: any;
         LiteGraph: any;
+        LGraph: any;
         LGraphCanvas: any;
         LGraphNode: any;
         __COMFYUI_FRONTEND_VERSION__: string;
@@ -71,6 +72,8 @@ export interface Probe {
     back: number;
     frontMs: number[];
     backMs: number[];
+    /** Redraw requests: LGraphCanvas.setDirty calls, and LGraph.setDirtyCanvas calls, which pass theirs on to setDirty. */
+    dirty: { setDirty: number; setDirtyCanvas: number };
     /** Settings reads through the two extension APIs, and how many of them happened inside a paint. */
     reads: { getSettingValue: number; settingGet: number; inPaint: number };
     renderLink: number;
@@ -159,6 +162,7 @@ async function installProbe(page: Page): Promise<void> {
             back: 0,
             frontMs: [],
             backMs: [],
+            dirty: { setDirty: 0, setDirtyCanvas: 0 },
             reads: { getSettingValue: 0, settingGet: 0, inPaint: 0 },
             renderLink: 0,
             segments: [],
@@ -210,6 +214,16 @@ async function installProbe(page: Page): Promise<void> {
         timePaints('drawFrontCanvas', 'front', 'frontMs');
         timePaints('drawBackCanvas', 'back', 'backMs');
 
+        const countCalls = (target: any, method: keyof Probe['dirty']) => {
+            const original = target[method];
+            target[method] = function (this: unknown, ...args: unknown[]) {
+                probe.dirty[method]++;
+                return original.apply(this, args);
+            };
+        };
+        countCalls(proto, 'setDirty');
+        countCalls(window.LGraph.prototype, 'setDirtyCanvas');
+
         const renderLink = proto.renderLink;
         proto.renderLink = function (this: unknown, ...args: any[]) {
             probe.renderLink++;
@@ -239,6 +253,7 @@ export async function resetProbe(page: Page): Promise<void> {
         probe.frontMs = [];
         probe.backMs = [];
         probe.segments = [];
+        probe.dirty = { setDirty: 0, setDirtyCanvas: 0 };
         probe.reads = { getSettingValue: 0, settingGet: 0, inPaint: 0 };
     });
 }
@@ -296,6 +311,8 @@ export interface NodeSpec {
     pos: Point;
     mode?: 'mute' | 'bypass';
     collapsed?: boolean;
+    /** Values of the node's widgets, in order, set once the links are made. */
+    widgets?: unknown[];
 }
 
 export interface LinkSpec {
@@ -354,7 +371,11 @@ export async function buildGraph(page: Page, spec: GraphSpec): Promise<BuiltGrap
             }
         }
         for (const [name, s] of Object.entries(spec.nodes)) {
-            if (s.mode) nodes[name].changeMode(MODES[s.mode]);
+            s.widgets?.forEach((value, i) => {
+                nodes[name].widgets[i].value = value;
+            });
+            // As the frontend's Bypass and Mute do (useSelectedLiteGraphItems.ts L122-130); changeMode refuses BYPASS (LGraphNode.ts L1722-1743).
+            if (s.mode) nodes[name].mode = MODES[s.mode];
             if (s.collapsed) nodes[name].collapse(true);
         }
         let subgraph: number | null = null;
@@ -399,14 +420,14 @@ export async function clickAt(page: Page, point: Point): Promise<void> {
     await page.mouse.click(x, y);
 }
 
-/** Front-canvas RGBA at a graph point. */
+/** Front-canvas RGBA of the pixel that holds a graph point. */
 export function pixelAt(page: Page, point: Point): Promise<number[]> {
     return page.evaluate(([x, y]) => {
         const { canvas } = window.app;
         const el: HTMLCanvasElement = canvas.canvas;
         const [cx, cy] = canvas.ds.convertOffsetToCanvas([x, y]);
         const ratio = el.width / el.clientWidth;
-        return [...el.getContext('2d')!.getImageData(Math.round(cx * ratio), Math.round(cy * ratio), 1, 1).data];
+        return [...el.getContext('2d')!.getImageData(Math.floor(cx * ratio), Math.floor(cy * ratio), 1, 1).data];
     }, point);
 }
 

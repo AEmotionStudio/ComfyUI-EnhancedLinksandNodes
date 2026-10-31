@@ -2,28 +2,32 @@
 /**
  * ComfyUI Enhanced Node Animations Extension
  *
- * Full-featured node animation system with:
- * - 4 animation styles (Gentle Pulse, Neon Nexus, Cosmic Ripple, Flower of Life)
- * - Text animation system (5 styles: neon, cyberpunk, retro, pulse, minimal)
- * - Particle color modes (rainbow, complementary, energy, quantum, aurora)
- * - Completion fireworks
- * - Per-node settings via context menu
- * - ColorManager integration for proper color resolution
- *
- * Ported from original node_animations.js (2,996 lines).
+ * Registers the node settings, and draws v2's node effects (Gentle Pulse, Neon
+ * Nexus, Cosmic Ripple, Flower of Life), their particles and the animated
+ * titles on LiteGraph's own node pass. What an effect draws around a node goes
+ * under every node, in onRender before the link motion; what falls on the node
+ * goes over its body, from drawNodeShape, under its slots and widgets. The
+ * styled title takes the native title's place. Effects fade with the node's
+ * mode, as native draws the node; collapsed nodes, and nodes in Vue mode, get
+ * none.
  *
  * @module extensions/node-animations
  */
 
-import type { ComfyExtension, LGraphNode } from '@comfyorg/comfyui-frontend-types';
+import type { ComfyExtension } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { api } from '/scripts/api.js';
 import { N, nodeSettings } from '@/core/settings';
-import { createNodeState } from '@/core/state';
-import type { NodeState, Color } from '@/core/types';
+import { clock, dummy, env, guard, install, layers, live, wake } from '@/core/engine';
+import type { NodeEffectSettings } from '@/effects/types';
 import { getNodeEffect, drawParticles } from '@/effects/node-effects';
 import { getCustomNodeColors } from '@/utils/color-manager';
 import { withAlpha, validateHexColor } from '@/utils/colors';
+
+/** The guard's keys, which its toast names when it turns one off. */
+const EFFECT = 'Node effect';
+const PARTICLES = 'Node particles';
+const TITLES = 'Animated titles';
+const OUTLINE = 'Hover outline';
 
 // =============================================================================
 // Text Animation System
@@ -218,6 +222,253 @@ function getParticleColor(index: number, time: number, _count: number): string {
 }
 
 // =============================================================================
+// Node layers
+// =============================================================================
+
+type Canvas = InstanceType<typeof LGraphCanvas>;
+type Node = InstanceType<typeof LGraphNode>;
+
+/** RenderShape.ROUND, CIRCLE and CARD (litegraph types/globalEnums.ts); a node of any other shape is a box. */
+const [ROUND, CIRCLE, CARD] = [2, 3, 4];
+/** LGraphEventMode.NEVER (muted) and BYPASS. */
+const [NEVER, BYPASS] = [2, 4];
+/** TitleMode.NO_TITLE, for which drawNodeShape draws no title (FE157 LGraphCanvas.ts L5917, FE1395 L5537). */
+const NO_TITLE = 1;
+
+/** What v2's drawNode handed the node effect. */
+function effectSettings(): NodeEffectSettings {
+    const colors = getCustomNodeColors();
+    return {
+        animation: {
+            phase: clock.nodePhase,
+            intensity: N.intensity * N.animationGlow,
+            direction: N.direction,
+            animSpeed: N.animationSpeed,
+            isStaticMode: N.staticMode,
+            isPaused: false,
+        },
+        quality: { quality: N.quality, animationSize: N.animationSize, glowIntensity: N.glowShow ? N.glow : 0 },
+        particles: {
+            showParticles: N.particleShow,
+            density: N.particleDensity,
+            speed: N.particleSpeed,
+            intensity: N.particleIntensity,
+            size: N.particleSize,
+            glowIntensity: N.particleGlow,
+        },
+        colors: { primary: colors.primary, secondary: colors.secondary, accent: colors.accent, hoverColor: N.colorHover, showHover: N.colorHoverShow },
+    };
+}
+
+/** What it handed the particles of a node without an effect. */
+function particleSettings(): NodeEffectSettings {
+    const colors = getCustomNodeColors();
+    return {
+        animation: { phase: clock.nodePhase, intensity: 1.0, direction: N.direction, animSpeed: 1, isStaticMode: false, isPaused: false },
+        quality: { quality: N.quality, animationSize: N.animationSize, glowIntensity: 0 },
+        particles: {
+            showParticles: true,
+            density: N.particleDensity,
+            speed: N.particleSpeed,
+            intensity: N.particleIntensity,
+            size: N.particleSize,
+            glowIntensity: N.particleGlow,
+        },
+        colors: { primary: colors.primary, secondary: colors.secondary, accent: colors.accent, hoverColor: '#00ff15', showHover: false },
+    };
+}
+
+/**
+ * How far from a node's centre the fireflies of drawParticles reach at most: they orbit up to 1.3 glow radii
+ * (calculateGlowRadius) and drift up by 0.3 of that, then wander and glow.
+ */
+function fireflies(w: number, h: number): number {
+    const radius = Math.max(w, h) * (0.5 + N.quality * 0.1) * N.animationSize;
+    return 1.7 * radius + 4.5 * N.particleIntensity + 17 + 20 * N.animationSize * N.particleSize;
+}
+
+/**
+ * How far past a node's body the effect draws at most, from its code in node-effects.ts: Neon Nexus measured
+ * from the body's edges, the others from its centre. A shadow counts as far as its blur.
+ */
+function effectReach(w: number, h: number): number {
+    const long = Math.max(w, h);
+    const short = Math.min(w, h);
+    const size = N.animationSize;
+    const intensity = N.intensity * N.animationGlow;
+    const glow = N.glowShow ? N.glow : 0;
+    const { particleShow: particles, particleIntensity: motion, particleSize: dot, particleGlow: dotGlow } = N;
+    switch (N.animate) {
+        case 2: {
+            // The widest tube's glow, the hover pulse's, the scan line, and the hex lattice and energy grid off the left edge.
+            const line = long * 0.0075 * size;
+            return Math.max(10, line + 48 * intensity * glow, line + 15 * intensity, particles ? 1.1 * short * size + 3 * dot + 5 * dotGlow + 2 : 0);
+        }
+        case 3: {
+            // The rings, and the corona of particles around them.
+            const rings = 0.7 * short * size + 1.5 * intensity + 1 + Math.max(2, 15 * glow);
+            const corona = 0.7 * long * (0.8 + 0.2 * motion) + 4 * dot + 3 * motion + 2 + 15 * dotGlow;
+            return Math.max(rings, particles ? corona : 0) - short / 2;
+        }
+        case 4: {
+            // The rings of circles, and the dots that circle each one.
+            const radius = short * 0.056 * intensity * size;
+            const rings = 2 * radius * Math.max(2, Math.floor(N.quality * 2));
+            const dots = rings + 0.5 * radius * motion + 1.5 * dot + 0.5 + 5 * dotGlow;
+            return Math.max(rings + radius + 1 + 15 * intensity * glow, particles ? dots : 0) - short / 2;
+        }
+        default: {
+            // Gentle Pulse: its outer glow and its fireflies, and its hover outline's glow off the edges.
+            const radius = long * (0.5 + N.quality * 0.1) * size;
+            const halo = Math.max(radius * (1.2 + 0.4 * glow) * (0.4 + 0.3 * intensity), particles ? fireflies(w, h) + 15 * glow : 0);
+            return Math.max(halo - short / 2, N.colorHoverShow ? 1 + 22.5 * glow : 0);
+        }
+    }
+}
+
+/** How far past a node's body its particles reach when it has no effect. */
+const particlesReach = (w: number, h: number) => fireflies(w, h) - Math.min(w, h) / 2;
+
+type Draw = (ctx: CanvasRenderingContext2D, node: Node, settings: NodeEffectSettings) => void;
+
+const drawEffect: Draw = (ctx, node, settings) => getNodeEffect(N.animate)(ctx, node, settings, clock.particlePhase, getParticleColor);
+
+const drawParticlesAlone: Draw = (ctx, node, settings) => {
+    ctx.translate(node.size[0] / 2, node.size[1] / 2);
+    drawParticles(ctx, node, settings, clock.particlePhase, getParticleColor);
+};
+
+/** What v2 drew for each node, as its drawNode chose: with the guard's key, what it handed the drawing, and how far past the body that reaches. */
+interface Fx {
+    key: string;
+    draw: Draw;
+    settings: NodeEffectSettings;
+    reach(w: number, h: number): number;
+}
+
+/** What every node gets now: the effect when Animate and Show base effect are on, else the particles alone, if either is. */
+function fx(): Fx | undefined {
+    if (N.animate > 0 && N.animationsEnabled) {
+        return guard.off(EFFECT) ? undefined : { key: EFFECT, draw: drawEffect, settings: effectSettings(), reach: effectReach };
+    }
+    if (!N.particleShow || guard.off(PARTICLES)) return undefined;
+    return { key: PARTICLES, draw: drawParticlesAlone, settings: particleSettings(), reach: particlesReach };
+}
+
+/** The alpha native draws a node at: getNodeModeAlpha (FE157 LGraphCanvas.ts L6234-6241, FE1395 L5789-5795; 1.39.5 has no ghost nodes). */
+function modeAlpha(canvas: Canvas, node: Node): number {
+    if (node.flags.ghost) return 0.3;
+    return node.mode === BYPASS ? 0.2 : node.mode === NEVER ? 0.4 : canvas.editor_alpha;
+}
+
+/**
+ * The context to draw v2's drawing with on a node native draws at `alpha`. v2 sets globalAlpha itself, so below
+ * full alpha every alpha it sets is scaled, as native's own drawing of a faded node is; one outside [0, 1], which
+ * v2 sets at high Glow settings, is ignored as the browser ignores it. (A canvas filter would do it too, but draws
+ * each call through a layer the size of the clip: hundreds of ms a frame.)
+ */
+function faded(ctx: CanvasRenderingContext2D, alpha: number): CanvasRenderingContext2D {
+    ctx.globalAlpha = alpha;
+    if (alpha === 1) return ctx;
+    return new Proxy(ctx, {
+        get: (target, key) => {
+            const value = Reflect.get(target, key);
+            if (key === 'globalAlpha') return value / alpha;
+            return typeof value === 'function' ? value.bind(target) : value;
+        },
+        set: (target, key, value) => {
+            if (key !== 'globalAlpha') return Reflect.set(target, key, value);
+            if (value >= 0 && value <= 1) target.globalAlpha = value * alpha;
+            return true;
+        },
+    });
+}
+
+/** Adds a node's body, title bar included, to the path as drawNodeShape fills it (FE157 LGraphCanvas.ts L5880-5904, FE1395 L5500-5524). */
+function body(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node): void {
+    const box = node.boundingRect;
+    const left = box[0] - node.pos[0];
+    const top = box[1] - node.pos[1];
+    const shape: number = node.renderingShape;
+    const r = LiteGraph.ROUND_RADIUS;
+    if (canvas.low_quality) ctx.rect(left, top, box[2], box[3]);
+    else if (shape === ROUND || shape === CARD) ctx.roundRect(left, top, box[2], box[3], shape === CARD ? [r, r, 0, 0] : [r]);
+    else if (shape === CIRCLE) ctx.arc(node.size[0] / 2, node.size[1] / 2, node.size[0] / 2, 0, Math.PI * 2);
+    else ctx.rect(left, top, box[2], box[3]);
+}
+
+/** Draws what v2 drew for a node in the state it drew in, before the node (without the shadow offset native drawNode sets), faded with the node. */
+function drawFx(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node, f: Fx): void {
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+    f.draw(faded(ctx, modeAlpha(canvas, node)), node, f.settings);
+}
+
+/** Whether `box` grown by `margin` on each side overlaps `area`. */
+const overlaps = (box: ArrayLike<number>, area: ArrayLike<number>, margin: number) =>
+    box[0] - margin <= area[0] + area[2] && box[0] + box[2] + margin >= area[0] && box[1] - margin <= area[1] + area[3] && box[1] + box[3] + margin >= area[1];
+
+/**
+ * The under-layer, before the link motion and every node: what each node's effect draws around its body, the part
+ * of it that showed in v2, which drew it all before the body. It takes the nodes whose area, grown by the effect's
+ * reach, is on screen, and counts what moves.
+ */
+function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    const { graph } = canvas;
+    // In Vue mode the DOM draws the nodes and none of the node hooks run; Nodes 2.0 comes with M8.
+    if (!graph || LiteGraph.vueNodesMode) return;
+    const f = fx();
+    // As in v2, the effect phase holds still in Static mode and while a run pauses it; particles keep moving.
+    const moves = N.animate > 0 && !N.staticMode && !(N.pauseDuringRender && env.running) && !env.reducedMotion;
+    const titles = N.textAnimationEnabled && moves && !canvas.low_quality && !guard.off(TITLES);
+    if (!f && !titles) return;
+    const particles = N.particleShow && !env.reducedMotion;
+    const area = canvas.visible_area;
+    for (const node of graph.nodes) {
+        const shown = node.flags.collapsed ? undefined : f;
+        const reach = shown ? shown.reach(node.size[0], node.size[1]) : 0;
+        if (!overlaps(node.renderArea, area, Math.max(0, reach))) continue;
+        // Where drawTitleText draws the styled title: not for a node that draws its own, nor one without a title bar.
+        if (titles && node.title && !node.onDrawTitleText && node.title_mode !== NO_TITLE) live.nodes++;
+        if (!shown) continue;
+        if (shown.key === EFFECT && moves) live.nodes++;
+        if (particles) live.particles++;
+        if (reach <= 0) continue;
+        ctx.save();
+        try {
+            ctx.translate(node.pos[0], node.pos[1]);
+            // Around the body only: the over-layer draws what falls on it.
+            ctx.beginPath();
+            ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
+            body(canvas, ctx, node);
+            ctx.clip('evenodd');
+            drawFx(canvas, ctx, node, shown);
+        } catch (error) {
+            guard.fail(shown.key, error);
+        } finally {
+            ctx.restore();
+        }
+    }
+    if (live.nodes || live.particles) wake();
+}
+
+/** Draws v2's styled title where native draws the title, at the alpha native set for it. False if it failed. */
+function styledTitle(ctx: CanvasRenderingContext2D, node: Node): boolean {
+    // drawNodeShape sets the node's alpha just before the title (FE157 LGraphCanvas.ts L5930, FE1395 L5550).
+    const alpha = ctx.globalAlpha;
+    ctx.save();
+    try {
+        // Centred on the title bar, which on a collapsed node is renderingSize wide too.
+        drawAnimatedText(faded(ctx, alpha), node.title, node.renderingSize[0] / 2, -15, clock.nodePhase);
+        return true;
+    } catch (error) {
+        guard.fail(TITLES, error);
+        return false;
+    } finally {
+        ctx.restore();
+    }
+}
+
+// =============================================================================
 // Extension
 // =============================================================================
 
@@ -226,255 +477,44 @@ const ext: ComfyExtension = {
     settings: nodeSettings,
 
     async setup() {
-        const state: NodeState = createNodeState();
+        install();
+        layers.nodes = under;
 
-        // Timing
-        const Timing = {
-            smoothDelta: 0,
-            lastTime: performance.now(),
-            update(): number {
-                const now = performance.now();
-                const raw = Math.min((now - this.lastTime) / 1000, 1 / 30);
-                this.lastTime = now;
-                this.smoothDelta = this.smoothDelta * 0.9 + raw * 0.1;
-                return this.smoothDelta;
-            },
-        };
-
-        // Particle controller (independent timing)
-        const ParticleController = {
-            phase: 0,
-            lastUpdate: 0,
-            update(currentTime: number, delta: number): number {
-                const dir = N.direction;
-                const speed = Math.max(0.01, N.particleSpeed);
-                if (currentTime - this.lastUpdate >= 16) {
-                    const phaseStep = ((2 * Math.PI) / 15) * delta * speed;
-                    this.phase += phaseStep * dir;
-                    this.lastUpdate = currentTime;
-                }
-                return this.phase;
-            },
-        };
-
-        // Track execution
-        api.addEventListener('status', ({ detail }: any) => {
-            state.isRunning = detail?.exec_info?.queue_remaining > 0;
-        });
-
-        // =====================================================================
-        // Animation Loop
-        // =====================================================================
-
-        function renderLoop(timestamp: number) {
-            const animStyle = N.animate;
-            const pauseDuringRender = N.pauseDuringRender;
-            const isRendering = state.isRunning;
-            const showParticles = N.particleShow;
-
-            // Always update timing so particles can move independently
-            const delta = Timing.update();
-            state.totalTime = (state.totalTime || 0) + delta;
-            ParticleController.update(timestamp, delta);
-
-            const paused = isRendering && pauseDuringRender;
-
-            // Update animation phase only when animation is active and not paused
-            if (animStyle > 0 && !paused) {
-                const speed = N.animationSpeed;
-                const direction = N.direction;
-                const isStaticMode = N.staticMode;
-
-                if (!isStaticMode) {
-                    state.phase += ((2 * Math.PI) / 15) * delta * speed * direction;
-                }
-            }
-
-            // Redraw canvas if any visual effect is active
-            if (animStyle > 0 || showParticles) {
-                app.graph?.setDirtyCanvas(true, false);
-            }
-
-            requestAnimationFrame(renderLoop);
-        }
-
-        requestAnimationFrame(renderLoop);
-
-        // =====================================================================
-        // drawNode Override
-        // =====================================================================
-
-        const originalDrawNode = LGraphCanvas.prototype.drawNode;
-
-        LGraphCanvas.prototype.drawNode = function (node, ctx) {
-            const animStyle = N.animate;
-            const animEnabled = N.animationsEnabled;
-
-            const showParticles = N.particleShow;
-
-            if (animStyle > 0 && animEnabled) {
-                const colors = getCustomNodeColors();
-                const isStaticMode = N.staticMode;
-                const glowIntensity = N.glow;
-                const animGlow = N.animationGlow;
-                const quality = N.quality;
-                const animSize = N.animationSize;
-                const intensity = N.intensity;
-                const direction = N.direction;
-                const animSpeed = N.animationSpeed;
-                const particleDensity = N.particleDensity;
-                const particleSpeed = N.particleSpeed;
-                const particleIntensity = N.particleIntensity;
-                const particleSize = N.particleSize;
-                const particleGlow = N.particleGlow;
-                const showGlow = N.glowShow;
-                const hoverColor = N.colorHover;
-                const showHover = N.colorHoverShow;
-
-                const effect = getNodeEffect(animStyle);
-                if (effect) {
-                    ctx.save();
-                    try {
-                        effect(
-                            ctx,
-                            node,
-                            {
-                                animation: {
-                                    phase: state.phase,
-                                    intensity: intensity * animGlow,
-                                    direction,
-                                    animSpeed,
-                                    isStaticMode,
-                                    isPaused: false,
-                                },
-                                quality: {
-                                    quality,
-                                    animationSize: animSize,
-                                    glowIntensity: showGlow ? glowIntensity : 0,
-                                },
-                                particles: {
-                                    showParticles,
-                                    density: particleDensity,
-                                    speed: particleSpeed,
-                                    intensity: particleIntensity,
-                                    size: particleSize,
-                                    glowIntensity: particleGlow,
-                                },
-                                colors: {
-                                    primary: colors.primary as Color,
-                                    secondary: colors.secondary as Color,
-                                    accent: colors.accent as Color,
-                                    hoverColor,
-                                    showHover,
-                                },
-                            },
-                            ParticleController.phase,
-                            getParticleColor,
-                        );
-                    } catch (e) {
-                        console.warn('[EnhancedNodes] Effect error:', e);
-                    }
+        // The node's body, then the over-layer: what the effect draws on the body (the under-layer drew the rest), then v2's hover outline.
+        const drawNodeShape = LGraphCanvas.prototype.drawNodeShape;
+        LGraphCanvas.prototype.drawNodeShape = function (this: Canvas, ...args: Parameters<Canvas['drawNodeShape']>) {
+            drawNodeShape.apply(this, args);
+            const [node, ctx] = args;
+            if (node.flags.collapsed) return;
+            const f = fx();
+            if (f) {
+                ctx.save();
+                try {
+                    ctx.beginPath();
+                    body(this, ctx, node);
+                    ctx.clip();
+                    drawFx(this, ctx, node, f);
+                } catch (error) {
+                    guard.fail(f.key, error);
+                } finally {
                     ctx.restore();
                 }
-            } else if (showParticles) {
-                // Particles-only mode (no animation style selected)
-                const colors = getCustomNodeColors();
-                const particleDensity = N.particleDensity;
-                const particleSpeed = N.particleSpeed;
-                const particleIntensity = N.particleIntensity;
-                const particleSize = N.particleSize;
-                const particleGlow = N.particleGlow;
-                const quality = N.quality;
-                const animSize = N.animationSize;
-                const direction = N.direction;
+            }
+
+            if (N.colorHoverShow && N.animate > 0 && (node.mouseOver || (this.selected_nodes && this.selected_nodes[node.id])) && !guard.off(OUTLINE)) {
+                const hoverColor = N.colorHover;
+                const outlineGlowSize = 15 * N.glow;
 
                 ctx.save();
-                ctx.translate(node.size[0] / 2, node.size[1] / 2);
                 try {
-                    drawParticles(
-                        ctx,
-                        node,
-                        {
-                            animation: {
-                                phase: state.phase,
-                                intensity: 1.0,
-                                direction,
-                                animSpeed: 1,
-                                isStaticMode: false,
-                                isPaused: false,
-                            },
-                            quality: {
-                                quality,
-                                animationSize: animSize,
-                                glowIntensity: 0,
-                            },
-                            particles: {
-                                showParticles: true,
-                                density: particleDensity,
-                                speed: particleSpeed,
-                                intensity: particleIntensity,
-                                size: particleSize,
-                                glowIntensity: particleGlow,
-                            },
-                            colors: {
-                                primary: colors.primary as Color,
-                                secondary: colors.secondary as Color,
-                                accent: colors.accent as Color,
-                                hoverColor: '#00ff15',
-                                showHover: false,
-                            },
-                        },
-                        ParticleController.phase,
-                        getParticleColor,
-                    );
-                } catch (e) {
-                    console.warn('[EnhancedNodes] Particle error:', e);
-                }
-                ctx.restore();
-            }
-
-            // Draw original node
-            originalDrawNode.call(this, node, ctx);
-
-            // Text animation (drawn on top of node)
-            if (N.textAnimationEnabled && node.title) {
-                ctx.save();
-                drawAnimatedText(
-                    ctx,
-                    node.title,
-                    node.size[0] / 2,
-                    -15,
-                    state.phase,
-                );
-                ctx.restore();
-            }
-        };
-
-        // =====================================================================
-        // Hover Color Override
-        // =====================================================================
-
-        const originalDrawNodeShape = LGraphCanvas.prototype.drawNodeShape;
-        if (originalDrawNodeShape) {
-            LGraphCanvas.prototype.drawNodeShape = function (node, ctx, ...args) {
-                originalDrawNodeShape.call(this, node, ctx, ...args);
-
-                const showHover = N.colorHoverShow;
-                const animStyle = N.animate;
-
-                if (showHover && animStyle > 0 && (node.mouseOver || (this.selected_nodes && this.selected_nodes[node.id]))) {
-                    const hoverColor = N.colorHover;
-                    const glowIntensity = N.glow;
-                    const outlineGlowSize = 15 * glowIntensity;
-
-                    ctx.save();
+                    ctx.globalAlpha = modeAlpha(this, node);
                     ctx.shadowColor = withAlpha(hoverColor, 0.5);
                     ctx.shadowBlur = node.mouseOver ? outlineGlowSize : outlineGlowSize * 1.5;
                     ctx.strokeStyle = withAlpha(hoverColor, 0.7);
                     ctx.lineWidth = 2;
 
                     // BUG: _shape is a RenderShape number on 1.39 and gone on 1.57, so round nodes get the square outline.
-                    const shape = (node as LGraphNode & { _shape?: unknown })._shape || 'box';
+                    const shape = (node as Node & { _shape?: unknown })._shape || 'box';
                     if (shape === 'round' || shape === 'card') {
                         const radius = node.constructor?.slot_start_y ? 8 : 4;
                         ctx.beginPath();
@@ -483,10 +523,23 @@ const ext: ComfyExtension = {
                     } else {
                         ctx.strokeRect(0, 0, node.size[0], node.size[1]);
                     }
+                } catch (error) {
+                    guard.fail(OUTLINE, error);
+                } finally {
                     ctx.restore();
                 }
-            };
-        }
+            }
+        };
+
+        // With Animated titles on, v2's styled title in place of the native one.
+        const drawTitleText = LGraphNode.prototype.drawTitleText;
+        LGraphNode.prototype.drawTitleText = function (this: Node, ...args: Parameters<Node['drawTitleText']>) {
+            // Left to native: a node that draws its own title, an untitled one (v2 styled only titles), and low quality, which draws none.
+            if (!N.textAnimationEnabled || !this.title || this.onDrawTitleText || args[1].low_quality || guard.off(TITLES)) return drawTitleText.apply(this, args);
+            // Native still draws its title, where nobody sees it, so other wrappers get their call; if ours failed, native's is the one shown.
+            if (styledTitle(args[0], this)) args[0] = dummy();
+            return drawTitleText.apply(this, args);
+        };
 
         console.log('[EnhancedNodes] Extension registered with full animation pipeline.');
     },

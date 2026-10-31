@@ -1,15 +1,15 @@
 /**
  * The settings schema (src/core/settings.ts): the 64 v2.0.1 settings with their
- * defaults, options and ranges, the migrations the frontend applies to stored
- * and set values, registration through the fake frontend, and the writes the
- * sidebar makes.
+ * defaults, options and ranges, the settings v3 adds, the migrations the
+ * frontend applies to stored and set values, registration through the fake
+ * frontend, and the writes the sidebar makes.
  */
 
 import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
 import { L, N, SETTINGS, commit, linkSettings, nodeSettings, preview, reset } from '@/core/settings';
 import { renderSettingsPanel } from '@/sidebar/SidebarSettings';
 import { app, fake, resetFakeApp } from '../helpers/fake-app';
-import { setupV2 } from './characterize/v2-hooks';
+import { start } from '../helpers/fake-litegraph';
 
 /** HEAD's (v2.0.1's) LINK_DEFAULTS and NODE_DEFAULTS from src/core/config.ts, without the two '... UI & Æmotion Studio About' ids. */
 const V2_DEFAULTS: Record<string, unknown> = {
@@ -104,6 +104,15 @@ const V2_OPTIONS: Record<string, unknown[]> = {
     '📦 Enhanced Nodes.Text.Style': ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal'],
 };
 
+/** The settings v3 adds, by the milestone that adds them, with their defaults and options. */
+const V3_DEFAULTS: Record<string, unknown> = {
+    // M3
+    '🔗 Enhanced Links.Coexist': 'auto',
+};
+const V3_OPTIONS: Record<string, unknown[]> = {
+    '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
+};
+
 /** [min, max, step] of v2.0.1's sidebar sliders; the Shadow and Text settings, which it has no slider for, take the v3 design's ranges. */
 const V2_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Animation.Speed': [0.1, 5, 0.1],
@@ -140,18 +149,19 @@ const params = (id: string) => PARAMS.find((p) => p.id === id)!;
 const migrate = (id: string, value: unknown) => params(id).migrateDeprecatedValue!(value);
 
 describe('settings schema', () => {
-    it('defines exactly the 64 v2.0.1 settings, each once', () => {
+    it('defines the 64 v2.0.1 settings and the ones v3 adds, each once', () => {
         const ids = SETTINGS.map((s) => s.id);
         expect(new Set(ids).size).toBe(ids.length);
-        expect([...ids].sort()).toEqual(Object.keys(V2_DEFAULTS).sort());
+        expect(Object.keys(V2_DEFAULTS)).toHaveLength(64);
+        expect([...ids].sort()).toEqual([...Object.keys(V2_DEFAULTS), ...Object.keys(V3_DEFAULTS)].sort());
     });
 
     it('keeps the v2.0.1 defaults', () => {
-        expect(Object.fromEntries(SETTINGS.map((s) => [s.id, s.default]))).toEqual(V2_DEFAULTS);
+        expect(Object.fromEntries(SETTINGS.map((s) => [s.id, s.default]))).toEqual({ ...V2_DEFAULTS, ...V3_DEFAULTS });
     });
 
     it('keeps the v2.0.1 options and the sidebar ranges', () => {
-        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'combo' ? [[s.id, s.options.map((o) => o.value)]] : []))).toEqual(V2_OPTIONS);
+        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'combo' ? [[s.id, s.options.map((o) => o.value)]] : []))).toEqual({ ...V2_OPTIONS, ...V3_OPTIONS });
         expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual(V2_RANGES);
     });
 
@@ -352,8 +362,7 @@ describe('writes', () => {
     });
 
     it('setup() saves nothing, not even migrated values, and registers no setting again', async () => {
-        vi.stubGlobal('requestAnimationFrame', () => 0);
-        await setupV2({ [THICKNESS]: '4.5', '🔗 Enhanced Links.Marker.Effects': 3 });
+        await start({ [THICKNESS]: '4.5', '🔗 Enhanced Links.Marker.Effects': 3 });
         await settle();
         expect(fake.posts).toEqual([]);
         expect(fake.duplicates).toEqual([]);

@@ -1,450 +1,5 @@
 import { app } from "/scripts/app.js";
-import { api } from "/scripts/api.js";
-import { L, e as enhanceColor, g as getLinkColor, a as getCustomLinkColors, v as validateHexColor, b as getSecondaryColor, c as getAccentColor, r as reset, S as SETTINGS, s as snapshotOf, d as commit, p as preview, l as linkSettings } from "./chunks/color-manager-CtPq5NfG.js";
-const SACRED = Object.freeze({
-  /** Base pattern foundation - used for trinity-based patterns */
-  TRINITY: 3,
-  /** Flow and crystalline structures */
-  HARMONY: 7,
-  /** Complex pattern completion cycles */
-  COMPLETION: 12,
-  /** Fibonacci sequence for growth patterns */
-  FIBONACCI: Object.freeze([1, 1, 2, 3, 5, 8, 13, 21]),
-  /** Quantum effects base */
-  QUANTUM: 5,
-  /** Infinite pattern cycles */
-  INFINITY: 8
-});
-function createFlowField(t, phase) {
-  return {
-    x: Math.sin(t * Math.PI * SACRED.TRINITY + phase) * 10,
-    y: Math.cos(t * Math.PI * SACRED.TRINITY + phase) * 10
-  };
-}
-function createCrystal(ctx, x, y, size, rotation, color) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
-  ctx.beginPath();
-  for (let i = 0; i < SACRED.HARMONY; i++) {
-    const angle = i / SACRED.HARMONY * Math.PI * 2;
-    const px = Math.cos(angle) * size;
-    const py = Math.sin(angle) * size;
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.strokeStyle = color;
-  ctx.stroke();
-  ctx.restore();
-}
-function enableAntiAliasing(ctx) {
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
-  ctx.miterLimit = 2;
-}
-function dist(a, b) {
-  return Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2);
-}
-const spline = {
-  getLength(start, end) {
-    const samples = 40;
-    let length = 0;
-    let prev = this.getPoint(start, end, 0);
-    for (let i = 1; i <= samples; i++) {
-      const p = this.getPoint(start, end, i / samples);
-      length += dist(prev, p);
-      prev = p;
-    }
-    return length;
-  },
-  getNormalizedT(start, end, targetDist, _totalLength) {
-    const samples = 40;
-    let acc = 0;
-    let prev = this.getPoint(start, end, 0);
-    for (let i = 1; i <= samples; i++) {
-      const t = i / samples;
-      const p = this.getPoint(start, end, t);
-      const seg = dist(prev, p);
-      acc += seg;
-      if (acc >= targetDist) {
-        const prevT = (i - 1) / samples;
-        const excess = acc - targetDist;
-        return prevT + (t - prevT) * (1 - excess / seg);
-      }
-      prev = p;
-    }
-    return 1;
-  },
-  getPoint(start, end, t) {
-    const d = dist(start, end);
-    const bend = Math.min(d * 0.5, 100);
-    const p0x = start[0], p0y = start[1];
-    const p1x = start[0] + bend, p1y = start[1];
-    const p2x = end[0] - bend, p2y = end[1];
-    const p3x = end[0], p3y = end[1];
-    const cx = 3 * (p1x - p0x);
-    const bx = 3 * (p2x - p1x) - cx;
-    const ax = p3x - p0x - cx - bx;
-    const cy = 3 * (p1y - p0y);
-    const by = 3 * (p2y - p1y) - cy;
-    const ay = p3y - p0y - cy - by;
-    return [
-      ax * t ** 3 + bx * t ** 2 + cx * t + p0x,
-      ay * t ** 3 + by * t ** 2 + cy * t + p0y
-    ];
-  },
-  draw(ctx, start, end, color, thickness) {
-    const d = dist(start, end);
-    const bend = Math.min(d * 0.5, 100);
-    ctx.beginPath();
-    ctx.moveTo(start[0], start[1]);
-    ctx.bezierCurveTo(
-      start[0] + bend,
-      start[1],
-      end[0] - bend,
-      end[1],
-      end[0],
-      end[1]
-    );
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const straight = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const linear = {
-  getLength(start, end) {
-    const midX = (start[0] + end[0]) / 2;
-    return Math.abs(midX - start[0]) + Math.abs(end[1] - start[1]) + Math.abs(end[0] - midX);
-  },
-  getNormalizedT(start, end, targetDist, totalLength) {
-    const midX = (start[0] + end[0]) / 2;
-    const h1 = Math.abs(midX - start[0]);
-    const v = Math.abs(end[1] - start[1]);
-    const s1p = h1 / totalLength;
-    const s2p = v / totalLength;
-    const h2 = Math.abs(end[0] - midX);
-    const nd = targetDist / totalLength;
-    if (nd <= s1p) return nd / s1p * 0.33;
-    if (nd <= s1p + s2p) return 0.33 + (nd - s1p) / s2p * 0.34;
-    return 0.67 + (nd - s1p - s2p) / (h2 / totalLength) * 0.33;
-  },
-  getPoint(start, end, t) {
-    const midX = (start[0] + end[0]) / 2;
-    if (t <= 0.33) {
-      const st2 = t / 0.33;
-      return [start[0] + (midX - start[0]) * st2, start[1]];
-    }
-    if (t <= 0.67) {
-      const st2 = (t - 0.33) / 0.34;
-      return [midX, start[1] + (end[1] - start[1]) * st2];
-    }
-    const st = (t - 0.67) / 0.33;
-    return [midX + (end[0] - midX) * st, end[1]];
-  },
-  draw(ctx, start, end, color, thickness) {
-    const midX = (start[0] + end[0]) / 2;
-    ctx.beginPath();
-    ctx.moveTo(start[0], start[1]);
-    ctx.lineTo(midX, start[1]);
-    ctx.lineTo(midX, end[1]);
-    ctx.lineTo(end[0], end[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const hidden = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw() {
-  }
-};
-const dotted = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, start, end, color, thickness) {
-    const len = dist(start, end);
-    const spacing = thickness * 3;
-    const num = Math.floor(len / spacing);
-    for (let i = 0; i <= num; i++) {
-      const t = i / num;
-      const x = start[0] + (end[0] - start[0]) * t;
-      const y = start[1] + (end[1] - start[1]) * t;
-      ctx.beginPath();
-      ctx.arc(x, y, thickness * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-  }
-};
-const dashed = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.setLineDash([thickness * 4, thickness * 2]);
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-};
-const double = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const off = thickness * 0.8;
-    const dx = Math.cos(angle + Math.PI / 2) * off;
-    const dy = Math.sin(angle + Math.PI / 2) * off;
-    ctx.beginPath();
-    ctx.moveTo(s[0] + dx, s[1] + dy);
-    ctx.lineTo(e[0] + dx, e[1] + dy);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.4;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(s[0] - dx, s[1] - dy);
-    ctx.lineTo(e[0] - dx, e[1] - dy);
-    ctx.stroke();
-  }
-};
-const stepped = {
-  getLength(s, e) {
-    return Math.abs(e[0] - s[0]) + Math.abs(e[1] - s[1]);
-  },
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const midX = s[0] + (e[0] - s[0]) * (t < 0.5 ? t * 2 : 1);
-    const midY = s[1] + (e[1] - s[1]) * (t >= 0.5 ? (t - 0.5) * 2 : 0);
-    return [midX, midY];
-  },
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(s[0] + (e[0] - s[0]), s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const zigzag = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const bx = s[0] + (e[0] - s[0]) * t;
-    const by = s[1] + (e[1] - s[1]) * t;
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const amp = 10, freq = 10;
-    return [
-      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
-      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
-    ];
-  },
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    const steps = 50;
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const rope = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const bx = s[0] + (e[0] - s[0]) * t;
-    const by = s[1] + (e[1] - s[1]) * t;
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const amp = 3, freq = 20;
-    return [
-      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
-      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
-    ];
-  },
-  draw(ctx, s, e, color, thickness) {
-    const steps = 100;
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 1.2;
-    ctx.lineCap = "round";
-    ctx.stroke();
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.lineWidth = thickness * 0.4;
-    ctx.stroke();
-  }
-};
-const glowpath = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
-    gradient.addColorStop(0, "rgba(255, 255, 255, 0.5)");
-    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.2)");
-    gradient.addColorStop(1, "rgba(255, 255, 255, 0.5)");
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = thickness * 2;
-    ctx.globalAlpha = 0.5;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-};
-const chain = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, start, end, color, thickness) {
-    const len = dist(start, end);
-    const linkSize = thickness * 2;
-    const numLinks = Math.floor(len / (linkSize * 2));
-    const angle = Math.atan2(end[1] - start[1], end[0] - start[0]);
-    for (let i = 0; i < numLinks; i++) {
-      const t = i / numLinks;
-      const x = start[0] + (end[0] - start[0]) * t;
-      const y = start[1] + (end[1] - start[1]) * t;
-      ctx.beginPath();
-      ctx.ellipse(x, y, linkSize, linkSize * 0.6, angle, 0, Math.PI * 2);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = thickness * 0.4;
-      ctx.stroke();
-    }
-  }
-};
-const pulse = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    const len = dist(s, e);
-    const dashLen = thickness * 4;
-    const numDashes = Math.floor(len / (dashLen * 2));
-    ctx.beginPath();
-    ctx.setLineDash([dashLen, dashLen]);
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    ctx.setLineDash([]);
-    const pulseWidth = thickness * 3;
-    for (let i = 0; i < numDashes; i++) {
-      const t = i / numDashes;
-      const x = s[0] + (e[0] - s[0]) * t;
-      const y = s[1] + (e[1] - s[1]) * t;
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, pulseWidth);
-      grad.addColorStop(0, color);
-      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.beginPath();
-      ctx.arc(x, y, pulseWidth, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.globalAlpha = 0.3;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
-};
-const holographic = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
-    gradient.addColorStop(1, color);
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = thickness * 1.2;
-    ctx.stroke();
-    const len = dist(s, e);
-    const spacing = thickness * 2;
-    const num = Math.floor(len / spacing);
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    for (let i = 0; i <= num; i++) {
-      const t = i / num;
-      const x = s[0] + (e[0] - s[0]) * t;
-      const y = s[1] + (e[1] - s[1]) * t;
-      ctx.beginPath();
-      ctx.moveTo(
-        x + Math.cos(angle + Math.PI / 2) * thickness,
-        y + Math.sin(angle + Math.PI / 2) * thickness
-      );
-      ctx.lineTo(
-        x + Math.cos(angle - Math.PI / 2) * thickness,
-        y + Math.sin(angle - Math.PI / 2) * thickness
-      );
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
-};
-const LinkRenderers = {
-  spline,
-  straight,
-  linear,
-  hidden,
-  dotted,
-  dashed,
-  double,
-  stepped,
-  zigzag,
-  rope,
-  glowpath,
-  chain,
-  pulse,
-  holographic
-};
-function getLinkRenderer(name) {
-  return LinkRenderers[name] ?? spline;
-}
+import { L, e as enhanceColor, g as getLinkColor, a as getCustomLinkColors, v as validateHexColor, b as getSecondaryColor, c as getAccentColor, d as guard, f as env, w as wake, l as live, h as dummy, i as layers, j as clock, r as reset, S as SETTINGS, s as snapshotOf, k as commit, p as preview, m as linkSettings, n as install } from "./chunks/color-manager-BWKJQb2w.js";
 const none = () => {
 };
 const diamond = (ctx, x, y, size) => {
@@ -586,6 +141,49 @@ const MarkerShapes = {
 function shapeNeedsFill(name) {
   return name !== "cross" && name !== "none";
 }
+const SACRED = Object.freeze({
+  /** Base pattern foundation - used for trinity-based patterns */
+  TRINITY: 3,
+  /** Flow and crystalline structures */
+  HARMONY: 7,
+  /** Complex pattern completion cycles */
+  COMPLETION: 12,
+  /** Fibonacci sequence for growth patterns */
+  FIBONACCI: Object.freeze([1, 1, 2, 3, 5, 8, 13, 21]),
+  /** Quantum effects base */
+  QUANTUM: 5,
+  /** Infinite pattern cycles */
+  INFINITY: 8
+});
+function createFlowField(t, phase) {
+  return {
+    x: Math.sin(t * Math.PI * SACRED.TRINITY + phase) * 10,
+    y: Math.cos(t * Math.PI * SACRED.TRINITY + phase) * 10
+  };
+}
+function createCrystal(ctx, x, y, size, rotation, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.beginPath();
+  for (let i = 0; i < SACRED.HARMONY; i++) {
+    const angle = i / SACRED.HARMONY * Math.PI * 2;
+    const px = Math.cos(angle) * size;
+    const py = Math.sin(angle) * size;
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  ctx.restore();
+}
+function enableAntiAliasing(ctx) {
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.miterLimit = 2;
+}
 function renderSacredFlow(ctx, items, phase, state) {
   const direction = state.direction;
   const quality = L.quality;
@@ -599,8 +197,7 @@ function renderSacredFlow(ctx, items, phase, state) {
   ctx.shadowBlur = glowIntensity;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
     const baseColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
     const primaryColor = enhanceColor(baseColor, colorScheme);
     const accentColor = enhanceColor(getAccentColor(defaultColor), colorScheme);
@@ -610,7 +207,7 @@ function renderSacredFlow(ctx, items, phase, state) {
       const baseT = i / points;
       const t = direction > 0 ? baseT : 1 - baseT;
       const flow = createFlowField(t, continuousPhase);
-      const pos = r.getPoint(start, end, t, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
       const x = pos[0] + flow.x * Math.sin(t * Math.PI + continuousPhase) * 0.5;
       const y = pos[1] + flow.y * Math.sin(t * Math.PI + continuousPhase) * 0.5;
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
@@ -628,7 +225,7 @@ function renderSacredFlow(ctx, items, phase, state) {
       const t = direction > 0 ? (baseT + continuousPhase * 0.5) % 1 : 1 - (baseT + continuousPhase * 0.5) % 1;
       const boundedT = Math.max(0, Math.min(1, t));
       const flow = createFlowField(boundedT, continuousPhase);
-      const pos = r.getPoint(start, end, boundedT, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
       const x = pos[0] + flow.x * Math.sin(boundedT * Math.PI + continuousPhase) * 0.5;
       const y = pos[1] + flow.y * Math.sin(boundedT * Math.PI + continuousPhase) * 0.5;
       ctx.beginPath();
@@ -669,15 +266,14 @@ function renderCrystalStream(ctx, items, _phase, state) {
     cx.stroke();
     cx.restore();
   };
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, isStatic);
+      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
       ctx.globalAlpha = 1;
     }
     const crystals = Math.floor(SACRED.HARMONY * quality * particleDensity);
@@ -685,7 +281,7 @@ function renderCrystalStream(ctx, items, _phase, state) {
       const baseT = i / crystals;
       const t = direction > 0 ? (baseT + continuousPhase) % 1 : 1 - (baseT + continuousPhase) % 1;
       const boundedT = Math.max(0, Math.min(1, t));
-      const pos = r.getPoint(start, end, boundedT, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
       const size = 5 * thickness * (1 + Math.sin(continuousPhase + boundedT * Math.PI));
       ctx.shadowColor = secondaryColor;
       ctx.shadowBlur = glowIntensity;
@@ -698,15 +294,14 @@ function renderQuantumField(ctx, items, phase, _state) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const particleDensity = L.particleDensity;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, isStatic);
+      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
       ctx.globalAlpha = 1;
     }
     const fieldLines = SACRED.QUANTUM;
@@ -716,7 +311,7 @@ function renderQuantumField(ctx, items, phase, _state) {
       const fieldPhase = phase + f * Math.PI * 2 / fieldLines;
       for (let i = 0; i <= points; i++) {
         const t = i / points;
-        const pos = r.getPoint(start, end, t, isStatic ? 0.3 : 0.5);
+        const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
         const uncertainty = 8 * Math.sin(t * Math.PI * 2 + fieldPhase);
         const x = pos[0] + uncertainty * Math.cos(fieldPhase);
         const y = pos[1] + uncertainty * Math.sin(fieldPhase);
@@ -739,8 +334,7 @@ function renderCosmicWeave(ctx, items, _phase, state) {
   const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
   const direction = state.direction;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -748,7 +342,7 @@ function renderCosmicWeave(ctx, items, _phase, state) {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0;
-      r.draw(ctx, end, start, primaryColor, thickness, isStatic);
+      r.draw(ctx, end2, start, primaryColor, thickness, isStatic);
       ctx.globalAlpha = 1;
     }
     const strands = SACRED.TRINITY;
@@ -758,7 +352,7 @@ function renderCosmicWeave(ctx, items, _phase, state) {
       const strandPhase = continuousPhase + s * Math.PI * 2 / strands;
       for (let i = 0; i <= points; i++) {
         const t = direction > 0 ? i / points : 1 - i / points;
-        const pos = r.getPoint(end, start, t, isStatic ? 0.3 : 0.5);
+        const pos = r.getPoint(end2, start, t, isStatic ? 0.3 : 0.5);
         const weave = Math.sin(t * Math.PI * 6 + strandPhase * direction) * 10;
         const x = pos[0] + weave * Math.cos(strandPhase);
         const y = pos[1] + weave * Math.sin(strandPhase);
@@ -783,15 +377,14 @@ function renderEnergyPulse(ctx, items, _phase, state) {
   const animSpeed = L.animationSpeed;
   const speedReductionFactor = 0.25;
   const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, isStatic);
+      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
       ctx.globalAlpha = 1;
     }
     const pulseCount = Math.floor(SACRED.TRINITY * quality);
@@ -800,7 +393,7 @@ function renderEnergyPulse(ctx, items, _phase, state) {
       const t = direction > 0 ? (baseT + continuousPhase) % 1 : 1 - (baseT + continuousPhase) % 1;
       const boundedT = Math.max(0, Math.min(1, t));
       const pulseSize = thickness * 2 * (1 - boundedT);
-      const pos = r.getPoint(start, end, boundedT, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
       ctx.beginPath();
       ctx.arc(pos[0], pos[1], pulseSize, 0, Math.PI * 2);
       ctx.fillStyle = secondaryColor;
@@ -819,16 +412,15 @@ function renderDNAHelix(ctx, items, _phase, state) {
   const glowIntensity = L.glowIntensity;
   const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
     const points = Math.floor(SACRED.COMPLETION * quality * 2);
     const helixRadius = 10;
     const rotations = 4;
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
-    const actualStart = direction > 0 ? start : end;
-    const actualEnd = direction > 0 ? end : start;
+    const actualStart = direction > 0 ? start : end2;
+    const actualEnd = direction > 0 ? end2 : start;
     const strand1Points = [];
     const strand2Points = [];
     for (let i = 0; i <= points; i++) {
@@ -880,8 +472,7 @@ function renderLavaFlow(ctx, items, phase, state) {
   const particleDensity = L.particleDensity;
   const animSpeed = L.animationSpeed;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -889,7 +480,7 @@ function renderLavaFlow(ctx, items, phase, state) {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0;
-      r.draw(ctx, start, end, primaryColor, thickness, isStatic);
+      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
       ctx.globalAlpha = 1;
     }
     const tubeWidth = thickness * 7;
@@ -899,7 +490,7 @@ function renderLavaFlow(ctx, items, phase, state) {
     ctx.beginPath();
     for (let i = 0; i <= pts; i++) {
       const t = i / pts;
-      const pos = r.getPoint(start, end, t, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
       const noise = Math.sin(t * Math.PI * 3 + continuousPhase) * turbulenceScale;
       const x = pos[0];
       const y = pos[1] + noise * Math.sin(continuousPhase * 0.8 + t * Math.PI * 2);
@@ -913,17 +504,17 @@ function renderLavaFlow(ctx, items, phase, state) {
     ctx.beginPath();
     for (let i = 0; i <= pts; i++) {
       const t = i / pts;
-      const pos = r.getPoint(start, end, t, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
       const noise = Math.sin(t * Math.PI * 3 + continuousPhase * 1.2) * (turbulenceScale * 0.7);
       const x = pos[0];
       const y = pos[1] + noise * Math.sin(continuousPhase * 0.6 + t * Math.PI * 2);
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     const gradient = ctx.createLinearGradient(
-      direction > 0 ? start[0] : end[0],
-      direction > 0 ? start[1] : end[1],
-      direction > 0 ? end[0] : start[0],
-      direction > 0 ? end[1] : start[1]
+      direction > 0 ? start[0] : end2[0],
+      direction > 0 ? start[1] : end2[1],
+      direction > 0 ? end2[0] : start[0],
+      direction > 0 ? end2[1] : start[1]
     );
     gradient.addColorStop(0, primaryColor);
     gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondaryColor);
@@ -940,7 +531,7 @@ function renderLavaFlow(ctx, items, phase, state) {
       const baseT = i / particleCount;
       const t = direction > 0 ? (baseT + continuousPhase * 0.5) % 1 : 1 - (baseT + continuousPhase * 0.5) % 1;
       const boundedT = Math.max(0, Math.min(1, t));
-      const pos = r.getPoint(start, end, boundedT, isStatic ? 0.3 : 0.5);
+      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
       const noise = Math.sin(boundedT * Math.PI * 3 + continuousPhase) * (turbulenceScale * 0.3);
       const x = pos[0] + Math.sin(boundedT * Math.PI * 2) * (tubeWidth * 0.15);
       const y = pos[1] + noise * Math.sin(continuousPhase + boundedT * Math.PI * 2) + Math.cos(boundedT * Math.PI * 3) * (tubeWidth * 0.15);
@@ -962,14 +553,13 @@ function renderStellarPlasma(ctx, items, _phase, state) {
   const particleDensity = L.particleDensity;
   const animSpeed = L.animationSpeed;
   const continuousPhase = -(state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end, defaultColor, linkStyle, isStatic }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
-    const actualStart = direction > 0 ? end : start;
-    const actualEnd = direction > 0 ? start : end;
-    const length = r.getLength(start, end);
+    const actualStart = direction > 0 ? end2 : start;
+    const actualEnd = direction > 0 ? start : end2;
+    const length = r.getLength(start, end2);
     const segments = Math.floor(length / 20) * quality * particleDensity;
     ctx.save();
     for (let i = 0; i <= segments; i++) {
@@ -1024,8 +614,7 @@ function renderClassicFlow(ctx, items, phase, state) {
   const shadowBlur = L.shadowBlur;
   const shadowOffset = L.shadowOffset;
   const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
     if (linkStyle !== "hidden") {
       const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
@@ -1039,7 +628,7 @@ function renderClassicFlow(ctx, items, phase, state) {
         ctx.shadowOffsetX = shadowOffset * 3;
         ctx.shadowOffsetY = shadowOffset * 3;
         ctx.lineWidth = thickness * 1.2;
-        r.draw(ctx, start, end, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
+        r.draw(ctx, start, end2, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
       }
       ctx.shadowColor = enhancedColor;
       ctx.shadowBlur = glowIntensity;
@@ -1047,7 +636,7 @@ function renderClassicFlow(ctx, items, phase, state) {
       ctx.shadowOffsetY = 0;
       ctx.strokeStyle = enhancedColor;
       ctx.lineWidth = thickness;
-      r.draw(ctx, start, end, enhancedColor, thickness, true);
+      r.draw(ctx, start, end2, enhancedColor, thickness, true);
     }
     if (markerEnabled && markerShape !== "none") {
       let effectiveMarkerColor;
@@ -1066,11 +655,11 @@ function renderClassicFlow(ctx, items, phase, state) {
       for (let i = 0; i < numMarks; i++) {
         const baseT = i / numMarks;
         const t = direction > 0 ? (baseT + continuousPhase * 0.1) % 1 : 1 - (baseT + continuousPhase * 0.1) % 1;
-        const pos = r.getPoint(start, end, t, true);
+        const pos = r.getPoint(start, end2, t, true);
         let angle = 0;
         if (markerShape === "arrow") {
           const nextT = Math.min(t + 0.01, 1);
-          const nextPos = r.getPoint(start, end, nextT, true);
+          const nextPos = r.getPoint(start, end2, nextT, true);
           angle = Math.atan2(nextPos[1] - pos[1], nextPos[0] - pos[0]);
         }
         let effectColor = effectiveMarkerColor;
@@ -1138,8 +727,7 @@ function renderStatic1(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
     if (linkStyle !== "hidden") {
@@ -1147,12 +735,12 @@ function renderStatic1(ctx, items, phase) {
       ctx.lineWidth = thickness * 1.5;
       ctx.shadowColor = primaryColor;
       ctx.shadowBlur = glowIntensity;
-      r.draw(ctx, start, end, primaryColor, thickness, true);
+      r.draw(ctx, start, end2, primaryColor, thickness, true);
     }
     const points = Math.floor(SACRED.TRINITY * quality);
     for (let i = 0; i <= points; i++) {
       const t = i / points;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const flow = createFlowField(t, phase);
       const x = pos[0] + flow.x * Math.sin(t * Math.PI + phase) * 0.3;
       const y = pos[1] + flow.y * Math.sin(t * Math.PI + phase) * 0.3;
@@ -1171,17 +759,16 @@ function renderStatic2(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
-      r.draw(ctx, start, end, primaryColor, thickness, true);
+      r.draw(ctx, start, end2, primaryColor, thickness, true);
     }
     const crystals = Math.floor(SACRED.HARMONY * quality);
     for (let i = 0; i < crystals; i++) {
       const t = i / crystals;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const size = thickness * 3 * (1 + Math.sin(phase + t * Math.PI * 2) * 0.2);
       ctx.shadowColor = secondaryColor;
       ctx.shadowBlur = glowIntensity;
@@ -1193,15 +780,14 @@ function renderStatic3(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, true);
+      r.draw(ctx, start, end2, primaryColor, thickness, true);
       ctx.globalAlpha = 1;
     }
     const fieldLines = SACRED.QUANTUM;
@@ -1211,7 +797,7 @@ function renderStatic3(ctx, items, phase) {
       const fieldPhase = phase + f * Math.PI * 2 / fieldLines;
       for (let i = 0; i <= points; i++) {
         const t = i / points;
-        const pos = r.getPoint(start, end, t, true);
+        const pos = r.getPoint(start, end2, t, true);
         const uncertainty = 8 * Math.sin(t * Math.PI * 2 + fieldPhase);
         const x = pos[0] + uncertainty * Math.cos(fieldPhase);
         const y = pos[1] + uncertainty * Math.sin(fieldPhase);
@@ -1232,8 +818,7 @@ function renderStatic4(ctx, items, phase) {
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
   const direction = L.direction;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -1241,7 +826,7 @@ function renderStatic4(ctx, items, phase) {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0;
-      r.draw(ctx, end, start, primaryColor, thickness, true);
+      r.draw(ctx, end2, start, primaryColor, thickness, true);
       ctx.globalAlpha = 1;
     }
     const strands = SACRED.TRINITY;
@@ -1251,7 +836,7 @@ function renderStatic4(ctx, items, phase) {
       const strandPhase = phase + s * Math.PI * 2 / strands;
       for (let i = 0; i <= points; i++) {
         const t = direction > 0 ? i / points : 1 - i / points;
-        const pos = r.getPoint(end, start, t, true);
+        const pos = r.getPoint(end2, start, t, true);
         const weave = Math.sin(t * Math.PI * 6 + strandPhase * direction) * 10;
         const x = pos[0] + weave * Math.cos(strandPhase);
         const y = pos[1] + weave * Math.sin(strandPhase);
@@ -1272,22 +857,21 @@ function renderStatic5(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     if (linkStyle !== "hidden") {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, true);
+      r.draw(ctx, start, end2, primaryColor, thickness, true);
       ctx.globalAlpha = 1;
     }
     const pulseCount = Math.floor(SACRED.TRINITY * quality);
     for (let i = 0; i < pulseCount; i++) {
       const t = i / pulseCount;
       const pulseSize = thickness * 2 * (1 + Math.sin(phase + t * Math.PI * 2) * 0.3);
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       ctx.beginPath();
       ctx.arc(pos[0], pos[1], pulseSize, 0, Math.PI * 2);
       ctx.fillStyle = secondaryColor;
@@ -1303,8 +887,7 @@ function renderStatic6(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -1316,7 +899,7 @@ function renderStatic6(ctx, items, phase) {
       for (let i = 0; i <= points; i++) {
         const t = i / points;
         const baseAngle = t * Math.PI * rotations * 2 + phase;
-        const pos = r.getPoint(start, end, t, true);
+        const pos = r.getPoint(start, end2, t, true);
         const hx = Math.cos(baseAngle) * helixRadius * (strand === 0 ? 1 : -1);
         const hy = Math.sin(baseAngle) * helixRadius * (strand === 0 ? 1 : -1);
         const x = pos[0] + hx;
@@ -1338,7 +921,7 @@ function renderStatic6(ctx, items, phase) {
     for (let b = 0; b <= bonds; b++) {
       const t = b / bonds;
       const baseAngle = t * Math.PI * rotations * 2 + phase;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const x1 = pos[0] + Math.cos(baseAngle) * helixRadius;
       const y1 = pos[1] + Math.sin(baseAngle) * helixRadius;
       const x2 = pos[0] - Math.cos(baseAngle) * helixRadius;
@@ -1355,8 +938,7 @@ function renderStatic7(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -1367,7 +949,7 @@ function renderStatic7(ctx, items, phase) {
     ctx.beginPath();
     for (let i = 0; i <= pts; i++) {
       const t = i / pts;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const noise = Math.sin(t * Math.PI * 3 + phase) * turbulenceScale;
       const x = pos[0];
       const y = pos[1] + noise * Math.sin(phase * 0.8 + t * Math.PI * 2);
@@ -1381,13 +963,13 @@ function renderStatic7(ctx, items, phase) {
     ctx.beginPath();
     for (let i = 0; i <= pts; i++) {
       const t = i / pts;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const noise = Math.sin(t * Math.PI * 3 + phase * 1.2) * (turbulenceScale * 0.7);
       const x = pos[0];
       const y = pos[1] + noise * Math.sin(phase * 0.6 + t * Math.PI * 2);
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
-    const gradient = ctx.createLinearGradient(start[0], start[1], end[0], end[1]);
+    const gradient = ctx.createLinearGradient(start[0], start[1], end2[0], end2[1]);
     gradient.addColorStop(0, primaryColor);
     gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondaryColor);
     gradient.addColorStop(1, accentColor);
@@ -1404,8 +986,7 @@ function renderStatic8(ctx, items, phase) {
   const thickness = L.thickness;
   const glowIntensity = L.glowIntensity;
   const quality = L.quality;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = getLinkColor(defaultColor);
     const secondaryColor = getSecondaryColor(defaultColor);
     const accentColor = getAccentColor(defaultColor);
@@ -1413,17 +994,17 @@ function renderStatic8(ctx, items, phase) {
       ctx.strokeStyle = primaryColor;
       ctx.lineWidth = thickness;
       ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end, primaryColor, thickness, true);
+      r.draw(ctx, start, end2, primaryColor, thickness, true);
       ctx.globalAlpha = 1;
     }
-    const length = r.getLength(start, end);
+    const length = r.getLength(start, end2);
     const maxSegments = Math.min(Math.floor(length / 30), 20);
     const segments = Math.max(5, Math.floor(maxSegments * quality * 0.5));
     const waveAmplitude = 8;
     const phaseOffset = phase * 0.5;
     for (let i = 0; i <= segments; i++) {
       const t = i / segments;
-      const pos = r.getPoint(start, end, t, true);
+      const pos = r.getPoint(start, end2, t, true);
       const wave = Math.sin(t * Math.PI * 2 + phaseOffset) * waveAmplitude;
       const size = thickness * (0.8 + Math.sin(phase + t * Math.PI) * 0.2);
       ctx.beginPath();
@@ -1462,8 +1043,7 @@ function renderStatic9(ctx, items, phase) {
   const particleDensity = L.particleDensity;
   const shadowBlur = L.shadowBlur;
   const shadowOffset = L.shadowOffset;
-  items.forEach(({ start, end, defaultColor, linkStyle }) => {
-    const r = getLinkRenderer(linkStyle);
+  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
     const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
     if (linkStyle !== "hidden") {
       const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
@@ -1477,7 +1057,7 @@ function renderStatic9(ctx, items, phase) {
         ctx.shadowOffsetX = shadowOffset * 3;
         ctx.shadowOffsetY = shadowOffset * 3;
         ctx.lineWidth = thickness * 1.2;
-        r.draw(ctx, start, end, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
+        r.draw(ctx, start, end2, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
       }
       ctx.shadowColor = enhancedColor;
       ctx.shadowBlur = glowIntensity;
@@ -1485,7 +1065,7 @@ function renderStatic9(ctx, items, phase) {
       ctx.shadowOffsetY = 0;
       ctx.strokeStyle = enhancedColor;
       ctx.lineWidth = thickness;
-      r.draw(ctx, start, end, enhancedColor, thickness, true);
+      r.draw(ctx, start, end2, enhancedColor, thickness, true);
     }
     if (markerEnabled && markerShape !== "none") {
       let effectiveMarkerColor;
@@ -1501,11 +1081,11 @@ function renderStatic9(ctx, items, phase) {
       for (let i = 0; i < numMarks; i++) {
         const baseT = i / numMarks;
         const t = baseT;
-        const pos = r.getPoint(start, end, t, true);
+        const pos = r.getPoint(start, end2, t, true);
         let angle = 0;
         if (markerShape === "arrow") {
           const nextT = Math.min(t + 0.01, 1);
-          const nextPos = r.getPoint(start, end, nextT, true);
+          const nextPos = r.getPoint(start, end2, nextT, true);
           angle = Math.atan2(nextPos[1] - pos[1], nextPos[0] - pos[0]);
         }
         let effectColor = effectiveMarkerColor;
@@ -1568,6 +1148,710 @@ function renderStaticStyle(ctx, items, style, phase) {
   if (renderer) {
     renderer(ctx, items, phase);
   }
+}
+function dist(a, b) {
+  return Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2);
+}
+const spline = {
+  getLength(start, end2) {
+    const samples = 40;
+    let length = 0;
+    let prev = this.getPoint(start, end2, 0);
+    for (let i = 1; i <= samples; i++) {
+      const p = this.getPoint(start, end2, i / samples);
+      length += dist(prev, p);
+      prev = p;
+    }
+    return length;
+  },
+  getNormalizedT(start, end2, targetDist, _totalLength) {
+    const samples = 40;
+    let acc = 0;
+    let prev = this.getPoint(start, end2, 0);
+    for (let i = 1; i <= samples; i++) {
+      const t = i / samples;
+      const p = this.getPoint(start, end2, t);
+      const seg = dist(prev, p);
+      acc += seg;
+      if (acc >= targetDist) {
+        const prevT = (i - 1) / samples;
+        const excess = acc - targetDist;
+        return prevT + (t - prevT) * (1 - excess / seg);
+      }
+      prev = p;
+    }
+    return 1;
+  },
+  getPoint(start, end2, t) {
+    const d = dist(start, end2);
+    const bend = Math.min(d * 0.5, 100);
+    const p0x = start[0], p0y = start[1];
+    const p1x = start[0] + bend, p1y = start[1];
+    const p2x = end2[0] - bend, p2y = end2[1];
+    const p3x = end2[0], p3y = end2[1];
+    const cx = 3 * (p1x - p0x);
+    const bx = 3 * (p2x - p1x) - cx;
+    const ax = p3x - p0x - cx - bx;
+    const cy = 3 * (p1y - p0y);
+    const by = 3 * (p2y - p1y) - cy;
+    const ay = p3y - p0y - cy - by;
+    return [
+      ax * t ** 3 + bx * t ** 2 + cx * t + p0x,
+      ay * t ** 3 + by * t ** 2 + cy * t + p0y
+    ];
+  },
+  draw(ctx, start, end2, color, thickness) {
+    const d = dist(start, end2);
+    const bend = Math.min(d * 0.5, 100);
+    ctx.beginPath();
+    ctx.moveTo(start[0], start[1]);
+    ctx.bezierCurveTo(
+      start[0] + bend,
+      start[1],
+      end2[0] - bend,
+      end2[1],
+      end2[0],
+      end2[1]
+    );
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+};
+const straight = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+};
+const linear = {
+  getLength(start, end2) {
+    const midX = (start[0] + end2[0]) / 2;
+    return Math.abs(midX - start[0]) + Math.abs(end2[1] - start[1]) + Math.abs(end2[0] - midX);
+  },
+  getNormalizedT(start, end2, targetDist, totalLength) {
+    const midX = (start[0] + end2[0]) / 2;
+    const h1 = Math.abs(midX - start[0]);
+    const v = Math.abs(end2[1] - start[1]);
+    const s1p = h1 / totalLength;
+    const s2p = v / totalLength;
+    const h2 = Math.abs(end2[0] - midX);
+    const nd = targetDist / totalLength;
+    if (nd <= s1p) return nd / s1p * 0.33;
+    if (nd <= s1p + s2p) return 0.33 + (nd - s1p) / s2p * 0.34;
+    return 0.67 + (nd - s1p - s2p) / (h2 / totalLength) * 0.33;
+  },
+  getPoint(start, end2, t) {
+    const midX = (start[0] + end2[0]) / 2;
+    if (t <= 0.33) {
+      const st2 = t / 0.33;
+      return [start[0] + (midX - start[0]) * st2, start[1]];
+    }
+    if (t <= 0.67) {
+      const st2 = (t - 0.33) / 0.34;
+      return [midX, start[1] + (end2[1] - start[1]) * st2];
+    }
+    const st = (t - 0.67) / 0.33;
+    return [midX + (end2[0] - midX) * st, end2[1]];
+  },
+  draw(ctx, start, end2, color, thickness) {
+    const midX = (start[0] + end2[0]) / 2;
+    ctx.beginPath();
+    ctx.moveTo(start[0], start[1]);
+    ctx.lineTo(midX, start[1]);
+    ctx.lineTo(midX, end2[1]);
+    ctx.lineTo(end2[0], end2[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+};
+const hidden = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw() {
+  }
+};
+const dotted = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, start, end2, color, thickness) {
+    const len = dist(start, end2);
+    const spacing = thickness * 3;
+    const num = Math.floor(len / spacing);
+    for (let i = 0; i <= num; i++) {
+      const t = i / num;
+      const x = start[0] + (end2[0] - start[0]) * t;
+      const y = start[1] + (end2[1] - start[1]) * t;
+      ctx.beginPath();
+      ctx.arc(x, y, thickness * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+  }
+};
+const dashed = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    ctx.setLineDash([thickness * 4, thickness * 2]);
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+};
+const double = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
+    const off = thickness * 0.8;
+    const dx2 = Math.cos(angle + Math.PI / 2) * off;
+    const dy2 = Math.sin(angle + Math.PI / 2) * off;
+    ctx.beginPath();
+    ctx.moveTo(s[0] + dx2, s[1] + dy2);
+    ctx.lineTo(e[0] + dx2, e[1] + dy2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.4;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(s[0] - dx2, s[1] - dy2);
+    ctx.lineTo(e[0] - dx2, e[1] - dy2);
+    ctx.stroke();
+  }
+};
+const stepped = {
+  getLength(s, e) {
+    return Math.abs(e[0] - s[0]) + Math.abs(e[1] - s[1]);
+  },
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint(s, e, t) {
+    const midX = s[0] + (e[0] - s[0]) * (t < 0.5 ? t * 2 : 1);
+    const midY = s[1] + (e[1] - s[1]) * (t >= 0.5 ? (t - 0.5) * 2 : 0);
+    return [midX, midY];
+  },
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(s[0] + (e[0] - s[0]), s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+};
+const zigzag = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint(s, e, t) {
+    const bx = s[0] + (e[0] - s[0]) * t;
+    const by = s[1] + (e[1] - s[1]) * t;
+    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
+    const amp = 10, freq = 10;
+    return [
+      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
+      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
+    ];
+  },
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    const steps = 50;
+    for (let i = 0; i <= steps; i++) {
+      const p = this.getPoint(s, e, i / steps);
+      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+};
+const rope = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint(s, e, t) {
+    const bx = s[0] + (e[0] - s[0]) * t;
+    const by = s[1] + (e[1] - s[1]) * t;
+    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
+    const amp = 3, freq = 20;
+    return [
+      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
+      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
+    ];
+  },
+  draw(ctx, s, e, color, thickness) {
+    const steps = 100;
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const p = this.getPoint(s, e, i / steps);
+      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 1.2;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const p = this.getPoint(s, e, i / steps);
+      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+    }
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.lineWidth = thickness * 0.4;
+    ctx.stroke();
+  }
+};
+const glowpath = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
+    gradient.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.2)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0.5)");
+    ctx.beginPath();
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = thickness * 2;
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+};
+const chain = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, start, end2, color, thickness) {
+    const len = dist(start, end2);
+    const linkSize = thickness * 2;
+    const numLinks = Math.floor(len / (linkSize * 2));
+    const angle = Math.atan2(end2[1] - start[1], end2[0] - start[0]);
+    for (let i = 0; i < numLinks; i++) {
+      const t = i / numLinks;
+      const x = start[0] + (end2[0] - start[0]) * t;
+      const y = start[1] + (end2[1] - start[1]) * t;
+      ctx.beginPath();
+      ctx.ellipse(x, y, linkSize, linkSize * 0.6, angle, 0, Math.PI * 2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness * 0.4;
+      ctx.stroke();
+    }
+  }
+};
+const pulse = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    const len = dist(s, e);
+    const dashLen = thickness * 4;
+    const numDashes = Math.floor(len / (dashLen * 2));
+    ctx.beginPath();
+    ctx.setLineDash([dashLen, dashLen]);
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    const pulseWidth = thickness * 3;
+    for (let i = 0; i < numDashes; i++) {
+      const t = i / numDashes;
+      const x = s[0] + (e[0] - s[0]) * t;
+      const y = s[1] + (e[1] - s[1]) * t;
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, pulseWidth);
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+      ctx.beginPath();
+      ctx.arc(x, y, pulseWidth, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.globalAlpha = 0.3;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+};
+const holographic = {
+  getLength: (s, e) => dist(s, e),
+  getNormalizedT: (_s, _e, td, tl) => td / tl,
+  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
+  draw(ctx, s, e, color, thickness) {
+    ctx.beginPath();
+    ctx.moveTo(s[0], s[1]);
+    ctx.lineTo(e[0], e[1]);
+    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
+    gradient.addColorStop(0, color);
+    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
+    gradient.addColorStop(1, color);
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = thickness * 1.2;
+    ctx.stroke();
+    const len = dist(s, e);
+    const spacing = thickness * 2;
+    const num = Math.floor(len / spacing);
+    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
+    for (let i = 0; i <= num; i++) {
+      const t = i / num;
+      const x = s[0] + (e[0] - s[0]) * t;
+      const y = s[1] + (e[1] - s[1]) * t;
+      ctx.beginPath();
+      ctx.moveTo(
+        x + Math.cos(angle + Math.PI / 2) * thickness,
+        y + Math.sin(angle + Math.PI / 2) * thickness
+      );
+      ctx.lineTo(
+        x + Math.cos(angle - Math.PI / 2) * thickness,
+        y + Math.sin(angle - Math.PI / 2) * thickness
+      );
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+};
+const LinkRenderers = {
+  spline,
+  straight,
+  linear,
+  hidden,
+  dotted,
+  dashed,
+  double,
+  stepped,
+  zigzag,
+  rope,
+  glowpath,
+  chain,
+  pulse,
+  holographic
+};
+function getLinkRenderer(name) {
+  return LinkRenderers[name] ?? spline;
+}
+const UP = 1;
+const DOWN = 2;
+const LEFT = 3;
+const RIGHT = 4;
+const STRAIGHT_LINK = 0;
+const LINEAR_LINK = 1;
+const dx = (dir) => dir === LEFT ? -1 : dir === RIGHT ? 1 : 0;
+const dy = (dir) => dir === UP ? -1 : dir === DOWN ? 1 : 0;
+class LinkPath {
+  /** The ends, which the effects hand back to ask for a point counted from either one. */
+  a = [0, 0];
+  b = [0, 0];
+  /** A spline's start, controls and end, or the points of a polyline, as x, y pairs. */
+  p = new Float64Array(12);
+  /** How many points p holds: 4 for a spline and for LINEAR, 6 for STRAIGHT. */
+  n = 4;
+  spline = true;
+  /** The length to each polyline point. */
+  at = new Float64Array(6);
+  length = 0;
+  /** Where native puts the segment's centre marker, and the angle of an arrow marker there. */
+  cx = 0;
+  cy = 0;
+  angle = 0;
+  /** The box around the points, which holds the whole path: left, top, right, bottom. */
+  box = new Float64Array(4);
+  /** The segment renderLink was called for, with the arguments the native call got. */
+  set(a, b, startDir, endDir, mode, startControl, endControl) {
+    const { p } = this;
+    const ax = this.a[0] = p[0] = a[0];
+    const ay = this.a[1] = p[1] = a[1];
+    const bx = this.b[0] = b[0];
+    const by = this.b[1] = b[1];
+    const sd = startDir || RIGHT;
+    const ed = endDir || LEFT;
+    this.spline = mode !== LINEAR_LINK && mode !== STRAIGHT_LINK;
+    if (this.spline) {
+      const d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) * 0.25;
+      p[2] = ax + (startControl ? startControl[0] || 0 : dx(sd) * d);
+      p[3] = ay + (startControl ? startControl[1] || 0 : dy(sd) * d);
+      p[4] = bx + (endControl ? endControl[0] || 0 : dx(ed) * d);
+      p[5] = by + (endControl ? endControl[1] || 0 : dy(ed) * d);
+      this.n = 4;
+    } else {
+      const l = mode === LINEAR_LINK ? 15 : 10;
+      const x1 = p[2] = ax + dx(sd) * l;
+      const y1 = p[3] = ay + dy(sd) * l;
+      const x2 = bx + dx(ed) * l;
+      const y2 = by + dy(ed) * l;
+      if (mode === STRAIGHT_LINK) {
+        p[4] = p[6] = (x1 + x2) * 0.5;
+        p[5] = y1;
+        p[7] = y2;
+        this.n = 6;
+      } else {
+        this.n = 4;
+      }
+      p[2 * this.n - 4] = x2;
+      p[2 * this.n - 3] = y2;
+    }
+    p[2 * this.n - 2] = bx;
+    p[2 * this.n - 1] = by;
+    this.measure();
+  }
+  measure() {
+    const { p, n, at, box } = this;
+    box[0] = box[2] = p[0];
+    box[1] = box[3] = p[1];
+    for (let i = 1; i < n; i++) {
+      box[0] = Math.min(box[0], p[2 * i]);
+      box[1] = Math.min(box[1], p[2 * i + 1]);
+      box[2] = Math.max(box[2], p[2 * i]);
+      box[3] = Math.max(box[3], p[2 * i + 1]);
+    }
+    if (this.spline) {
+      this.length = 0;
+      let x = p[0];
+      let y = p[1];
+      for (let i = 1; i <= 40; i++) {
+        const nx = this.bezier(i / 40, 0);
+        const ny = this.bezier(i / 40, 1);
+        this.length += Math.hypot(nx - x, ny - y);
+        x = nx;
+        y = ny;
+      }
+      this.cx = this.bezier(0.5, 0);
+      this.cy = this.bezier(0.5, 1);
+      this.angle = Math.atan2(this.bezier(0.51, 1) - this.cy, this.bezier(0.51, 0) - this.cx);
+      return;
+    }
+    at[0] = 0;
+    for (let i = 1; i < n; i++) at[i] = at[i - 1] + Math.hypot(p[2 * i] - p[2 * i - 2], p[2 * i + 1] - p[2 * i - 1]);
+    this.length = at[n - 1];
+    const x1 = p[2];
+    const y1 = p[3];
+    const x2 = p[2 * n - 4];
+    const y2 = p[2 * n - 3];
+    this.cx = (x1 + x2) * 0.5;
+    this.cy = (y1 + y2) * 0.5;
+    if (n === 4) this.angle = Math.atan2(y2 - y1, x2 - x1);
+    else this.angle = Math.abs(y2 - y1) < 4 ? 0 : Math.sign(y2 - y1) * Math.PI / 2;
+  }
+  /** x (axis 0) or y (axis 1) of the spline at t. */
+  bezier(t, axis) {
+    const { p } = this;
+    const mt = 1 - t;
+    return mt * mt * mt * p[axis] + 3 * mt * mt * t * p[2 + axis] + 3 * mt * t * t * p[4 + axis] + t * t * t * p[6 + axis];
+  }
+  getLength() {
+    return this.length;
+  }
+  /** The point at t counted from `from`: the start, or the end, from which Cosmic Weave, DNA Helix and Stellar Plasma count. */
+  getPoint(from, _to, t) {
+    const u = from === this.b ? 1 - t : t;
+    if (this.spline) return [this.bezier(u, 0), this.bezier(u, 1)];
+    const { p, at } = this;
+    const target = Math.min(this.length, Math.max(0, u * this.length));
+    let i = 1;
+    while (i < this.n - 1 && at[i] < target) i++;
+    const span = at[i] - at[i - 1];
+    const f = span ? (target - at[i - 1]) / span : 0;
+    return [p[2 * i - 2] + (p[2 * i] - p[2 * i - 2]) * f, p[2 * i - 1] + (p[2 * i + 1] - p[2 * i - 1]) * f];
+  }
+  /** Strokes the path the way v2's spline stroked its own. */
+  draw(ctx, _start, _end, color, thickness) {
+    const { p } = this;
+    ctx.beginPath();
+    ctx.moveTo(p[0], p[1]);
+    if (this.spline) ctx.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
+    else for (let i = 1; i < this.n; i++) ctx.lineTo(p[2 * i], p[2 * i + 1]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+}
+const LINKS = "Link animation";
+const LOD_SCALE = 0.25;
+const REACH = 120;
+const ARROW = 2;
+class Segment {
+  native = new LinkPath();
+  start = this.native.a;
+  end = this.native.b;
+  path = this.native;
+  defaultColor = "";
+  linkStyle = "";
+  isStatic = false;
+}
+const pool = [];
+let count = 0;
+const shown = [];
+const one = [];
+const moment = { direction: 1, totalTime: 0, phase: 0 };
+const pass = { ctx: void 0, on: false, still: false, calls: 0, highlighted: {} };
+const pose = { phase: Math.PI / 4, stale: true, animate: 0, linkStyle: "", quality: 0, particleDensity: 0 };
+let warned = false;
+let foreign = false;
+let told = false;
+function defers() {
+  if (L.coexist === "ours" || L.coexist === "auto" && !foreign) return false;
+  if (L.coexist === "auto" && !told) {
+    told = true;
+    app.extensionManager.toast.add({
+      severity: "info",
+      summary: "Link effects left to another extension",
+      detail: "Another extension draws links, so Enhanced link effects step aside. Node effects keep working. To keep Enhanced link effects, change Other link extensions in the settings.",
+      life: 1e4
+    });
+  }
+  return true;
+}
+function begin(canvas, ctx) {
+  count = 0;
+  pass.ctx = ctx;
+  pass.calls = 0;
+  pass.on = L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
+  pass.still = L.staticMode || L.pauseDuringRender && env.running || env.reducedMotion;
+  pass.highlighted = canvas.highlighted_links;
+  if (L.animate !== pose.animate || L.linkStyle !== pose.linkStyle || L.quality !== pose.quality || L.particleDensity !== pose.particleDensity) {
+    Object.assign(pose, { animate: L.animate, linkStyle: L.linkStyle, quality: L.quality, particleDensity: L.particleDensity, stale: true });
+  }
+  if (pass.still && pose.stale) {
+    pose.phase = (pose.phase + Math.PI * 2) % (Math.PI * 4);
+    pose.stale = false;
+  }
+}
+function end(canvas) {
+  pass.ctx = void 0;
+  if (count && !pass.still) {
+    live.links = count;
+    wake();
+  }
+  if (pass.calls || warned) return;
+  for (const segment of canvas.renderedPaths) {
+    if (segment._dragging) continue;
+    warned = true;
+    console.warn("[Enhanced Links & Nodes] Another extension draws links without calling renderLink, so links are not animated.");
+    return;
+  }
+}
+function record(canvas, link, a, b, color, startDir, endDir, extras) {
+  const segment = pool[count++] ??= new Segment();
+  segment.native.set(a, b, startDir, endDir, canvas.links_render_mode, extras?.startControl, extras?.endControl);
+  segment.defaultColor = pass.highlighted[link.id] ? "#FFF" : String(color || LGraphCanvas.link_type_colors[String(link.type)] || canvas.default_link_color);
+  segment.linkStyle = L.linkStyle;
+  segment.path = L.linkStyle === "spline" ? segment.native : getLinkRenderer(L.linkStyle);
+  segment.isStatic = pass.still;
+  return segment;
+}
+function bake(canvas, ctx, segment) {
+  ctx.save();
+  try {
+    enableAntiAliasing(ctx);
+    one[0] = segment;
+    renderStaticStyle(ctx, one, L.animate, pose.phase);
+  } catch (error) {
+    guard.fail(LINKS, error);
+    return false;
+  } finally {
+    ctx.restore();
+  }
+  ctx.save();
+  marker(canvas, ctx, segment);
+  ctx.restore();
+  return true;
+}
+function marker(canvas, ctx, segment) {
+  const shape = canvas.linkMarkerShape;
+  if (!shape || canvas.ds.scale < 0.6 || !canvas.highquality_render) return;
+  const { cx, cy, angle } = segment.native;
+  ctx.beginPath();
+  if (shape === ARROW) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    ctx.moveTo(cx - 3.2 * cos + 5 * sin, cy - 3.2 * sin - 5 * cos);
+    ctx.lineTo(cx + 7 * cos, cy + 7 * sin);
+    ctx.lineTo(cx - 3.2 * cos - 5 * sin, cy - 3.2 * sin + 5 * cos);
+  } else {
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+  }
+  ctx.fillStyle = segment.defaultColor;
+  ctx.fill();
+}
+function motion(canvas, ctx) {
+  if (pass.still) return 0;
+  const area = canvas.visible_area;
+  let n = 0;
+  for (let i = 0; i < count; i++) {
+    const { box } = pool[i].native;
+    if (box[2] + REACH >= area[0] && box[0] - REACH <= area[0] + area[2] && box[3] + REACH >= area[1] && box[1] - REACH <= area[1] + area[3]) shown[n++] = pool[i];
+  }
+  shown.length = n;
+  if (!n) return 0;
+  ctx.save();
+  try {
+    enableAntiAliasing(ctx);
+    moment.direction = L.direction;
+    moment.totalTime = clock.linkTime;
+    moment.phase = clock.linkPhase;
+    renderAnimatedStyle(ctx, shown, L.animate, clock.linkPhase, moment);
+  } catch (error) {
+    guard.fail(LINKS, error);
+    if (guard.off(LINKS)) canvas.setDirty(true, true);
+  } finally {
+    ctx.restore();
+  }
+  ctx.globalAlpha = canvas.editor_alpha;
+  for (const segment of shown) marker(canvas, ctx, segment);
+  for (const reroute of canvas._visibleReroutes) {
+    reroute.draw(ctx, canvas._pattern);
+    if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
+  }
+  return n;
+}
+function installLinks() {
+  const proto = LGraphCanvas.prototype;
+  const drawConnections = proto.drawConnections;
+  const renderLink = proto.renderLink;
+  foreign = !String(renderLink).includes("renderLinkDirect") || Boolean(globalThis.__LINKFX_V2_BOOTED__);
+  warned = told = false;
+  proto.drawConnections = function(...args) {
+    begin(this, args[0]);
+    try {
+      return drawConnections.apply(this, args);
+    } finally {
+      end(this);
+    }
+  };
+  proto.renderLink = function(...args) {
+    const [ctx, a, b, link, skipBorder, flow, color, startDir, endDir, extras] = args;
+    pass.calls++;
+    if (pass.on && ctx === pass.ctx && link && !(skipBorder && flow) && !extras?.disabled) {
+      const segment = record(this, link, a, b, color, startDir, endDir, extras);
+      if (!pass.still || bake(this, ctx, segment)) args[0] = dummy();
+    }
+    return renderLink.apply(this, args);
+  };
+  layers.links = (canvas, ctx, over) => {
+    if (over !== Boolean(canvas.graph?.config.links_ontop)) return;
+    live.links = motion(canvas, ctx);
+    if (live.links) wake();
+  };
 }
 const Icons = {
   chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`
@@ -2213,167 +2497,13 @@ function initSidebar() {
     registerSidebar();
   }, 100);
 }
-const AnimationState = {
-  direction: 1,
-  targetPhase: 0,
-  smoothFactor: 0.95,
-  lastPhaseUpdate: 0,
-  transitionSpeed: 2 * Math.PI / (10 * 1.5),
-  update(delta) {
-    const dir = L.direction;
-    const speed = Math.max(0.01, L.animationSpeed);
-    this.direction = dir;
-    return State.phase + this.transitionSpeed * delta * speed * this.direction;
-  }
-};
-const TimingManager = {
-  smoothDelta: 0,
-  lastTime: performance.now(),
-  update() {
-    const now = performance.now();
-    const rawDelta = Math.min((now - this.lastTime) / 1e3, 1 / 30);
-    this.lastTime = now;
-    this.smoothDelta = this.smoothDelta * 0.9 + rawDelta * 0.1;
-    return this.smoothDelta;
-  }
-};
-const State = {
-  isRunning: false,
-  phase: 0,
-  totalTime: 0,
-  lastFrame: performance.now(),
-  animationFrame: null,
-  staticPhase: Math.PI / 4,
-  lastSettings: null,
-  lastAnimStyle: null,
-  forceUpdate: false,
-  forceRedraw: false,
-  lastRenderState: null,
-  speedMultiplier: 1,
-  linkPositions: /* @__PURE__ */ new Map(),
-  particlePool: /* @__PURE__ */ new Map(),
-  activeParticles: /* @__PURE__ */ new Set()
-};
 const ext = {
   name: "enhanced.link.animations",
   settings: linkSettings,
   async setup() {
-    api.addEventListener("status", ({ detail }) => {
-      State.isRunning = detail?.exec_info?.queue_remaining > 0;
-      app.graph?.setDirtyCanvas(true, true);
-    });
+    install();
     initSidebar();
-    const origDrawConnections = LGraphCanvas.prototype.drawConnections;
-    LGraphCanvas.prototype.drawConnections = function(ctx) {
-      try {
-        ctx.save();
-        enableAntiAliasing(ctx);
-        const animStyle = L.animate;
-        const linkStyle = L.linkStyle;
-        const shouldPauseDuringRender = L.pauseDuringRender;
-        const isStaticMode = L.staticMode;
-        const quality = L.quality;
-        const particleDensity = L.particleDensity;
-        if (animStyle === 0) {
-          origDrawConnections.call(this, ctx);
-          ctx.restore();
-          return;
-        }
-        const isPaused = shouldPauseDuringRender && State.isRunning;
-        const effectiveStaticMode = isStaticMode || isPaused;
-        const currentSettings = `${animStyle}-${linkStyle}-${quality}-${particleDensity}`;
-        if (State.lastSettings !== currentSettings || State.forceRedraw) {
-          State.forceUpdate = true;
-          State.lastSettings = currentSettings;
-          State.lastAnimStyle = animStyle;
-          State.forceRedraw = false;
-        }
-        const delta = TimingManager.update();
-        let phase;
-        if (effectiveStaticMode) {
-          if (State.forceUpdate || State.lastAnimStyle !== animStyle) {
-            State.staticPhase = (State.staticPhase + Math.PI * 2) % (Math.PI * 4);
-            State.forceUpdate = false;
-            State.lastAnimStyle = animStyle;
-          }
-          phase = State.staticPhase;
-        } else {
-          phase = AnimationState.update(delta);
-          State.phase = phase;
-          State.totalTime += delta;
-        }
-        State.activeParticles.clear();
-        const renderQueue = /* @__PURE__ */ new Map();
-        for (const linkId in this.graph.links) {
-          const linkData = this.graph.links[linkId];
-          if (!linkData) continue;
-          const originNode = this.graph._nodes_by_id[linkData.origin_id];
-          const targetNode = this.graph._nodes_by_id[linkData.target_id];
-          if (!originNode || !targetNode || originNode.flags?.collapsed || targetNode.flags?.collapsed) continue;
-          const startPos = new Float32Array(2);
-          const endPos = new Float32Array(2);
-          originNode.getConnectionPos(false, linkData.origin_slot, startPos);
-          targetNode.getConnectionPos(true, linkData.target_slot, endPos);
-          const defaultColor = linkData.type ? LGraphCanvas.link_type_colors?.[linkData.type] ?? this.default_connection_color : this.default_connection_color;
-          if (!renderQueue.has(animStyle)) {
-            renderQueue.set(animStyle, []);
-          }
-          renderQueue.get(animStyle).push({
-            start: startPos,
-            end: endPos,
-            color: defaultColor,
-            defaultColor,
-            linkId,
-            linkStyle,
-            isStatic: effectiveStaticMode
-          });
-        }
-        if (effectiveStaticMode) {
-          const items = renderQueue.get(animStyle);
-          if (items) {
-            renderStaticStyle(ctx, items, animStyle, phase);
-          }
-        } else {
-          renderQueue.forEach((items, style) => {
-            renderAnimatedStyle(ctx, items, style, phase, {
-              direction: AnimationState.direction,
-              totalTime: State.totalTime,
-              phase: State.phase
-            });
-          });
-        }
-        ctx.restore();
-        app.graph?.setDirtyCanvas(true, true);
-      } catch (error) {
-        console.error("[EnhancedLinks] Error in drawConnections:", error);
-        origDrawConnections.call(this, ctx);
-      }
-    };
-    function animate() {
-      const isStaticMode = L.staticMode;
-      const animStyle = L.animate;
-      const shouldPauseDuringRender = L.pauseDuringRender;
-      if (shouldPauseDuringRender && State.isRunning) {
-        if (!State.lastRenderState) {
-          State.lastRenderState = {
-            phase: State.phase,
-            totalTime: State.totalTime
-          };
-        }
-        requestAnimationFrame(animate);
-        return;
-      } else if (State.lastRenderState) {
-        State.phase = State.lastRenderState.phase;
-        State.totalTime = State.lastRenderState.totalTime;
-        State.lastRenderState = null;
-      }
-      if (isStaticMode && animStyle > 0 || animStyle > 0 && !isStaticMode) {
-        State.totalTime += TimingManager.smoothDelta * State.speedMultiplier;
-        app.graph?.setDirtyCanvas(true, true);
-      }
-      State.animationFrame = requestAnimationFrame(animate);
-    }
-    animate();
+    installLinks();
     console.log("[EnhancedLinks] Extension registered with full batched rendering pipeline.");
   }
 };
