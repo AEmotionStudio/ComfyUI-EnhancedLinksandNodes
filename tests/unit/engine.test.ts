@@ -322,6 +322,81 @@ describe('ticker', () => {
     });
 });
 
+describe('Perf.MaxFps', () => {
+    const MAX_FPS = '🔗 Enhanced Links.Perf.MaxFps';
+
+    /** The paints a second the ticker asks for over 4 s at `hz`. */
+    async function rate(settings: Record<string, unknown>, hz: number): Promise<number> {
+        const setDirty = warmUp(await start({ ...NODES_ON, ...settings }, PAIR));
+        frames(hz * 4, hz);
+        return setDirty.mock.calls.length / 4;
+    }
+
+    // Paced evenly, 60 gave 37.5 paints a second at 75 Hz and 48 at 144 Hz.
+    for (const hz of [60, 75, 120, 144]) {
+        it(`averages at least 57 paints a second at 60 on a ${hz} Hz display, and never more than 60`, async () => {
+            const paints = await rate({}, hz);
+            expect(paints).toBeGreaterThanOrEqual(57);
+            expect(paints).toBeLessThanOrEqual(60);
+        });
+    }
+
+    it('asks for 30 a second at 30, and a paint every frame at Display rate', async () => {
+        expect(await rate({ [MAX_FPS]: 30 }, 60)).toBe(30);
+        expect(await rate({ [MAX_FPS]: 30 }, 144)).toBe(30);
+        expect(await rate({ [MAX_FPS]: 0 }, 75)).toBe(75);
+        expect(await rate({ [MAX_FPS]: 0 }, 144)).toBe(144);
+    });
+
+    it('starts afresh after a long frame instead of catching up', async () => {
+        const setDirty = warmUp(await start(NODES_ON, PAIR));
+        frames(10, 144);
+        setDirty.mockClear();
+        page.now += 500;
+        frames(3, 144);
+        expect(setDirty).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('Motion', () => {
+    const MOTION = '🔗 Enhanced Links.Motion';
+    const reduced = (matches: boolean) => {
+        fake.reducedMotion.matches = matches;
+        fake.reducedMotion.dispatchEvent(new Event('change'));
+    };
+    const animating = () => {
+        frames(5);
+        page.requests = 0;
+        frames(30);
+        return page.requests > 0;
+    };
+
+    it('Reduce holds effects still though the system asks for full motion, Full animates them though it asks for less, and Follow system does as it asks', async () => {
+        await start({ ...NODES_ON, [MOTION]: 'reduce' }, PAIR);
+        expect(animating()).toBe(false);
+        reduced(true);
+        await app.extensionManager.setting.set(MOTION, 'full');
+        expect(animating()).toBe(true);
+        await app.extensionManager.setting.set(MOTION, 'system');
+        expect(animating()).toBe(false);
+        reduced(false);
+        expect(animating()).toBe(true);
+    });
+
+    it('overrides the disable-animations class 1.57.1 puts on the body, both ways', async () => {
+        await start({ ...NODES_ON, [MOTION]: 'full' }, PAIR);
+        document.body.classList.add('disable-animations');
+        await Promise.resolve();
+        expect(animating()).toBe(true);
+        preview(MOTION, 'system');
+        expect(animating()).toBe(false);
+        document.body.classList.remove('disable-animations');
+        await Promise.resolve();
+        preview(MOTION, 'reduce');
+        expect(animating()).toBe(false);
+    });
+});
+
 describe('onRender and onDrawForeground', () => {
     /** A front pass with both nodes counts each of them once. */
     const nodesPerPass = () => {

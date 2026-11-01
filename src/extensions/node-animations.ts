@@ -9,8 +9,8 @@
  * motion; what falls on the node goes over its body, from drawNodeShape, under
  * its slots and widgets.
  * The styled title takes the native title's place, over the effect. Effects
- * fade with the node's mode, as native draws the node; collapsed nodes, and
- * nodes in Vue mode, get none. The node menu's Node FX and Completion FX set a
+ * fade with the node's mode, as native draws the node; collapsed nodes, nodes
+ * in Vue mode, and every node with Node effects off, get none. The node menu's Node FX and Completion FX set a
  * node's own effect and fireworks, which it keeps in its properties.
  *
  * @module extensions/node-animations
@@ -26,6 +26,7 @@ import { OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, 
 import { drawTitle, titleOf } from '@/nodes/text';
 import { drawBursts, fireworks } from '@/fx/bursts';
 import { startSprites, stopSprites } from '@/fx/particles';
+import { installPanel } from '@/sidebar/sidebar';
 
 /** The guard's keys, which its toast names when it turns one off. */
 const EFFECT = 'Node effect';
@@ -65,7 +66,7 @@ const styleWanted = (node: Node) => ownStyle(node) ?? N.animate;
  * None shows nothing, and a collapsed one none.
  */
 function styleOf(node: Node): number | undefined {
-    if (node.flags.collapsed) return undefined;
+    if (!N.enabled || node.flags.collapsed) return undefined;
     const style = styleWanted(node);
     if (style > 0) return style;
     return ownStyle(node) === undefined && N.particleShow ? 0 : undefined;
@@ -160,7 +161,7 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     // In Vue mode the DOM draws the nodes and none of the node hooks run; Nodes 2.0 comes with M8.
     if (!graph || LiteGraph.vueNodesMode) return;
     const moving = !holdsStill();
-    const titles = N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
+    const titles = N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
     const area = canvas.visible_area;
     // Canvas px to a graph unit: the canvas is only scaled and moved.
     const scale = ctx.getTransform().a;
@@ -262,6 +263,7 @@ const ext: ComfyExtension = {
 
     async setup() {
         install();
+        installPanel('nodes');
         layers.nodes = under;
         layers.bursts = (canvas, ctx) => {
             if (!live.bursts) return;
@@ -314,7 +316,7 @@ const ext: ComfyExtension = {
         // With Animated titles on, the styled title in place of the native one.
         LGraphNode.prototype.drawTitleText = function (this: Node, ...args: Parameters<Node['drawTitleText']>) {
             // Left to native: a node that draws its own title, an untitled one (v2 styled only titles), and low quality, which draws none.
-            if (!N.textAnimationEnabled || !this.title || this.onDrawTitleText || args[1].low_quality || guard.off(TITLES)) return drawTitleText.apply(this, args);
+            if (!N.enabled || !N.textAnimationEnabled || !this.title || this.onDrawTitleText || args[1].low_quality || guard.off(TITLES)) return drawTitleText.apply(this, args);
             // Drawn after the node's effect by the drawNodeShape wrapper, or at once by a drawNodeShape that replaced it.
             if (shaping === this) titled = args[1];
             else if (!styledTitle(app.canvas, args[0], this)) return drawTitleText.apply(this, args);
@@ -337,7 +339,7 @@ const ext: ComfyExtension = {
         // Not over another workflow's nodes, or a subgraph's, that have the same ids.
         api.addEventListener('execution_success', ({ detail }) => {
             const graph = app.canvas?.graph;
-            if (graph && graph === ranOn && !guard.off(FIREWORKS)) fireworks(graph.nodes.filter(celebrates), detail.prompt_id);
+            if (N.enabled && graph && graph === ranOn && !guard.off(FIREWORKS)) fireworks(graph.nodes.filter(celebrates), detail.prompt_id);
         });
 
         console.log('[EnhancedNodes] Extension registered with full animation pipeline.');

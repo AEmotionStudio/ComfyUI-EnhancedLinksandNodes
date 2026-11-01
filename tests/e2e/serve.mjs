@@ -5,8 +5,8 @@
 //
 //   node tests/e2e/serve.mjs <leg>        (COMFYUI_DIR defaults to the ComfyUI this repo sits in)
 //
-// --multi-user gives every leg a `default` user (extensions enabled) and a `native` one (both disabled);
-// each test clones one into a fresh user.
+// --multi-user gives every leg a `default` user (extensions enabled), a `native` one (both disabled) and the
+// first-run picker's profiles; each test clones one into a fresh user.
 import { execFileSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -37,10 +37,61 @@ const SETTINGS = {
     'Comfy.LinkRelease.ActionShift': 'context menu',
 };
 
-// `default` also answers the requests the frontend sends before it knows its user.
+const LOOK = '🔗 Enhanced Links.Look';
+
+// The 27 keys the author's v2 settings hold, as v2's panel saved them: v2.0.1's defaults but for link animation None.
+const V2_AUTHOR = {
+    '🔗 Enhanced Links.UI & Æmotion Studio About': 0,
+    '🔗 Enhanced Links.Animate': 0,
+    '📦 Enhanced Nodes.Particle.Show': false,
+    '📦 Enhanced Nodes.Particle.Color.Mode': 'default',
+    '📦 Enhanced Nodes.Animate': 0,
+    '🔗 Enhanced Links.Direction': 1,
+    '🔗 Enhanced Links.Link.Style': 'spline',
+    '🔗 Enhanced Links.Quality': 1,
+    '🔗 Enhanced Links.Thickness': 3,
+    '🔗 Enhanced Links.Color.Mode': 'default',
+    '🔗 Enhanced Links.Color.Scheme': 'default',
+    '🔗 Enhanced Links.Glow.Intensity': 10,
+    '🔗 Enhanced Links.Particle.Density': 0.5,
+    '🔗 Enhanced Links.Marker.Shape': 'arrow',
+    '🔗 Enhanced Links.Link.Shadow.Enabled': false,
+    '🔗 Enhanced Links.Marker.Shadow.Enabled': false,
+    '📦 Enhanced Nodes.Glow': 0.5,
+    '📦 Enhanced Nodes.Animation.Glow': 0.5,
+    '📦 Enhanced Nodes.Animation.Size': 1,
+    '📦 Enhanced Nodes.Quality': 2,
+    '📦 Enhanced Nodes.Particle.Density': 1,
+    '📦 Enhanced Nodes.Particle.Speed': 1,
+    '📦 Enhanced Nodes.Particle.Intensity': 1,
+    '📦 Enhanced Nodes.Particle.Size': 1,
+    '📦 Enhanced Nodes.Particle.Glow': 0.5,
+    '🔗 Enhanced Links.Static.Mode': false,
+    '🔗 Enhanced Links.Animation.Speed': 1,
+};
+
+// `default` also answers the requests the frontend sends before it knows its user. Its look is chosen, so the
+// first-run picker keeps away; the picker's profiles below (tests/e2e/picker.spec.ts) leave it unchosen.
 const PROFILES = {
-    default: { 'Comfy.Extension.Disabled': [] },
+    default: { 'Comfy.Extension.Disabled': [], [LOOK]: 'subtle' },
     native: { 'Comfy.Extension.Disabled': ['enhanced.link.animations', 'enhanced.node.animations'] },
+    fresh: { 'Comfy.Extension.Disabled': [] },
+    'v2-defaults': { 'Comfy.Extension.Disabled': [], ...V2_AUTHOR, '🔗 Enhanced Links.Animate': 9 },
+    'v2-custom': { 'Comfy.Extension.Disabled': [], ...V2_AUTHOR },
+    // What v1's settings dialog saved for a user who changed a few: ranges v1 allowed and v3 clamps, v1's inherited
+    // marker colour, and the About launcher's key.
+    'v1-era': {
+        'Comfy.Extension.Disabled': [],
+        '🔗 Enhanced Links.Animate': 4,
+        '🔗 Enhanced Links.Animation.Speed': 12,
+        '🔗 Enhanced Links.Glow.Intensity': 25,
+        '🔗 Enhanced Links.Marker.Color.Mode': 'inherit',
+        '🔗 Enhanced Links.UI & Æmotion Studio About': 0,
+        '📦 Enhanced Nodes.Animate': 3,
+        '📦 Enhanced Nodes.Direction': -1,
+        '📦 Enhanced Nodes.Text.Animation.Enabled': true,
+        '📦 Enhanced Nodes.Text.Style': 'cyberpunk',
+    },
 };
 
 const legs = JSON.parse(fs.readFileSync(path.join(HERE, 'legs.json'), 'utf8'));

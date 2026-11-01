@@ -15,7 +15,7 @@ import * as colors from '@/core/colors';
 import { OVER, UNDER, drawNodeFx } from '@/nodes/effects';
 import { fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
-import { FakeCanvas, FakeNode, frames, page, start, type GraphSpec } from '../helpers/fake-litegraph';
+import { FakeCanvas, FakeNode, frames, page, run, start, type GraphSpec } from '../helpers/fake-litegraph';
 import { WHOLE } from './characterize/v1-inputs';
 
 /**
@@ -233,6 +233,27 @@ describe('node effects', () => {
         expect(lines.filter((line) => line.startsWith('strokeRect('))).toEqual([]);
         expect(canvas.front.paints.find((p) => p.op === 'fill' && p.style === '#353535')!.shadowColor).toBe('rgba(0, 0, 0, 0.5)');
         expect([live.nodes, live.particles]).toEqual([0, 0]);
+    });
+
+    it('draw nothing, nor halos, styled titles or fireworks, with Node effects off, which keeps every node setting', async () => {
+        const spec: GraphSpec = { nodes: [{ ...KSAMPLER, output: true }] };
+        const selected = async (settings: Record<string, unknown>) => {
+            const canvas = await start(settings, spec);
+            canvas.graph._nodes[0].selected = canvas.graph._nodes[0].mouseOver = true;
+            return canvas;
+        };
+        const native = frame(await selected(LINKS_OFF)).lines;
+        const canvas = await selected({ ...LINKS_OFF, ...PARTICLES, ...TITLES, '📦 Enhanced Nodes.Animate': 2, '📦 Enhanced Nodes.Color.Hover.Show': true, '📦 Enhanced Nodes.Enabled': false });
+        const off = frame(canvas);
+        expect(off.calls).toEqual([]);
+        expect(off.lines).toEqual(native);
+        run('off', [1]);
+        frames(1);
+        expect([live.nodes, live.particles, live.bursts]).toEqual([0, 0, 0]);
+        expect([N.animate, N.particleShow, N.textAnimationEnabled]).toEqual([2, true, true]);
+        preview('📦 Enhanced Nodes.Enabled', true);
+        expect(frame(canvas).calls).toHaveLength(2);
+        expect(fake.posts).toEqual([]);
     });
 
     it('draw particles only, and only the halo with no particles, with Show base effect off', async () => {

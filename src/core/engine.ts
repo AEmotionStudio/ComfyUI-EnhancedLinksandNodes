@@ -11,7 +11,7 @@
 
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import { L, N, revision } from '@/core/settings';
+import { L, N, revision, watch } from '@/core/settings';
 
 type Canvas = typeof app.canvas;
 
@@ -25,7 +25,6 @@ const TURNAROUND = 0.3;
 export const MAX_FLASH_HZ = 3;
 /** Quantum Field's five filaments each sweep round their link once a turn of its phase. */
 const QUANTUM_SWEEPS = 5;
-const MAX_FPS = 60;
 /** rAF timestamps jitter around the display's interval, so a frame this much early still counts. */
 const JITTER_MS = 1;
 const GUARD_MS = 10_000;
@@ -49,7 +48,7 @@ export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, n
 /** The pose of still links: the first frame v1 drew in Static mode (old_link_animations.js:2440-2456). */
 export const STILL_PHASE = (9 * Math.PI) / 4;
 
-/** Whether the queue is running (v2's rule: the global 'status' event), and whether the user asked for less motion. */
+/** Whether the queue is running (v2's rule: the global 'status' event), and whether effects show still for less motion, as Motion says. */
 export const env = { running: false, reducedMotion: false };
 
 /**
@@ -92,6 +91,8 @@ export function dummy(): CanvasRenderingContext2D {
 let frame = 0;
 /** When the clock last moved; 0 while stopped, so the first frame after a start moves it by nothing. */
 let last = 0;
+/** When the next paint is due at the Perf.MaxFps cap. */
+let due = 0;
 
 /** Whether the front canvas needs repainting: anything animated is on screen and the tab shows. */
 function want(): boolean {
@@ -101,24 +102,25 @@ function want(): boolean {
 /** Moves a direction toward `to` by what turning around in TURNAROUND allows in `dt`. */
 const toward = (dir: number, to: number, dt: number) => dir + Math.max((-2 * dt) / TURNAROUND, Math.min((2 * dt) / TURNAROUND, to - dir));
 
-function advance(dt: number): void {
-    if (live.links) {
+/** Moves clock `k` on by `dt` seconds: its links, nodes, particles and bursts where `moving` counts any. The panel's gallery tiles run a clock of their own. */
+export function advance(k: typeof clock, dt: number, moving: typeof live): void {
+    if (moving.links) {
         const speed = L.animationSpeed;
-        clock.linkDir = toward(clock.linkDir, L.direction, dt);
-        clock.linkPhase -= PHI2 * speed * clock.linkDir * dt;
-        clock.linkFlow += 2 * speed * speed * clock.linkDir * dt;
-        clock.quantumPhase -= Math.min(PHI2 * speed, (2 * Math.PI * MAX_FLASH_HZ) / QUANTUM_SWEEPS) * clock.linkDir * dt;
+        k.linkDir = toward(k.linkDir, L.direction, dt);
+        k.linkPhase -= PHI2 * speed * k.linkDir * dt;
+        k.linkFlow += 2 * speed * speed * k.linkDir * dt;
+        k.quantumPhase -= Math.min(PHI2 * speed, (2 * Math.PI * MAX_FLASH_HZ) / QUANTUM_SWEEPS) * k.linkDir * dt;
     } else {
         // Links that are not moving turn around at once.
-        clock.linkDir = L.direction;
+        k.linkDir = L.direction;
     }
-    clock.nodeDir = live.nodes || live.particles ? toward(clock.nodeDir, N.direction, dt) : N.direction;
-    if (live.nodes) clock.nodePhase += TURN * N.animationSpeed * clock.nodeDir * dt;
-    if (live.particles) {
-        clock.particleTime += N.particleSpeed * clock.nodeDir * dt;
-        clock.nodeTime += dt;
+    k.nodeDir = moving.nodes || moving.particles ? toward(k.nodeDir, N.direction, dt) : N.direction;
+    if (moving.nodes) k.nodePhase += TURN * N.animationSpeed * k.nodeDir * dt;
+    if (moving.particles) {
+        k.particleTime += N.particleSpeed * k.nodeDir * dt;
+        k.nodeTime += dt;
     }
-    if (live.bursts) clock.burstTime += dt;
+    if (moving.bursts) k.burstTime += dt;
 }
 
 function tick(now: number): void {
@@ -128,13 +130,18 @@ function tick(now: number): void {
         return;
     }
     if (!last) {
-        last = now;
+        last = due = now;
         // The clock starts again: links and nodes run the way Direction says, without turning around.
         clock.linkDir = L.direction;
         clock.nodeDir = N.direction;
-    } else if (now - last >= 1000 / MAX_FPS - JITTER_MS) {
-        advance(Math.min((now - last) / 1000, 0.1));
+    } else if (now >= due - JITTER_MS) {
+        advance(clock, Math.min((now - last) / 1000, 0.1), live);
         last = now;
+        // Paced by when each paint is due rather than by the time since the last one, so a cap the display's rate is
+        // no multiple of still holds on average: at 60 a 75 Hz display skips one frame in five, not every other one.
+        // A paint more than an interval late starts the pacing afresh instead of catching up.
+        const interval = L.perfMaxFps ? 1000 / L.perfMaxFps : 0;
+        due = due + interval > now ? due + interval : now + interval;
         heal(app.canvas);
         app.canvas.setDirty(true, false);
     }
@@ -241,7 +248,7 @@ export function install(): void {
     const query = matchMedia('(prefers-reduced-motion: reduce)');
     const motion = () => {
         // 1.57.1 mirrors Comfy.Appearance.DisableAnimations as this class (coreSettings.ts), so it needs no settings read.
-        const reduced = query.matches || document.body.classList.contains('disable-animations');
+        const reduced = L.motion === 'reduce' || (L.motion === 'system' && (query.matches || document.body.classList.contains('disable-animations')));
         if (reduced === env.reducedMotion) return;
         env.reducedMotion = reduced;
         need();
@@ -249,6 +256,9 @@ export function install(): void {
     motion();
     query.addEventListener('change', motion);
     new MutationObserver(motion).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    watch((id) => {
+        if (id === '🔗 Enhanced Links.Motion') motion();
+    });
 
     api.addEventListener('status', ({ detail }) => {
         const running = detail?.exec_info?.queue_remaining > 0;
@@ -262,17 +272,31 @@ export function install(): void {
 const failures = new Map<string, { times: number[]; logged: number; off: boolean }>();
 let failuresSince = revision;
 
-function failuresOf(key: string) {
+function current() {
     if (failuresSince !== revision) {
         failures.clear();
         failuresSince = revision;
     }
-    return failures.get(key);
+    return failures;
 }
+
+const failuresOf = (key: string) => current().get(key);
 
 export const guard = {
     /** Whether `key` failed too often; changing any setting turns it back on. */
     off: (key: string): boolean => failuresOf(key)?.off ?? false,
+
+    /** The keys turned off now. */
+    tripped: (): string[] => [...current()].flatMap(([key, f]) => (f.off ? [key] : [])),
+
+    /** Turns every key back on, as changing a setting does, and redraws. */
+    retry(): void {
+        failures.clear();
+        need();
+    },
+
+    /** Told when a key is turned off: the open panel, which shows it. */
+    onTrip: undefined as (() => void) | undefined,
 
     /** Logs at most once per key every 10 s. FAILURES within 10 s turn the key off, with one toast that says so. */
     fail(key: string, error: unknown): void {
@@ -293,5 +317,6 @@ export const guard = {
             detail: `It failed ${FAILURES} times in 10 seconds. Change any Enhanced Links & Nodes setting to turn it back on.`,
             life: 10_000,
         });
+        guard.onTrip?.();
     },
 };

@@ -3,7 +3,7 @@
  * ComfyUI Enhanced Link Animations Extension
  *
  * Registers the link settings. setup() starts the engine, the link pipeline
- * (links/pipeline.ts) on ComfyUI's own link pass, and the sidebar.
+ * (links/pipeline.ts) on ComfyUI's own link pass, and the panel.
  *
  * @module extensions/link-animations
  */
@@ -13,7 +13,7 @@ import { app } from '/scripts/app.js';
 import { linkSettings } from '@/core/settings';
 import { install } from '@/core/engine';
 import { installLinks } from '@/links/pipeline';
-import { initSidebar } from '@/sidebar/sidebar';
+import { installPanel } from '@/sidebar/sidebar';
 
 const ext: ComfyExtension = {
     name: 'enhanced.link.animations',
@@ -21,7 +21,7 @@ const ext: ComfyExtension = {
 
     async setup() {
         install();
-        initSidebar();
+        installPanel('links');
         installLinks();
 
         console.log('[EnhancedLinks] Extension registered with full batched rendering pipeline.');

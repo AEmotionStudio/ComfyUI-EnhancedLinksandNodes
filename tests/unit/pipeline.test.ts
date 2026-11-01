@@ -12,7 +12,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { clock, guard, live } from '@/core/engine';
 import { palette } from '@/core/colors';
-import { preview } from '@/core/settings';
+import { L, preview } from '@/core/settings';
 import { STILL } from '@/links/stills';
 import { drawMarkers } from '@/links/styles';
 import { fake } from '../helpers/fake-app';
@@ -157,6 +157,19 @@ describe('renderLink', () => {
             expect(live.links).toBe(0);
         });
     }
+
+    it('leaves links to native with Link effects off, which keeps every link setting, and draws them again once it is on', async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Enabled': false }, PAIR);
+        const original = vi.spyOn(canvas.linkRenderer, 'renderLinkDirect');
+        const painted = frame(canvas);
+        expect(original.mock.calls.map(([ctx]) => ctx === canvas.bgctx)).toEqual([true]);
+        expect([strokes(painted.front), live.links, L.animate]).toEqual([[], 0, 9]);
+        preview('🔗 Enhanced Links.Enabled', true);
+        frame(canvas);
+        expect(original.mock.calls.map(([ctx]) => ctx === canvas.bgctx)).toEqual([true, false]);
+        expect(live.links).toBe(1);
+        expect(fake.posts).toEqual([]);
+    });
 
     it("draws links in LiteGraph's low quality too, as v1 and v2 did", async () => {
         const canvas = await start({}, PAIR);

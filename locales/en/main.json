@@ -6,13 +6,15 @@
     "Links · Color": "Links · Color",
     "Links · Markers": "Links · Markers",
     "Links · Shadows": "Links · Shadows",
-    "Links · Compatibility": "Links · Compatibility",
     "Nodes · Effect": "Nodes · Effect",
     "Nodes · Glow & hover": "Nodes · Glow & hover",
     "Nodes · Color": "Nodes · Color",
     "Nodes · Particles": "Nodes · Particles",
     "Nodes · Titles": "Nodes · Titles",
     "Runs · During a run": "Runs · During a run",
-    "Runs · Completion": "Runs · Completion"
+    "Runs · Completion": "Runs · Completion",
+    "Performance · Budget": "Performance · Budget",
+    "Performance · Accessibility": "Performance · Accessibility",
+    "Performance · Compatibility": "Performance · Compatibility"
   }
 }

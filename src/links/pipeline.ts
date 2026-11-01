@@ -11,7 +11,8 @@
  * or the graph moves. What moves is drawn over the background in every front
  * pass, under the nodes. A shape of our own takes the segment's hit data with
  * it, so clicks and the link menu follow what is drawn. When another extension
- * draws links too, Coexist can leave every link to it.
+ * draws links too, Coexist can leave every link to it; Link effects off
+ * leaves every link to native.
  *
  * @module links/pipeline
  */
@@ -91,6 +92,22 @@ export class Segment {
     within(u: number): boolean {
         return u >= 0 && (u < 1 || (u === 1 && this.t1 === 1));
     }
+
+    /**
+     * Lays the segment from a to b on the path Link.Style gives it, the render mode's `mode` where that keeps native's:
+     * `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave or a coil starts and ends.
+     */
+    lay(a: Readonly<ArrayLike<number>>, b: Readonly<ArrayLike<number>>, startDir: number, endDir: number, mode: number, u0 = 0, fromSlot = true,
+        toSlot = true, startControl?: Readonly<ArrayLike<number>>, endControl?: Readonly<ArrayLike<number>>): void {
+        const style = LINK_STYLES[L.linkStyle];
+        this.u0 = u0;
+        this.path.set(a, b, startDir, endDir, style.mode ?? mode, startControl, endControl);
+        if (style.shape === 'step') this.path.step(endDir);
+        this.len = this.path.length;
+        if (style.shape === 'wave' || style.shape === 'coil') this.path.bend(style.shape === 'coil', u0, fromSlot, toSlot);
+        this.custom = Boolean(style.shape) || (style.mode ?? mode) !== mode;
+        this.linkStyle = L.linkStyle;
+    }
 }
 
 /** The segments of the last pass are pool[0, count); the pool only grows. */
@@ -137,9 +154,12 @@ let warned = false;
 let foreign = false;
 let told = false;
 
-/** Whether Coexist leaves the links to native and other extensions; the first time 'auto' does, it says so. */
+/** Whether Coexist leaves the links to native and other extensions. */
+export const deferring = (): boolean => L.coexist === 'defer' || (L.coexist === 'auto' && foreign);
+
+/** deferring(), and the first time 'auto' defers, a toast that says so. */
 function defers(): boolean {
-    if (L.coexist === 'ours' || (L.coexist === 'auto' && !foreign)) return false;
+    if (!deferring()) return false;
     if (L.coexist === 'auto' && !told) {
         told = true;
         app.extensionManager.toast.add({
@@ -175,7 +195,7 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     ends.clear();
     pass.ctx = ctx;
     pass.calls = pass.bases = 0;
-    pass.on = L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
+    pass.on = L.enabled && L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
     pass.still = L.staticMode || (L.pauseDuringRender && env.running) || env.reducedMotion || !moves();
     pass.highlighted = canvas.highlighted_links;
     // While a graph with many glowing links on screen is panned, zoomed or has nodes dragged, its bases go plain.
@@ -233,15 +253,8 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     const reroute = extras?.reroute;
     // The reroute the segment starts from (LinkSegment.parentId), where the segment into it ended; none where the link starts.
     const from = canvas.graph?.getReroute((reroute ?? link).parentId);
-    const style = LINK_STYLES[L.linkStyle];
-    const mode = style.mode ?? canvas.links_render_mode;
     segment.link = link;
-    segment.u0 = (from && ends.get(from)) || 0;
-    segment.path.set(a, b, startDir, endDir, mode, extras?.startControl, extras?.endControl);
-    if (style.shape === 'step') segment.path.step(endDir);
-    segment.len = segment.path.length;
-    if (style.shape === 'wave' || style.shape === 'coil') segment.path.bend(style.shape === 'coil', segment.u0, !from, !reroute);
-    segment.custom = Boolean(style.shape) || mode !== canvas.links_render_mode;
+    segment.lay(a, b, startDir, endDir, canvas.links_render_mode, (from && ends.get(from)) || 0, !from, !reroute, extras?.startControl, extras?.endControl);
     if (reroute) ends.set(reroute, segment.u0 + segment.len);
     // The segment into the input is the link's last.
     open = Boolean(reroute);
@@ -250,7 +263,6 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     // link.color: white while highlighted, else the colour handed in, the type's or the canvas default, the first the canvas takes.
     segment.pal = pass.highlighted[link.id] ? HIGHLIGHT : palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link.type)])
         ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR)!;
-    segment.linkStyle = L.linkStyle;
     segment.isStatic = pass.still;
     return segment;
 }

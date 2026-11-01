@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite';
+import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
+/** The extension's version, which pyproject.toml gives the Comfy Registry; About shows it. */
+const version = readFileSync(resolve(__dirname, 'pyproject.toml'), 'utf8').match(/^version = "(.+)"$/m)![1];
+
 export default defineConfig({
+    define: { __ELN_VERSION__: JSON.stringify(version) },
     build: {
         lib: {
             entry: {

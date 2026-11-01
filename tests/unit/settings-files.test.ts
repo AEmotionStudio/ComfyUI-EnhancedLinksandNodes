@@ -10,13 +10,17 @@ import { SETTINGS, linkSettings, nodeSettings } from '@/core/settings';
 
 type Entry = (typeof SETTINGS)[number];
 
+/** The settings the dialog shows, and the hidden ones the panel and the picker keep. */
+const SHOWN = SETTINGS.filter((s) => s.type !== 'hidden');
+const HIDDEN = SETTINGS.filter((s) => s.type === 'hidden');
+
 /** The frontend's normalizeI18nKey: dots become underscores, so an id or a label is a single key. */
 const key = (text: string) => text.replaceAll('.', '_');
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
 
 /** settings.<id>.name, .tooltip and .options.<option text>, which SettingItem.vue looks up in both frontends. */
-const settings = json(Object.fromEntries(SETTINGS.map((s) => [key(s.id), {
+const settings = json(Object.fromEntries(SHOWN.map((s) => [key(s.id), {
     name: s.name,
     tooltip: 'tooltip' in s ? s.tooltip : undefined,
     options: s.type === 'combo' ? Object.fromEntries(s.options.map((o) => [key(o.text), o.text])) : undefined,
@@ -24,13 +28,14 @@ const settings = json(Object.fromEntries(SETTINGS.map((s) => [key(s.id), {
 
 /** The dialog's two category levels in display order: the panel, then each group. */
 const categories = [...new Set([...linkSettings, ...nodeSettings]
+    .filter((p) => p.category)
     .sort((a, b) => b.sortOrder! - a.sortOrder!)
     .flatMap((p) => p.category!.slice(0, 2)))];
 
 /** settingsCategories.<label>, which the dialog's navigation and group headings look up at the top of main.json. */
 const main = json({ settingsCategories: Object.fromEntries(categories.map((c) => [key(c), c])) });
 
-function optionsOrRange(s: Entry): string {
+function optionsOrRange(s: Exclude<Entry, { type: 'hidden' }>): string {
     switch (s.type) {
         case 'boolean':
             return '`true`, `false`';
@@ -43,7 +48,7 @@ function optionsOrRange(s: Entry): string {
     }
 }
 
-function defaultOf(s: Entry): string {
+function defaultOf(s: Exclude<Entry, { type: 'hidden' }>): string {
     const text = s.type === 'combo' ? ` ${s.options.find((o) => o.value === s.default)!.text}` : '';
     return `\`${s.default}\`${text}`;
 }
@@ -60,9 +65,17 @@ const docs = [
         '',
         '| Name | Id | Type | Options or range | Default | Tooltip |',
         '| --- | --- | --- | --- | --- | --- |',
-        ...SETTINGS.filter((s) => s.group === group).map((s) =>
+        ...SHOWN.filter((s) => s.group === group).map((s) =>
             `| ${s.name} | \`${s.id}\` | ${s.type} | ${optionsOrRange(s)} | ${defaultOf(s)} | ${'tooltip' in s ? s.tooltip : ''} |`),
     ]),
+    '',
+    '## Kept by the panel',
+    '',
+    'The panel and the first-run picker save these in the same file. The settings dialog does not show them.',
+    '',
+    '| Name | Id | Default | What it holds |',
+    '| --- | --- | --- | --- |',
+    ...HIDDEN.map((s) => `| ${s.name} | \`${s.id}\` | \`${JSON.stringify(s.default)}\` | ${s.tooltip} |`),
     '',
 ].join('\n');
 

@@ -1,352 +1,999 @@
-/**
- * Sidebar CSS — injected inline by sidebar.ts
- *
- * Uses ComfyUI PrimeVue theme variables for native look.
+/*
+ * The panel, on ComfyUI's own tokens so it follows the palette: the palette's
+ * --fg-color and --comfy-menu-bg, and the frontend's --interface-stroke,
+ * --secondary-background and --primary-background (1.39.5 to 1.60), with
+ * fallbacks. It paints no background of its own but the sidebar's. Muted text
+ * is the text colour at 72 %, which keeps 4.5:1 on the palettes' menus and
+ * controls; an accent never carries text.
  */
 
-/* =============================================================================
-   Sidebar Container
-   ============================================================================= */
+/* The brand mark, the rail icon too: a link with a spark, in the current colour. */
+.eln-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background: currentColor;
+    --eln-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3Cpath d='M5.5 1.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z' fill='black' stroke='none'/%3E%3C/svg%3E");
+    -webkit-mask: var(--eln-mark) center / contain no-repeat;
+    mask: var(--eln-mark) center / contain no-repeat;
+}
 
-.enh-sidebar {
+.eln {
+    --eln-fg: var(--fg-color, #fff);
+    --eln-muted: color-mix(in srgb, var(--eln-fg) 72%, transparent);
+    --eln-surface: var(--comfy-menu-bg, #171718);
+    --eln-stroke: var(--interface-stroke, var(--border-color, #4e4e4e));
+    --eln-control: var(--secondary-background, var(--comfy-input-bg, #262729));
+    --eln-control-hover: var(--secondary-background-hover, var(--eln-stroke));
+    --eln-accent: var(--primary-background, #0b8ce9);
+    /* Rings and selected outlines: the accent toward the text colour, at least 3:1 on light menus too. */
+    --eln-accent-strong: color-mix(in srgb, var(--eln-accent) 70%, var(--eln-fg));
+    --eln-tint: color-mix(in srgb, var(--eln-accent) 18%, var(--eln-surface));
+    --eln-ring: var(--eln-fg);
+    --eln-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
     display: flex;
     flex-direction: column;
     height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
-    color: var(--p-content-color, #ddd);
-    background: var(--p-content-background, #1a1a2e);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--p-surface-500, #555) transparent;
+    min-width: 0;
+    color: var(--eln-fg);
+    font: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.35;
 }
 
-.enh-sidebar::-webkit-scrollbar {
-    width: 6px;
+.eln *,
+.eln *::before,
+.eln *::after {
+    box-sizing: border-box;
 }
 
-.enh-sidebar::-webkit-scrollbar-thumb {
-    background: var(--p-surface-500, #555);
-    border-radius: 3px;
+.eln button,
+.eln input,
+.eln select {
+    font: inherit;
+    color: inherit;
 }
 
-/* =============================================================================
-   Header
-   ============================================================================= */
-
-.enh-sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--p-surface-700, #333);
-    flex-shrink: 0;
-}
-
-.enh-sidebar-header svg {
-    flex-shrink: 0;
-    opacity: 0.8;
-}
-
-.enh-sidebar-header h2 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.enh-sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 6px 0;
-}
-
-/* =============================================================================
-   Collapsible Sections
-   ============================================================================= */
-
-.enh-sidebar-section {
-    border-bottom: 1px solid var(--p-surface-700, #333);
-}
-
-.enh-sidebar-section-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    cursor: pointer;
-    user-select: none;
-    font-weight: 500;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--p-content-color, #ccc);
-    transition: background 0.15s;
-}
-
-.enh-sidebar-section-header:hover {
-    background: var(--p-surface-800, rgba(255, 255, 255, 0.04));
-}
-
-.enh-sidebar-section-header:focus-visible {
-    outline: 2px solid var(--p-primary-color, #6366f1);
-    outline-offset: -2px;
-}
-
-.enh-sidebar-section-header svg {
-    transition: transform 0.2s ease;
-    flex-shrink: 0;
-}
-
-.enh-sidebar-section-header.collapsed svg {
-    transform: rotate(-90deg);
-}
-
-.enh-sidebar-section-body {
-    padding: 4px 14px 10px;
-}
-
-.enh-sidebar-section-body.collapsed {
-    display: none;
-}
-
-/* =============================================================================
-   Control Rows
-   ============================================================================= */
-
-.enh-control-row {
-    margin-bottom: 8px;
-}
-
-.enh-control-row label {
-    display: block;
-    font-size: 11px;
-    color: var(--p-text-muted-color, #999);
-    margin-bottom: 3px;
-}
-
-.enh-control-label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.enh-control-value {
-    font-size: 11px;
-    color: var(--p-primary-color, #6366f1);
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-}
-
-/* =============================================================================
-   Slider
-   ============================================================================= */
-
-.enh-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--p-surface-600, #444);
-    outline: none;
+.eln button {
     cursor: pointer;
 }
 
-.enh-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--p-primary-color, #6366f1);
-    cursor: pointer;
-    transition: box-shadow 0.15s;
-}
-
-.enh-slider::-webkit-slider-thumb:hover {
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-}
-
-.enh-slider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--p-primary-color, #6366f1);
-    border: none;
-    cursor: pointer;
-}
-
-/* =============================================================================
-   Toggle Switch
-   ============================================================================= */
-
-.enh-toggle-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.enh-toggle-row label {
-    font-size: 11px;
-    color: var(--p-text-muted-color, #999);
-    cursor: pointer;
-}
-
-.enh-toggle {
-    position: relative;
-    width: 34px;
-    height: 18px;
-    border-radius: 9px;
-    background: var(--p-surface-600, #444);
-    cursor: pointer;
-    transition: background 0.2s;
-    flex-shrink: 0;
-}
-
-.enh-toggle::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #fff;
-    transition: transform 0.2s;
-}
-
-.enh-toggle.active {
-    background: var(--p-primary-color, #6366f1);
-}
-
-.enh-toggle.active::after {
-    transform: translateX(16px);
-}
-
-.enh-toggle:focus-visible {
-    outline: 2px solid var(--p-primary-color, #6366f1);
+.eln :focus-visible {
+    outline: 2px solid var(--eln-ring);
     outline-offset: 2px;
 }
 
-/* =============================================================================
-   Select Dropdown
-   ============================================================================= */
-
-.enh-select {
-    width: 100%;
-    padding: 5px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--p-surface-600, #444);
-    background: var(--p-surface-800, #1a1a2e);
-    color: var(--p-content-color, #ddd);
-    font-size: 12px;
-    cursor: pointer;
-    outline: none;
+.eln [hidden] {
+    display: none !important;
 }
 
-.enh-select:focus {
-    border-color: var(--p-primary-color, #6366f1);
+.eln-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
-.enh-select option {
-    background: var(--p-surface-800, #1a1a2e);
-    color: var(--p-content-color, #ddd);
-}
-
-/* =============================================================================
-   Color Picker
-   ============================================================================= */
-
-.enh-color-row {
-    display: flex;
-    flex-direction: column;
-}
-
-.enh-color-wrapper {
+/* Header, as the native tabs have it. */
+.eln-head {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.25rem;
+    min-height: 4rem;
+    padding-inline: 1rem 0.5rem;
+    border-bottom: 1px solid var(--eln-stroke);
 }
 
-.enh-color-input {
-    width: 32px;
-    height: 24px;
-    border: 1px solid var(--p-surface-600, #444);
-    border-radius: 4px;
+.eln-mark {
+    flex: none;
+    font-size: 1.125rem;
+    margin-inline-end: 0.25rem;
+}
+
+/* A little under 1rem, so the whole name fits beside the tools at the sidebar's default width. */
+.eln-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.eln-tool {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
     padding: 0;
-    cursor: pointer;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--eln-muted);
+    transition: background-color 120ms var(--eln-ease), color 120ms var(--eln-ease);
+}
+
+.eln-tool:hover,
+.eln-tool[aria-pressed='true'] {
+    background: var(--eln-control);
+    color: var(--eln-fg);
+}
+
+.eln-tool[aria-pressed='true'] {
+    box-shadow: inset 0 0 0 1px var(--eln-accent-strong);
+}
+
+/* Quick bar */
+.eln-quick {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--eln-stroke);
+}
+
+.eln-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+.eln-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.75rem;
+    padding: 0.125rem 0.625rem 0.125rem 0.5rem;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--eln-muted);
+    transition: background-color 120ms var(--eln-ease), border-color 120ms var(--eln-ease);
+}
+
+/* On, off and mixed show by the chip's dot as well as its colours. */
+.eln-chip::before {
+    content: '';
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+}
+
+.eln-chip[aria-pressed='true'] {
+    border-color: var(--eln-accent-strong);
+    background: var(--eln-tint);
+    color: var(--eln-fg);
+}
+
+.eln-chip[aria-pressed='true']::before {
+    background: currentColor;
+}
+
+.eln-chip[aria-pressed='mixed'] {
+    border-color: var(--eln-accent-strong);
+    color: var(--eln-fg);
+}
+
+.eln-chip[aria-pressed='mixed']::before {
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+
+.eln-chip:hover {
+    background: var(--eln-control);
+}
+
+.eln-look {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.eln-look-label {
+    color: var(--eln-muted);
+}
+
+.eln-look > .eln-select {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    text-align: start;
+}
+
+.eln-look-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.eln-look .pi-chevron-down {
+    font-size: 0.625rem;
+    color: var(--eln-muted);
+}
+
+/* The Look menu, over the panel below the quick bar. */
+.eln-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    inset-inline: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    max-height: 20rem;
+    padding: 0.25rem;
+    overflow-y: auto;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.5rem;
+    background: var(--eln-surface);
+    box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.3);
+}
+
+.eln-menu > [role='group'] {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--eln-stroke);
+}
+
+.eln-menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2rem;
+    padding: 0 0.5rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    text-align: start;
+}
+
+.eln-menu-item:hover,
+.eln-menu-item:focus-visible {
+    background: var(--eln-control);
+}
+
+.eln-menu-item > .pi {
+    font-size: 0.625rem;
+}
+
+.eln-menu-item[aria-checked='false'] > .pi {
+    visibility: hidden;
+}
+
+/* Tabs, with the living underline in the palette's link colours. */
+.eln-tabs {
+    display: flex;
+    padding-inline: 0.375rem;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--eln-stroke);
+    scrollbar-width: none;
+}
+
+.eln-tab {
+    position: relative;
+    flex: none;
+    min-height: 2.5rem;
+    padding: 0 0.4375rem;
+    border: 0;
+    background: transparent;
+    color: var(--eln-muted);
+    font-weight: 500;
+}
+
+.eln-tab:hover {
+    color: var(--eln-fg);
+}
+
+.eln-tab[aria-selected='true'] {
+    color: var(--eln-fg);
+    font-weight: 600;
+}
+
+.eln-tab[aria-selected='true']::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.375rem;
+    bottom: -1px;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, var(--eln-link-1, #64b5f6), var(--eln-link-2, #ff9cf9), var(--eln-link-3, #b39ddb), var(--eln-link-1, #64b5f6));
+    background-size: 300% 100%;
+    animation: eln-drift 8s linear infinite;
+}
+
+@keyframes eln-drift {
+    to {
+        background-position: 150% 0;
+    }
+}
+
+/* Search */
+.eln-find {
+    position: relative;
+    padding: 0.5rem 1rem;
+}
+
+.eln-find > .pi {
+    position: absolute;
+    inset-inline-start: 1.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--eln-muted);
+    font-size: 0.75rem;
+    pointer-events: none;
+}
+
+.eln-search {
+    width: 100%;
+    height: 2rem;
+    padding-inline: 1.75rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    background: var(--eln-control);
+}
+
+.eln-search::placeholder,
+.eln-hex::placeholder {
+    color: var(--eln-muted);
+    opacity: 1;
+}
+
+/* Body: the panel's one scroller. */
+.eln-body {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
+
+.eln-section {
+    padding: 0.25rem 1rem;
+}
+
+.eln-section + .eln-section {
+    border-top: 1px solid var(--eln-stroke);
+}
+
+.eln-section-head {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.eln-section-head h3 {
+    flex: 1;
+    margin: 0;
+    font-size: inherit;
+}
+
+.eln-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-weight: 600;
+    text-align: start;
+}
+
+.eln-section-toggle .pi {
+    font-size: 0.625rem;
+    color: var(--eln-muted);
+    transition: transform 120ms var(--eln-ease);
+}
+
+.eln-section-toggle[aria-expanded='false'] .pi {
+    transform: rotate(-90deg);
+}
+
+.eln-count,
+.eln-tag {
+    flex: none;
+    padding: 0.0625rem 0.375rem;
+    border-radius: 0.375rem;
+    background: var(--eln-control);
+    color: var(--eln-muted);
+    font-size: 0.6875rem;
+    white-space: nowrap;
+}
+
+.eln-heading,
+.eln-crumb {
+    margin: 0.5rem 0;
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.eln-crumb {
+    color: var(--eln-muted);
+}
+
+.eln-section-body {
+    padding-bottom: 0.5rem;
+}
+
+/* A setting's row: name and small controls on one line, wide controls under it. */
+.eln-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-block: 0.3125rem;
+}
+
+.eln-row-head {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2rem;
+}
+
+.eln-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.eln-dot {
+    flex: none;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--eln-accent-strong);
+}
+
+.eln-row-head > .eln-dot {
+    visibility: hidden;
+    margin-inline-start: -0.625rem;
+    margin-inline-end: -0.125rem;
+}
+
+.eln-row--modified > .eln-row-head > .eln-dot {
+    visibility: visible;
+}
+
+.eln-reset {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--eln-muted);
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 120ms var(--eln-ease);
+}
+
+.eln-row:hover .eln-reset,
+.eln-reset:focus-visible {
+    opacity: 1;
+}
+
+.eln-reset:hover {
+    background: var(--eln-control);
+    color: var(--eln-fg);
+}
+
+.eln-off {
+    opacity: 0.45;
+}
+
+.eln-need {
+    margin: 0;
+    color: var(--eln-muted);
+    font-size: 0.75rem;
+}
+
+.eln-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--eln-fg);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.eln-more {
+    margin-top: 0.25rem;
+    color: var(--eln-muted);
+    font-size: 0.75rem;
+}
+
+/* Controls */
+.eln-switch {
+    position: relative;
+    flex: none;
+    width: 2.25rem;
+    height: 1.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 1rem;
+    background: var(--border-default, var(--eln-stroke));
+    transition: background-color 120ms var(--eln-ease);
+}
+
+.eln-switch::after {
+    content: '';
+    position: absolute;
+    top: 0.125rem;
+    inset-inline-start: 0.125rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--base-background, var(--eln-surface));
+    transition: transform 120ms var(--eln-ease);
+}
+
+.eln-switch[aria-checked='true'] {
+    background: var(--eln-accent);
+}
+
+.eln-switch[aria-checked='true']::after {
+    transform: translateX(1rem);
+}
+
+.eln-select,
+.eln-number,
+.eln-hex {
+    height: 2rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    background: var(--eln-control);
+}
+
+/* At most half the row, so the name beside it keeps to one line; a list of long choices has a line of its own. */
+.eln-select {
+    max-width: 50%;
+    padding-inline: 0.5rem;
+}
+
+.eln-row > .eln-select {
+    max-width: none;
+}
+
+.eln-select:hover,
+.eln-search:hover {
+    background: var(--eln-control-hover);
+}
+
+.eln-select option,
+.eln-select optgroup {
+    background: var(--eln-surface);
+}
+
+.eln-slider {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.eln-range {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--eln-accent);
+}
+
+.eln-number {
+    width: 4.5rem;
+    padding-inline: 0.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.eln-segments {
+    display: flex;
+    padding: 0.125rem;
+    border-radius: 0.5rem;
+    background: var(--eln-control);
+}
+
+.eln-segment {
+    flex: 1 1 auto;
+    min-height: 1.75rem;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--eln-muted);
+}
+
+.eln-segment[aria-checked='true'] {
+    background: var(--eln-surface);
+    box-shadow: inset 0 0 0 1px var(--eln-accent-strong);
+    color: var(--eln-fg);
+    font-weight: 600;
+}
+
+.eln-colour {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.eln-well {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.1875rem;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.5rem;
     background: transparent;
 }
 
-.enh-color-input::-webkit-color-swatch-wrapper {
-    padding: 1px;
+.eln-hex {
+    width: 5.25rem;
+    padding-inline: 0.5rem;
+    font-variant-numeric: tabular-nums;
 }
 
-.enh-color-input::-webkit-color-swatch {
-    border: none;
-    border-radius: 3px;
+/* Galleries of live tiles. */
+.eln-gallery,
+.eln-looks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: 0.5rem;
 }
 
-.enh-color-preview {
+.eln-looks {
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+}
+
+.eln-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.25rem 0.25rem 0.375rem;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.5rem;
+    background: transparent;
+    text-align: start;
+    transition: border-color 120ms var(--eln-ease);
+}
+
+.eln-tile:hover {
+    border-color: var(--eln-muted);
+}
+
+.eln-tile[aria-checked='true'] {
+    border-color: var(--eln-accent-strong);
+    box-shadow: inset 0 0 0 1px var(--eln-accent-strong);
+}
+
+/* A tick as well as the outline. */
+.eln-tile[aria-checked='true']::after {
+    content: '\e909';
+    position: absolute;
+    top: 0.375rem;
+    inset-inline-end: 0.375rem;
+    display: grid;
+    place-items: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: var(--eln-surface);
+    color: var(--eln-fg);
+    font-family: primeicons;
+    font-size: 0.625rem;
+}
+
+.eln-tile-canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 0.375rem;
+}
+
+.eln-tile-name {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-inline: 0.125rem;
+    overflow: hidden;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.eln-tile-text {
+    display: -webkit-box;
+    padding-inline: 0.125rem;
+    overflow: hidden;
+    color: var(--eln-muted);
+    font-size: 0.6875rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* Looks */
+.eln-mine-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.25rem;
+}
+
+.eln-mine-name {
     flex: 1;
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--p-surface-600, #444);
-    background: var(--p-surface-800, #1a1a2e);
-    color: var(--p-content-color, #ddd);
-    font-size: 12px;
-    font-family: monospace;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.enh-color-preview:focus {
-    border-color: var(--p-primary-color, #6366f1);
-    outline: none;
+.eln-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-block: 0.5rem;
 }
 
-/* =============================================================================
-   About Section
-   ============================================================================= */
-
-.enh-about {
-    padding: 10px 14px;
-    font-size: 11px;
-    color: var(--p-text-muted-color, #888);
-    line-height: 1.5;
+.eln-button {
+    min-height: 1.75rem;
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: var(--eln-control);
 }
 
-.enh-about a {
-    color: var(--p-primary-color, #6366f1);
+.eln-button:hover {
+    background: var(--eln-control-hover);
+}
+
+.eln-hint {
+    margin: 0.25rem 0;
+    color: var(--eln-muted);
+}
+
+.eln-errors {
+    margin: 0.25rem 0;
+    padding-inline-start: 1.25rem;
+    color: var(--eln-muted);
+    font-size: 0.75rem;
+}
+
+/* Notices */
+.eln-notices:not(:empty) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem 0.25rem;
+}
+
+.eln-notice {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-inline-start: 3px solid var(--eln-accent-strong);
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--eln-fg) 6%, var(--eln-surface));
+}
+
+.eln-notice > span {
+    flex: 1 1 12rem;
+}
+
+.eln-notice > .pi {
+    color: var(--eln-accent-strong);
+}
+
+/* The undo bar of a frontend whose toasts take no action. */
+.eln-undo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--eln-stroke);
+    background: var(--eln-surface);
+}
+
+.eln-undo > span {
+    flex: 1;
+}
+
+/* About */
+.eln a {
+    color: inherit;
+    text-underline-offset: 2px;
+}
+
+.eln-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 0.75rem;
+}
+
+.eln-brand > .eln-icon {
+    flex: none;
+    font-size: 2rem;
+}
+
+.eln-brand .eln-heading,
+.eln-brand .eln-hint {
+    margin: 0;
+}
+
+.eln-news {
+    margin: 0 0 0.5rem;
+    padding-inline-start: 1.125rem;
+}
+
+.eln-news > li + li {
+    margin-top: 0.25rem;
+}
+
+a.eln-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
     text-decoration: none;
 }
 
-.enh-about a:hover {
-    text-decoration: underline;
+.eln-keys {
+    margin: 0 0 0.5rem;
 }
 
-/* =============================================================================
-   Section Divider
-   ============================================================================= */
+.eln-keys > dt {
+    font-weight: 600;
+}
 
-.enh-section-divider {
+.eln-keys > dd {
+    margin: 0 0 0.375rem;
+    color: var(--eln-muted);
+}
+
+.eln-confirm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-inline-start: 3px solid var(--eln-accent-strong);
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--eln-fg) 6%, var(--eln-surface));
+}
+
+.eln-confirm > p {
+    flex: 1 1 100%;
+    margin: 0;
+}
+
+.eln-diagnostics {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.5rem;
+    background: var(--eln-control);
+    color: inherit;
+    font: inherit;
+    font-size: 0.75rem;
+    resize: vertical;
+}
+
+.eln-studio {
+    padding-block: 0.5rem;
+}
+
+.eln-studio > summary {
+    min-height: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/*
+ * The first-run look picker, and the undo of a pick where toasts take no action and the panel is closed: a card over
+ * the canvas's bottom-left, under ComfyUI's menus, dialogs and toasts, and right of the canvas info LiteGraph draws
+ * in the corner.
+ */
+.eln.eln-picker,
+.eln.eln-picker-undo {
+    position: absolute;
+    inset-inline-start: 8rem;
+    bottom: 1rem;
+    z-index: 1000;
+    height: auto;
+    border: 1px solid var(--eln-stroke);
+    border-radius: 0.75rem;
+    background: var(--eln-surface);
+    box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.3);
+    pointer-events: auto;
+}
+
+.eln.eln-picker {
+    gap: 0.625rem;
+    width: min(24rem, calc(100% - 9rem));
+    max-height: calc(100% - 2rem);
+    padding: 0.75rem 1rem 1rem;
+    overflow-y: auto;
+}
+
+.eln-picker-close {
+    position: absolute;
+    top: 0.5rem;
+    inset-inline-end: 0.5rem;
+}
+
+/* The card takes the focus as it shows: the accent marks it, as the text colour would glare around a whole card. */
+.eln-picker:focus-visible {
+    outline: 2px solid var(--eln-accent-strong);
+    outline-offset: 2px;
+}
+
+.eln-picker-head {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 6px 0 4px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--p-primary-color, #6366f1);
-    opacity: 0.7;
+    gap: 0.25rem;
+    min-height: 1.5rem;
+    padding-inline-end: 2rem;
 }
 
-.enh-section-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--p-surface-600, #444);
+.eln-picker-more,
+.eln-picker-foot > .eln-hint {
+    margin: 0;
+    color: var(--eln-muted);
+}
+
+.eln-picker-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.eln-picker-foot > .eln-hint {
+    flex: 1 1 100%;
+}
+
+.eln-button--primary {
+    background: var(--eln-tint);
+    box-shadow: inset 0 0 0 1px var(--eln-accent-strong);
+}
+
+.eln.eln-picker-undo {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+
+/* Less motion, as Motion says, or as the system or ComfyUI's Disable animations asks unless Motion is Full. */
+.eln--still *,
+.eln--still *::after,
+.disable-animations .eln:not(.eln--full) *,
+.disable-animations .eln:not(.eln--full) *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eln:not(.eln--full) *,
+    .eln:not(.eln--full) *::after {
+        animation: none !important;
+        transition: none !important;
+    }
 }

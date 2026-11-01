@@ -1,4 +1,8 @@
 {
+  "🔗 Enhanced Links_Enabled": {
+    "name": "Link effects",
+    "tooltip": "Off draws native ComfyUI links and leaves every other link setting as it is."
+  },
   "🔗 Enhanced Links_Animate": {
     "name": "Link animation",
     "tooltip": "Effect drawn along every link.",
@@ -186,14 +190,9 @@
     "name": "Drop shadow offset",
     "tooltip": "Used by Drop shadow."
   },
-  "🔗 Enhanced Links_Coexist": {
-    "name": "Other link extensions",
-    "tooltip": "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.",
-    "options": {
-      "Step aside if one is found": "Step aside if one is found",
-      "Keep Enhanced link effects": "Keep Enhanced link effects",
-      "Always step aside": "Always step aside"
-    }
+  "📦 Enhanced Nodes_Enabled": {
+    "name": "Node effects",
+    "tooltip": "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is."
   },
   "📦 Enhanced Nodes_Animate": {
     "name": "Node effect",
@@ -385,5 +384,32 @@
   "📦 Enhanced Nodes_End Animation_Enabled": {
     "name": "Fireworks when a run finishes",
     "tooltip": "Above your run's output nodes. Completion FX in the node menu sets them for one node."
+  },
+  "🔗 Enhanced Links_Perf_MaxFps": {
+    "name": "Effect frame-rate cap",
+    "tooltip": "The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows.",
+    "options": {
+      "30 fps": "30 fps",
+      "60 fps": "60 fps",
+      "Display rate": "Display rate"
+    }
+  },
+  "🔗 Enhanced Links_Motion": {
+    "name": "Motion",
+    "tooltip": "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them.",
+    "options": {
+      "Follow system": "Follow system",
+      "Reduce": "Reduce",
+      "Full": "Full"
+    }
+  },
+  "🔗 Enhanced Links_Coexist": {
+    "name": "Other link extensions",
+    "tooltip": "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.",
+    "options": {
+      "Step aside if one is found": "Step aside if one is found",
+      "Keep Enhanced link effects": "Keep Enhanced link effects",
+      "Always step aside": "Always step aside"
+    }
   }
 }

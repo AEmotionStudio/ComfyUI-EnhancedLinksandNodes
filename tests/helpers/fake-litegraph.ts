@@ -14,6 +14,7 @@
 
 import { vi } from 'vitest';
 import { clock, live } from '@/core/engine';
+import { LOOK } from '@/core/settings';
 import { api, app, fake, resetFakeApp } from './fake-app';
 import { CanvasRecorder } from './recording-context';
 
@@ -654,7 +655,7 @@ export function run(prompt: string, ran: number[], cached: number[] = []): void 
 }
 
 /**
- * A fresh page with exactly `settings` stored: new LiteGraph globals, a canvas
+ * A fresh page with exactly `settings` stored, and Look 'custom' unless they hold one: new LiteGraph globals, a canvas
  * over `spec` as app.canvas, then both extensions' setup(), as ComfyUI runs
  * them, and the graph loaded as a workflow. The page shows the canvas, motion is not reduced, the queue is idle and
  * no fireworks play.
@@ -669,7 +670,8 @@ export async function start(settings: Record<string, unknown> = {}, spec: GraphS
         fake.reducedMotion.dispatchEvent(new Event('change'));
     }
     queue(0);
-    resetFakeApp(settings);
+    // The first-run picker answered, so stored values draw as they are; the first-run overlay's tests store Look ''.
+    resetFakeApp({ [LOOK]: 'custom', ...settings });
     // Nor fireworks: past the end of any show, which fireworks() and the next pass then clear.
     clock.burstTime += 3600;
     live.bursts = 0;
@@ -682,7 +684,6 @@ export async function start(settings: Record<string, unknown> = {}, spec: GraphS
     const canvas = new LGraphCanvas(new Graph(spec, LGraphNode));
     Object.assign(app, { canvas });
 
-    vi.useFakeTimers({ toFake: ['setTimeout'] }); // initSidebar's delayed registration never fires
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await import('@/extensions/link-animations');
     await import('@/extensions/node-animations');
@@ -697,7 +698,6 @@ export async function start(settings: Record<string, unknown> = {}, spec: GraphS
             extension.loadedGraphNode?.(node, app);
         }
     }
-    vi.useRealTimers();
     page.requests = 0;
     canvas.calls = [];
     return canvas;

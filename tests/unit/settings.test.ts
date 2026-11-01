@@ -6,8 +6,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
-import { L, N, SETTINGS, commit, linkSettings, nodeSettings, preview, reset } from '@/core/settings';
-import { renderSettingsPanel } from '@/sidebar/SidebarSettings';
+import { L, LOOK, N, SETTINGS, commit, commitAll, customised, drawWith, linkSettings, nodeSettings, preview, reset, restore, revision, shown, watch } from '@/core/settings';
 import { app, fake, resetFakeApp } from '../helpers/fake-app';
 import { start } from '../helpers/fake-litegraph';
 
@@ -112,10 +111,20 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Marker.All': false,
     '🔗 Enhanced Links.Shadow.Style': 'halo',
     '📦 Enhanced Nodes.Selection.Glow': true,
+    // M5
+    '🔗 Enhanced Links.Enabled': true,
+    '📦 Enhanced Nodes.Enabled': true,
+    '🔗 Enhanced Links.Perf.MaxFps': 60,
+    '🔗 Enhanced Links.Motion': 'system',
+    '🔗 Enhanced Links.Look': '',
+    '🔗 Enhanced Links.Panel.State': { tab: 'looks', advanced: false, search: '' },
+    '🔗 Enhanced Links.WhatsNew.Seen': '',
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
     '🔗 Enhanced Links.Shadow.Style': ['halo', 'drop'],
+    '🔗 Enhanced Links.Perf.MaxFps': [30, 60, 0],
+    '🔗 Enhanced Links.Motion': ['system', 'reduce', 'full'],
 };
 
 /** The v2.0.1 defaults v3 changes, by the milestone that changes them. */
@@ -213,8 +222,9 @@ describe('settings schema', () => {
     it('types each setting by its default, so no slider has a string default', () => {
         const kinds = { boolean: 'boolean', slider: 'number', color: 'string' } as const;
         for (const s of SETTINGS) {
-            const kind = s.type === 'combo' ? typeof s.options[0].value : kinds[s.type];
-            expect(typeof s.default, s.id).toBe(kind);
+            // The hidden settings hold text, but for the panel's state.
+            if (s.type === 'hidden') expect(typeof s.default, s.id).toBe(s.id === '🔗 Enhanced Links.Panel.State' ? 'object' : 'string');
+            else expect(typeof s.default, s.id).toBe(s.type === 'combo' ? typeof s.options[0].value : kinds[s.type]);
         }
     });
 
@@ -228,7 +238,7 @@ describe('settings schema', () => {
 
     it('names every setting uniquely, in text without emoji', () => {
         expect(new Set(SETTINGS.map((s) => s.name)).size).toBe(SETTINGS.length);
-        const texts = SETTINGS.flatMap((s) => [s.name, s.group, 'tooltip' in s ? s.tooltip : '', ...(s.type === 'combo' ? s.options.map((o) => o.text) : [])]);
+        const texts = SETTINGS.flatMap((s) => [s.name, 'group' in s ? s.group : '', 'tooltip' in s ? s.tooltip : '', ...(s.type === 'combo' ? s.options.map((o) => o.text) : [])]);
         for (const text of texts) expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
     });
 
@@ -239,9 +249,11 @@ describe('settings schema', () => {
         expect(Object.keys(N)).toHaveLength(nodeSettings.length);
     });
 
-    it('gives each setting its own three-level dialog category, ordered as the schema', () => {
-        expect(new Set(PARAMS.map((p) => p.category!.join('/'))).size).toBe(SETTINGS.length);
-        for (const s of SETTINGS) expect(params(s.id).category, s.id).toEqual(['Enhanced Links & Nodes', s.group, s.id]);
+    it('gives each setting its own three-level dialog category, ordered as the schema, and the hidden ones none', () => {
+        const shown = SETTINGS.filter((s) => s.type !== 'hidden');
+        expect(SETTINGS.length - shown.length).toBe(3);
+        expect(new Set(PARAMS.flatMap((p) => (p.category ? [p.category.join('/')] : []))).size).toBe(shown.length);
+        for (const s of SETTINGS) expect(params(s.id).category, s.id).toEqual('group' in s ? ['Enhanced Links & Nodes', s.group, s.id] : undefined);
         // The dialog sorts settings, and groups by their first setting, by descending sortOrder.
         expect(SETTINGS.map((s) => params(s.id).sortOrder)).toEqual(SETTINGS.map((_, i) => SETTINGS.length - i));
     });
@@ -260,6 +272,72 @@ describe('settings schema', () => {
             expect(p.attrs, s.id).toEqual(s.type === 'slider' ? { min: s.min, max: s.max, step: s.step } : undefined);
             expect(p.options, s.id).toEqual(s.type === 'combo' ? s.options : undefined);
         }
+    });
+});
+
+// These show values by preview(): the extensions register in the tests after them.
+describe('how the panel shows each setting', () => {
+    const shownSettings = () => SETTINGS.filter((s) => s.type !== 'hidden');
+    /** Shows `values` over the defaults. */
+    const showing = (values: Record<string, unknown> = {}) => {
+        for (const s of SETTINGS) preview(s.id, s.id in values ? values[s.id] : s.default);
+    };
+
+    afterEach(() => {
+        showing();
+    });
+
+    it('shows 36 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(36);
+    });
+
+    it('lets looks set every setting but the master switches, Perf, Motion, Coexist and the hidden ones', () => {
+        const alone = SETTINGS.filter((s) => s.type === 'hidden' || ('look' in s && s.look === false)).map((s) => s.id);
+        expect(alone).toEqual([
+            '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled', '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
+            LOOK, '🔗 Enhanced Links.Panel.State', '🔗 Enhanced Links.WhatsNew.Seen',
+        ]);
+    });
+
+    it('hides what cannot apply: the link settings with link effects off or Animate None, markers without Classic Flow or Marker.All, custom colours without Custom', () => {
+        const visible = () => shownSettings().filter((s) => !('showIf' in s) || s.showIf()).map((s) => s.id.replace(/^\S+ Enhanced \w+\./, (p) => (p.startsWith('🔗') ? 'L.' : 'N.')));
+        // The defaults: Classic Flow links with markers and shadows; no node effect, particles or titles.
+        expect(visible()).toEqual([
+            'L.Enabled', 'L.Animate', 'L.Animation.Speed', 'L.Direction', 'L.Static.Mode', 'L.Link.Style', 'L.Thickness', 'L.Quality', 'L.Particle.Density',
+            'L.Color.Mode', 'L.Color.Scheme', 'L.Glow.Intensity', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Size', 'L.Marker.Color.Mode',
+            'L.Marker.Glow', 'L.Marker.Effects', 'L.Link.Shadow.Enabled', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style',
+            'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled', 'L.Pause.During.Render', 'N.End Animation.Enabled',
+            'L.Perf.MaxFps', 'L.Motion', 'L.Coexist',
+        ]);
+        showing({
+            '🔗 Enhanced Links.Animate': 6, '🔗 Enhanced Links.Static.Mode': true, '🔗 Enhanced Links.Color.Mode': 'custom',
+            '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Glow.Show': false, '📦 Enhanced Nodes.Selection.Glow': false,
+            '📦 Enhanced Nodes.Particle.Show': true, '📦 Enhanced Nodes.Particle.Color.Mode': 'aurora',
+        });
+        // DNA Helix carries no particles or markers, and draws no shadow; frozen, its speed does nothing.
+        expect(visible()).toEqual(expect.arrayContaining(['L.Color.Primary', 'L.Color.Secondary', 'L.Color.Accent', 'L.Marker.All', 'N.Animations.Enabled', 'N.Color.Mode', 'N.Particle.Glow']));
+        expect(visible()).not.toEqual(expect.arrayContaining(['L.Animation.Speed']));
+        for (const id of ['L.Animation.Speed', 'L.Particle.Density', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Link.Shadow.Enabled', 'L.Shadow.Style', 'N.Glow', 'N.Color.Particle', 'N.Text.Style']) {
+            expect(visible(), id).not.toContain(id);
+        }
+        preview('🔗 Enhanced Links.Marker.All', true);
+        expect(visible()).toEqual(expect.arrayContaining(['L.Particle.Density', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style']));
+        preview('🔗 Enhanced Links.Enabled', false);
+        preview('📦 Enhanced Nodes.Enabled', false);
+        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', 'L.Perf.MaxFps', 'L.Motion', 'L.Coexist']);
+    });
+
+    it('points the title and particle colours at Custom node colours, which they need, until it is set', () => {
+        showing({ '📦 Enhanced Nodes.Text.Animation.Enabled': true, '📦 Enhanced Nodes.Particle.Show': true });
+        const needs = (id: string) => {
+            const s = SETTINGS.find((e) => e.id === id)!;
+            return 'needs' in s ? s.needs() : undefined;
+        };
+        const fix = { reason: 'Used when Node effect colors is Custom.', id: '📦 Enhanced Nodes.Color.Mode', value: 'custom' };
+        expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([fix, fix]);
+        preview(fix.id, fix.value);
+        expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([undefined, undefined]);
+        expect(SETTINGS.filter((s) => 'needs' in s).map((s) => s.id)).toEqual(['📦 Enhanced Nodes.Color.Particle', '📦 Enhanced Nodes.Text.Color']);
     });
 });
 
@@ -319,7 +397,8 @@ describe('migrateDeprecatedValue', () => {
                 : s.type === 'slider' ? [s.min, s.default, s.max]
                 : s.type === 'boolean' ? [true, false]
                 : [s.default];
-            for (const value of valid) expect(migrate(s.id, value), s.id).toBe(value);
+            // The panel's state comes back as a copy.
+            for (const value of valid) expect(migrate(s.id, value), s.id)[typeof value === 'object' ? 'toEqual' : 'toBe'](value);
         }
     });
 });
@@ -345,6 +424,8 @@ describe('registration through the fake frontend', () => {
     });
 
     it('registers every node setting with the node extension alone and feeds N its stored value', async () => {
+        // With a look picked, so the first-run overlay (tested below) shows the stored v2.0.1 defaults as they are.
+        preview(LOOK, 'custom');
         const nodes = SETTINGS.filter((s) => s.id.startsWith('📦 Enhanced Nodes.'));
         resetFakeApp(Object.fromEntries(nodes.map((s) => [s.id, otherThanDefault(s)])));
         const { canvas } = app;
@@ -355,6 +436,7 @@ describe('registration through the fake frontend', () => {
         expect([...fake.registered.keys()]).toEqual(nodeSettings.map((p) => p.id));
         expect(N).toEqual(Object.fromEntries(nodes.map((s) => [s.key, otherThanDefault(s)])));
         expect(fake.posts).toEqual([]);
+        preview(LOOK, '');
     });
 
     it('feeds L the migrated stored values when the link extension registers, and writes nothing', async () => {
@@ -500,21 +582,25 @@ describe('writes', () => {
     });
 
     it('the sidebar saves a slider drag, a colour pick, a typed hex code and a toggle once each, and Reset only what changed', async () => {
-        resetFakeApp();
+        await start({ '🔗 Enhanced Links.Panel.State': { tab: 'links', advanced: false, search: '' } });
         const setDirty = vi.spyOn(app.canvas, 'setDirty');
-        const panel = document.createElement('div');
-        renderSettingsPanel(panel);
-        const control = (label: string) => [...panel.querySelectorAll('.enh-control-row, .enh-toggle-row')].find((row) => row.querySelector('label')?.textContent === label)!;
+        const tab = fake.tabs.find((t) => t.id === 'enhanced-links-nodes')!;
+        // In the page, as the sidebar's slot is.
+        const panel = document.body.appendChild(document.createElement('div'));
+        tab.render(panel);
+        // jsdom's selectors miss attribute values with emoji in them.
+        const control = (id: string) => [...panel.querySelectorAll<HTMLElement>('[data-setting]')].find((el) => el.dataset.setting === id)!;
         const fire = (el: HTMLInputElement, type: string, value: string) => {
             el.value = value;
             el.dispatchEvent(new Event(type));
         };
 
-        const slider = control('Thickness').querySelector('input')!;
+        const slider = control(THICKNESS).querySelector<HTMLInputElement>('input[type=range]')!;
         expect([slider.min, slider.max, slider.step, slider.value]).toEqual(['1', '10', '0.5', '3']);
         for (const value of ['3.5', '4', '4.5', '5']) fire(slider, 'input', value);
         expect(L.thickness).toBe(5);
-        const well = control('Custom Color').querySelector<HTMLInputElement>('input[type=color]')!;
+        // Shown once Marker color is Custom; its row is there all the same.
+        const well = control('🔗 Enhanced Links.Marker.Color').querySelector<HTMLInputElement>('input[type=color]')!;
         for (const value of ['#102030', '#123456']) fire(well, 'input', value);
         expect(L.markerColor).toBe('#123456');
         await settle();
@@ -522,23 +608,204 @@ describe('writes', () => {
 
         slider.dispatchEvent(new Event('change'));
         well.dispatchEvent(new Event('change'));
-        fire(control('Hover Color').querySelector<HTMLInputElement>('input[type=text]')!, 'change', 'ABCDEF');
-        control('Link Shadows').querySelector<HTMLElement>('.enh-toggle')!.click();
+        fire(control('🔗 Enhanced Links.Color.Primary').querySelector<HTMLInputElement>('input[type=text]')!, 'change', 'ABCDEF');
+        control('🔗 Enhanced Links.Link.Shadow.Enabled').querySelector<HTMLElement>('[role=switch]')!.click();
         await settle();
         // Link shadows are on by default since M4, so the toggle turns them off.
         const changed = [
             [THICKNESS, 5],
             ['🔗 Enhanced Links.Marker.Color', '#123456'],
-            ['📦 Enhanced Nodes.Color.Hover', '#abcdef'],
+            ['🔗 Enhanced Links.Color.Primary', '#abcdef'],
             ['🔗 Enhanced Links.Link.Shadow.Enabled', false],
         ];
         expect(fake.posts).toEqual(changed);
         // One redraw per value shown: four slider steps, two colours, the hex code and the toggle.
         expect(setDirty).toHaveBeenCalledTimes(8);
+        expect(control(THICKNESS).classList.contains('eln-row--modified')).toBe(true);
 
-        [...panel.querySelectorAll('button')].find((b) => b.textContent === 'Reset Link Settings to Defaults')!.click();
+        // The Path section's reset saves only what changed there, and offers its undo.
+        control(THICKNESS).closest('section')!.querySelector<HTMLElement>('.eln-section-head .eln-tool')!.click();
         await settle();
-        expect(fake.posts.slice(changed.length)).toEqual([[THICKNESS, 3], ['🔗 Enhanced Links.Marker.Color', '#00fff7'], ['🔗 Enhanced Links.Link.Shadow.Enabled', true]]);
-        expect(control('Thickness').querySelector('input')!.value).toBe('3');
+        expect(fake.posts.slice(changed.length)).toEqual([[THICKNESS, 3]]);
+        expect(slider.value).toBe('3');
+        panel.querySelector<HTMLElement>('.eln-undo button')!.click();
+        await settle();
+        expect(fake.posts.slice(changed.length + 1)).toEqual([[THICKNESS, 5]]);
+        expect(slider.value).toBe('5');
+        tab.destroy!();
+        panel.remove();
+        await settle();
+        expect(fake.posts).toHaveLength(changed.length + 2);
+    });
+
+    it('Reset leaves the hidden settings as they are, and its undo puts back what it changed', async () => {
+        resetFakeApp({ [THICKNESS]: 6, [LOOK]: 'showcase', '🔗 Enhanced Links.Panel.State': { tab: 'nodes', advanced: true, search: '' } });
+        const undo = reset('🔗 Enhanced Links.');
+        await settle();
+        expect(fake.posts).toEqual([[THICKNESS, 3]]);
+        undo();
+        await settle();
+        expect(fake.posts).toEqual([[THICKNESS, 3], [THICKNESS, 6]]);
+        expect(L.thickness).toBe(6);
+    });
+
+    it('commitAll commits only what differs from what is saved or queued, in order, and its undo puts that back', async () => {
+        resetFakeApp({ [THICKNESS]: 6 });
+        commit(NODE_GLOW, 1);
+        const undo = commitAll({ [NODE_GLOW]: 1, '🔗 Enhanced Links.Animate': 9, [THICKNESS]: '4', '🔗 Enhanced Links.Marker.Shape': 'star' });
+        await settle();
+        expect(fake.posts).toEqual([[NODE_GLOW, 1], [THICKNESS, 4], ['🔗 Enhanced Links.Marker.Shape', 'star']]);
+        undo();
+        await settle();
+        expect(fake.posts.slice(3)).toEqual([[THICKNESS, 6], ['🔗 Enhanced Links.Marker.Shape', 'arrow']]);
+        expect([L.thickness, L.markerShape, N.glow]).toEqual([6, 'arrow', 1]);
+    });
+
+    it('restore() ends previews with what is saved or queued', async () => {
+        resetFakeApp({ [THICKNESS]: 6 });
+        commit(NODE_GLOW, 0.8);
+        preview(THICKNESS, 2);
+        preview(NODE_GLOW, 0.1);
+        restore([THICKNESS, NODE_GLOW]);
+        expect([L.thickness, N.glow]).toEqual([6, 0.8]);
+        await settle();
+        expect(fake.posts).toEqual([[NODE_GLOW, 0.8]]);
+    });
+
+    it('drawWith lends values to L and N for one draw alone: nothing redraws or hears of them, and the revision is one of their own', () => {
+        resetFakeApp({ [THICKNESS]: 6 });
+        const setDirty = vi.spyOn(app.canvas, 'setDirty');
+        const heard: string[] = [];
+        const stop = watch((id) => heard.push(id));
+        const own = revision;
+        let seen: number[] = [];
+        drawWith({ [THICKNESS]: 9, [NODE_GLOW]: 0.2 }, () => {
+            seen = [L.thickness, N.glow, revision];
+        });
+        drawWith({}, () => seen.push(revision));
+        stop();
+        expect(seen.slice(0, 2)).toEqual([9, 0.2]);
+        // Below 0, and another for each draw, so no cache mistakes one draw's values for another's.
+        expect(seen[2]).toBeLessThan(0);
+        expect(seen[3]).toBeLessThan(seen[2]);
+        expect([L.thickness, N.glow, revision]).toEqual([6, 0.5, own]);
+        expect(heard).toEqual([]);
+        expect(setDirty).not.toHaveBeenCalled();
+    });
+
+    it('tells watchers of every change shown, from a preview, a commit or the settings dialog, until they stop; hidden ones redraw nothing', async () => {
+        resetFakeApp();
+        const setDirty = vi.spyOn(app.canvas, 'setDirty');
+        const heard: string[] = [];
+        const stop = watch((id) => heard.push(id));
+        preview(THICKNESS, 5);
+        preview(THICKNESS, 5);
+        commit(NODE_GLOW, 1);
+        await app.extensionManager.setting.set('🔗 Enhanced Links.Marker.Shape', 'star');
+        commit('🔗 Enhanced Links.Panel.State', { tab: 'perf', advanced: false, search: '' });
+        await settle();
+        expect(heard).toEqual([THICKNESS, NODE_GLOW, '🔗 Enhanced Links.Marker.Shape', '🔗 Enhanced Links.Panel.State']);
+        expect(setDirty).toHaveBeenCalledTimes(3);
+        expect(L.panelState).toEqual({ tab: 'perf', advanced: false, search: '' });
+        stop();
+        preview(THICKNESS, 6);
+        expect(heard).toHaveLength(4);
+    });
+});
+
+/** v1's DEFAULT_SETTINGS (old_link_animations.js:19-45, old_node_animations.js:146-178), which v1 saved for everyone who ran it. */
+const V1_SAVED: Record<string, unknown> = {
+    ...Object.fromEntries(Object.entries(V2_DEFAULTS).filter(([id]) => id.startsWith('🔗'))),
+    '🔗 Enhanced Links.Link.Shadow.Enabled': true,
+    '🔗 Enhanced Links.Marker.Shadow.Enabled': true,
+    '🔗 Enhanced Links.UI & Æmotion Studio About': 0,
+    '📦 Enhanced Nodes.Animate': 2,
+    '📦 Enhanced Nodes.Color.Mode': 'custom',
+    '📦 Enhanced Nodes.Color.Primary': '#ffb300',
+    '📦 Enhanced Nodes.Color.Secondary': '#fb00ff',
+    '📦 Enhanced Nodes.Color.Accent': '#9d00ff',
+    '📦 Enhanced Nodes.Color.Particle': '#ffb300',
+    '📦 Enhanced Nodes.Glow': 1,
+    '📦 Enhanced Nodes.Particle.Glow': 1,
+    '📦 Enhanced Nodes.Particle.Density': 0.5,
+    '📦 Enhanced Nodes.Particle.Show': true,
+    '📦 Enhanced Nodes.Quality': 1,
+    '📦 Enhanced Nodes.Text.Glow': 1,
+    '📦 Enhanced Nodes.End Animation.Enabled': false,
+    '📦 Enhanced Nodes.UI & Æmotion Studio About': 0,
+};
+
+describe('the first-run overlay', () => {
+    beforeAll(async () => {
+        await import('@/extensions/link-animations');
+        await import('@/extensions/node-animations');
+    });
+
+    const DEFAULTS = Object.fromEntries(SETTINGS.map((s) => [s.id, s.default]));
+    const showing = () => Object.fromEntries(SETTINGS.map((s) => [s.id, shown(s.id)]));
+    const LINK_SHADOW = '🔗 Enhanced Links.Link.Shadow.Enabled';
+
+    // The four profiles a first run can meet: none, the 64 defaults the v2 panel's Reset saved, those with the user's
+    // own changes, and what v1 saved.
+    for (const [profile, stored, own, shows] of [
+        ['a fresh install', {}, false, {}],
+        ["v2.0.1's defaults", V2_DEFAULTS, false, {}],
+        ['v2 settings of their own', { ...V2_DEFAULTS, [THICKNESS]: 6, '📦 Enhanced Nodes.Animate': 3 }, true, { [THICKNESS]: 6, '📦 Enhanced Nodes.Animate': 3 }],
+        // v1's own fireworks default is v2.0.1's, so it counts as unset too.
+        ["v1's saved defaults", V1_SAVED, true, Object.fromEntries(Object.entries(V1_SAVED).filter(([id]) => id in DEFAULTS && id !== '📦 Enhanced Nodes.End Animation.Enabled'))],
+    ] as const) {
+        it(`shows the defaults for ${profile}, but for values that differ from v2.0.1's, and writes nothing`, async () => {
+            resetFakeApp({ ...stored });
+            expect(showing()).toEqual({ ...DEFAULTS, ...shows });
+            expect(customised()).toBe(own);
+            await settle();
+            expect(fake.posts).toEqual([]);
+            expect(Object.fromEntries(fake.settings)).toEqual(stored);
+        });
+    }
+
+    it("counts a saved value that differs from v2.0.1's default as the user's own, though it is v3's default, and an unsaved one not", () => {
+        resetFakeApp({ [LINK_SHADOW]: true });
+        expect(customised()).toBe(true);
+        resetFakeApp({ [LINK_SHADOW]: false, '🔗 Enhanced Links.Coexist': 'auto', [LOOK]: 'showcase' });
+        expect(customised()).toBe(false);
+    });
+
+    it('shows the stored v2.0.1 defaults once Look is answered, as Keep my settings does', async () => {
+        resetFakeApp({ ...V2_DEFAULTS, [THICKNESS]: 6 });
+        expect(L.linkShadowEnabled).toBe(true);
+        commit(LOOK, 'custom');
+        expect([L.linkShadowEnabled, L.markerShadowEnabled, N.colorPrimary, N.endAnimationEnabled, L.thickness]).toEqual([false, false, '#44aaff', false, 6]);
+        await settle();
+        expect(fake.posts).toEqual([[LOOK, 'custom']]);
+        // As the page loads again.
+        resetFakeApp(Object.fromEntries(fake.settings));
+        expect([L.linkShadowEnabled, N.colorPrimary]).toEqual([false, '#44aaff']);
+    });
+
+    it("keeps a v2.0.1 default the user sets in the panel through a reload, answering the picker with what shows", async () => {
+        const END = '📦 Enhanced Nodes.End Animation.Enabled';
+        resetFakeApp(V2_DEFAULTS);
+        commit(END, false);
+        expect([N.endAnimationEnabled, L.markerShadowEnabled, L.look]).toEqual([false, true, 'custom']);
+        await settle();
+        // The store held End Animation's false already; the other overlaid settings save the defaults they show.
+        expect(fake.posts.at(-1)).toEqual([LOOK, 'custom']);
+        const overlaid = Object.keys(V2_DEFAULTS).filter((id) => V2_DEFAULTS[id] !== DEFAULTS[id] && id !== END);
+        expect(overlaid).toHaveLength(6);
+        expect(new Map(fake.posts)).toEqual(new Map<string, unknown>([...overlaid.map((id) => [id, DEFAULTS[id]] as const), [LOOK, 'custom']]));
+        resetFakeApp(Object.fromEntries(fake.settings));
+        expect(showing()).toEqual({ ...DEFAULTS, [END]: false, [LOOK]: 'custom' });
+    });
+
+    it('keeps a v2.0.1 default the user sets in the settings dialog through a reload; a v3 value needs no answer', async () => {
+        resetFakeApp(V2_DEFAULTS);
+        await app.extensionManager.setting.set(LINK_SHADOW, true);
+        expect([L.linkShadowEnabled, L.look]).toEqual([true, '']);
+        await app.extensionManager.setting.set(LINK_SHADOW, false);
+        expect([L.linkShadowEnabled, L.markerShadowEnabled, L.look]).toEqual([false, true, 'custom']);
+        await settle();
+        resetFakeApp(Object.fromEntries(fake.settings));
+        expect([L.linkShadowEnabled, L.markerShadowEnabled, L.look]).toEqual([false, true, 'custom']);
     });
 });

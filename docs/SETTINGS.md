@@ -8,6 +8,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
+| Link effects | `🔗 Enhanced Links.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI links and leaves every other link setting as it is. |
 | Link animation | `🔗 Enhanced Links.Animate` | combo | `0` None, `9` Classic Flow, `1` Sacred Flow, `2` Crystal Stream, `3` Quantum Field, `4` Cosmic Weave, `5` Energy Pulse, `6` DNA Helix, `7` Lava Flow, `8` Stellar Plasma | `9` Classic Flow | Effect drawn along every link. |
 | Link animation speed | `🔗 Enhanced Links.Animation.Speed` | slider | 0.1 to 3, step 0.05 | `1` |  |
 | Link flow direction | `🔗 Enhanced Links.Direction` | combo | `1` Forward, `-1` Reverse | `1` Forward | Which way effects travel. |
@@ -56,16 +57,11 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Drop shadow blur | `🔗 Enhanced Links.Shadow.Blur` | slider | 0 to 10, step 0.5 | `5` | Used by Drop shadow. |
 | Drop shadow offset | `🔗 Enhanced Links.Shadow.Offset` | slider | 0 to 10, step 0.5 | `3` | Used by Drop shadow. |
 
-## Links · Compatibility
-
-| Name | Id | Type | Options or range | Default | Tooltip |
-| --- | --- | --- | --- | --- | --- |
-| Other link extensions | `🔗 Enhanced Links.Coexist` | combo | `auto` Step aside if one is found, `ours` Keep Enhanced link effects, `defer` Always step aside | `auto` Step aside if one is found | When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working. |
-
 ## Nodes · Effect
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
+| Node effects | `📦 Enhanced Nodes.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is. |
 | Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Flower of Life | `0` None | Effect drawn on and around every node. Node FX in the node menu picks one for a node. |
 | Show base effect | `📦 Enhanced Nodes.Animations.Enabled` | boolean | `true`, `false` | `true` | Off draws only the effect's own particles. |
 | Node effect speed | `📦 Enhanced Nodes.Animation.Speed` | slider | 0.1 to 3, step 0.1 | `1` |  |
@@ -136,3 +132,31 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Fireworks when a run finishes | `📦 Enhanced Nodes.End Animation.Enabled` | boolean | `true`, `false` | `true` | Above your run's output nodes. Completion FX in the node menu sets them for one node. |
+
+## Performance · Budget
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Effect frame-rate cap | `🔗 Enhanced Links.Perf.MaxFps` | combo | `30` 30 fps, `60` 60 fps, `0` Display rate | `60` 60 fps | The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows. |
+
+## Performance · Accessibility
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Motion | `🔗 Enhanced Links.Motion` | combo | `system` Follow system, `reduce` Reduce, `full` Full | `system` Follow system | Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them. |
+
+## Performance · Compatibility
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Other link extensions | `🔗 Enhanced Links.Coexist` | combo | `auto` Step aside if one is found, `ours` Keep Enhanced link effects, `defer` Always step aside | `auto` Step aside if one is found | When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working. |
+
+## Kept by the panel
+
+The panel and the first-run picker save these in the same file. The settings dialog does not show them.
+
+| Name | Id | Default | What it holds |
+| --- | --- | --- | --- |
+| Current look | `🔗 Enhanced Links.Look` | `""` | The look last picked: empty until the first-run picker is answered, custom for settings kept as they were. |
+| Panel state | `🔗 Enhanced Links.Panel.State` | `{"tab":"looks","advanced":false,"search":""}` | The panel's tab, whether Advanced is open, and its search. |
+| Last seen version | `🔗 Enhanced Links.WhatsNew.Seen` | `""` | The version whose What's new was last shown. |

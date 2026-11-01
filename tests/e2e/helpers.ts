@@ -19,6 +19,8 @@ declare global {
         __eln: Probe;
         __elnCsp: CspViolation[];
         __elnConnectionPos?: { node: number; input: boolean; pos: Point }[];
+        /** The width of the canvas each native link segment was drawn on since nativeTargets(). */
+        __elnTargets: number[];
     }
 }
 
@@ -398,6 +400,26 @@ export async function openSubgraph(page: Page, nodeId: number): Promise<void> {
     await settle(page);
 }
 
+/** Whether a setting id is one of the extensions'. */
+export const ours = (id: string) => id.startsWith('🔗 Enhanced Links.') || id.startsWith('📦 Enhanced Nodes.');
+
+/** From now on, the ids of the settings the page POSTs, once for each id a POST writes. */
+export function settingPosts(page: Page): string[] {
+    const ids: string[] = [];
+    page.on('request', (request) => {
+        if (request.method() !== 'POST') return;
+        const path = new URL(request.url()).pathname;
+        if (path.startsWith('/api/settings/')) ids.push(decodeURIComponent(path.slice('/api/settings/'.length)));
+        else if (path === '/api/settings') ids.push(...Object.keys(request.postDataJSON()));
+    });
+    return ids;
+}
+
+/** The settings store's values of `ids`. */
+export function settingValues(page: Page, ids: string[]): Promise<unknown[]> {
+    return page.evaluate((ids) => ids.map((id) => window.app.extensionManager.setting.get(id)), ids);
+}
+
 export function setSetting(page: Page, id: string, value: unknown): Promise<void> {
     return page.evaluate(([id, value]) => window.app.extensionManager.setting.set(id, value), [id, value] as const);
 }
@@ -575,4 +597,86 @@ export function titleOf(page: Page, nodeId: number): Promise<Point> {
         const node = app.canvas.graph.getNodeById(id);
         return [node.pos[0] + node.size[0] / 2, node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT / 2] as Point;
     }, nodeId);
+}
+
+/** From now on, records the canvas each native link segment is drawn on, which is 1 px wide where the extension draws the link itself. */
+export function nativeTargets(page: Page): Promise<void> {
+    return page.evaluate(() => {
+        const renderer = window.app.canvas.linkRenderer;
+        const direct = renderer.renderLinkDirect;
+        window.__elnTargets = [];
+        renderer.renderLinkDirect = function (this: unknown, ctx: CanvasRenderingContext2D, ...rest: unknown[]) {
+            window.__elnTargets.push(ctx.canvas.width);
+            return direct.call(this, ctx, ...rest);
+        };
+    });
+}
+
+/** Whether the next background pass draws the links natively, as ComfyUI does without the extension. */
+export async function drawnNatively(page: Page): Promise<boolean> {
+    await page.evaluate(() => (window.__elnTargets = []));
+    await redraw(page);
+    const widths = await page.evaluate(() => window.__elnTargets);
+    expect(widths.length).toBeGreaterThan(0);
+    return widths.every((width) => width > 1);
+}
+
+/**
+ * The lowest contrast ratios of the visible text in `root` (the panel, unless named), its inputs' values and
+ * placeholders, against what is behind them; but for disabled controls, which WCAG 1.4.3 leaves out.
+ */
+export function lowestContrast(page: Page, root = '.eln'): Promise<{ ratio: number; text: string }[]> {
+    return page.evaluate((root) => {
+        const parse = (colour: string): number[] => {
+            const rgb = colour.match(/^rgba?\(([^)]+)\)$/);
+            if (rgb) {
+                const [r, g, b, a = 1] = rgb[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+                return [r, g, b, a];
+            }
+            const srgb = colour.match(/^color\(srgb ([^)]+)\)$/);
+            if (srgb) {
+                const [r, g, b, a = 1] = srgb[1].split(/[\s/]+/).filter(Boolean).map(Number);
+                return [r * 255, g * 255, b * 255, a];
+            }
+            throw new Error(`Unread colour ${colour}`);
+        };
+        const over = (top: number[], below: number[]) => [...top.slice(0, 3).map((v, i) => v * top[3] + below[i] * (1 - top[3])), 1];
+        /** The colour behind an element: its own background and its ancestors', down to the first opaque one. */
+        const behind = (el: Element | null) => {
+            const layers: number[][] = [];
+            for (; el; el = el.parentElement) {
+                const colour = parse(getComputedStyle(el).backgroundColor);
+                if (colour[3] > 0) layers.push(colour);
+                if (colour[3] === 1) break;
+            }
+            return layers.reverse().reduce((below, top) => over(top, below), [255, 255, 255, 1]);
+        };
+        const luminance = (c: number[]) => {
+            const [r, g, b] = c.slice(0, 3).map((v) => (v / 255 <= 0.03928 ? v / 255 / 12.92 : ((v / 255 + 0.055) / 1.055) ** 2.4));
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const opacity = (el: Element | null) => {
+            let alpha = 1;
+            for (; el; el = el.parentElement) alpha *= Number(getComputedStyle(el).opacity);
+            return alpha;
+        };
+        const ratio = (fg: number[], el: Element) => {
+            const bg = behind(el);
+            const [a, b] = [luminance(over([...fg.slice(0, 3), fg[3] * opacity(el)], bg)), luminance(bg)].sort((x, y) => y - x);
+            return (a + 0.05) / (b + 0.05);
+        };
+        const panel = document.querySelector(root)!;
+        const found: { ratio: number; text: string }[] = [];
+        for (const el of panel.querySelectorAll('*')) {
+            const text = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent!.trim()).join(' ').trim();
+            if (!text || !el.checkVisibility() || el.closest('.eln-sr, select, [inert]')) continue;
+            found.push({ ratio: ratio(parse(getComputedStyle(el).color), el), text });
+        }
+        for (const input of panel.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input:not([type=range], [type=color], [type=file]), select')) {
+            if (!input.checkVisibility() || input.closest('[inert]')) continue;
+            found.push({ ratio: ratio(parse(getComputedStyle(input).color), input), text: `${input.tagName} ${input.value}` });
+            if ('placeholder' in input && input.placeholder) found.push({ ratio: ratio(parse(getComputedStyle(input, '::placeholder').color), input), text: input.placeholder });
+        }
+        return found.sort((a, b) => a.ratio - b.ratio).slice(0, 3);
+    }, root);
 }

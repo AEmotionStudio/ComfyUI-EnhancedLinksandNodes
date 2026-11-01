@@ -41,7 +41,7 @@ const FUNCTION = new RegExp(`^(rgb|hsl)a?\\(\\s*${NUMBER}(%|deg)?\\s*,?\\s*${NUM
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 
 /** The red, green and blue (0-255) of hue h (degrees from 0 to 360), saturation s and lightness l (0-100), as v1's hsl2Hex rounds them. */
-function fromHsl(h: number, s: number, l: number): [number, number, number] {
+export function fromHsl(h: number, s: number, l: number): [number, number, number] {
     l /= 100;
     const a = (s * Math.min(l, 1 - l)) / 100;
     const f = (n: number) => {

@@ -1,10 +1,10 @@
 // The settings as ComfyUI handles them: the native dialog, stored values and their migrations, the
-// sidebar's writes, and each extension's settings with the other disabled. A disabled extension's
+// panel's writes, and each extension's settings with the other disabled. A disabled extension's
 // settings stay registered, so the -native projects run the dialog and migration tests too.
 import { readFileSync } from 'node:fs';
 import type { Page } from '@playwright/test';
 import * as graphs from './fixtures/graphs';
-import { buildGraph, expect, openApp, readProbe, redraw, resetProbe, test } from './helpers';
+import { buildGraph, expect, openApp, ours, readProbe, redraw, resetProbe, setSetting, settingPosts, settingValues, test } from './helpers';
 
 const locale = (file: string) => JSON.parse(readFileSync(new URL(`../../locales/en/${file}`, import.meta.url), 'utf8'));
 const MAIN = locale('main.json');
@@ -16,24 +16,6 @@ const [PANEL, ...GROUPS]: string[] = Object.values(MAIN.settingsCategories);
 /** The vue-i18n key of every string in a locale file. */
 const messageKeys = (messages: object, prefix = ''): string[] =>
     Object.entries(messages).flatMap(([key, value]) => (typeof value === 'string' ? [prefix + key] : messageKeys(value, `${prefix}${key}.`)));
-
-const ours = (id: string) => id.startsWith('🔗 Enhanced Links.') || id.startsWith('📦 Enhanced Nodes.');
-
-/** From now on, the ids of the settings the page POSTs, once for each id a POST writes. */
-function settingPosts(page: Page): string[] {
-    const ids: string[] = [];
-    page.on('request', (request) => {
-        if (request.method() !== 'POST') return;
-        const path = new URL(request.url()).pathname;
-        if (path.startsWith('/api/settings/')) ids.push(decodeURIComponent(path.slice('/api/settings/'.length)));
-        else if (path === '/api/settings') ids.push(...Object.keys(request.postDataJSON()));
-    });
-    return ids;
-}
-
-function settingValues(page: Page, ids: string[]): Promise<unknown[]> {
-    return page.evaluate((ids) => ids.map((id) => window.app.extensionManager.setting.get(id)), ids);
-}
 
 /** The registered settings, keyed like {@link SETTINGS}. */
 function registered(page: Page): Promise<string[]> {
@@ -88,17 +70,19 @@ test.describe('with stored values that need migrating', () => {
 });
 
 test('the sidebar saves a slider drag and a select change with one POST each', async ({ page, profile }) => {
-    test.skip(profile === 'native', 'the sidebar comes with the link extension');
+    test.skip(profile === 'native', 'the panel comes with the extensions');
     const THICKNESS = '🔗 Enhanced Links.Thickness';
     const LINK_STYLE = '🔗 Enhanced Links.Link.Style';
     await openApp(page);
+    // The panel opens on the Links tab.
+    await setSetting(page, '🔗 Enhanced Links.Panel.State', { tab: 'links', advanced: false, search: '' });
     const posts = settingPosts(page);
-    await page.getByRole('button', { name: /^Enhanced Links & Nodes Settings/ }).click();
-    const sidebar = page.locator('.enh-sidebar');
-    await sidebar.getByText('🔗 Link Style', { exact: true }).click();
-    const control = (label: string) => sidebar.locator('.enh-control-row').filter({ has: page.getByText(label, { exact: true }) });
+    await page.getByRole('button', { name: /^Enhanced Links & Nodes/ }).first().click();
+    const panel = page.locator('.eln');
+    await panel.getByRole('button', { name: 'Path', exact: true }).click();
+    const control = (id: string) => panel.locator(`[data-setting="${id}"]`);
 
-    const slider = control('Thickness').locator('input[type=range]');
+    const slider = control(THICKNESS).locator('input[type=range]');
     await slider.evaluate((el) => el.addEventListener('input', () => {
         el.dataset.steps = String(Number(el.dataset.steps ?? 0) + 1);
     }));
@@ -111,7 +95,7 @@ test('the sidebar saves a slider drag and a select change with one POST each', a
     expect(Number(await slider.getAttribute('data-steps'))).toBeGreaterThan(10);
     await expect.poll(() => posts.filter(ours)).toEqual([THICKNESS]);
 
-    await control('Link Style').locator('select').selectOption('dotted');
+    await control(LINK_STYLE).locator('select').selectOption({ label: 'Dotted' });
     await expect.poll(() => posts.filter(ours)).toEqual([THICKNESS, LINK_STYLE]);
     // A late or repeated save would show up by now.
     await page.waitForTimeout(1000);

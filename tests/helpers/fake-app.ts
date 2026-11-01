@@ -16,6 +16,14 @@ interface Setting {
     onChange?: (newValue: unknown, oldValue?: unknown) => unknown;
 }
 
+/** A sidebar tab as a custom extension registers one. */
+interface SidebarTab {
+    id: string;
+    iconBadge?: string | (() => string | null);
+    render: (container: HTMLElement) => void;
+    destroy?: () => void;
+}
+
 interface Extension {
     name: string;
     settings?: Setting[];
@@ -38,16 +46,31 @@ export const fake = {
     /** The settings each set() sent to the server, in order. */
     posts: [] as Array<[id: string, value: unknown]>,
     extensions: [] as Extension[],
+    /** The sidebar tabs registered, which registration keeps for the page, as the sidebar store does. */
+    tabs: [] as SidebarTab[],
     /** What app.extensionManager.toast.add showed, in order. */
     toasts: [] as unknown[],
+    /** The commands run through app.extensionManager.command.execute, in order. */
+    commands: [] as string[],
+    /** The user's data files by path, as the server's /userdata keeps them. */
+    userData: new Map<string, string>(),
     /** What matchMedia('(prefers-reduced-motion: reduce)') returns: tests set matches, then dispatch 'change'. */
     reducedMotion: Object.assign(new EventTarget(), { matches: false }),
     /** The LGraphCanvas global, a new class after every resetFakeApp(). */
     LGraphCanvas: installLiteGraph(),
 };
 
-// src asks matchMedia about reduced motion only.
-Object.assign(globalThis, { matchMedia: () => fake.reducedMotion });
+// src asks matchMedia about reduced motion only. jsdom has no IntersectionObserver either: here nothing is ever on screen.
+Object.assign(globalThis, {
+    matchMedia: () => fake.reducedMotion,
+    IntersectionObserver: class {
+        observe(): void {}
+        unobserve(): void {}
+    },
+});
+
+// The canvas's part of the page, where the frontends put what floats over the canvas (LiteGraphCanvasSplitterOverlay.vue).
+document.body.append(Object.assign(document.createElement('div'), { className: 'graph-canvas-panel' }));
 
 /** settingStore.get: the stored value, else the registered default. */
 function value(id: string): unknown {
@@ -114,8 +137,10 @@ export const app = {
     },
     extensionManager: {
         setting: { get: read, set },
-        registerSidebarTab: () => {},
+        registerSidebarTab: (tab: SidebarTab) => void fake.tabs.push(tab),
+        getSidebarTabs: () => fake.tabs,
         toast: { add: (message: unknown) => void fake.toasts.push(message) },
+        command: { execute: async (id: string) => void fake.commands.push(id) },
     },
     canvas,
     graph: {
@@ -129,8 +154,20 @@ export const app = {
     },
 };
 
-/** ComfyApi is an EventTarget; tests dispatch its events, such as 'status', as ComfyUI does. */
-export const api = new EventTarget();
+/**
+ * ComfyApi is an EventTarget; tests dispatch its events, such as 'status', as ComfyUI does. Its user data calls answer
+ * as the server's /userdata does (app/user_manager.py): 404 for a file that is not there.
+ */
+export const api = Object.assign(new EventTarget(), {
+    getUserData: async (file: string) => {
+        const body = fake.userData.get(file);
+        return body === undefined ? new Response(null, { status: 404, statusText: 'Not Found' }) : new Response(body);
+    },
+    storeUserData: async (file: string, data: unknown, options: { stringify?: boolean }) => {
+        fake.userData.set(file, options.stringify ? JSON.stringify(data) : String(data));
+        return new Response(null);
+    },
+});
 
 /** Installs fresh LiteGraph globals and returns their LGraphCanvas; a new class drops prototype patches from earlier setups. */
 function installLiteGraph() {
@@ -159,6 +196,7 @@ export function resetFakeApp(settings: Record<string, unknown> = {}): void {
     fake.duplicates = [];
     fake.posts = [];
     fake.toasts = [];
+    fake.commands = [];
     fake.LGraphCanvas = installLiteGraph();
     fake.registered.forEach(load);
 }
