@@ -156,3 +156,12 @@ export const gallery: GraphSpec = {
         int: { from: 'int', to: 'intTarget', reroute: [500, 720] },
     },
 };
+
+/** For the node rows of the contact sheets: two nodes of different sizes and a Sleep node, an output node, without links. */
+export const nodeScene: GraphSpec = {
+    nodes: {
+        image: { type: 'ELNImage', pos: [220, 180] },
+        latent: { type: 'ELNLatent', pos: [640, 300] },
+        sleep: { type: 'ELNSleep', pos: [380, 540] },
+    },
+};

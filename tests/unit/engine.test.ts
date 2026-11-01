@@ -1,18 +1,21 @@
 /**
  * The engine (src/core/engine.ts) through both extensions on the fake
- * LiteGraph: the clock keeps v2's 60 Hz rates at any frame rate, the ticker
- * asks for front paints only while something animated is on screen and at most
- * 60 a second, onRender and onDrawForeground stay chained when other
- * extensions take them over, and the guard turns off what keeps failing.
+ * LiteGraph: the clock runs the links and the nodes at v1's rates, which for the
+ * nodes are its 60 Hz ones, at any frame rate; the ticker asks for front paints only while
+ * something animated is on screen and at most 60 a second; onRender and
+ * onDrawForeground stay chained when other extensions take them over; and the
+ * guard turns off what keeps failing.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { clock, guard, install, live } from '@/core/engine';
 import { preview } from '@/core/settings';
+import { MOVING } from '@/links/animations';
 import { app, fake } from '../helpers/fake-app';
 import { frames, page, queue, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
 
 const TURN = (2 * Math.PI) / 15;
+const PHI2 = ((1 + Math.sqrt(5)) / 2) ** 2;
 
 /** Two nodes on screen and an IMAGE link between them. */
 const PAIR: GraphSpec = { nodes: [{ pos: [100, 200] }, { pos: [600, 200] }], links: [{ from: 0, to: 1, type: 'IMAGE' }] };
@@ -25,7 +28,10 @@ afterEach(() => {
 });
 
 const count = (canvas: FakeCanvas, call: string) => canvas.calls.filter((c) => c === call).length;
-const strokes = (canvas: FakeCanvas) => canvas.front.paints.filter((p) => p.op === 'stroke').length;
+/** What the link layer drew in the front passes so far: the IMAGE link's markers and centre marker, in the default link colour. */
+const motion = (canvas: FakeCanvas) => canvas.front.paints.filter((p) => p.op === 'fill' && p.style === '#99aa99').length;
+/** Classic Flow's two markers and the centre marker, which one front pass draws for the link. */
+const PER_PASS = 3;
 
 /** Runs a few frames so the ticker is past its first one, then forgets what was asked for so far. */
 function warmUp(canvas: FakeCanvas) {
@@ -36,7 +42,7 @@ function warmUp(canvas: FakeCanvas) {
 }
 
 describe('clock', () => {
-    it("moves at v2's per-second rates at 60 Hz, and at 144 Hz within 1% of them", async () => {
+    it("moves the links and the nodes at v1's rates at 60 Hz, and at 144 Hz within 1% of them", async () => {
         const settings = {
             ...NODES_ON,
             '🔗 Enhanced Links.Animation.Speed': 2,
@@ -45,25 +51,105 @@ describe('clock', () => {
             '📦 Enhanced Nodes.Particle.Speed': 3,
             '📦 Enhanced Nodes.Direction': -1,
         };
-        // v2.0.1 per second at 60 Hz: AnimationState.update, its node renderLoop and ParticleController each added
-        // (2π/15) × speed × direction × the frame delta; drawConnections and the link rAF loop each added the delta to the flow time.
-        const v2 = { linkPhase: -TURN * 2, linkTime: 2, nodePhase: -TURN * 1.5, particlePhase: -TURN * 3 };
-        const rates: Record<number, typeof v2> = {};
+        // Per second. v1 (old_link_animations.js:260-303, 2457-2459): phase −= PHI² × speed × direction × Δ, and its time
+        // gained speed × Δ twice a frame, which the renderers took times the speed again. Quantum Field's phase turns as
+        // the phase does, up to 3/5 of a turn a second. v1's node controllers at 60 Hz (old_node_animations.js:71-127,
+        // 2945-2957) added (2π/15) × speed × direction × Δ to the effect phase and to the particles' (here TURN × their
+        // time, which runs Particle.Speed seconds a second), and its time Δ.
+        const rates = { linkPhase: PHI2 * 2, linkFlow: -2 * 2 * 2, quantumPhase: (2 * Math.PI * 3) / 5, nodePhase: -TURN * 1.5, particleTime: -3, nodeTime: 1 };
+        const moved: Record<number, typeof rates> = {};
         for (const hz of [60, 144]) {
             warmUp(await start(settings, PAIR));
             const before = { ...clock };
             frames(hz, hz);
-            rates[hz] = {
+            moved[hz] = {
                 linkPhase: clock.linkPhase - before.linkPhase,
-                linkTime: clock.linkTime - before.linkTime,
+                linkFlow: clock.linkFlow - before.linkFlow,
+                quantumPhase: clock.quantumPhase - before.quantumPhase,
                 nodePhase: clock.nodePhase - before.nodePhase,
-                particlePhase: clock.particlePhase - before.particlePhase,
+                particleTime: clock.particleTime - before.particleTime,
+                nodeTime: clock.nodeTime - before.nodeTime,
             };
         }
-        for (const key of Object.keys(v2) as (keyof typeof v2)[]) {
-            expect(rates[60][key], key).toBeCloseTo(v2[key], 6);
-            expect(Math.abs(rates[144][key] / rates[60][key] - 1), key).toBeLessThan(0.01);
+        for (const key of Object.keys(rates) as (keyof typeof rates)[]) {
+            expect(moved[60][key], key).toBeCloseTo(rates[key], 6);
+            expect(Math.abs(moved[144][key] / moved[60][key] - 1), key).toBeLessThan(0.01);
         }
+    });
+
+    it('turns the link phase once every 2.40 s at speed 1, backwards going Forward, and never wraps it', async () => {
+        warmUp(await start({}, PAIR));
+        const phase = clock.linkPhase;
+        // 2π / PHI² = 2.39996 s; at 60 Hz the 144th frame lands on 2.40 s.
+        frames(144);
+        expect((clock.linkPhase - phase) / (-2 * Math.PI)).toBeCloseTo(2.4 / ((2 * Math.PI) / PHI2), 9);
+        frames(600);
+        expect(clock.linkPhase - phase).toBeCloseTo(-PHI2 * 12.4, 6);
+    });
+
+    it('flows forward going Forward, backward going Reverse, and four times as far at twice the speed', async () => {
+        const flow = async (settings: Record<string, unknown>) => {
+            warmUp(await start(settings, PAIR));
+            const before = clock.linkFlow;
+            frames(60);
+            return clock.linkFlow - before;
+        };
+        const forward = await flow({});
+        expect(forward).toBeCloseTo(2, 9);
+        expect(await flow({ '🔗 Enhanced Links.Direction': -1 })).toBeCloseTo(-forward, 9);
+        expect(await flow({ '🔗 Enhanced Links.Animation.Speed': 2 })).toBeCloseTo(4 * forward, 9);
+    });
+
+    it('turns the links around over 0.3 s when Direction changes, and at once while they are still', async () => {
+        const canvas = await start({}, PAIR);
+        warmUp(canvas);
+        preview('🔗 Enhanced Links.Direction', -1);
+        // A setting change repaints both canvases; the direction moves by 2 / 0.3 a second from the next tick on.
+        const turning: number[] = [];
+        for (let i = 0; i < 24; i++) {
+            frames(1);
+            turning.push(clock.linkDir);
+        }
+        expect(turning[0]).toBeCloseTo(1 - 2 / 18, 9);
+        expect(turning[8]).toBeCloseTo(0, 9);
+        expect(turning.slice(17)).toEqual(Array(7).fill(-1));
+        // Flowing backwards now, at the full rate.
+        const flow = clock.linkFlow;
+        frames(60);
+        expect(clock.linkFlow - flow).toBeCloseTo(-2, 9);
+
+        // Turned while held still, whether the ticker stopped or ran on for the nodes, they set off the new way at once.
+        for (const settings of [{}, NODES_ON]) {
+            warmUp(await start({ ...settings, '🔗 Enhanced Links.Direction': -1 }, PAIR));
+            preview('🔗 Enhanced Links.Static.Mode', true);
+            frames(5);
+            preview('🔗 Enhanced Links.Direction', 1);
+            frames(5);
+            preview('🔗 Enhanced Links.Static.Mode', false);
+            frames(3);
+            const before = clock.linkFlow;
+            frames(6);
+            expect(clock.linkFlow - before, JSON.stringify(settings)).toBeCloseTo(0.2, 9);
+        }
+    });
+
+    it('turns the nodes around over 0.3 s when their Direction changes, the effect phase and the particles alike', async () => {
+        warmUp(await start({ ...LINKS_OFF, ...NODES_ON }, PAIR));
+        preview('📦 Enhanced Nodes.Direction', -1);
+        const turning: number[] = [];
+        for (let i = 0; i < 24; i++) {
+            frames(1);
+            turning.push(clock.nodeDir);
+        }
+        expect(turning[0]).toBeCloseTo(1 - 2 / 18, 9);
+        expect(turning[8]).toBeCloseTo(0, 9);
+        expect(turning.slice(17)).toEqual(Array(7).fill(-1));
+        const before = { ...clock };
+        frames(60);
+        expect(clock.nodePhase - before.nodePhase).toBeCloseTo(-TURN, 9);
+        expect(clock.particleTime - before.particleTime).toBeCloseTo(-1, 9);
+        // The time Cosmic Ripple's motes wobble by runs on forward.
+        expect(clock.nodeTime - before.nodeTime).toBeCloseTo(1, 9);
     });
 
     it('moves by at most 0.1 s across a long frame', async () => {
@@ -71,14 +157,14 @@ describe('clock', () => {
         const phase = clock.linkPhase;
         // One frame 2 s after the last.
         frames(1, 0.5);
-        expect(clock.linkPhase - phase).toBeCloseTo(TURN * 0.1, 9);
+        expect(clock.linkPhase - phase).toBeCloseTo(-PHI2 * 0.1, 9);
     });
 
     it('moves only the clocks of what animates', async () => {
         for (const [settings, moving] of [
-            [{}, ['linkPhase', 'linkTime']],
+            [{}, ['linkPhase', 'linkFlow', 'quantumPhase']],
             [{ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 1 }, ['nodePhase']],
-            [{ ...LINKS_OFF, '📦 Enhanced Nodes.Particle.Show': true }, ['particlePhase']],
+            [{ ...LINKS_OFF, '📦 Enhanced Nodes.Particle.Show': true }, ['particleTime', 'nodeTime']],
         ] as const) {
             warmUp(await start(settings, PAIR));
             const before = { ...clock };
@@ -134,7 +220,7 @@ describe('ticker', () => {
         frames(1);
         expect(clock.linkPhase).toBe(phase);
         frames(1);
-        expect(clock.linkPhase - phase).toBeCloseTo(TURN / 60, 9);
+        expect(clock.linkPhase - phase).toBeCloseTo(-PHI2 / 60, 9);
         expect(setDirty).toHaveBeenCalledTimes(1);
     });
 
@@ -150,7 +236,7 @@ describe('ticker', () => {
         frames(1);
         expect(clock.linkPhase).toBe(phase);
         frames(1);
-        expect(clock.linkPhase - phase).toBeCloseTo(TURN / 60, 9);
+        expect(clock.linkPhase - phase).toBeCloseTo(-PHI2 / 60, 9);
     });
 
     // Animated titles move with the node effect's phase, so they stop with it.
@@ -232,7 +318,7 @@ describe('ticker', () => {
         preview('📦 Enhanced Nodes.Animate', 2);
         frames(5);
         expect(page.waiting).toHaveLength(1);
-        expect(live).toEqual({ links: 1, nodes: 2, particles: 2 });
+        expect(live).toEqual({ links: 1, nodes: 2, particles: 2, bursts: 0 });
     });
 });
 
@@ -265,20 +351,19 @@ describe('onRender and onDrawForeground', () => {
         canvas.graph.config.links_ontop = true;
         canvas.setDirty(true, true);
         frames(5);
-        const strokes = () => canvas.front.paints.filter((p) => p.op === 'stroke').length;
         const drawn = (count: number) => {
-            const before = strokes();
+            const before = motion(canvas);
             frames(count);
-            return strokes() - before;
+            return motion(canvas) - before;
         };
-        expect(drawn(1)).toBe(1);
+        expect(drawn(1)).toBe(PER_PASS);
         const replacement = vi.fn();
         canvas.onDrawForeground = replacement;
         // The link count of the pass it missed runs on, so the ticker chains it again on its next frame.
         expect(drawn(1)).toBe(0);
         frames(2);
         expect(canvas.onDrawForeground).not.toBe(replacement);
-        expect(drawn(1)).toBe(1);
+        expect(drawn(1)).toBe(PER_PASS);
         expect(live.links).toBe(1);
     });
 
@@ -331,7 +416,7 @@ describe('onRender and onDrawForeground', () => {
         install();
         canvas.draw(true, true);
         expect(calls).toEqual({ onRender: 1, onDrawForeground: 1, wrapper: 2 });
-        expect(strokes(canvas)).toBe(1);
+        expect(motion(canvas)).toBe(PER_PASS);
     });
 
     describe('replaced while nothing moved', () => {
@@ -342,9 +427,9 @@ describe('onRender and onDrawForeground', () => {
             // The link pass counts the segments it recorded, so the ticker runs and chains our onRender again.
             frames(5);
             expect(canvas.onRender).not.toBe(replacement);
-            const [before, calls] = [strokes(canvas), replacement.mock.calls.length];
+            const [before, calls] = [motion(canvas), replacement.mock.calls.length];
             frames(1);
-            expect([strokes(canvas) - before, replacement.mock.calls.length - calls, live.links]).toEqual([1, 1, 1]);
+            expect([motion(canvas) - before, replacement.mock.calls.length - calls, live.links]).toEqual([PER_PASS, 1, 1]);
         });
 
         it('onRender, while Static mode kept the ticker off, until links move again', async () => {
@@ -358,9 +443,9 @@ describe('onRender and onDrawForeground', () => {
             preview('🔗 Enhanced Links.Static.Mode', false);
             frames(5);
             expect(canvas.onRender).not.toBe(replacement);
-            const before = strokes(canvas);
+            const before = motion(canvas);
             frames(1);
-            expect(strokes(canvas) - before).toBe(1);
+            expect(motion(canvas) - before).toBe(PER_PASS);
         });
 
         it('onDrawForeground, where links on top are drawn, before the first frame', async () => {
@@ -370,9 +455,9 @@ describe('onRender and onDrawForeground', () => {
             canvas.onDrawForeground = replacement;
             frames(5);
             expect(canvas.onDrawForeground).not.toBe(replacement);
-            const before = strokes(canvas);
+            const before = motion(canvas);
             frames(1);
-            expect(strokes(canvas) - before).toBe(1);
+            expect(motion(canvas) - before).toBe(PER_PASS);
         });
     });
 
@@ -416,9 +501,11 @@ describe('guard', () => {
 
     it('turns off a link animation that fails every frame, which then draws natively and stops the ticker', async () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        // Lava Flow's gradient throws on a colour the canvas cannot parse, here a palette's.
-        const canvas = await start({ '🔗 Enhanced Links.Animate': 7 }, { ...PAIR, links: [{ from: 0, to: 1, type: 'INT' }] });
-        Object.assign((globalThis as unknown as { LGraphCanvas: { link_type_colors: Record<string, string> } }).LGraphCanvas.link_type_colors, { INT: 'nope' });
+        const canvas = await start({ '🔗 Enhanced Links.Animate': 7 }, PAIR);
+        // Every colour has a palette, so no colour makes Lava Flow's gradient throw any more; here it throws itself.
+        vi.spyOn(MOVING, 7).mockImplementation(() => {
+            throw new Error('boom');
+        });
         frames(20);
         expect(guard.off('Link animation')).toBe(true);
         expect(fake.toasts).toEqual([expect.objectContaining({ summary: 'Link animation turned off' })]);

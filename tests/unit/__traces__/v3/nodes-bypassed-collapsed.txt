@@ -1,0 +1,759 @@
+# One front pass: the bypassed node at 0.2, the collapsed one native
+drawImage(image(1600x900), 0, 0)
+save()
+scale(1, 1)
+translate(0, 0)
+getTransform()
+save()
+translate(100, 100)
+translate(1884, 0)
+beginPath()
+roundRect(0, -30, 220, 150, [8])
+translate(-1884, 0)
+fillStyle = #353535
+shadowColor = #ffb300
+shadowBlur = 10
+shadowOffsetX = -1882
+shadowOffsetY = 2
+globalAlpha = 0.2
+fill()
+beginPath()
+rect(-100, -100, 1600, 900)
+roundRect(0, -30, 220, 150, [8])
+clip("evenodd")
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 0.2
+beginPath()
+arc(110, 60, 57.12, 0, 6.28)
+grad1 = createLinearGradient(52.88, 60, 167.12, 60)
+grad1.addColorStop(0, rgba(251, 0, 255, 0.256))
+grad1.addColorStop(0.5, rgba(255, 179, 0, 0.32))
+grad1.addColorStop(1, rgba(157, 0, 255, 0.256))
+strokeStyle = grad1
+lineWidth = 1.44
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 2.4
+stroke()
+beginPath()
+arc(110, 60, 73.92, 0, 6.28)
+grad2 = createLinearGradient(36.08, 60, 183.92, 60)
+grad2.addColorStop(0, rgba(251, 0, 255, 0.096))
+grad2.addColorStop(0.5, rgba(255, 179, 0, 0.12))
+grad2.addColorStop(1, rgba(157, 0, 255, 0.096))
+strokeStyle = grad2
+lineWidth = 1
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 2
+stroke()
+grad3 = createRadialGradient(-41.98, 35.72, 0, -41.98, 35.72, 2)
+grad3.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad3.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad3
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(-41.98, 35.72, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(-41.98, 35.72, 1, 0, 6.28)
+fill()
+grad4 = createRadialGradient(-16.34, 5.13, 0, -16.34, 5.13, 3.02)
+grad4.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad4.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad4
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(-16.34, 5.13, 3.02, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(-16.34, 5.13, 1.51, 0, 6.28)
+fill()
+grad5 = createRadialGradient(24.59, -6.43, 0, 24.59, -6.43, 5.86)
+grad5.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad5.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad5
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(24.59, -6.43, 5.86, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(24.59, -6.43, 2.93, 0, 6.28)
+fill()
+grad6 = createRadialGradient(53.43, -13.13, 0, 53.43, -13.13, 6.99)
+grad6.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad6.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad6
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(53.43, -13.13, 6.99, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(53.43, -13.13, 3.49, 0, 6.28)
+fill()
+grad7 = createRadialGradient(68.44, -36.4, 0, 68.44, -36.4, 5.37)
+grad7.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad7.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad7
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(68.44, -36.4, 5.37, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(68.44, -36.4, 2.69, 0, 6.28)
+fill()
+grad8 = createRadialGradient(89.18, -72.62, 0, 89.18, -72.62, 2.5)
+grad8.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad8.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad8
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(89.18, -72.62, 2.5, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(89.18, -72.62, 1.25, 0, 6.28)
+fill()
+grad9 = createRadialGradient(124.64, -92.66, 0, 124.64, -92.66, 2)
+grad9.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad9.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad9
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(124.64, -92.66, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(124.64, -92.66, 1, 0, 6.28)
+fill()
+grad10 = createRadialGradient(159.21, -76.12, 0, 159.21, -76.12, 2.27)
+grad10.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad10.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad10
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(159.21, -76.12, 2.27, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(159.21, -76.12, 1.13, 0, 6.28)
+fill()
+grad11 = createRadialGradient(175.51, -36.12, 0, 175.51, -36.12, 5.12)
+grad11.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad11.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad11
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(175.51, -36.12, 5.12, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(175.51, -36.12, 2.56, 0, 6.28)
+fill()
+grad12 = createRadialGradient(180.76, -2.22, 0, 180.76, -2.22, 6.95)
+grad12.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad12.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad12
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(180.76, -2.22, 6.95, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(180.76, -2.22, 3.47, 0, 6.28)
+fill()
+grad13 = createRadialGradient(198.06, 15.28, 0, 198.06, 15.28, 6.06)
+grad13.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad13.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad13
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(198.06, 15.28, 6.06, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(198.06, 15.28, 3.03, 0, 6.28)
+fill()
+grad14 = createRadialGradient(232.78, 32.73, 0, 232.78, 32.73, 3.28)
+grad14.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad14.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad14
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(232.78, 32.73, 3.28, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(232.78, 32.73, 1.64, 0, 6.28)
+fill()
+grad15 = createRadialGradient(260.34, 64.92, 0, 260.34, 64.92, 2)
+grad15.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad15.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad15
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(260.34, 64.92, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(260.34, 64.92, 1, 0, 6.28)
+fill()
+grad16 = createRadialGradient(254.02, 102.05, 0, 254.02, 102.05, 2)
+grad16.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad16.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad16
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(254.02, 102.05, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(254.02, 102.05, 1, 0, 6.28)
+fill()
+grad17 = createRadialGradient(217.49, 123.76, 0, 217.49, 123.76, 4.3)
+grad17.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad17.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad17
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(217.49, 123.76, 4.3, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(217.49, 123.76, 2.15, 0, 6.28)
+fill()
+grad18 = createRadialGradient(179.41, 129.59, 0, 179.41, 129.59, 6.67)
+grad18.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad18.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad18
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(179.41, 129.59, 6.67, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(179.41, 129.59, 3.34, 0, 6.28)
+fill()
+grad19 = createRadialGradient(158, 141.4, 0, 158, 141.4, 6.59)
+grad19.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad19.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad19
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(158, 141.4, 6.59, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(158, 141.4, 3.29, 0, 6.28)
+fill()
+grad20 = createRadialGradient(142.52, 172.49, 0, 142.52, 172.49, 4.12)
+grad20.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad20.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad20
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(142.52, 172.49, 4.12, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(142.52, 172.49, 2.06, 0, 6.28)
+fill()
+grad21 = createRadialGradient(114.37, 205.24, 0, 114.37, 205.24, 2)
+grad21.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad21.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad21
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(114.37, 205.24, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(114.37, 205.24, 1, 0, 6.28)
+fill()
+grad22 = createRadialGradient(76.38, 209.46, 0, 76.38, 209.46, 2)
+grad22.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad22.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad22
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(76.38, 209.46, 2, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(76.38, 209.46, 1, 0, 6.28)
+fill()
+grad23 = createRadialGradient(49.23, 178.87, 0, 49.23, 178.87, 3.45)
+grad23.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad23.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad23
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(49.23, 178.87, 3.45, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(49.23, 178.87, 1.73, 0, 6.28)
+fill()
+grad24 = createRadialGradient(40.89, 138.18, 0, 40.89, 138.18, 6.19)
+grad24.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad24.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad24
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(40.89, 138.18, 6.19, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(40.89, 138.18, 3.09, 0, 6.28)
+fill()
+grad25 = createRadialGradient(33.41, 111.9, 0, 33.41, 111.9, 6.91)
+grad25.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad25.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad25
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(33.41, 111.9, 6.91, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(33.41, 111.9, 3.45, 0, 6.28)
+fill()
+grad26 = createRadialGradient(7.49, 96.75, 0, 7.49, 96.75, 4.96)
+grad26.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad26.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad26
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(7.49, 96.75, 4.96, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(7.49, 96.75, 2.48, 0, 6.28)
+fill()
+grad27 = createRadialGradient(-27.83, 72.84, 0, -27.83, 72.84, 2.12)
+grad27.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad27.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad27
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(-27.83, 72.84, 2.12, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(-27.83, 72.84, 1.06, 0, 6.28)
+fill()
+restore()
+restore()
+save()
+scale(1, 1)
+translate(0, 0)
+save()
+translate(100, 100)
+globalAlpha = 0.2
+shadowColor = rgba(0, 0, 0, 0.5)
+shadowOffsetX = 2
+shadowOffsetY = 2
+shadowBlur = 3
+shadowColor = rgba(0, 0, 0, 0)
+strokeStyle = #333333
+fillStyle = #353535
+beginPath()
+roundRect(0, -30, 220, 150, [8])
+fill()
+shadowColor = rgba(0, 0, 0, 0)
+globalAlpha = 0.2
+font = 14px Inter
+fillStyle = #999999
+measureText("Bypassed")
+textAlign = left
+fillText("Bypassed", 30, -10)
+save()
+beginPath()
+roundRect(0, -30, 220, 150, [8])
+clip()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 0.2
+beginPath()
+arc(110, 60, 57.12, 0, 6.28)
+grad28 = createLinearGradient(52.88, 60, 167.12, 60)
+grad28.addColorStop(0, rgba(251, 0, 255, 0.256))
+grad28.addColorStop(0.5, rgba(255, 179, 0, 0.32))
+grad28.addColorStop(1, rgba(157, 0, 255, 0.256))
+strokeStyle = grad28
+lineWidth = 1.44
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 2.4
+stroke()
+beginPath()
+arc(110, 60, 40.32, 0, 6.28)
+grad29 = createLinearGradient(69.68, 60, 150.32, 60)
+grad29.addColorStop(0, rgba(251, 0, 255, 0.416))
+grad29.addColorStop(0.5, rgba(255, 179, 0, 0.52))
+grad29.addColorStop(1, rgba(157, 0, 255, 0.416))
+strokeStyle = grad29
+lineWidth = 2.34
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 3.9
+stroke()
+beginPath()
+arc(110, 60, 23.52, 0, 6.28)
+grad30 = createLinearGradient(86.48, 60, 133.52, 60)
+grad30.addColorStop(0, rgba(251, 0, 255, 0.576))
+grad30.addColorStop(0.5, rgba(255, 179, 0, 0.72))
+grad30.addColorStop(1, rgba(157, 0, 255, 0.576))
+strokeStyle = grad30
+lineWidth = 3.24
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 5.4
+stroke()
+beginPath()
+arc(110, 60, 6.72, 0, 6.28)
+grad31 = createLinearGradient(103.28, 60, 116.72, 60)
+grad31.addColorStop(0, rgba(251, 0, 255, 0.736))
+grad31.addColorStop(0.5, rgba(255, 179, 0, 0.92))
+grad31.addColorStop(1, rgba(157, 0, 255, 0.736))
+strokeStyle = grad31
+lineWidth = 4.14
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 6.9
+stroke()
+beginPath()
+arc(110, 60, 73.92, 0, 6.28)
+grad32 = createLinearGradient(36.08, 60, 183.92, 60)
+grad32.addColorStop(0, rgba(251, 0, 255, 0.096))
+grad32.addColorStop(0.5, rgba(255, 179, 0, 0.12))
+grad32.addColorStop(1, rgba(157, 0, 255, 0.096))
+strokeStyle = grad32
+lineWidth = 1
+shadowColor = rgba(251, 0, 255, 0.5)
+shadowBlur = 2
+stroke()
+grad33 = createRadialGradient(-16.34, 5.13, 0, -16.34, 5.13, 3.02)
+grad33.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad33.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad33
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(-16.34, 5.13, 3.02, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(-16.34, 5.13, 1.51, 0, 6.28)
+fill()
+grad34 = createRadialGradient(24.59, -6.43, 0, 24.59, -6.43, 5.86)
+grad34.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad34.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad34
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(24.59, -6.43, 5.86, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(24.59, -6.43, 2.93, 0, 6.28)
+fill()
+grad35 = createRadialGradient(53.43, -13.13, 0, 53.43, -13.13, 6.99)
+grad35.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad35.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad35
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(53.43, -13.13, 6.99, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(53.43, -13.13, 3.49, 0, 6.28)
+fill()
+grad36 = createRadialGradient(68.44, -36.4, 0, 68.44, -36.4, 5.37)
+grad36.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad36.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad36
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(68.44, -36.4, 5.37, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(68.44, -36.4, 2.69, 0, 6.28)
+fill()
+grad37 = createRadialGradient(175.51, -36.12, 0, 175.51, -36.12, 5.12)
+grad37.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad37.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad37
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(175.51, -36.12, 5.12, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(175.51, -36.12, 2.56, 0, 6.28)
+fill()
+grad38 = createRadialGradient(180.76, -2.22, 0, 180.76, -2.22, 6.95)
+grad38.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad38.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad38
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(180.76, -2.22, 6.95, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(180.76, -2.22, 3.47, 0, 6.28)
+fill()
+grad39 = createRadialGradient(198.06, 15.28, 0, 198.06, 15.28, 6.06)
+grad39.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad39.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad39
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(198.06, 15.28, 6.06, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(198.06, 15.28, 3.03, 0, 6.28)
+fill()
+grad40 = createRadialGradient(232.78, 32.73, 0, 232.78, 32.73, 3.28)
+grad40.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad40.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad40
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(232.78, 32.73, 3.28, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(232.78, 32.73, 1.64, 0, 6.28)
+fill()
+grad41 = createRadialGradient(217.49, 123.76, 0, 217.49, 123.76, 4.3)
+grad41.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad41.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad41
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(217.49, 123.76, 4.3, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(217.49, 123.76, 2.15, 0, 6.28)
+fill()
+grad42 = createRadialGradient(179.41, 129.59, 0, 179.41, 129.59, 6.67)
+grad42.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad42.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad42
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(179.41, 129.59, 6.67, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(179.41, 129.59, 3.34, 0, 6.28)
+fill()
+grad43 = createRadialGradient(158, 141.4, 0, 158, 141.4, 6.59)
+grad43.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad43.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad43
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(158, 141.4, 6.59, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(158, 141.4, 3.29, 0, 6.28)
+fill()
+grad44 = createRadialGradient(40.89, 138.18, 0, 40.89, 138.18, 6.19)
+grad44.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad44.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad44
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(40.89, 138.18, 6.19, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(40.89, 138.18, 3.09, 0, 6.28)
+fill()
+grad45 = createRadialGradient(33.41, 111.9, 0, 33.41, 111.9, 6.91)
+grad45.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad45.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad45
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(33.41, 111.9, 6.91, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(33.41, 111.9, 3.45, 0, 6.28)
+fill()
+grad46 = createRadialGradient(7.49, 96.75, 0, 7.49, 96.75, 4.96)
+grad46.addColorStop(0, rgba(255, 179, 0, 0.7))
+grad46.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad46
+shadowColor = rgba(255, 179, 0, 0.5)
+shadowBlur = 10
+beginPath()
+arc(7.49, 96.75, 4.96, 0, 6.28)
+fill()
+fillStyle = rgba(255, 179, 0, 0.7)
+shadowColor = #ffb300
+shadowBlur = 15
+beginPath()
+arc(7.49, 96.75, 2.48, 0, 6.28)
+fill()
+restore()
+shadowColor = rgba(0, 0, 0, 0)
+globalAlpha = 1
+fillStyle = #222222
+fillRect(10, 10, 200, 20)
+globalAlpha = 1
+restore()
+save()
+translate(500, 100)
+globalAlpha = 1
+shadowColor = rgba(0, 0, 0, 0.5)
+shadowOffsetX = 2
+shadowOffsetY = 2
+shadowBlur = 3
+strokeStyle = #333333
+fillStyle = #353535
+beginPath()
+roundRect(0, -30, 80, 30, [8])
+fill()
+shadowColor = rgba(0, 0, 0, 0)
+globalAlpha = 1
+font = 14px Inter
+fillStyle = #999999
+textAlign = left
+fillText("Collapsed", 30, -10)
+shadowColor = rgba(0, 0, 0, 0)
+globalAlpha = 1
+restore()
+save()
+restore()
+restore()

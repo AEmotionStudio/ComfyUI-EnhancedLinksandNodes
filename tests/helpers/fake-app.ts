@@ -20,6 +20,8 @@ interface Extension {
     name: string;
     settings?: Setting[];
     setup?: (app: unknown) => unknown;
+    nodeCreated?: (node: unknown, app: unknown) => unknown;
+    loadedGraphNode?: (node: unknown, app: unknown) => unknown;
 }
 
 export const fake = {
@@ -132,7 +134,7 @@ export const api = new EventTarget();
 
 /** Installs fresh LiteGraph globals and returns their LGraphCanvas; a new class drops prototype patches from earlier setups. */
 function installLiteGraph() {
-    const LiteGraph = { STRAIGHT_LINK: 0, LINEAR_LINK: 1, SPLINE_LINK: 2, LINK_COLOR: '#9A9', EVENT_LINK_COLOR: '#A86' };
+    const LiteGraph = { STRAIGHT_LINK: 0, LINEAR_LINK: 1, SPLINE_LINK: 2, LINK_COLOR: '#9A9', EVENT_LINK_COLOR: '#A86', NODE_TITLE_HEIGHT: 30, NODE_FONT: 'Inter' };
 
     class LGraphCanvas {
         static link_type_colors: Record<string, string> = { '-1': LiteGraph.EVENT_LINK_COLOR, number: '#AAA', node: '#DCA' };

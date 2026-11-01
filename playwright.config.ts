@@ -16,15 +16,20 @@ const legs: Record<string, Leg> = JSON.parse(readFileSync(new URL('./tests/e2e/l
 const perf = process.env.ELN_PERF === '1';
 // @gallery screenshots are for looking at, not checks, so they only run with ELN_GALLERY=1 (pnpm e2e:gallery).
 const gallery = process.env.ELN_GALLERY === '1';
+// ELN_GPU=1 has Chromium draw on the machine's GPU, through ANGLE on EGL, so frame rates mean something; otherwise it
+// draws with SwiftShader on the CPU, as it also does with --use-angle=vulkan.
+const GPU_ARGS = ['--ignore-gpu-blocklist', '--enable-gpu', '--use-gl=angle', '--use-angle=gl-egl', '--enable-gpu-rasterization'];
+const gpu = process.env.ELN_GPU === '1';
 
-// The reference builds and interop only run the tests tagged for them, and only interop runs @interop tests.
+// The reference builds and interop only run the tests tagged for them, and only interop runs @interop tests. v1 also
+// takes the @gallery contact sheets, for which pnpm e2e:gallery names it.
 const projects: { name: string; leg: string; profile: string; only?: string }[] = [
     { name: 'fe157-native', leg: 'fe157', profile: 'native' },
     { name: 'fe157', leg: 'fe157', profile: 'default' },
     { name: 'fe1395-native', leg: 'fe1395', profile: 'native' },
     { name: 'fe1395', leg: 'fe1395', profile: 'default' },
     { name: 'v2-ref', leg: 'v2-ref', profile: 'default', only: '@perf' },
-    { name: 'v1-ref', leg: 'v1-ref', profile: 'default', only: '@perf' },
+    { name: 'v1-ref', leg: 'v1-ref', profile: 'default', only: '@perf|@gallery' },
     { name: 'interop', leg: 'interop', profile: 'default', only: '@interop' },
 ];
 
@@ -41,7 +46,7 @@ function requestedProjects(argv: string[]): RegExp[] {
 // Without --project, the reference builds count only with ELN_PERF=1, and interop only when asked for (--project interop).
 const requested = requestedProjects(process.argv);
 const selected = projects.filter((p) =>
-    requested.length ? requested.some((r) => r.test(p.name)) : !p.only || (p.only === '@perf' && perf),
+    requested.length ? requested.some((r) => r.test(p.name)) : !p.only || (perf && p.only.includes('@perf')),
 );
 const chromium = '/usr/bin/chromium';
 
@@ -59,7 +64,7 @@ export default defineConfig<LegOptions>({
             ...(existsSync(chromium) ? { executablePath: chromium } : {}),
             // The page is already held to the leg by ComfyUI's --offline CSP; this keeps the browser's own
             // background fetches (optimization guides, component updates) off the network too.
-            args: ['--proxy-server=http://127.0.0.1:9', '--proxy-bypass-list=127.0.0.1'],
+            args: ['--proxy-server=http://127.0.0.1:9', '--proxy-bypass-list=127.0.0.1', ...(gpu ? GPU_ARGS : [])],
         },
         viewport: { width: 1600, height: 900 },
         deviceScaleFactor: 1,

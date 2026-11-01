@@ -108,9 +108,48 @@ const V2_OPTIONS: Record<string, unknown[]> = {
 const V3_DEFAULTS: Record<string, unknown> = {
     // M3
     '🔗 Enhanced Links.Coexist': 'auto',
+    // M4
+    '🔗 Enhanced Links.Marker.All': false,
+    '🔗 Enhanced Links.Shadow.Style': 'halo',
+    '📦 Enhanced Nodes.Selection.Glow': true,
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
+    '🔗 Enhanced Links.Shadow.Style': ['halo', 'drop'],
+};
+
+/** The v2.0.1 defaults v3 changes, by the milestone that changes them. */
+const V3_CHANGED_DEFAULTS: Record<string, unknown> = {
+    // M4: v1's shadows, on by default, and v1's custom node colours.
+    '🔗 Enhanced Links.Link.Shadow.Enabled': true,
+    '🔗 Enhanced Links.Marker.Shadow.Enabled': true,
+    '📦 Enhanced Nodes.Color.Primary': '#ffb300',
+    '📦 Enhanced Nodes.Color.Secondary': '#fb00ff',
+    '📦 Enhanced Nodes.Color.Accent': '#9d00ff',
+    '📦 Enhanced Nodes.Color.Particle': '#ffb300',
+    // M4: v1's fireworks, which v2 had no code for.
+    '📦 Enhanced Nodes.End Animation.Enabled': true,
+};
+
+/** The v2.0.1 options and ranges v3 changes, by the milestone that changes them. */
+const V3_CHANGED_OPTIONS: Record<string, unknown[]> = {
+    // M4: the Coil path, the merkaba marker, v1's Same as link marker colour, and v1's density presets for v2's sliders.
+    '🔗 Enhanced Links.Link.Style': ['spline', 'straight', 'linear', 'hidden', 'dotted', 'dashed', 'double', 'stepped', 'zigzag', 'coil', 'rope', 'glowpath', 'chain', 'pulse', 'holographic'],
+    '🔗 Enhanced Links.Marker.Shape': ['none', 'arrow', 'diamond', 'circle', 'square', 'triangle', 'star', 'heart', 'cross', 'hexagon', 'flower', 'spiral', 'merkaba'],
+    '🔗 Enhanced Links.Marker.Color.Mode': ['default', 'inherit', 'custom'],
+    '🔗 Enhanced Links.Particle.Density': [0.5, 1, 2, 3],
+    '📦 Enhanced Nodes.Particle.Density': [0.5, 1, 2, 3],
+};
+const V3_CHANGED_RANGES: Record<string, [min: number, max: number, step: number]> = {
+    // M4: v1's speed works quadratically, so 3× moves effects 9× as fast.
+    '🔗 Enhanced Links.Animation.Speed': [0.1, 3, 0.05],
+    // M4: the UX design's node speed, and v1's ranges for the node glows (0 to 1) and energies (0.1 to 2).
+    '📦 Enhanced Nodes.Animation.Speed': [0.1, 3, 0.1],
+    '📦 Enhanced Nodes.Intensity': [0.1, 2, 0.1],
+    '📦 Enhanced Nodes.Animation.Glow': [0, 1, 0.05],
+    '📦 Enhanced Nodes.Glow': [0, 1, 0.05],
+    '📦 Enhanced Nodes.Particle.Intensity': [0.1, 2, 0.1],
+    '📦 Enhanced Nodes.Particle.Glow': [0, 1, 0.05],
 };
 
 /** [min, max, step] of v2.0.1's sidebar sliders; the Shadow and Text settings, which it has no slider for, take the v3 design's ranges. */
@@ -156,13 +195,19 @@ describe('settings schema', () => {
         expect([...ids].sort()).toEqual([...Object.keys(V2_DEFAULTS), ...Object.keys(V3_DEFAULTS)].sort());
     });
 
-    it('keeps the v2.0.1 defaults', () => {
-        expect(Object.fromEntries(SETTINGS.map((s) => [s.id, s.default]))).toEqual({ ...V2_DEFAULTS, ...V3_DEFAULTS });
+    it('keeps the v2.0.1 defaults, but for what v3 changes', () => {
+        expect(Object.fromEntries(SETTINGS.map((s) => [s.id, s.default]))).toEqual({ ...V2_DEFAULTS, ...V3_CHANGED_DEFAULTS, ...V3_DEFAULTS });
     });
 
-    it('keeps the v2.0.1 options and the sidebar ranges', () => {
-        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'combo' ? [[s.id, s.options.map((o) => o.value)]] : []))).toEqual({ ...V2_OPTIONS, ...V3_OPTIONS });
-        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual(V2_RANGES);
+    it('keeps the v2.0.1 options and the sidebar ranges, but for what v3 changes', () => {
+        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'combo' ? [[s.id, s.options.map((o) => o.value)]] : []))).toEqual({ ...V2_OPTIONS, ...V3_CHANGED_OPTIONS, ...V3_OPTIONS });
+        // The sliders v3 turns into presets are combos now.
+        const sliders = Object.fromEntries(Object.entries(V2_RANGES).filter(([id]) => !(id in V3_CHANGED_OPTIONS)));
+        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual({ ...sliders, ...V3_CHANGED_RANGES });
+        // Every v2.0.1 Link.Style, Marker.Shape and Marker.Color.Mode value is still an option.
+        for (const id of ['🔗 Enhanced Links.Link.Style', '🔗 Enhanced Links.Marker.Shape', '🔗 Enhanced Links.Marker.Color.Mode']) {
+            expect(V3_CHANGED_OPTIONS[id], id).toEqual(expect.arrayContaining(V2_OPTIONS[id]));
+        }
     });
 
     it('types each setting by its default, so no slider has a string default', () => {
@@ -230,7 +275,8 @@ describe('migrateDeprecatedValue', () => {
         ['a numeric string becomes a number on a slider', '🔗 Enhanced Links.Thickness', '4.5', 4.5],
         ['a value above the range is clamped', '🔗 Enhanced Links.Glow.Intensity', 25, 20],
         ['a value below the range is clamped', '🔗 Enhanced Links.Marker.Size', 0, 1],
-        ['a numeric string out of range is clamped', '📦 Enhanced Nodes.Animation.Speed', '100', 5],
+        ['a numeric string out of range is clamped', '📦 Enhanced Nodes.Animation.Speed', '100', 3],
+        ["a link speed v2's slider allowed past 3 is clamped to it", '🔗 Enhanced Links.Animation.Speed', 5, 3],
         ['NaN becomes the default', '🔗 Enhanced Links.Shadow.Blur', NaN, 5],
         ['null becomes the default', '📦 Enhanced Nodes.Text.Size', null, 14],
         ['a non-numeric string becomes the default', '📦 Enhanced Nodes.Glow', 'bright', 0.5],
@@ -243,6 +289,26 @@ describe('migrateDeprecatedValue', () => {
         ['"true" becomes true', '📦 Enhanced Nodes.Particle.Show', 'true', true],
         ['"false" becomes false', '🔗 Enhanced Links.Marker.Enabled', 'false', false],
         ['any other non-boolean becomes the default', '🔗 Enhanced Links.Static.Mode', 1, false],
+        // M4
+        ["v1's link Color.Mode off, which no option offered, becomes the default", '🔗 Enhanced Links.Color.Mode', 'off', 'default'],
+        ["v1's Same as link marker colour is an option again", '🔗 Enhanced Links.Marker.Color.Mode', 'inherit', 'inherit'],
+        ['a density between presets takes the nearest', '🔗 Enhanced Links.Particle.Density', 0.7, 0.5],
+        ['a density nearer Balanced takes it', '🔗 Enhanced Links.Particle.Density', 0.8, 1],
+        ['a density halfway between presets takes the lower', '🔗 Enhanced Links.Particle.Density', 1.5, 1],
+        ['a density past halfway takes the higher', '📦 Enhanced Nodes.Particle.Density', 2.6, 3],
+        ["a density of 0, which made v2's styles vanish, becomes Minimal", '🔗 Enhanced Links.Particle.Density', 0, 0.5],
+        ['a negative density becomes Minimal', '📦 Enhanced Nodes.Particle.Density', -1, 0.5],
+        ["a density past Ultra from v2's dialog becomes Ultra", '🔗 Enhanced Links.Particle.Density', 20, 3],
+        ['a numeric string density takes the nearest preset', '📦 Enhanced Nodes.Particle.Density', '2.2', 2],
+        ['a density that is not a number becomes the default', '📦 Enhanced Nodes.Particle.Density', 'lots', 1],
+        ['a shadow style v3 does not know becomes the halo', '🔗 Enhanced Links.Shadow.Style', 'soft', 'halo'],
+        ["a node glow v2's slider took past 1 takes v1's 1", '📦 Enhanced Nodes.Glow', 1.8, 1],
+        ["an effect bloom v2's slider took past 1 takes v1's 1", '📦 Enhanced Nodes.Animation.Glow', 2, 1],
+        ["a particle glow v2's slider took past 1 takes v1's 1", '📦 Enhanced Nodes.Particle.Glow', 1.5, 1],
+        ["an energy v2's slider took past 2 takes v1's 2", '📦 Enhanced Nodes.Intensity', 3, 2],
+        ["an energy of 0, which v2's slider allowed, takes v1's 0.1", '📦 Enhanced Nodes.Intensity', 0, 0.1],
+        ["a particle motion of 0 takes v1's 0.1", '📦 Enhanced Nodes.Particle.Intensity', 0, 0.1],
+        ["a node speed v2's slider took past 3 is clamped to it", '📦 Enhanced Nodes.Animation.Speed', 4.5, 3],
     ])('%s', (_rule, id, stored, migrated) => {
         expect(migrate(id, stored)).toBe(migrated);
     });
@@ -459,11 +525,12 @@ describe('writes', () => {
         fire(control('Hover Color').querySelector<HTMLInputElement>('input[type=text]')!, 'change', 'ABCDEF');
         control('Link Shadows').querySelector<HTMLElement>('.enh-toggle')!.click();
         await settle();
+        // Link shadows are on by default since M4, so the toggle turns them off.
         const changed = [
             [THICKNESS, 5],
             ['🔗 Enhanced Links.Marker.Color', '#123456'],
             ['📦 Enhanced Nodes.Color.Hover', '#abcdef'],
-            ['🔗 Enhanced Links.Link.Shadow.Enabled', true],
+            ['🔗 Enhanced Links.Link.Shadow.Enabled', false],
         ];
         expect(fake.posts).toEqual(changed);
         // One redraw per value shown: four slider steps, two colours, the hex code and the toggle.
@@ -471,7 +538,7 @@ describe('writes', () => {
 
         [...panel.querySelectorAll('button')].find((b) => b.textContent === 'Reset Link Settings to Defaults')!.click();
         await settle();
-        expect(fake.posts.slice(changed.length)).toEqual([[THICKNESS, 3], ['🔗 Enhanced Links.Marker.Color', '#00fff7'], ['🔗 Enhanced Links.Link.Shadow.Enabled', false]]);
+        expect(fake.posts.slice(changed.length)).toEqual([[THICKNESS, 3], ['🔗 Enhanced Links.Marker.Color', '#00fff7'], ['🔗 Enhanced Links.Link.Shadow.Enabled', true]]);
         expect(control('Thickness').querySelector('input')!.value).toBe('3');
     });
 });

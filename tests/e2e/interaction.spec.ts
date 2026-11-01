@@ -10,6 +10,7 @@ import {
     distance,
     drawnLinkEnds,
     expect,
+    linkCentre,
     linkColour,
     openApp,
     openSubgraph,
@@ -26,6 +27,7 @@ import {
     titleOf,
     toClient,
     vueSlotCentres,
+    type GraphSpec,
     type Point,
 } from './helpers';
 
@@ -86,6 +88,31 @@ test.describe('link hit-testing', () => {
         await expect(menu).toContainText('Add Reroute');
         await expect(menu).toContainText('Delete');
     });
+
+    for (const [style, name] of [['stepped', 'Stepped'], ['zigzag', 'Wave'], ['coil', 'Coil']]) {
+        test.describe(`along a ${name} link`, () => {
+            test.use({ settings: { '🔗 Enhanced Links.Link.Style': style } });
+
+            test('clicking the centre opens the link menu, where the centre marker is drawn', async ({ page, profile }) => {
+                test.skip(!enabled(profile), 'Link.Style is the extension\'s');
+                const graph = await buildGraph(page, graphs.diagonal);
+                await redraw(page);
+                const centre = await linkCentre(page, graph.links.int);
+                // The marker is a 5 px circle in the link colour.
+                const [drawn, colour] = [await pixelAt(page, centre), await linkColour(page, graph.links.int)];
+                expect(near(drawn, colour), `drawn ${drawn}, link colour ${colour}`).toBe(true);
+                // Steps leave the native curve far behind: across at the output's height, then down to the input.
+                const native = await splinePoint(page, graph.links.int, 0.5);
+                if (style === 'stepped') expect(distance(centre, native)).toBeGreaterThan(100);
+                else expect(distance(centre, native)).toBeLessThan(12);
+                await clickAt(page, centre);
+                const menu = page.locator('.litecontextmenu');
+                await expect(menu).toBeVisible({ timeout: 3000 });
+                await expect(menu).toContainText('Add Reroute');
+                await expect(menu).toContainText('Delete');
+            });
+        });
+    }
 
     test('shift-dragging a link starts a connection', async ({ page }) => {
         const graph = await buildGraph(page, graphs.pair);
@@ -243,6 +270,8 @@ test.describe('link rendering', () => {
 
     test('links are painted in their native colours', async ({ page }) => {
         const graph = await buildGraph(page, graphs.typed);
+        // Classic Flow's markers glide along the links with a dark halo, and could pass under a sampled point.
+        await setSetting(page, '🔗 Enhanced Links.Marker.Enabled', false);
         await redraw(page);
         const wrong: string[] = [];
         // The middle holds the centre marker, in the link colour; the link's own body shows on either side of it.
@@ -297,6 +326,125 @@ test.describe('link rendering', () => {
     });
 });
 
+test.describe('node menus', () => {
+    const NODE: GraphSpec = { nodes: { node: { type: 'ELNInt', pos: [400, 300] } } };
+
+    /** The node's own Enhanced choices, and whether the workflow counts as changed once its tracker has looked. */
+    const state = (page: Page, nodeId: number) => page.evaluate((id) => {
+        const { app } = window;
+        const workflow = app.extensionManager.workflow.activeWorkflow;
+        const tracker = workflow.changeTracker;
+        (tracker.captureCanvasState ?? tracker.checkState).call(tracker);
+        const { properties } = app.canvas.graph.getNodeById(id);
+        return { own: Object.fromEntries(Object.entries(properties).filter(([key]) => key.startsWith('enhanced_fx_'))), modified: Boolean(workflow.isModified) };
+    }, nodeId);
+
+    /** Loads `workflow`, or the graph as it stands, as a workflow fresh from its file. */
+    const load = (page: Page, workflow?: object) => page.evaluate(async (data) => {
+        const { app } = window;
+        await app.loadGraphData(data ?? app.graph.serialize(), true, false);
+    }, workflow);
+
+    test('Node FX and Completion FX set the node, ticked, and Use global takes it back', async ({ page, profile }) => {
+        test.skip(!enabled(profile), "the menus are the extension's");
+        const graph = await buildGraph(page, NODE);
+        const pick = async (submenu: string, entry: string) => {
+            const [x, y] = await toClient(page, await titleOf(page, graph.nodes.node));
+            await page.mouse.click(x, y, { button: 'right' });
+            await page.locator('.litecontextmenu .litemenu-entry', { hasText: submenu }).click();
+            await page.locator('.litecontextmenu').last().locator('.litemenu-entry', { hasText: entry }).click();
+            await expect(page.locator('.litecontextmenu')).toHaveCount(0);
+        };
+        await load(page);
+        expect(await state(page, graph.nodes.node)).toEqual({ own: {}, modified: false });
+        await pick('Node FX', 'Neon Nexus');
+        await pick('Completion FX', 'Off');
+        await expect.poll(() => state(page, graph.nodes.node)).toEqual({ own: { enhanced_fx_style: 2, enhanced_fx_completion: 'off' }, modified: true });
+        // The choice is ticked; Use global takes it back out.
+        const [x, y] = await toClient(page, await titleOf(page, graph.nodes.node));
+        await page.mouse.click(x, y, { button: 'right' });
+        await page.locator('.litecontextmenu .litemenu-entry', { hasText: 'Node FX' }).click();
+        const submenu = page.locator('.litecontextmenu').last();
+        await expect(submenu.locator('.litemenu-entry', { hasText: 'Neon Nexus' })).toHaveText('✓ Neon Nexus');
+        await submenu.locator('.litemenu-entry', { hasText: 'Use global' }).click();
+        await pick('Completion FX', 'Use global');
+        expect((await state(page, graph.nodes.node)).own).toEqual({});
+    });
+
+    test.describe('in Vue nodes mode', () => {
+        test.use({ settings: { 'Comfy.VueNodes.Enabled': true } });
+
+        test('the Vue node menu shows them too, and a pick sets the node', async ({ page, profile }) => {
+            test.skip(!enabled(profile), "the menus are the extension's");
+            const graph = await buildGraph(page, NODE);
+            const node = page.locator(`.lg-node[data-node-id="${graph.nodes.node}"]`);
+            await expect(node).toHaveCount(1);
+            await node.click({ button: 'right', position: { x: 60, y: 12 } });
+            await page.getByRole('menuitem', { name: 'Node FX' }).hover();
+            await page.getByRole('menuitem', { name: 'Cosmic Ripple' }).click();
+            await expect.poll(async () => (await state(page, graph.nodes.node)).own).toEqual({ enhanced_fx_style: 3 });
+        });
+    });
+
+    test('a workflow that holds the choices loads without a write, and is not marked modified', async ({ page }) => {
+        const graph = await buildGraph(page, NODE);
+        const own = { enhanced_fx_style: 4, enhanced_fx_particles_only: true, enhanced_fx_completion: 'fireworks' };
+        const workflow = await page.evaluate(([id, own]) => {
+            const data = window.app.graph.serialize();
+            const node = data.nodes.find((n: { id: number }) => Number(n.id) === id);
+            node.properties = { ...node.properties, ...own };
+            return data;
+        }, [graph.nodes.node, own] as const);
+        await load(page, workflow);
+        // Drawn a while, with Flower of Life on the node.
+        await redraw(page);
+        await page.waitForTimeout(1000);
+        expect(await state(page, graph.nodes.node)).toEqual({ own, modified: false });
+    });
+});
+
+test.describe('fireworks', () => {
+    test.use({ settings: { '🔗 Enhanced Links.Animate': 0 } });
+
+    test('light up over the output node after a run, then the canvas goes quiet', async ({ page, profile }) => {
+        test.skip(!enabled(profile), "the fireworks are the extension's");
+        test.setTimeout(90_000);
+        await buildGraph(page, { nodes: { sleep: { type: 'ELNSleep', pos: [400, 400], widgets: [0.2] } } });
+        await settle(page);
+        // Where the first burst's white-hot core opens: 5 % of the view right of the node and 20 % above it.
+        const core: Point = await page.evaluate(() => {
+            const { canvas } = window.app;
+            const [node] = canvas.graph.nodes;
+            return [node.pos[0] + canvas.visible_area[2] * 0.05, node.pos[1] - canvas.visible_area[3] * 0.2];
+        });
+        const before = await pixelAt(page, core);
+        // The brightest the core gets while the show plays, sampled each frame from the run's success on.
+        const brightest = page.evaluate(([x, y]) => new Promise<number[]>((resolve) => {
+            const { app } = window;
+            app.api.addEventListener('execution_success', () => {
+                const el: HTMLCanvasElement = app.canvas.canvas;
+                const [cx, cy] = app.canvas.ds.convertOffsetToCanvas([x, y]);
+                const ratio = el.width / el.clientWidth;
+                let best = [0, 0, 0, 0];
+                const until = performance.now() + 1500;
+                const sample = () => {
+                    const pixel = [...el.getContext('2d')!.getImageData(Math.floor(cx * ratio), Math.floor(cy * ratio), 1, 1).data];
+                    if (pixel[0] + pixel[1] + pixel[2] > best[0] + best[1] + best[2]) best = pixel;
+                    if (performance.now() < until) requestAnimationFrame(sample);
+                    else resolve(best);
+                };
+                requestAnimationFrame(sample);
+            }, { once: true });
+        }), core);
+        await page.evaluate(() => window.app.queuePrompt(0, 1));
+        const lit = await brightest;
+        expect(lit.slice(0, 3).every((c, i) => c > before[i] + 100), `before ${before}, brightest ${lit}`).toBe(true);
+        // The show is over within its 1.2 s: then nothing repaints.
+        expect(await settle(page, 500, 5000)).toBe(true);
+        expect(await paints(page, 2000)).toMatchObject({ front: 0, back: 0 });
+    });
+});
+
 test.describe('Vue nodes', () => {
     test.use({ settings: { 'Comfy.VueNodes.Enabled': true } });
 
@@ -313,7 +461,7 @@ test.describe('Vue nodes', () => {
             const [source, target] = [await vueSlotCentres(page, graph.nodes.source), await vueSlotCentres(page, graph.nodes.target)];
             return Math.max(distance(ends[0], source.outputs[0]), distance(ends[1], target.inputs[0]));
         }, { message: 'px between the drawn link ends and the slot dots', timeout: 5000 }).toBeLessThan(3);
-        // What shows next to the dots is the link: with the extension, its own drawing, as the background holds no moving link.
+        // What shows next to the dots is the link: with the extension, the body it draws where native would have.
         const colour = await linkColour(page, graph.links.int);
         await expect.poll(async () => {
             await redraw(page);

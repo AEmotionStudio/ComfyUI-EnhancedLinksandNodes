@@ -1,0 +1,673 @@
+/**
+ * The four node effects as v1 drew them (old_node_animations.js:1203-1897),
+ * at v1's energy, Intensity × 1.5, and with their bloom from Animation.Glow.
+ * Gentle Pulse breathes a light over the node with fireflies around it; Neon
+ * Nexus wraps the body in a flickering neon tube with a scan line, beside a
+ * lattice of spinning hexagons and a dashed energy grid; Cosmic Ripple sends
+ * rings out from the centre inside a corona of motes; Flower of Life turns a
+ * rosette with dots circling its points. A selected node takes v1's glowing
+ * frame (:2104-2113), and the hover outline, which in v1 only Gentle Pulse
+ * drew, frames the others too. With Show base effect off a style draws its own
+ * particles alone, as v1's Particles Only did.
+ *
+ * An effect is drawn in two parts, one each side of the node's edge: what falls
+ * around the body goes under every node, and what falls on it over its fill.
+ * Each element is drawn in the parts it reaches, so most are drawn once; both
+ * sides at once draw every element, in v1's order. While still (Static mode, a
+ * paused run, reduced motion) an effect takes v1's still pose.
+ *
+ * Where v3 draws differently from v1 on purpose: Gentle Pulse's fireflies
+ * flicker by a hash of the time instead of Math.random(), so both parts draw a
+ * firefly at one size; Cosmic Ripple's rings ripple going Reverse too, where
+ * v1's vanished; and Flower of Life's particles circle its pattern without the
+ * base effect, where v1's fell into its centre.
+ *
+ * @module nodes/effects
+ */
+
+import { N, revision } from '@/core/settings';
+import { TURN, env } from '@/core/engine';
+import { nodePalette, particleColour, translucent, type NodePalette } from '@/core/colors';
+import { noise } from '@/fx/particles';
+import type { ComfyNode } from '@/core/types';
+
+/** The node clock an effect is drawn at (core/engine.ts). */
+interface NodeMoment {
+    nodePhase: number;
+    particleTime: number;
+    nodeTime: number;
+}
+
+/** v1's pose for still effects and titles: State.staticPhase (old_node_animations.js:56), at time 0, where v1's first still frame was. */
+export const STILL_NODE: NodeMoment = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
+
+/** Whether node effects hold still: in Static mode, while a run pauses them, and with reduced motion. */
+export const holdsStill = () => N.staticMode || (N.pauseDuringRender && env.running) || env.reducedMotion;
+
+/** The sides of a node's edge: around its body, drawn under every node, and on it, drawn over its fill. */
+export const UNDER = 1;
+export const OVER = 2;
+
+/**
+ * What a call draws: the elements on `sides` of the node's edge, the edge of the shape native fills, from (x0, y0) to
+ * (x1, y1) in node space with corners `round` px round, or -1 for a circle. Both sides draw every element, wherever
+ * it falls, as v1 drew an effect.
+ */
+export interface Part {
+    sides: number;
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+    round: number;
+}
+
+/**
+ * The call being drawn: its part; the alpha native draws the node at, which every alpha the effect sets is scaled by;
+ * whether it holds still; and whether the node is hovered or selected with the hover outline on.
+ */
+let part: Part | undefined;
+let fade = 1;
+let held = false;
+let outlined = false;
+/** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
+let depth = 0;
+
+function save(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    depth++;
+}
+
+function restore(ctx: CanvasRenderingContext2D): void {
+    ctx.restore();
+    depth--;
+}
+
+/** Whether what covers the box from (x0, y0) to (x1, y1) in node space shows in the part being drawn. */
+function shows(x0: number, y0: number, x1: number, y1: number): boolean {
+    const p = part!;
+    if (p.sides !== UNDER && p.sides !== OVER) return true;
+    if (p.round < 0) return true;
+    if (x1 <= p.x0 || x0 >= p.x1 || y1 <= p.y0 || y0 >= p.y1) return p.sides === UNDER;
+    const r = p.round;
+    const corner = (x0 < p.x0 + r || x1 > p.x1 - r) && (y0 < p.y0 + r || y1 > p.y1 - r);
+    const inside = x0 >= p.x0 && x1 <= p.x1 && y0 >= p.y0 && y1 <= p.y1 && !corner;
+    return !inside || p.sides === OVER;
+}
+
+/** Whether a disc that reaches `r` from (x, y) shows. A glow reaches three standard deviations, 1.5 × its blur, past its shape. */
+const circle = (x: number, y: number, r: number) => shows(x - r, y - r, x + r, y + r);
+
+const pales = new Map<string, string>();
+let palesSince = -1;
+
+/**
+ * A colour at `alpha` as v1's Gentle Pulse drew it (old_node_animations.js:1231-1247): its own withAlpha read a hex
+ * colour's digits two by two and took a pair that read 0 as 255, so its #ffb300 glowed #ffb3ff and its #fb00ff #fbffff.
+ * Kept, as it is what v1 showed. Particle colours in hsl() keep their own hue, which v1 misread as yellow.
+ */
+function pale(colour: string, alpha: number): string {
+    if (colour.charCodeAt(0) !== 35) return translucent(colour, alpha);
+    if (palesSince !== revision) {
+        pales.clear();
+        palesSince = revision;
+    }
+    let start = pales.get(colour);
+    if (start === undefined) {
+        const pair = (i: number) => parseInt(colour.slice(i, i + 2), 16) || 255;
+        pales.set(colour, (start = `rgba(${pair(1)}, ${pair(3)}, ${pair(5)}, `));
+    }
+    return `${start}${alpha})`;
+}
+
+/** The hover outline, Gentle Pulse's in v1 (old_node_animations.js:1254-1264): a rectangle round the body, glowing more while selected. */
+function outline(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, selected: boolean | undefined, colour: (colour: string, alpha: number) => string): void {
+    save(ctx);
+    const blur = 15 * N.animationGlow;
+    ctx.shadowColor = colour(N.colorHover, 0.5);
+    ctx.shadowBlur = selected ? blur * 1.5 : blur;
+    ctx.strokeStyle = colour(N.colorHover, 0.7);
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = fade;
+    ctx.strokeRect(x, y, w, h);
+    restore(ctx);
+}
+
+/** 1. Gentle Pulse (old_node_animations.js:1203-1398): a light breathing on the node, white at its core, and fireflies about it. */
+function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { quality, animationGlow: glow, animationSize: size, particleSpeed: speed, particleIntensity: motion } = N;
+    const { primary, secondary, accent } = pal;
+    const phase = k.nodePhase;
+    // v1's ParticleController phase.
+    const time = held ? phase : TURN * k.particleTime;
+    const radius = Math.max(w, h) * (0.5 + quality * 0.1) * size;
+    const cx = w / 2;
+    const cy = h / 2;
+    save(ctx);
+    ctx.translate(cx, cy);
+
+    if (outlined) outline(ctx, -cx, -cy, w, h, node.selected, pale);
+
+    let blur = 0;
+    if (!only) {
+        // Speed counts twice, as in v1.
+        const breathe = Math.pow(Math.sin(held ? phase : phase * 0.375 * N.direction * N.animationSpeed), 2);
+        const pulse = 0.4 + 0.4 * breathe * (N.intensity * 1.5 * 0.75);
+        const inner = radius * pulse;
+        const outer = radius * (1.2 + glow * 0.4) * pulse;
+        if (circle(cx, cy, inner)) {
+            const alpha = 0.2 * glow * (0.5 + breathe * 0.5);
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, inner);
+            gradient.addColorStop(0, pale('#ffffff', Math.min(alpha + 0.15, 1)));
+            gradient.addColorStop(0.3, pale(primary, alpha));
+            gradient.addColorStop(0.7, pale(secondary, alpha * 0.6));
+            gradient.addColorStop(1, pale(accent, 0));
+            ctx.beginPath();
+            ctx.arc(0, 0, inner, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = Math.min(0.2 + Math.abs(breathe) * 0.3 + glow * 0.2, 1) * fade;
+            ctx.fill();
+        }
+        if (circle(cx, cy, outer)) {
+            const alpha = 0.1 * glow * (0.5 + breathe * 0.5);
+            const gradient = ctx.createRadialGradient(0, 0, radius * 0.6 * pulse, 0, 0, outer);
+            gradient.addColorStop(0, pale(secondary, alpha));
+            gradient.addColorStop(0.6, pale(accent, alpha * 0.5));
+            gradient.addColorStop(1, pale(accent, 0));
+            ctx.beginPath();
+            ctx.arc(0, 0, outer, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = Math.min(0.15 + Math.abs(breathe) * 0.2 + glow * 0.15, 1) * fade;
+            ctx.fill();
+        }
+        // Above Fast quality the fireflies glow.
+        if (quality > 1) {
+            ctx.shadowColor = pale(secondary, 0.3);
+            ctx.shadowBlur = blur = 10 * glow * (quality * 0.5);
+        }
+    }
+
+    if (N.particleShow) {
+        const { particleGlow: dotGlow } = N;
+        const count = Math.floor((8 + quality * 2) * N.particleDensity);
+        const base = (4 + quality) * size * N.particleSize;
+        const wobble = quality > 1 ? 12 : 6;
+        const rate = held ? 0 : TURN * speed * speed;
+        // v1 took Math.random() for each firefly's flicker on each frame it drew, about 30 a second.
+        const tick = Math.floor(k.nodeTime * 30) * 4096;
+        for (let i = 0; i < count; i++) {
+            const offset = i * (Math.PI * 2 / count);
+            const pace = held ? 1 : (0.5 + Math.sin(i) * 0.25) * motion * speed;
+            const turned = held ? phase + offset : time * pace + offset;
+            const orbit = radius * (0.8 +
+                Math.sin(held ? phase + i : time * 0.2 * speed + i) * 0.25 +
+                Math.cos(held ? phase + i * 0.7 : time * 0.3 * speed + i * 0.7) * 0.25);
+            const angle = turned + (i * Math.PI * 2 / count);
+            const torus = Math.sin(time * 0.3 * speed + i) * (motion * 2.0);
+            const jitterX = held ? 0 : Math.sin(time * 3 * speed + i) * 1.2 * motion + Math.cos(time * 2 * speed + i * 0.5) * 0.5 * motion;
+            const jitterY = held ? 0 : Math.cos(time * 2.5 * speed + i) * 1.2 * motion + Math.sin(time * 1.5 * speed + i * 0.7) * 0.5 * motion;
+            const x = Math.cos(angle) * (orbit + torus) + Math.sin(held ? phase + i : time * 0.2 * speed + i) * wobble + jitterX;
+            // Drifting up by 0.3 of its orbit.
+            const y = Math.sin(angle) * (orbit + torus) - orbit * 0.3 + Math.cos(held ? phase + i : time * 0.15 * speed + i) * wobble + jitterY;
+            const s = held ? base : base * (0.7 + Math.sin(time * 0.5 * speed + i) * 0.4 + noise(tick + i) * 0.3);
+            if (!circle(cx + x, cy + y, s * 2.0 + 1.5 * blur)) continue;
+
+            const colour = particleColour(pal, i, time * speed, rate);
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, s * 2.0);
+            gradient.addColorStop(0, pale(colour, 0.8 * dotGlow));
+            gradient.addColorStop(0.4, pale(colour, 0.4 * dotGlow));
+            gradient.addColorStop(1, pale(colour, 0));
+            const blinkOffset = Math.abs((Math.sin(i * 12.9898) * 43758.5453) % (2 * Math.PI));
+            const blinkSpeed = 1.2 + Math.sin(i * 0.7) * 0.6;
+            const blink = held ? 0.8 : 0.4 + 0.8 * Math.pow(Math.sin(time * blinkSpeed * speed + blinkOffset), 2);
+            const alpha = Math.min(blink, 1) * dotGlow;
+
+            ctx.beginPath();
+            ctx.arc(x, y, s * 2.0, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = alpha * 0.8 * fade;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(x, y, s * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = colour;
+            ctx.globalAlpha = Math.min(alpha * 1.5, 1) * fade;
+            ctx.fill();
+        }
+    }
+    restore(ctx);
+}
+
+/** Neon Nexus's three faint hologram outlines. */
+const HOLOGRAM = [0, 1, 2].map((i) => `hsl(${(i * 60) % 360}, 80%, 75%)`);
+/** Its energy grid's dashes. */
+const DASH = [5, 3];
+
+/** A rectangle with quadratic corners, as a new path: v1's roundedRect (old_node_animations.js:1630-1642). */
+function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+/**
+ * 2. Neon Nexus (old_node_animations.js:1400-1643): a four-layer neon tube round the body in a faint hologram, a scan
+ * line sweeping it, a lattice of spinning hexagons down its left edge beside a marching energy grid, and a white pulse
+ * while hovered or selected.
+ */
+function neonNexus(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { primary, secondary, accent } = pal;
+    const { animationGlow: glow, animationSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
+    const intensity = N.intensity * 1.5;
+    const phase = k.nodePhase;
+    const time = held ? phase : phase * speed;
+    const radius = Math.min(w, h) * 0.08;
+    const line = Math.max(w, h) * 0.0075 * size;
+    const grid = Math.min(w, h) * 0.4 * size;
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowColor = 'transparent';
+
+    if (!only) {
+        for (let i = 0; i < 3; i++) {
+            save(ctx);
+            ctx.globalAlpha = (0.2 - i * 0.05) * fade;
+            ctx.strokeStyle = HOLOGRAM[i];
+            ctx.lineWidth = line * 0.4;
+            roundedRect(ctx, -i * 2, -i * 2, w + i * 4, h + i * 4, radius + i * 1);
+            ctx.stroke();
+            restore(ctx);
+        }
+
+        const flicker = held ? 1.0 : 0.95 + 0.05 * Math.sin(phase * 0.3 * N.direction);
+        for (let i = 0; i < 4; i++) {
+            save(ctx);
+            ctx.lineWidth = line * (1 + i * 0.3);
+            const colour = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent : 'rgba(255, 255, 255, 0.4)';
+            ctx.strokeStyle = colour;
+            ctx.shadowColor = colour;
+            ctx.shadowBlur = (i + 1) * 12 * intensity * glow;
+            const opacity = 0.95 - i * 0.15;
+            ctx.globalAlpha = (held ? opacity : opacity * flicker) * fade;
+            roundedRect(ctx, 0, 0, w, h, radius);
+            ctx.stroke();
+            if (i === 0) {
+                ctx.globalAlpha = (held ? 0.3 : 0.3 * flicker) * fade;
+                ctx.lineWidth = line * 0.8;
+                ctx.shadowBlur = 20 * intensity * glow;
+                roundedRect(ctx, 0, 0, w, h, radius);
+                ctx.stroke();
+            }
+            restore(ctx);
+        }
+
+        const scan = h * (Math.sin(phase * 2) * 0.5 + 0.5);
+        if (!held && shows(0, scan - 10, w, scan + 10)) {
+            const gradient = ctx.createLinearGradient(0, scan - 10, 0, scan + 10);
+            gradient.addColorStop(0, 'rgba(255,255,255,0)');
+            gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, scan - 10, w, 20);
+        }
+    }
+
+    if (N.particleShow) {
+        const spacing = grid / 4;
+        const base = 2 * N.particleSize;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        for (let i = 0; i < 70; i++) {
+            const col = i % 5;
+            const row = Math.floor(i / 5);
+            const x = (col - 2) * spacing + Math.cos(phase + col) * 2;
+            const y = (row - 2) * spacing + Math.sin(phase + row) * 2;
+            const s = base + Math.sin(phase * 2 + i) * (base * 0.3);
+            if (!circle(x, y, s + 1.5 * 5 * dotGlow)) continue;
+            const colour = particleColour(pal, i, time, rate);
+            save(ctx);
+            ctx.translate(x, y);
+            ctx.rotate(phase + (i * Math.PI / 8));
+            ctx.fillStyle = colour;
+            ctx.globalAlpha = (0.4 + Math.sin(phase * 3 + i) * 0.2) * dotGlow * fade;
+            ctx.shadowColor = colour;
+            ctx.shadowBlur = 5 * dotGlow;
+            ctx.beginPath();
+            for (let side = 0; side < 6; side++) {
+                const angle = (side * Math.PI / 3) + phase;
+                const corner = s * (0.8 + Math.sin(phase * 5 + side) * 0.2);
+                ctx.lineTo(Math.cos(angle) * corner, Math.sin(angle) * corner);
+            }
+            ctx.closePath();
+            ctx.fill();
+            restore(ctx);
+        }
+
+        if (!only) {
+            save(ctx);
+            ctx.strokeStyle = primary;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.2 * dotGlow * fade;
+            ctx.setLineDash(DASH);
+            ctx.lineDashOffset = phase * 10;
+            const middle = h / 5;
+            const left = -grid * 0.5;
+            for (let i = -1; i <= 1; i += 0.5) {
+                if (shows(left + i * grid - 0.5, middle - grid, left + i * grid + 0.5, middle + grid)) {
+                    ctx.beginPath();
+                    ctx.moveTo(left + (i * grid), middle - grid);
+                    ctx.lineTo(left + (i * grid), middle + grid);
+                    ctx.stroke();
+                }
+                if (shows(left - grid, middle + i * grid - 0.5, left + grid, middle + i * grid + 0.5)) {
+                    ctx.beginPath();
+                    ctx.moveTo(left - grid, middle + (i * grid));
+                    ctx.lineTo(left + grid, middle + (i * grid));
+                    ctx.stroke();
+                }
+            }
+            restore(ctx);
+        }
+    }
+
+    if ((node.selected || node.mouseOver) && !only) {
+        save(ctx);
+        ctx.globalCompositeOperation = 'lighter';
+        const pulse = 0.5 + 0.5 * Math.sin(phase * 3);
+        const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
+        gradient.addColorStop(0, `rgba(255,255,255,${0.15 * pulse})`);
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        roundedRect(ctx, 0, 0, w, h, radius);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(255,255,255,${0.7 * pulse})`;
+        ctx.lineWidth = line * 2;
+        ctx.shadowColor = `rgba(255,255,255,${0.5 * pulse})`;
+        ctx.shadowBlur = 15 * intensity;
+        roundedRect(ctx, 0, 0, w, h, radius);
+        ctx.stroke();
+        restore(ctx);
+    }
+}
+
+/** 3. Cosmic Ripple (old_node_animations.js:1645-1748): five rings blooming from the centre, inside a turning corona of motes. */
+function cosmicRipple(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { primary, secondary, accent } = pal;
+    const { animationGlow: glow, particleGlow: dotGlow, particleIntensity: motion } = N;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    if (!only) {
+        const most = Math.max(1, Math.min(w, h) * 0.7 * N.animationSize);
+        const intensity = N.intensity * 1.5;
+        // v1's % kept the phase's sign, so going Reverse, which takes the phase below 0, every ring vanished.
+        const ripple = Math.abs(k.nodePhase) * 0.8;
+        for (let i = 0; i < 5; i++) {
+            const at = (ripple - i * 0.2) % 1;
+            const r = Math.max(5, most * at);
+            if (!(r > 5 && r < most)) continue;
+            const blur = Math.max(2, 15 * (1 - at) * glow);
+            const line = Math.max(1, 3 * intensity * (1 - at));
+            if (!circle(cx, cy, r + line / 2 + 1.5 * blur)) continue;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            const gradient = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+            const alpha = Math.max(0, 1 - at);
+            gradient.addColorStop(0, translucent(secondary, alpha * 0.8));
+            gradient.addColorStop(0.5, translucent(primary, alpha));
+            gradient.addColorStop(1, translucent(accent, alpha * 0.8));
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = line;
+            ctx.shadowColor = translucent(secondary, 0.5);
+            ctx.shadowBlur = blur;
+            ctx.stroke();
+        }
+    }
+
+    if (N.particleShow) {
+        const count = Math.floor(Math.min(100, 30 + Math.floor(motion * 20)) * N.particleDensity);
+        const corona = Math.max(1, Math.max(w, h) * 0.7);
+        const time = k.nodeTime;
+        for (let i = 0; i < count; i++) {
+            // v1 turned the corona by its time × Particle.Speed × Direction: the particle time.
+            const angle = ((i / count) * Math.PI * 2) + k.particleTime;
+            const spread = Math.max(0.1, 0.8 + Math.sin(time * 0.5 + i) * 0.2 * motion);
+            const x = (Math.cos(angle) * corona * spread) + cx;
+            const y = (Math.sin(angle) * corona * spread) + cy;
+            const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion);
+            const trail = Math.max(1, s * 2);
+            if (!circle(x, y, trail + 1.5 * 15 * dotGlow)) continue;
+            const colour = particleColour(pal, i, time, 1);
+
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, trail);
+            gradient.addColorStop(0, translucent(colour, 0.7 * dotGlow));
+            gradient.addColorStop(1, translucent(colour, 0));
+            ctx.fillStyle = gradient;
+            ctx.shadowColor = translucent(colour, dotGlow * 0.5);
+            ctx.shadowBlur = 10 * dotGlow;
+            ctx.beginPath();
+            ctx.arc(x, y, trail, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = translucent(colour, 0.7);
+            ctx.shadowColor = translucent(colour, dotGlow);
+            ctx.shadowBlur = 15 * dotGlow;
+            ctx.beginPath();
+            ctx.arc(x, y, s, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
+/** Flower of Life's points: its centre, then each ring's circles, 6 to a ring more than the ring inside it; 127 at Quality 3. */
+const xs = new Float64Array(127);
+const ys = new Float64Array(127);
+
+/**
+ * 4. Flower of Life (old_node_animations.js:1750-1897): a pulsing circle in the centre ringed by layers of smaller
+ * circles joined by faint chords, framed by a turning hexagon round a white core, with dots circling every circle.
+ */
+function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { primary, secondary, accent } = pal;
+    const { quality, particleGlow: dotGlow, particleIntensity: motion, particleSpeed: speed } = N;
+    const intensity = N.intensity * 1.5;
+    const cx = w / 2;
+    const cy = h / 2;
+    const phase = k.nodePhase;
+    const time = held ? phase : phase * speed;
+    const radius = Math.min(w, h) * 0.056 * intensity * N.animationSize;
+    const layers = Math.max(2, Math.floor(quality * 2));
+    const rotation = phase * 0.2;
+    const pulse = 0.8 + Math.sin(phase * 1.5) * 0.2;
+
+    xs[0] = cx;
+    ys[0] = cy;
+    let n = 1;
+    for (let layer = 1; layer <= layers; layer++) {
+        const circles = layer * 6;
+        for (let i = 0; i < circles; i++, n++) {
+            const angle = (i / circles) * Math.PI * 2 + rotation;
+            xs[n] = cx + Math.cos(angle) * (radius * 2) * layer;
+            ys[n] = cy + Math.sin(angle) * (radius * 2) * layer;
+        }
+    }
+
+    if (!only) {
+        const blur = 15 * intensity * N.animationGlow;
+        const reach = 1 + 1.5 * blur;
+        // Every line glows in the primary colour, and the core too.
+        ctx.strokeStyle = primary;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = primary;
+        ctx.shadowBlur = blur;
+        if (circle(cx, cy, radius * pulse + reach)) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        for (let layer = 1, j = 1; layer <= layers; layer++) {
+            for (let index = 0; index < layer * 6; index++, j++) {
+                if (j > 1 && index > 0 && shows(Math.min(xs[j - 1], xs[j]) - reach, Math.min(ys[j - 1], ys[j]) - reach, Math.max(xs[j - 1], xs[j]) + reach, Math.max(ys[j - 1], ys[j]) + reach)) {
+                    ctx.beginPath();
+                    ctx.moveTo(xs[j - 1], ys[j - 1]);
+                    ctx.lineTo(xs[j], ys[j]);
+                    ctx.strokeStyle = secondary;
+                    ctx.globalAlpha = 0.3 * pulse * fade;
+                    ctx.stroke();
+                }
+                if (circle(xs[j], ys[j], radius * pulse + reach)) {
+                    ctx.beginPath();
+                    ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
+                    ctx.strokeStyle = index % 2 === 0 ? secondary : accent;
+                    ctx.globalAlpha = (1 - (layer / (layers + 1))) * fade;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        if (circle(cx, cy, radius * layers * 2 + reach)) {
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2 + rotation;
+                const x = cx + Math.cos(angle) * radius * layers * 2;
+                const y = cy + Math.sin(angle) * radius * layers * 2;
+                if (i) ctx.lineTo(x, y);
+                else ctx.moveTo(x, y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = primary;
+            ctx.globalAlpha = 0.3 * fade;
+            ctx.stroke();
+        }
+
+        if (circle(cx, cy, radius * 2 + 1.5 * blur)) {
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 2);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
+            gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.2 * pulse})`);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = gradient;
+            ctx.globalAlpha = 0.3 * fade;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius * 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    if (N.particleShow) {
+        const count = Math.floor(5 * N.particleDensity * motion);
+        const dot = 2 * quality * N.particleSize;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        for (let j = 0; j < n; j++) {
+            for (let p = 0; p < count; p++) {
+                const angle = (p / count) * Math.PI * 2 + time * 2 * motion;
+                const x = xs[j] + Math.cos(angle) * (radius * 0.5 * motion);
+                const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion);
+                if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
+                const colour = particleColour(pal, j * count + p, time, rate);
+                ctx.beginPath();
+                ctx.arc(x, y, dot, 0, Math.PI * 2);
+                ctx.fillStyle = colour;
+                ctx.shadowColor = colour;
+                ctx.shadowBlur = 10 * dotGlow;
+                ctx.globalAlpha = 0.7 * dotGlow * fade;
+                ctx.fill();
+            }
+        }
+    }
+}
+
+type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
+
+/** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, flowerOfLife];
+
+/** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
+function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
+    const blur = 15 * (N.glow * 2);
+    ctx.shadowColor = pal.accent;
+    ctx.shadowBlur = blur * 1.5;
+    ctx.strokeStyle = pal.secondary;
+    ctx.lineWidth = 2;
+    ctx.globalAlpha = fade;
+    ctx.strokeRect(0, 0, w, h);
+}
+
+/**
+ * Draws node effect `style` (0: the fireflies of a node with particles and no effect) on `node`, its body `w` × `h` px,
+ * at `k`, or in v1's still pose while effects hold still: the elements `p` names, at `alpha` times their own alphas, and
+ * with `only` the style's particles alone. Its colours, and its frame and hover outline, are the style's. The caller
+ * saves and restores the context around it.
+ */
+export function drawNodeFx(ctx: CanvasRenderingContext2D, style: number, node: ComfyNode, w: number, h: number, k: NodeMoment, p: Part, alpha: number, only: boolean): void {
+    part = p;
+    fade = alpha;
+    held = holdsStill();
+    outlined = style > 0 && N.colorHoverShow && Boolean(node.selected || node.mouseOver);
+    const pal = nodePalette(style);
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+    ctx.lineCap = 'butt';
+    ctx.lineJoin = 'miter';
+    ctx.globalAlpha = fade;
+    const saves = depth;
+    try {
+        EFFECTS[style](ctx, node, w, h, held ? STILL_NODE : k, pal, only);
+        if (outlined && style > 1) outline(ctx, 0, 0, w, h, node.selected, translucent);
+        if (style > 0 && !only && N.selectionGlow && node.selected) frame(ctx, w, h, pal);
+    } finally {
+        while (depth > saves) restore(ctx);
+    }
+}
+
+/**
+ * How far past a node's box, title bar included, its effect draws at most, with its glows: what the under part of
+ * a node off screen can still draw on it.
+ */
+export function reach(style: number, w: number, h: number, only: boolean): number {
+    const { quality, animationGlow: glow, animationSize: size, particleShow: dots, particleSize: dotSize, particleGlow: dotGlow, particleIntensity: motion } = N;
+    const intensity = N.intensity * 1.5;
+    const long = Math.max(w, h);
+    const short = Math.min(w, h);
+    let r = 0;
+    if (style > 0 && N.colorHoverShow) r = 1 + 1.5 * 15 * glow * 1.5;
+    if (style > 0 && !only && N.selectionGlow) r = Math.max(r, 1 + 1.5 * 45 * N.glow);
+    switch (style) {
+        case 2: {
+            const line = long * 0.0075 * size;
+            if (!only) r = Math.max(r, 4 + line, line + 1.5 * 48 * intensity * glow, line + 1.5 * 15 * intensity, 0.6 * short * size + 0.5);
+            // The lattice, which runs down from the body's top left corner.
+            if (dots) r = Math.max(r, 1.1 * short * size + 2 + 2.6 * dotSize + 7.5 * dotGlow);
+            return r;
+        }
+        case 3: {
+            const rings = 0.7 * short * size + 1.5 * intensity + 1.5 * Math.max(2, 15 * glow);
+            const corona = 0.7 * long * (0.8 + 0.2 * motion) + 2 * (2 * dotSize + 1.5 * motion) + 1.5 * 15 * dotGlow;
+            return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
+        }
+        case 4: {
+            const radius = short * 0.056 * intensity * size;
+            const rings = 2 * radius * Math.max(2, Math.floor(quality * 2));
+            const pattern = rings + radius + 1 + 1.5 * 15 * intensity * glow;
+            const circling = rings + 0.5 * radius * motion + 2 * quality * dotSize + 1.5 * 10 * dotGlow;
+            return Math.max(r, (only ? 0 : pattern) - short / 2, (dots ? circling : 0) - short / 2);
+        }
+        default: {
+            const radius = long * (0.5 + quality * 0.1) * size;
+            const light = radius * (1.2 + 0.4 * glow) * (0.4 + 0.3 * intensity);
+            // The fireflies orbit up to 1.3 radii out and drift up by 0.39 of one, then wander, glow and flicker.
+            const blur = !only && quality > 1 ? 1.5 * 10 * glow * quality * 0.5 : 0;
+            const fireflies = 1.7 * radius + 4.5 * motion + 12 + 2.8 * (4 + quality) * size * dotSize + blur;
+            return Math.max(r, (only ? 0 : light) - short / 2, (dots ? fireflies : 0) - short / 2);
+        }
+    }
+}

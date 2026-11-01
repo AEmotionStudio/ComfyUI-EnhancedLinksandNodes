@@ -35,15 +35,15 @@ afterEach(() => {
 describe('link colour fallback', () => {
     it('Classic Flow strokes "" and unknown types in the default link colour', async () => {
         const canvas = await draw({ ...V1_LINK_SETTINGS, '🔗 Enhanced Links.Link.Shadow.Enabled': false, '🔗 Enhanced Links.Marker.Shadow.Enabled': false });
-        expect(canvas.front.lines.filter((line) => line.includes('[ignored'))).toEqual([]);
-        expect(canvas.front.paints.filter((p) => p.op === 'stroke').map((p) => p.style)).toEqual(['#64b5f6', '#99aa99', '#99aa99']);
+        for (const layer of [canvas.back, canvas.front]) expect(layer.lines.filter((line) => line.includes('[ignored'))).toEqual([]);
+        expect(canvas.back.paints.filter((p) => p.op === 'stroke').map((p) => p.style)).toEqual(['#64b5f6', '#99aa99', '#99aa99']);
 
         // With v1's default shadows on, v2 drew those links in the black of the shadow pass before them.
         const v1 = await draw(V1_LINK_SETTINGS);
         // Link bodies are 3 × 0.8 wide; the shadow passes under them are 3.6 × 0.8.
-        const bodies = v1.front.paints.filter((p) => p.op === 'stroke' && Math.abs(p.lineWidth - 2.4) < 0.01);
+        const bodies = v1.back.paints.filter((p) => p.op === 'stroke' && Math.abs(p.lineWidth - 2.4) < 0.01);
         expect(bodies.map((p) => p.style)).toEqual(['#64b5f6', '#99aa99', '#99aa99']);
-        expect(v1.front.paints.filter((p) => p.op === 'stroke' && p.style === SHADOW)).toHaveLength(3);
+        expect(v1.back.paints.filter((p) => p.op === 'stroke' && p.style === SHADOW)).toHaveLength(3);
     });
 
     it('Lava Flow draws "" links without throwing', async () => {

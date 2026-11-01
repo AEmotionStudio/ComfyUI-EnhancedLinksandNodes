@@ -1,1621 +1,610 @@
 import { app } from "/scripts/app.js";
-import { L, e as enhanceColor, g as getLinkColor, a as getCustomLinkColors, v as validateHexColor, b as getSecondaryColor, c as getAccentColor, d as guard, f as env, w as wake, l as live, h as dummy, i as layers, j as clock, r as reset, S as SETTINGS, s as snapshotOf, k as commit, p as preview, m as linkSettings, n as install } from "./chunks/color-manager-BWKJQb2w.js";
-const none = () => {
-};
-const diamond = (ctx, x, y, size) => {
-  ctx.beginPath();
-  ctx.moveTo(x, y - size);
-  ctx.lineTo(x + size, y);
-  ctx.lineTo(x, y + size);
-  ctx.lineTo(x - size, y);
-  ctx.closePath();
-};
-const circle = (ctx, x, y, size) => {
-  ctx.beginPath();
-  ctx.arc(x, y, size, 0, Math.PI * 2);
-  ctx.closePath();
-};
-const arrow = (ctx, x, y, size, angle = 0) => {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
-  ctx.beginPath();
-  ctx.moveTo(size, 0);
-  ctx.lineTo(-size, size);
-  ctx.lineTo(-size * 0.5, 0);
-  ctx.lineTo(-size, -size);
-  ctx.closePath();
-  ctx.restore();
-};
-const square = (ctx, x, y, size) => {
-  ctx.beginPath();
-  ctx.rect(x - size, y - size, size * 2, size * 2);
-  ctx.closePath();
-};
-const triangle = (ctx, x, y, size) => {
-  ctx.beginPath();
-  ctx.moveTo(x, y - size);
-  ctx.lineTo(x + size, y + size);
-  ctx.lineTo(x - size, y + size);
-  ctx.closePath();
-};
-const star = (ctx, x, y, size) => {
-  const spikes = 5;
-  const innerRadius = size * 0.4;
-  ctx.beginPath();
-  for (let i = 0; i < spikes * 2; i++) {
-    const r = i % 2 === 0 ? size : innerRadius;
-    const a = i * Math.PI / spikes;
-    const px = x + Math.cos(a) * r;
-    const py = y + Math.sin(a) * r;
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-};
-const heart = (ctx, x, y, size) => {
-  ctx.beginPath();
-  ctx.save();
-  ctx.translate(x, y);
-  const scale = size * 0.7;
-  ctx.scale(scale, scale);
-  ctx.moveTo(0, 0.4);
-  ctx.bezierCurveTo(0, 0.3, -0.5, -0.4, -1, -0.4);
-  ctx.bezierCurveTo(-1.5, -0.4, -1.5, 0.2, -1.5, 0.2);
-  ctx.bezierCurveTo(-1.5, 0.6, -0.5, 1.4, 0, 2);
-  ctx.bezierCurveTo(0.5, 1.4, 1.5, 0.6, 1.5, 0.2);
-  ctx.bezierCurveTo(1.5, 0.2, 1.5, -0.4, 1, -0.4);
-  ctx.bezierCurveTo(0.5, -0.4, 0, 0.3, 0, 0.4);
-  ctx.restore();
-  ctx.closePath();
-};
-const cross = (ctx, x, y, size) => {
-  ctx.beginPath();
-  const width = size * 0.3;
-  ctx.moveTo(x, y - size);
-  ctx.lineTo(x, y + size);
-  ctx.moveTo(x - size, y);
-  ctx.lineTo(x + size, y);
-  ctx.closePath();
-  ctx.lineWidth = width;
-  ctx.lineCap = "round";
-  ctx.stroke();
-  ctx.lineCap = "butt";
-};
-const hexagon = (ctx, x, y, size) => {
-  ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const a = i * Math.PI / 3;
-    const px = x + Math.cos(a) * size;
-    const py = y + Math.sin(a) * size;
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-};
-const flower = (ctx, x, y, size) => {
-  const petals = 6;
-  const innerRadius = size * 0.3;
-  ctx.beginPath();
-  for (let i = 0; i < petals; i++) {
-    const a = i * Math.PI * 2 / petals;
-    const na = (i + 1) * Math.PI * 2 / petals;
-    const ma = (a + na) / 2;
-    const sx = x + Math.cos(a) * innerRadius;
-    const sy = y + Math.sin(a) * innerRadius;
-    const cx = x + Math.cos(ma) * size * 1.5;
-    const cy = y + Math.sin(ma) * size * 1.5;
-    const ex = x + Math.cos(na) * innerRadius;
-    const ey = y + Math.sin(na) * innerRadius;
-    i === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
-    ctx.quadraticCurveTo(cx, cy, ex, ey);
-  }
-  ctx.closePath();
-  ctx.moveTo(x + innerRadius, y);
-  ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
-};
-const spiral = (ctx, x, y, size) => {
-  ctx.beginPath();
-  const turns = 3, points = 40;
-  for (let i = 0; i <= points; i++) {
-    const t = i / points;
-    const r = size * t;
-    const a = t * turns * Math.PI * 2;
-    const px = x + Math.cos(a) * r;
-    const py = y + Math.sin(a) * r;
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-  }
-};
-const MarkerShapes = {
-  none,
-  diamond,
-  circle,
-  arrow,
-  square,
-  triangle,
-  star,
-  heart,
-  cross,
-  hexagon,
-  flower,
-  spiral
-};
-function shapeNeedsFill(name) {
-  return name !== "cross" && name !== "none";
+import { L, D as DOT, s as shine, g as glow, r as rainbow, c as clock, a as guard, e as env, w as wake, l as live, d as dummy, b as layers, H as HIGHLIGHT, p as palette, S as STILL_PHASE, f as startSprites, h as stopSprites, i as reset, j as SETTINGS, k as snapshotOf, m as commit, n as preview, o as linkSettings, q as install } from "./chunks/particles-rmz1g5bC.js";
+const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
+function wrap(x) {
+  const r = x % 1;
+  return r < 0 ? r + 1 : r;
 }
-const SACRED = Object.freeze({
-  /** Base pattern foundation - used for trinity-based patterns */
-  TRINITY: 3,
-  /** Flow and crystalline structures */
-  HARMONY: 7,
-  /** Complex pattern completion cycles */
-  COMPLETION: 12,
-  /** Fibonacci sequence for growth patterns */
-  FIBONACCI: Object.freeze([1, 1, 2, 3, 5, 8, 13, 21]),
-  /** Quantum effects base */
-  QUANTUM: 5,
-  /** Infinite pattern cycles */
-  INFINITY: 8
-});
-function createFlowField(t, phase) {
-  return {
-    x: Math.sin(t * Math.PI * SACRED.TRINITY + phase) * 10,
-    y: Math.cos(t * Math.PI * SACRED.TRINITY + phase) * 10
-  };
+const here$3 = new Float64Array(4);
+let ts = new Float64Array(64);
+function vertices(s, n) {
+  const first2 = Math.ceil(s.t0 * n);
+  const last = Math.floor(s.t1 * n);
+  if (ts.length < last - first2 + 3) ts = new Float64Array(2 * (last - first2 + 3));
+  let m = 0;
+  if (first2 / n > s.t0) ts[m++] = s.t0;
+  for (let i = first2; i <= last; i++) ts[m++] = i / n;
+  if (last / n < s.t1) ts[m++] = s.t1;
+  return m;
 }
-function createCrystal(ctx, x, y, size, rotation, color) {
+const HEPTAGON = {
+  path(ctx, x, y, size, angle) {
+    ctx.beginPath();
+    for (let i = 0; i < SACRED.HARMONY; i++) {
+      const corner = angle + i / SACRED.HARMONY * Math.PI * 2;
+      const px = x + Math.cos(corner) * size;
+      const py = y + Math.sin(corner) * size;
+      if (i) ctx.lineTo(px, py);
+      else ctx.moveTo(px, py);
+    }
+    ctx.closePath();
+  },
+  stroked: true,
+  turn: Math.PI * 2 / SACRED.HARMONY
+};
+function createCrystal(ctx, x, y, size, rotation, color, glowColor, blur) {
+  glow(ctx, HEPTAGON, x, y, size, rotation, color, glowColor, blur);
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rotation);
-  ctx.beginPath();
-  for (let i = 0; i < SACRED.HARMONY; i++) {
-    const angle = i / SACRED.HARMONY * Math.PI * 2;
-    const px = Math.cos(angle) * size;
-    const py = Math.sin(angle) * size;
-    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-  }
-  ctx.closePath();
+  HEPTAGON.path(ctx, 0, 0, size, 0);
   ctx.strokeStyle = color;
   ctx.stroke();
   ctx.restore();
 }
-function enableAntiAliasing(ctx) {
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
-  ctx.miterLimit = 2;
-}
-function renderSacredFlow(ctx, items, phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  const animSpeed = L.animationSpeed;
-  const colorScheme = L.colorScheme;
-  const speedReductionFactor = 0.25;
-  const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
-  ctx.shadowBlur = glowIntensity;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
-    const baseColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
-    const primaryColor = enhanceColor(baseColor, colorScheme);
-    const accentColor = enhanceColor(getAccentColor(defaultColor), colorScheme);
+const RUNG = {
+  path(ctx, x, y, size, angle) {
+    const dx2 = Math.cos(angle) * size;
+    const dy2 = Math.sin(angle) * size;
     ctx.beginPath();
-    const points = Math.floor(SACRED.TRINITY * quality * particleDensity);
-    for (let i = 0; i <= points; i++) {
-      const baseT = i / points;
-      const t = direction > 0 ? baseT : 1 - baseT;
-      const flow = createFlowField(t, continuousPhase);
-      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
-      const x = pos[0] + flow.x * Math.sin(t * Math.PI + continuousPhase) * 0.5;
-      const y = pos[1] + flow.y * Math.sin(t * Math.PI + continuousPhase) * 0.5;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    ctx.moveTo(x + dx2, y + dy2);
+    ctx.lineTo(x - dx2, y - dy2);
+  },
+  stroked: true,
+  turn: Math.PI
+};
+const moved = (turn, T, cp) => turn(T * Math.PI * SACRED.TRINITY - cp) * 10 * Math.sin(T * Math.PI - cp) * 0.5;
+function sacredFlow$1(ctx, s, k) {
+  const { thickness, glowIntensity } = L;
+  const { primary, accent } = s.pal;
+  const cp = k.linkFlow * 0.25;
+  const m = vertices(s, Math.max(12, Math.round(s.chain / 8)));
+  ctx.beginPath();
+  for (let j = 0; j < m; j++) {
+    const T = ts[j];
+    s.path.at(s.local(T), here$3);
+    const x = here$3[0] + moved(Math.sin, T, cp);
+    const y = here$3[1] + moved(Math.cos, T, cp);
+    if (j) ctx.lineTo(x, y);
+    else ctx.moveTo(x, y);
+  }
+  ctx.strokeStyle = primary;
+  ctx.lineWidth = thickness;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.shadowColor = primary;
+  ctx.shadowBlur = glowIntensity;
+  ctx.globalAlpha = 1;
+  ctx.stroke();
+  const count2 = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity));
+  for (let i = 0; i < count2; i++) {
+    const T = wrap(i / count2 + cp * 0.5);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    const x = here$3[0] + moved(Math.sin, T, cp);
+    const y = here$3[1] + moved(Math.cos, T, cp);
+    DOT.path(ctx, x, y, thickness * 0.75, 0);
+    ctx.globalAlpha = 0.4 + Math.sin(k.linkPhase + T * Math.PI * 2) * 0.2;
+    shine(ctx, DOT, x, y, thickness * 0.75, 0, accent, accent, glowIntensity);
+  }
+}
+function crystalStream$1(ctx, s, k) {
+  const { thickness } = L;
+  const { primary, secondary } = s.pal;
+  const cp = k.linkFlow;
+  const count2 = Math.max(1, Math.floor(SACRED.HARMONY * L.quality * L.particleDensity));
+  for (let i = 0; i < count2; i++) {
+    const T = wrap(i / count2 + cp);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    ctx.lineWidth = thickness * 0.8;
+    ctx.globalAlpha = 1;
+    createCrystal(ctx, here$3[0], here$3[1], 5 * thickness * (1 + Math.sin(cp + T * Math.PI)), T * Math.PI * 2 + cp, primary, secondary, L.glowIntensity);
+  }
+}
+function quantumField$1(ctx, s, k) {
+  const { primary, secondary } = s.pal;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality * L.particleDensity)));
+  for (let f = 0; f < SACRED.QUANTUM; f++) {
+    const fieldPhase = k.quantumPhase + f * Math.PI * 2 / SACRED.QUANTUM;
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$3);
+      const uncertainty = 8 * Math.sin(T * Math.PI * 2 + fieldPhase);
+      const x = here$3[0] + uncertainty * Math.cos(fieldPhase);
+      const y = here$3[1] + uncertainty * Math.sin(fieldPhase);
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
     }
-    ctx.strokeStyle = primaryColor;
+    const color = f % 2 === 0 ? primary : secondary;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = L.thickness * 0.5;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = L.glowIntensity;
+    ctx.globalAlpha = 0.3;
+    ctx.stroke();
+  }
+}
+function cosmicWeave$1(ctx, s, k) {
+  const colors = [s.pal.primary, s.pal.secondary, s.pal.accent];
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality)));
+  for (let strand = 0; strand < SACRED.TRINITY; strand++) {
+    const strandPhase = k.linkFlow + strand * Math.PI * 2 / SACRED.TRINITY;
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$3);
+      const weave = Math.sin((1 - T) * Math.PI * 6 + strandPhase) * 10;
+      const x = here$3[0] + weave * Math.cos(strandPhase);
+      const y = here$3[1] + weave * Math.sin(strandPhase);
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    ctx.strokeStyle = colors[strand];
+    ctx.lineWidth = L.thickness * 0.7;
+    ctx.shadowColor = colors[strand];
+    ctx.shadowBlur = L.glowIntensity;
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+  }
+}
+function energyPulse$1(ctx, s, k) {
+  const { secondary } = s.pal;
+  const cp = k.linkFlow * 0.25;
+  const count2 = Math.max(1, Math.floor(SACRED.TRINITY * L.quality));
+  for (let i = 0; i < count2; i++) {
+    const T = wrap(i / count2 + cp);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    const trip = L.direction > 0 ? T : 1 - T;
+    const r = L.thickness * 2 * (1 - trip);
+    DOT.path(ctx, here$3[0], here$3[1], r, 0);
+    ctx.globalAlpha = 0.5 * (1 - trip);
+    shine(ctx, DOT, here$3[0], here$3[1], r, 0, secondary, secondary, L.glowIntensity * 2);
+  }
+}
+function dnaHelix$1(ctx, s, k) {
+  const { primary, secondary, accent } = s.pal;
+  const { thickness, glowIntensity } = L;
+  const radius = 10;
+  const rotations = 4;
+  const angle = (T) => (1 - T) * Math.PI * rotations * 2 + k.linkFlow;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality * 2)));
+  for (let strand = 0; strand < 2; strand++) {
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$3);
+      const side = strand ? -1 : 1;
+      const x = here$3[0] + side * Math.cos(angle(T)) * radius;
+      const y = here$3[1] + side * Math.sin(angle(T)) * radius;
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    const color = strand ? secondary : primary;
+    ctx.strokeStyle = color;
     ctx.lineWidth = thickness;
-    ctx.shadowColor = primaryColor;
+    ctx.shadowColor = color;
     ctx.shadowBlur = glowIntensity;
     ctx.globalAlpha = 1;
     ctx.stroke();
-    const particleCount = Math.floor(SACRED.TRINITY * quality * particleDensity);
-    const particleSize = thickness * 0.75;
-    for (let i = 0; i < particleCount; i++) {
-      const baseT = i / particleCount;
-      const t = direction > 0 ? (baseT + continuousPhase * 0.5) % 1 : 1 - (baseT + continuousPhase * 0.5) % 1;
-      const boundedT = Math.max(0, Math.min(1, t));
-      const flow = createFlowField(boundedT, continuousPhase);
-      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
-      const x = pos[0] + flow.x * Math.sin(boundedT * Math.PI + continuousPhase) * 0.5;
-      const y = pos[1] + flow.y * Math.sin(boundedT * Math.PI + continuousPhase) * 0.5;
-      ctx.beginPath();
-      ctx.arc(x, y, particleSize, 0, Math.PI * 2);
-      ctx.fillStyle = accentColor;
-      ctx.shadowColor = accentColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.4 + Math.sin(phase + t * Math.PI * 2) * 0.2;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  });
-  ctx.lineCap = "butt";
-  ctx.lineJoin = "miter";
-  ctx.shadowBlur = 0;
-}
-function renderCrystalStream(ctx, items, _phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  const animSpeed = L.animationSpeed;
-  const continuousPhase = (state.totalTime || 0) * animSpeed;
-  const createCrystal2 = (cx, x, y, size, rotation, color) => {
-    cx.save();
-    cx.translate(x, y);
-    cx.rotate(rotation);
-    cx.beginPath();
-    for (let i = 0; i < SACRED.HARMONY; i++) {
-      const angle = i / SACRED.HARMONY * Math.PI * 2;
-      const px = Math.cos(angle) * size;
-      const py = Math.sin(angle) * size;
-      i === 0 ? cx.moveTo(px, py) : cx.lineTo(px, py);
-    }
-    cx.closePath();
-    cx.strokeStyle = color;
-    cx.stroke();
-    cx.restore();
-  };
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
-      ctx.globalAlpha = 1;
-    }
-    const crystals = Math.floor(SACRED.HARMONY * quality * particleDensity);
-    for (let i = 0; i < crystals; i++) {
-      const baseT = i / crystals;
-      const t = direction > 0 ? (baseT + continuousPhase) % 1 : 1 - (baseT + continuousPhase) % 1;
-      const boundedT = Math.max(0, Math.min(1, t));
-      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
-      const size = 5 * thickness * (1 + Math.sin(continuousPhase + boundedT * Math.PI));
-      ctx.shadowColor = secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      createCrystal2(ctx, pos[0], pos[1], size, boundedT * Math.PI * 2 + continuousPhase, primaryColor);
-    }
-  });
-}
-function renderQuantumField(ctx, items, phase, _state) {
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
-      ctx.globalAlpha = 1;
-    }
-    const fieldLines = SACRED.QUANTUM;
-    const points = Math.floor(SACRED.COMPLETION * quality * particleDensity);
-    for (let f = 0; f < fieldLines; f++) {
-      ctx.beginPath();
-      const fieldPhase = phase + f * Math.PI * 2 / fieldLines;
-      for (let i = 0; i <= points; i++) {
-        const t = i / points;
-        const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
-        const uncertainty = 8 * Math.sin(t * Math.PI * 2 + fieldPhase);
-        const x = pos[0] + uncertainty * Math.cos(fieldPhase);
-        const y = pos[1] + uncertainty * Math.sin(fieldPhase);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = f % 2 === 0 ? primaryColor : secondaryColor;
-      ctx.lineWidth = thickness * 0.5;
-      ctx.shadowColor = f % 2 === 0 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.3;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderCosmicWeave(ctx, items, _phase, state) {
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const animSpeed = L.animationSpeed;
-  const continuousPhase = (state.totalTime || 0) * animSpeed;
-  const direction = state.direction;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0;
-      r.draw(ctx, end2, start, primaryColor, thickness, isStatic);
-      ctx.globalAlpha = 1;
-    }
-    const strands = SACRED.TRINITY;
-    const points = Math.floor(SACRED.COMPLETION * quality);
-    for (let s = 0; s < strands; s++) {
-      ctx.beginPath();
-      const strandPhase = continuousPhase + s * Math.PI * 2 / strands;
-      for (let i = 0; i <= points; i++) {
-        const t = direction > 0 ? i / points : 1 - i / points;
-        const pos = r.getPoint(end2, start, t, isStatic ? 0.3 : 0.5);
-        const weave = Math.sin(t * Math.PI * 6 + strandPhase * direction) * 10;
-        const x = pos[0] + weave * Math.cos(strandPhase);
-        const y = pos[1] + weave * Math.sin(strandPhase);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      const strandColor = [primaryColor, secondaryColor, accentColor][s % 3];
-      ctx.strokeStyle = strandColor;
-      ctx.lineWidth = thickness * 0.7;
-      ctx.shadowColor = strandColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.5;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderEnergyPulse(ctx, items, _phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const animSpeed = L.animationSpeed;
-  const speedReductionFactor = 0.25;
-  const continuousPhase = (state.totalTime || 0) * animSpeed * speedReductionFactor;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
-      ctx.globalAlpha = 1;
-    }
-    const pulseCount = Math.floor(SACRED.TRINITY * quality);
-    for (let i = 0; i < pulseCount; i++) {
-      const baseT = i / pulseCount;
-      const t = direction > 0 ? (baseT + continuousPhase) % 1 : 1 - (baseT + continuousPhase) % 1;
-      const boundedT = Math.max(0, Math.min(1, t));
-      const pulseSize = thickness * 2 * (1 - boundedT);
-      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
-      ctx.beginPath();
-      ctx.arc(pos[0], pos[1], pulseSize, 0, Math.PI * 2);
-      ctx.fillStyle = secondaryColor;
-      ctx.shadowColor = secondaryColor;
-      ctx.shadowBlur = glowIntensity * 2;
-      ctx.globalAlpha = 0.5 * (1 - boundedT);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderDNAHelix(ctx, items, _phase, state) {
-  const direction = -state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const animSpeed = L.animationSpeed;
-  const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
-    const points = Math.floor(SACRED.COMPLETION * quality * 2);
-    const helixRadius = 10;
-    const rotations = 4;
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    const actualStart = direction > 0 ? start : end2;
-    const actualEnd = direction > 0 ? end2 : start;
-    const strand1Points = [];
-    const strand2Points = [];
-    for (let i = 0; i <= points; i++) {
-      const t = i / points;
-      const baseAngle = t * Math.PI * rotations * 2 + continuousPhase;
-      const pos = r.getPoint(actualStart, actualEnd, t, isStatic ? 0.3 : 0.5);
-      const hx = Math.cos(baseAngle) * helixRadius;
-      const hy = Math.sin(baseAngle) * helixRadius;
-      strand1Points.push({ x: pos[0] + hx, y: pos[1] + hy });
-      strand2Points.push({ x: pos[0] - hx, y: pos[1] - hy });
-    }
-    [strand1Points, strand2Points].forEach((strandPoints, index) => {
-      ctx.beginPath();
-      strandPoints.forEach((point, i) => {
-        i === 0 ? ctx.moveTo(point.x, point.y) : ctx.lineTo(point.x, point.y);
-      });
-      ctx.strokeStyle = index === 0 ? primaryColor : secondaryColor;
-      ctx.lineWidth = thickness;
-      ctx.shadowColor = index === 0 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.stroke();
-    });
-    const bonds = rotations * 4;
-    ctx.strokeStyle = accentColor;
-    ctx.shadowColor = accentColor;
-    ctx.shadowBlur = glowIntensity * 0.5;
+  }
+  const bonds = rotations * 4;
+  for (let b = 0; b < bonds; b++) {
+    const T = 1 - b / bonds;
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    ctx.lineWidth = thickness;
     ctx.globalAlpha = 0.6;
-    for (let b = 0; b < bonds; b++) {
-      const t = b / bonds;
-      const baseAngle = t * Math.PI * rotations * 2 + continuousPhase;
-      const pos = r.getPoint(actualStart, actualEnd, t, isStatic ? 0.3 : 0.5);
-      const x1 = pos[0] + Math.cos(baseAngle) * helixRadius;
-      const y1 = pos[1] + Math.sin(baseAngle) * helixRadius;
-      const x2 = pos[0] - Math.cos(baseAngle) * helixRadius;
-      const y2 = pos[1] - Math.sin(baseAngle) * helixRadius;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
+    RUNG.path(ctx, here$3[0], here$3[1], radius, angle(T));
+    shine(ctx, RUNG, here$3[0], here$3[1], radius, angle(T), accent, accent, glowIntensity * 0.5);
+  }
 }
-function renderLavaFlow(ctx, items, phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  const animSpeed = L.animationSpeed;
-  const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0;
-      r.draw(ctx, start, end2, primaryColor, thickness, isStatic);
-      ctx.globalAlpha = 1;
-    }
-    const tubeWidth = thickness * 7;
-    const flowWidth = thickness * 5;
-    const turbulenceScale = 20;
-    const pts = Math.floor(SACRED.TRINITY * quality * 12);
+function linkGradient(ctx, s, dir) {
+  const { start, end: end2, t0, t1 } = s;
+  const dx2 = (end2[0] - start[0]) / (t1 - t0);
+  const dy2 = (end2[1] - start[1]) / (t1 - t0);
+  const x0 = start[0] - dx2 * t0;
+  const y0 = start[1] - dy2 * t0;
+  const x1 = end2[0] + dx2 * (1 - t1);
+  const y1 = end2[1] + dy2 * (1 - t1);
+  return dir > 0 ? ctx.createLinearGradient(x0, y0, x1, y1) : ctx.createLinearGradient(x1, y1, x0, y0);
+}
+const LAVA = [
+  { ripple: 20, rate: 1, swell: 0.8 },
+  { ripple: 20 * 0.7, rate: 1.2, swell: 0.6 }
+];
+function lavaFlow$1(ctx, s, k) {
+  const { primary, secondary, accent } = s.pal;
+  const { thickness, glowIntensity } = L;
+  const cp = k.linkFlow;
+  const tube = thickness * 7;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality * 12)));
+  for (const layer of LAVA) {
     ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const t = i / pts;
-      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
-      const noise = Math.sin(t * Math.PI * 3 + continuousPhase) * turbulenceScale;
-      const x = pos[0];
-      const y = pos[1] + noise * Math.sin(continuousPhase * 0.8 + t * Math.PI * 2);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$3);
+      const across = Math.sin(T * Math.PI * 3 - cp * layer.rate) * layer.ripple * Math.sin(T * Math.PI * 2 - cp * layer.swell);
+      const x = here$3[0] - here$3[3] * across;
+      const y = here$3[1] + here$3[2] * across;
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
     }
-    ctx.strokeStyle = secondaryColor;
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = tubeWidth;
     ctx.lineCap = "round";
-    ctx.stroke();
-    ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const t = i / pts;
-      const pos = r.getPoint(start, end2, t, isStatic ? 0.3 : 0.5);
-      const noise = Math.sin(t * Math.PI * 3 + continuousPhase * 1.2) * (turbulenceScale * 0.7);
-      const x = pos[0];
-      const y = pos[1] + noise * Math.sin(continuousPhase * 0.6 + t * Math.PI * 2);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    const gradient = ctx.createLinearGradient(
-      direction > 0 ? start[0] : end2[0],
-      direction > 0 ? start[1] : end2[1],
-      direction > 0 ? end2[0] : start[0],
-      direction > 0 ? end2[1] : start[1]
-    );
-    gradient.addColorStop(0, primaryColor);
-    gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondaryColor);
-    gradient.addColorStop(1, accentColor);
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = flowWidth;
-    ctx.lineCap = "round";
-    ctx.shadowColor = secondaryColor;
+    ctx.shadowColor = secondary;
     ctx.shadowBlur = glowIntensity * 1.5;
-    ctx.stroke();
-    const particleCount = Math.floor(SACRED.TRINITY * quality * particleDensity * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const baseT = i / particleCount;
-      const t = direction > 0 ? (baseT + continuousPhase * 0.5) % 1 : 1 - (baseT + continuousPhase * 0.5) % 1;
-      const boundedT = Math.max(0, Math.min(1, t));
-      const pos = r.getPoint(start, end2, boundedT, isStatic ? 0.3 : 0.5);
-      const noise = Math.sin(boundedT * Math.PI * 3 + continuousPhase) * (turbulenceScale * 0.3);
-      const x = pos[0] + Math.sin(boundedT * Math.PI * 2) * (tubeWidth * 0.15);
-      const y = pos[1] + noise * Math.sin(continuousPhase + boundedT * Math.PI * 2) + Math.cos(boundedT * Math.PI * 3) * (tubeWidth * 0.15);
-      const particleSize = thickness * (0.5 + Math.sin(continuousPhase + i) * 0.2);
-      ctx.beginPath();
-      ctx.arc(x, y, particleSize, 0, Math.PI * 2);
-      ctx.fillStyle = accentColor;
-      ctx.globalAlpha = 0.6 + Math.sin(continuousPhase + i) * 0.4;
-      ctx.fill();
+    if (layer === LAVA[0]) {
+      ctx.strokeStyle = secondary;
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = tube;
+    } else {
+      const gradient = linkGradient(ctx, s, L.direction);
+      gradient.addColorStop(0, primary);
+      gradient.addColorStop(0.4 + Math.sin(k.linkPhase) * 0.1, secondary);
+      gradient.addColorStop(1, accent);
+      ctx.strokeStyle = gradient;
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = thickness * 5;
     }
-    ctx.globalAlpha = 1;
-  });
+    ctx.stroke();
+  }
+  const count2 = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity * 3));
+  for (let i = 0; i < count2; i++) {
+    const T = wrap(i / count2 + cp * 0.5);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    const along = Math.sin(T * Math.PI * 2) * (tube * 0.15);
+    const across = Math.sin(T * Math.PI * 3 - cp) * (20 * 0.3) * Math.sin(T * Math.PI * 2 - cp) + Math.cos(T * Math.PI * 3) * (tube * 0.15);
+    const x = here$3[0] + here$3[2] * along - here$3[3] * across;
+    const y = here$3[1] + here$3[3] * along + here$3[2] * across;
+    const r = thickness * (0.5 + Math.sin(cp + i) * 0.2);
+    DOT.path(ctx, x, y, r, 0);
+    ctx.globalAlpha = 0.6 + Math.sin(cp + i) * 0.4;
+    shine(ctx, DOT, x, y, r, 0, accent, secondary, glowIntensity * 1.5);
+  }
 }
-function renderStellarPlasma(ctx, items, _phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  const animSpeed = L.animationSpeed;
-  const continuousPhase = -(state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end: end2, defaultColor, isStatic, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    const actualStart = direction > 0 ? end2 : start;
-    const actualEnd = direction > 0 ? start : end2;
-    const length = r.getLength(start, end2);
-    const segments = Math.floor(length / 20) * quality * particleDensity;
-    ctx.save();
-    for (let i = 0; i <= segments; i++) {
-      const baseT = i / segments;
-      const t = baseT;
-      const pos = r.getPoint(actualStart, actualEnd, t, isStatic ? 0.3 : 0.5);
-      const wavePhase = t * Math.PI * 4 - continuousPhase * direction;
-      const wave = Math.sin(wavePhase) * 15;
-      const sizePhase = t * Math.PI * 2 - continuousPhase * direction;
-      const size = thickness * (0.5 + Math.sin(sizePhase) * 0.5);
-      ctx.beginPath();
-      ctx.arc(pos[0], pos[1] + wave, size, 0, Math.PI * 2);
-      ctx.fillStyle = t < 0.5 ? primaryColor : secondaryColor;
-      ctx.shadowColor = t < 0.5 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
+function stellarPlasma$1(ctx, s, k) {
+  const { primary, secondary, accent } = s.pal;
+  const { thickness, glowIntensity } = L;
+  const f = k.linkFlow;
+  const segments = Math.floor(s.chain / 20) * L.quality * L.particleDensity || 1;
+  const first2 = (t) => L.direction > 0 ? t < 0.5 : t > 0.5;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const size = thickness * (0.5 + Math.sin(t * Math.PI * 2 + f) * 0.5);
+    let u = s.local(1 - t);
+    if (s.within(u)) {
+      s.path.at(u, here$3);
+      const y2 = here$3[1] + Math.sin(t * Math.PI * 4 + f) * 15;
+      const color = first2(t) ? primary : secondary;
+      DOT.path(ctx, here$3[0], y2, size, 0);
       ctx.globalAlpha = 0.7 - Math.abs(t - 0.5) * 0.3;
-      ctx.fill();
-      if (i % 3 === 0) {
-        const particleT = (baseT + continuousPhase * 0.5) % 1;
-        const boundedPT = Math.max(0, Math.min(1, particleT));
-        const particlePos = r.getPoint(actualStart, actualEnd, boundedPT, isStatic ? 0.3 : 0.5);
-        const pWavePhase = boundedPT * Math.PI * 4 - continuousPhase * direction;
-        const pWave = Math.sin(pWavePhase) * 15;
-        ctx.beginPath();
-        ctx.arc(particlePos[0], particlePos[1] + pWave, size * 0.5, 0, Math.PI * 2);
-        ctx.fillStyle = accentColor;
-        ctx.shadowColor = accentColor;
-        ctx.shadowBlur = glowIntensity * 0.5;
-        ctx.globalAlpha = 0.6 - Math.abs(boundedPT - 0.5) * 0.4;
-        ctx.fill();
-      }
+      shine(ctx, DOT, here$3[0], y2, size, 0, color, color, glowIntensity);
     }
-    ctx.restore();
-    ctx.globalAlpha = 1;
-  });
-}
-function renderClassicFlow(ctx, items, phase, state) {
-  const direction = state.direction;
-  const quality = L.quality;
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const particleDensity = L.particleDensity;
-  const animSpeed = L.animationSpeed;
-  const markerEnabled = L.markerEnabled;
-  const markerShape = L.markerShape;
-  const markerSize = L.markerSize;
-  const markerColorMode = L.markerColorMode;
-  const markerColor = L.markerColor;
-  const markerGlow = L.markerGlow;
-  const markerEffect = L.markerEffects;
-  const colorScheme = L.colorScheme;
-  const shadowBlur = L.shadowBlur;
-  const shadowOffset = L.shadowOffset;
-  const continuousPhase = (state.totalTime || 0) * animSpeed;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
-    if (linkStyle !== "hidden") {
-      const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
-      const enhancedColor = enhanceColor(linkColor, colorScheme);
-      ctx.lineWidth = thickness;
-      const linkShadowEnabled = L.linkShadowEnabled;
-      if (linkShadowEnabled) {
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
-        ctx.shadowBlur = shadowBlur * 4;
-        ctx.shadowOffsetX = shadowOffset * 3;
-        ctx.shadowOffsetY = shadowOffset * 3;
-        ctx.lineWidth = thickness * 1.2;
-        r.draw(ctx, start, end2, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
-      }
-      ctx.shadowColor = enhancedColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.strokeStyle = enhancedColor;
-      ctx.lineWidth = thickness;
-      r.draw(ctx, start, end2, enhancedColor, thickness, true);
-    }
-    if (markerEnabled && markerShape !== "none") {
-      let effectiveMarkerColor;
-      if (markerColorMode === "custom") {
-        effectiveMarkerColor = enhanceColor(
-          validateHexColor(markerColor) || primaryColor,
-          colorScheme
-        );
-      } else if (markerColorMode === "default") {
-        effectiveMarkerColor = enhanceColor(defaultColor, colorScheme);
-      } else {
-        effectiveMarkerColor = primaryColor;
-      }
-      const numMarks = Math.floor(SACRED.TRINITY * quality * markerSize * particleDensity * 0.5);
-      const markSize = 3 * markerSize;
-      for (let i = 0; i < numMarks; i++) {
-        const baseT = i / numMarks;
-        const t = direction > 0 ? (baseT + continuousPhase * 0.1) % 1 : 1 - (baseT + continuousPhase * 0.1) % 1;
-        const pos = r.getPoint(start, end2, t, true);
-        let angle = 0;
-        if (markerShape === "arrow") {
-          const nextT = Math.min(t + 0.01, 1);
-          const nextPos = r.getPoint(start, end2, nextT, true);
-          angle = Math.atan2(nextPos[1] - pos[1], nextPos[0] - pos[0]);
-        }
-        let effectColor = effectiveMarkerColor;
-        let opacity = 1;
-        switch (markerEffect) {
-          case "pulse":
-            opacity = 0.5 + Math.sin(phase + t * Math.PI * 2) * 0.5;
-            break;
-          case "fade":
-            opacity = 1 - t;
-            break;
-          case "rainbow": {
-            const hue = (t * 360 + phase * 50) % 360;
-            effectColor = enhanceColor(`hsl(${hue}, 100%, 50%)`, colorScheme);
-            break;
-          }
-        }
-        const shapeFn = MarkerShapes[markerShape];
-        if (shapeFn) {
-          const markerShadowEnabled = L.markerShadowEnabled;
-          if (markerShadowEnabled) {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
-            ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
-            ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
-            ctx.shadowBlur = shadowBlur * 4;
-            ctx.shadowOffsetX = shadowOffset * 3;
-            ctx.shadowOffsetY = shadowOffset * 3;
-            ctx.globalAlpha = opacity;
-            shapeFn(ctx, pos[0], pos[1], markSize * 1.2, angle);
-            if (shapeNeedsFill(markerShape)) ctx.fill();
-          }
-          ctx.shadowColor = markerEffect === "rainbow" ? primaryColor : effectColor;
-          ctx.shadowBlur = markerGlow;
-          ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = 0;
-          if (markerShape === "cross") ctx.strokeStyle = effectColor;
-          ctx.fillStyle = effectColor;
-          ctx.globalAlpha = opacity;
-          shapeFn(ctx, pos[0], pos[1], markSize, angle);
-          if (shapeNeedsFill(markerShape)) ctx.fill();
-        }
-      }
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-const ANIMATED_RENDERERS = {
-  1: renderSacredFlow,
-  2: renderCrystalStream,
-  3: renderQuantumField,
-  4: renderCosmicWeave,
-  5: renderEnergyPulse,
-  6: renderDNAHelix,
-  7: renderLavaFlow,
-  8: renderStellarPlasma,
-  9: renderClassicFlow
-};
-function renderAnimatedStyle(ctx, items, style, phase, state) {
-  const renderer = ANIMATED_RENDERERS[style];
-  if (renderer) {
-    renderer(ctx, items, phase, state);
+    if (i % 3) continue;
+    const spark = wrap(t - f * 0.5);
+    u = s.local(1 - spark);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$3);
+    const y = here$3[1] + Math.sin(spark * Math.PI * 4 + f) * 15;
+    DOT.path(ctx, here$3[0], y, size * 0.5, 0);
+    ctx.globalAlpha = 0.6 - Math.abs(spark - 0.5) * 0.4;
+    shine(ctx, DOT, here$3[0], y, size * 0.5, 0, accent, accent, glowIntensity * 0.5);
   }
 }
-function renderStatic1(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness * 1.5;
-      ctx.shadowColor = primaryColor;
-      ctx.shadowBlur = glowIntensity;
-      r.draw(ctx, start, end2, primaryColor, thickness, true);
-    }
-    const points = Math.floor(SACRED.TRINITY * quality);
-    for (let i = 0; i <= points; i++) {
-      const t = i / points;
-      const pos = r.getPoint(start, end2, t, true);
-      const flow = createFlowField(t, phase);
-      const x = pos[0] + flow.x * Math.sin(t * Math.PI + phase) * 0.3;
-      const y = pos[1] + flow.y * Math.sin(t * Math.PI + phase) * 0.3;
-      ctx.beginPath();
-      ctx.arc(x, y, thickness * 0.8, 0, Math.PI * 2);
-      ctx.fillStyle = accentColor;
-      ctx.shadowColor = linkStyle === "hidden" ? accentColor : primaryColor;
-      ctx.shadowBlur = linkStyle === "hidden" ? glowIntensity * 0.7 : glowIntensity;
-      ctx.globalAlpha = 0.4 + Math.sin(phase + t * Math.PI * 2) * 0.2;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic2(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      r.draw(ctx, start, end2, primaryColor, thickness, true);
-    }
-    const crystals = Math.floor(SACRED.HARMONY * quality);
-    for (let i = 0; i < crystals; i++) {
-      const t = i / crystals;
-      const pos = r.getPoint(start, end2, t, true);
-      const size = thickness * 3 * (1 + Math.sin(phase + t * Math.PI * 2) * 0.2);
-      ctx.shadowColor = secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      createCrystal(ctx, pos[0], pos[1], size, t * Math.PI * 2 + phase * 0.2, primaryColor);
-    }
-  });
-}
-function renderStatic3(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, true);
-      ctx.globalAlpha = 1;
-    }
-    const fieldLines = SACRED.QUANTUM;
-    const points = Math.floor(SACRED.COMPLETION * quality);
-    for (let f = 0; f < fieldLines; f++) {
-      ctx.beginPath();
-      const fieldPhase = phase + f * Math.PI * 2 / fieldLines;
-      for (let i = 0; i <= points; i++) {
-        const t = i / points;
-        const pos = r.getPoint(start, end2, t, true);
-        const uncertainty = 8 * Math.sin(t * Math.PI * 2 + fieldPhase);
-        const x = pos[0] + uncertainty * Math.cos(fieldPhase);
-        const y = pos[1] + uncertainty * Math.sin(fieldPhase);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = f % 2 === 0 ? primaryColor : secondaryColor;
-      ctx.lineWidth = thickness * 0.5;
-      ctx.shadowColor = f % 2 === 0 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.3;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic4(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  const direction = L.direction;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0;
-      r.draw(ctx, end2, start, primaryColor, thickness, true);
-      ctx.globalAlpha = 1;
-    }
-    const strands = SACRED.TRINITY;
-    const points = Math.floor(SACRED.COMPLETION * quality);
-    for (let s = 0; s < strands; s++) {
-      ctx.beginPath();
-      const strandPhase = phase + s * Math.PI * 2 / strands;
-      for (let i = 0; i <= points; i++) {
-        const t = direction > 0 ? i / points : 1 - i / points;
-        const pos = r.getPoint(end2, start, t, true);
-        const weave = Math.sin(t * Math.PI * 6 + strandPhase * direction) * 10;
-        const x = pos[0] + weave * Math.cos(strandPhase);
-        const y = pos[1] + weave * Math.sin(strandPhase);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      const strandColor = [primaryColor, secondaryColor, accentColor][s % 3];
-      ctx.strokeStyle = strandColor;
-      ctx.lineWidth = thickness * 0.7;
-      ctx.shadowColor = strandColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.5;
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic5(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, true);
-      ctx.globalAlpha = 1;
-    }
-    const pulseCount = Math.floor(SACRED.TRINITY * quality);
-    for (let i = 0; i < pulseCount; i++) {
-      const t = i / pulseCount;
-      const pulseSize = thickness * 2 * (1 + Math.sin(phase + t * Math.PI * 2) * 0.3);
-      const pos = r.getPoint(start, end2, t, true);
-      ctx.beginPath();
-      ctx.arc(pos[0], pos[1], pulseSize, 0, Math.PI * 2);
-      ctx.fillStyle = secondaryColor;
-      ctx.shadowColor = secondaryColor;
-      ctx.shadowBlur = glowIntensity * 2;
-      ctx.globalAlpha = 0.4 + Math.sin(phase + t * Math.PI * 2) * 0.2;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic6(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    const points = Math.floor(SACRED.COMPLETION * quality * 2);
-    const helixRadius = 10;
-    const rotations = 4;
-    for (let strand = 0; strand < 2; strand++) {
-      ctx.beginPath();
-      for (let i = 0; i <= points; i++) {
-        const t = i / points;
-        const baseAngle = t * Math.PI * rotations * 2 + phase;
-        const pos = r.getPoint(start, end2, t, true);
-        const hx = Math.cos(baseAngle) * helixRadius * (strand === 0 ? 1 : -1);
-        const hy = Math.sin(baseAngle) * helixRadius * (strand === 0 ? 1 : -1);
-        const x = pos[0] + hx;
-        const y = pos[1] + hy;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = strand === 0 ? primaryColor : secondaryColor;
-      ctx.lineWidth = thickness * 1.2;
-      ctx.shadowColor = strand === 0 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.stroke();
-    }
-    const bonds = rotations * 4;
-    ctx.strokeStyle = accentColor;
-    ctx.shadowColor = accentColor;
-    ctx.shadowBlur = glowIntensity * 0.5;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.globalAlpha = 0.8;
-    for (let b = 0; b <= bonds; b++) {
-      const t = b / bonds;
-      const baseAngle = t * Math.PI * rotations * 2 + phase;
-      const pos = r.getPoint(start, end2, t, true);
-      const x1 = pos[0] + Math.cos(baseAngle) * helixRadius;
-      const y1 = pos[1] + Math.sin(baseAngle) * helixRadius;
-      const x2 = pos[0] - Math.cos(baseAngle) * helixRadius;
-      const y2 = pos[1] - Math.sin(baseAngle) * helixRadius;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic7(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    const tubeWidth = thickness * 7;
-    const flowWidth = thickness * 5;
-    const turbulenceScale = 15;
-    const pts = Math.floor(SACRED.TRINITY * quality * 12);
-    ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const t = i / pts;
-      const pos = r.getPoint(start, end2, t, true);
-      const noise = Math.sin(t * Math.PI * 3 + phase) * turbulenceScale;
-      const x = pos[0];
-      const y = pos[1] + noise * Math.sin(phase * 0.8 + t * Math.PI * 2);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = secondaryColor;
-    ctx.globalAlpha = 0;
-    ctx.lineWidth = tubeWidth;
-    ctx.lineCap = "round";
-    ctx.stroke();
-    ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const t = i / pts;
-      const pos = r.getPoint(start, end2, t, true);
-      const noise = Math.sin(t * Math.PI * 3 + phase * 1.2) * (turbulenceScale * 0.7);
-      const x = pos[0];
-      const y = pos[1] + noise * Math.sin(phase * 0.6 + t * Math.PI * 2);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    const gradient = ctx.createLinearGradient(start[0], start[1], end2[0], end2[1]);
-    gradient.addColorStop(0, primaryColor);
-    gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondaryColor);
-    gradient.addColorStop(1, accentColor);
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = flowWidth;
-    ctx.lineCap = "round";
-    ctx.shadowColor = secondaryColor;
-    ctx.shadowBlur = glowIntensity * 1.5;
-    ctx.stroke();
-  });
-}
-function renderStatic8(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = getLinkColor(defaultColor);
-    const secondaryColor = getSecondaryColor(defaultColor);
-    const accentColor = getAccentColor(defaultColor);
-    if (linkStyle !== "hidden") {
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = thickness;
-      ctx.globalAlpha = 0.3;
-      r.draw(ctx, start, end2, primaryColor, thickness, true);
-      ctx.globalAlpha = 1;
-    }
-    const length = r.getLength(start, end2);
-    const maxSegments = Math.min(Math.floor(length / 30), 20);
-    const segments = Math.max(5, Math.floor(maxSegments * quality * 0.5));
-    const waveAmplitude = 8;
-    const phaseOffset = phase * 0.5;
-    for (let i = 0; i <= segments; i++) {
-      const t = i / segments;
-      const pos = r.getPoint(start, end2, t, true);
-      const wave = Math.sin(t * Math.PI * 2 + phaseOffset) * waveAmplitude;
-      const size = thickness * (0.8 + Math.sin(phase + t * Math.PI) * 0.2);
-      ctx.beginPath();
-      ctx.arc(pos[0], pos[1] + wave, size, 0, Math.PI * 2);
-      ctx.fillStyle = t < 0.5 ? primaryColor : secondaryColor;
-      ctx.shadowColor = t < 0.5 ? primaryColor : secondaryColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.globalAlpha = 0.6;
-      ctx.fill();
-      if (i % 3 === 0 && quality > 1) {
-        const particleSize = size * 0.4;
-        ctx.beginPath();
-        ctx.arc(pos[0], pos[1] + wave * 1.2, particleSize, 0, Math.PI * 2);
-        ctx.fillStyle = accentColor;
-        ctx.shadowColor = accentColor;
-        ctx.shadowBlur = glowIntensity * 0.5;
-        ctx.globalAlpha = 0.4;
-        ctx.fill();
-      }
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-function renderStatic9(ctx, items, phase) {
-  const thickness = L.thickness;
-  const glowIntensity = L.glowIntensity;
-  const quality = L.quality;
-  const markerEnabled = L.markerEnabled;
-  const markerShape = L.markerShape;
-  const markerSize = L.markerSize;
-  const markerColorMode = L.markerColorMode;
-  const markerColor = L.markerColor;
-  const markerGlow = L.markerGlow;
-  const markerEffect = L.markerEffects;
-  const colorScheme = L.colorScheme;
-  const particleDensity = L.particleDensity;
-  const shadowBlur = L.shadowBlur;
-  const shadowOffset = L.shadowOffset;
-  items.forEach(({ start, end: end2, defaultColor, linkStyle, path: r }) => {
-    const primaryColor = enhanceColor(getLinkColor(defaultColor), colorScheme);
-    if (linkStyle !== "hidden") {
-      const linkColor = getCustomLinkColors() ? getLinkColor(defaultColor) : defaultColor;
-      const enhancedColor = enhanceColor(linkColor, colorScheme);
-      ctx.lineWidth = thickness;
-      const linkShadowEnabled = L.linkShadowEnabled;
-      if (linkShadowEnabled) {
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
-        ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
-        ctx.shadowBlur = shadowBlur * 4;
-        ctx.shadowOffsetX = shadowOffset * 3;
-        ctx.shadowOffsetY = shadowOffset * 3;
-        ctx.lineWidth = thickness * 1.2;
-        r.draw(ctx, start, end2, "rgba(0, 0, 0, 0.95)", thickness * 1.2, true);
-      }
-      ctx.shadowColor = enhancedColor;
-      ctx.shadowBlur = glowIntensity;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.strokeStyle = enhancedColor;
-      ctx.lineWidth = thickness;
-      r.draw(ctx, start, end2, enhancedColor, thickness, true);
-    }
-    if (markerEnabled && markerShape !== "none") {
-      let effectiveMarkerColor;
-      if (markerColorMode === "custom") {
-        effectiveMarkerColor = enhanceColor(validateHexColor(markerColor) || primaryColor, colorScheme);
-      } else if (markerColorMode === "default") {
-        effectiveMarkerColor = enhanceColor(defaultColor, colorScheme);
-      } else {
-        effectiveMarkerColor = primaryColor;
-      }
-      const numMarks = Math.floor(SACRED.TRINITY * quality * markerSize * particleDensity * 0.5);
-      const markSize = 3 * markerSize;
-      for (let i = 0; i < numMarks; i++) {
-        const baseT = i / numMarks;
-        const t = baseT;
-        const pos = r.getPoint(start, end2, t, true);
-        let angle = 0;
-        if (markerShape === "arrow") {
-          const nextT = Math.min(t + 0.01, 1);
-          const nextPos = r.getPoint(start, end2, nextT, true);
-          angle = Math.atan2(nextPos[1] - pos[1], nextPos[0] - pos[0]);
-        }
-        let effectColor = effectiveMarkerColor;
-        let opacity = 1;
-        switch (markerEffect) {
-          case "pulse":
-            opacity = 0.5 + Math.sin(phase + t * Math.PI * 2) * 0.5;
-            break;
-          case "fade":
-            opacity = 1 - t;
-            break;
-          case "rainbow": {
-            const hue = (t * 360 + phase * 50) % 360;
-            effectColor = enhanceColor(`hsl(${hue}, 100%, 50%)`, colorScheme);
-            break;
-          }
-        }
-        const shapeFn = MarkerShapes[markerShape];
-        if (shapeFn) {
-          const markerShadowEnabled = L.markerShadowEnabled;
-          if (markerShadowEnabled) {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.95)";
-            ctx.strokeStyle = "rgba(0, 0, 0, 0.95)";
-            ctx.shadowColor = "rgba(0, 0, 0, 0.95)";
-            ctx.shadowBlur = shadowBlur * 4;
-            ctx.shadowOffsetX = shadowOffset * 3;
-            ctx.shadowOffsetY = shadowOffset * 3;
-            ctx.globalAlpha = opacity;
-            shapeFn(ctx, pos[0], pos[1], markSize * 1.2, angle);
-            if (shapeNeedsFill(markerShape)) ctx.fill();
-          }
-          ctx.shadowColor = markerEffect === "rainbow" ? primaryColor : effectColor;
-          ctx.shadowBlur = markerGlow;
-          ctx.shadowOffsetX = 0;
-          ctx.shadowOffsetY = 0;
-          if (markerShape === "cross") ctx.strokeStyle = effectColor;
-          ctx.fillStyle = effectColor;
-          ctx.globalAlpha = opacity;
-          shapeFn(ctx, pos[0], pos[1], markSize, angle);
-          if (shapeNeedsFill(markerShape)) ctx.fill();
-        }
-      }
-    }
-    ctx.globalAlpha = 1;
-  });
-}
-const STATIC_RENDERERS = {
-  1: renderStatic1,
-  2: renderStatic2,
-  3: renderStatic3,
-  4: renderStatic4,
-  5: renderStatic5,
-  6: renderStatic6,
-  7: renderStatic7,
-  8: renderStatic8,
-  9: renderStatic9
+const STROKES = /* @__PURE__ */ new Set([1, 3, 4, 6, 7]);
+const MOVING = {
+  1: sacredFlow$1,
+  2: crystalStream$1,
+  3: quantumField$1,
+  4: cosmicWeave$1,
+  5: energyPulse$1,
+  6: dnaHelix$1,
+  7: lavaFlow$1,
+  8: stellarPlasma$1
 };
-function renderStaticStyle(ctx, items, style, phase) {
-  const renderer = STATIC_RENDERERS[style];
-  if (renderer) {
-    renderer(ctx, items, phase);
-  }
-}
-function dist(a, b) {
-  return Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2);
-}
-const spline = {
-  getLength(start, end2) {
-    const samples = 40;
-    let length = 0;
-    let prev = this.getPoint(start, end2, 0);
-    for (let i = 1; i <= samples; i++) {
-      const p = this.getPoint(start, end2, i / samples);
-      length += dist(prev, p);
-      prev = p;
-    }
-    return length;
-  },
-  getNormalizedT(start, end2, targetDist, _totalLength) {
-    const samples = 40;
-    let acc = 0;
-    let prev = this.getPoint(start, end2, 0);
-    for (let i = 1; i <= samples; i++) {
-      const t = i / samples;
-      const p = this.getPoint(start, end2, t);
-      const seg = dist(prev, p);
-      acc += seg;
-      if (acc >= targetDist) {
-        const prevT = (i - 1) / samples;
-        const excess = acc - targetDist;
-        return prevT + (t - prevT) * (1 - excess / seg);
-      }
-      prev = p;
-    }
-    return 1;
-  },
-  getPoint(start, end2, t) {
-    const d = dist(start, end2);
-    const bend = Math.min(d * 0.5, 100);
-    const p0x = start[0], p0y = start[1];
-    const p1x = start[0] + bend, p1y = start[1];
-    const p2x = end2[0] - bend, p2y = end2[1];
-    const p3x = end2[0], p3y = end2[1];
-    const cx = 3 * (p1x - p0x);
-    const bx = 3 * (p2x - p1x) - cx;
-    const ax = p3x - p0x - cx - bx;
-    const cy = 3 * (p1y - p0y);
-    const by = 3 * (p2y - p1y) - cy;
-    const ay = p3y - p0y - cy - by;
-    return [
-      ax * t ** 3 + bx * t ** 2 + cx * t + p0x,
-      ay * t ** 3 + by * t ** 2 + cy * t + p0y
-    ];
-  },
-  draw(ctx, start, end2, color, thickness) {
-    const d = dist(start, end2);
-    const bend = Math.min(d * 0.5, 100);
-    ctx.beginPath();
-    ctx.moveTo(start[0], start[1]);
-    ctx.bezierCurveTo(
-      start[0] + bend,
-      start[1],
-      end2[0] - bend,
-      end2[1],
-      end2[0],
-      end2[1]
-    );
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const straight = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const linear = {
-  getLength(start, end2) {
-    const midX = (start[0] + end2[0]) / 2;
-    return Math.abs(midX - start[0]) + Math.abs(end2[1] - start[1]) + Math.abs(end2[0] - midX);
-  },
-  getNormalizedT(start, end2, targetDist, totalLength) {
-    const midX = (start[0] + end2[0]) / 2;
-    const h1 = Math.abs(midX - start[0]);
-    const v = Math.abs(end2[1] - start[1]);
-    const s1p = h1 / totalLength;
-    const s2p = v / totalLength;
-    const h2 = Math.abs(end2[0] - midX);
-    const nd = targetDist / totalLength;
-    if (nd <= s1p) return nd / s1p * 0.33;
-    if (nd <= s1p + s2p) return 0.33 + (nd - s1p) / s2p * 0.34;
-    return 0.67 + (nd - s1p - s2p) / (h2 / totalLength) * 0.33;
-  },
-  getPoint(start, end2, t) {
-    const midX = (start[0] + end2[0]) / 2;
-    if (t <= 0.33) {
-      const st2 = t / 0.33;
-      return [start[0] + (midX - start[0]) * st2, start[1]];
-    }
-    if (t <= 0.67) {
-      const st2 = (t - 0.33) / 0.34;
-      return [midX, start[1] + (end2[1] - start[1]) * st2];
-    }
-    const st = (t - 0.67) / 0.33;
-    return [midX + (end2[0] - midX) * st, end2[1]];
-  },
-  draw(ctx, start, end2, color, thickness) {
-    const midX = (start[0] + end2[0]) / 2;
-    ctx.beginPath();
-    ctx.moveTo(start[0], start[1]);
-    ctx.lineTo(midX, start[1]);
-    ctx.lineTo(midX, end2[1]);
-    ctx.lineTo(end2[0], end2[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const hidden = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw() {
-  }
-};
-const dotted = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, start, end2, color, thickness) {
-    const len = dist(start, end2);
-    const spacing = thickness * 3;
-    const num = Math.floor(len / spacing);
-    for (let i = 0; i <= num; i++) {
-      const t = i / num;
-      const x = start[0] + (end2[0] - start[0]) * t;
-      const y = start[1] + (end2[1] - start[1]) * t;
-      ctx.beginPath();
-      ctx.arc(x, y, thickness * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-  }
-};
-const dashed = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.setLineDash([thickness * 4, thickness * 2]);
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-};
-const double = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const off = thickness * 0.8;
-    const dx2 = Math.cos(angle + Math.PI / 2) * off;
-    const dy2 = Math.sin(angle + Math.PI / 2) * off;
-    ctx.beginPath();
-    ctx.moveTo(s[0] + dx2, s[1] + dy2);
-    ctx.lineTo(e[0] + dx2, e[1] + dy2);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.4;
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(s[0] - dx2, s[1] - dy2);
-    ctx.lineTo(e[0] - dx2, e[1] - dy2);
-    ctx.stroke();
-  }
-};
-const stepped = {
-  getLength(s, e) {
-    return Math.abs(e[0] - s[0]) + Math.abs(e[1] - s[1]);
-  },
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const midX = s[0] + (e[0] - s[0]) * (t < 0.5 ? t * 2 : 1);
-    const midY = s[1] + (e[1] - s[1]) * (t >= 0.5 ? (t - 0.5) * 2 : 0);
-    return [midX, midY];
-  },
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(s[0] + (e[0] - s[0]), s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const zigzag = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const bx = s[0] + (e[0] - s[0]) * t;
-    const by = s[1] + (e[1] - s[1]) * t;
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const amp = 10, freq = 10;
-    return [
-      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
-      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
-    ];
-  },
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    const steps = 50;
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-  }
-};
-const rope = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint(s, e, t) {
-    const bx = s[0] + (e[0] - s[0]) * t;
-    const by = s[1] + (e[1] - s[1]) * t;
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    const amp = 3, freq = 20;
-    return [
-      bx + Math.cos(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp,
-      by + Math.sin(angle + Math.PI / 2) * Math.sin(t * Math.PI * freq) * amp
-    ];
-  },
-  draw(ctx, s, e, color, thickness) {
-    const steps = 100;
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 1.2;
-    ctx.lineCap = "round";
-    ctx.stroke();
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p = this.getPoint(s, e, i / steps);
-      i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
-    }
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.lineWidth = thickness * 0.4;
-    ctx.stroke();
-  }
-};
-const glowpath = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
-    gradient.addColorStop(0, "rgba(255, 255, 255, 0.5)");
-    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.2)");
-    gradient.addColorStop(1, "rgba(255, 255, 255, 0.5)");
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = thickness * 2;
-    ctx.globalAlpha = 0.5;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-  }
-};
-const chain = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, start, end2, color, thickness) {
-    const len = dist(start, end2);
-    const linkSize = thickness * 2;
-    const numLinks = Math.floor(len / (linkSize * 2));
-    const angle = Math.atan2(end2[1] - start[1], end2[0] - start[0]);
-    for (let i = 0; i < numLinks; i++) {
-      const t = i / numLinks;
-      const x = start[0] + (end2[0] - start[0]) * t;
-      const y = start[1] + (end2[1] - start[1]) * t;
-      ctx.beginPath();
-      ctx.ellipse(x, y, linkSize, linkSize * 0.6, angle, 0, Math.PI * 2);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = thickness * 0.4;
-      ctx.stroke();
-    }
-  }
-};
-const pulse = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    const len = dist(s, e);
-    const dashLen = thickness * 4;
-    const numDashes = Math.floor(len / (dashLen * 2));
-    ctx.beginPath();
-    ctx.setLineDash([dashLen, dashLen]);
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness * 0.8;
-    ctx.stroke();
-    ctx.setLineDash([]);
-    const pulseWidth = thickness * 3;
-    for (let i = 0; i < numDashes; i++) {
-      const t = i / numDashes;
-      const x = s[0] + (e[0] - s[0]) * t;
-      const y = s[1] + (e[1] - s[1]) * t;
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, pulseWidth);
-      grad.addColorStop(0, color);
-      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.beginPath();
-      ctx.arc(x, y, pulseWidth, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.globalAlpha = 0.3;
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
-};
-const holographic = {
-  getLength: (s, e) => dist(s, e),
-  getNormalizedT: (_s, _e, td, tl) => td / tl,
-  getPoint: (s, e, t) => [s[0] + (e[0] - s[0]) * t, s[1] + (e[1] - s[1]) * t],
-  draw(ctx, s, e, color, thickness) {
-    ctx.beginPath();
-    ctx.moveTo(s[0], s[1]);
-    ctx.lineTo(e[0], e[1]);
-    const gradient = ctx.createLinearGradient(s[0], s[1], e[0], e[1]);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
-    gradient.addColorStop(1, color);
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = thickness * 1.2;
-    ctx.stroke();
-    const len = dist(s, e);
-    const spacing = thickness * 2;
-    const num = Math.floor(len / spacing);
-    const angle = Math.atan2(e[1] - s[1], e[0] - s[0]);
-    for (let i = 0; i <= num; i++) {
-      const t = i / num;
-      const x = s[0] + (e[0] - s[0]) * t;
-      const y = s[1] + (e[1] - s[1]) * t;
-      ctx.beginPath();
-      ctx.moveTo(
-        x + Math.cos(angle + Math.PI / 2) * thickness,
-        y + Math.sin(angle + Math.PI / 2) * thickness
-      );
-      ctx.lineTo(
-        x + Math.cos(angle - Math.PI / 2) * thickness,
-        y + Math.sin(angle - Math.PI / 2) * thickness
-      );
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
-};
-const LinkRenderers = {
-  spline,
-  straight,
-  linear,
-  hidden,
-  dotted,
-  dashed,
-  double,
-  stepped,
-  zigzag,
-  rope,
-  glowpath,
-  chain,
-  pulse,
-  holographic
-};
-function getLinkRenderer(name) {
-  return LinkRenderers[name] ?? spline;
-}
 const UP = 1;
 const DOWN = 2;
 const LEFT = 3;
 const RIGHT = 4;
 const STRAIGHT_LINK = 0;
 const LINEAR_LINK = 1;
+const CHORDS = 40;
+const STUB = 10;
+const CORNER = 8;
+const WAVE = 10;
+const WAVELENGTH = 60;
+const COIL = 6;
+const PITCH = 12;
+const TAPER = 15;
+const MOST_POINTS = 2049;
 const dx = (dir) => dir === LEFT ? -1 : dir === RIGHT ? 1 : 0;
 const dy = (dir) => dir === UP ? -1 : dir === DOWN ? 1 : 0;
+const smooth = (x) => x >= 1 ? 1 : x <= 0 ? 0 : x * x * (3 - 2 * x);
+let samples = new Float64Array(64);
+const here$2 = new Float64Array(4);
 class LinkPath {
   /** The ends, which the effects hand back to ask for a point counted from either one. */
   a = [0, 0];
   b = [0, 0];
   /** A spline's start, controls and end, or the points of a polyline, as x, y pairs. */
   p = new Float64Array(12);
-  /** How many points p holds: 4 for a spline and for LINEAR, 6 for STRAIGHT. */
+  /** How many points p holds: 4 for a spline. */
   n = 4;
   spline = true;
-  /** The length to each polyline point. */
-  at = new Float64Array(6);
+  /** A spline's x and y as a·t³ + b·t² + c·t + start, as v1 computed its own (old_link_animations.js:455-475). */
+  k = new Float64Array(6);
+  /** The length to each polyline point, or to each of a spline's CHORDS + 1 samples. */
+  cum = new Float64Array(CHORDS + 1);
+  /** A coil's points, as x, y pairs, and how many: it is drawn and hit through them, and effects keep to the path inside. */
+  loops = new Float64Array(0);
+  looped = 0;
   length = 0;
-  /** Where native puts the segment's centre marker, and the angle of an arrow marker there. */
+  /** Where the segment's centre marker goes, and the angle of an arrow marker there. */
   cx = 0;
   cy = 0;
   angle = 0;
   /** The box around the points, which holds the whole path: left, top, right, bottom. */
   box = new Float64Array(4);
-  /** The segment renderLink was called for, with the arguments the native call got. */
+  /** The path native draws for a renderLink call in render mode `mode`, from the arguments the call got. */
   set(a, b, startDir, endDir, mode, startControl, endControl) {
-    const { p } = this;
-    const ax = this.a[0] = p[0] = a[0];
-    const ay = this.a[1] = p[1] = a[1];
+    const ax = this.a[0] = a[0];
+    const ay = this.a[1] = a[1];
     const bx = this.b[0] = b[0];
     const by = this.b[1] = b[1];
+    this.looped = 0;
     const sd = startDir || RIGHT;
     const ed = endDir || LEFT;
     this.spline = mode !== LINEAR_LINK && mode !== STRAIGHT_LINK;
     if (this.spline) {
       const d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) * 0.25;
-      p[2] = ax + (startControl ? startControl[0] || 0 : dx(sd) * d);
-      p[3] = ay + (startControl ? startControl[1] || 0 : dy(sd) * d);
-      p[4] = bx + (endControl ? endControl[0] || 0 : dx(ed) * d);
-      p[5] = by + (endControl ? endControl[1] || 0 : dy(ed) * d);
-      this.n = 4;
-    } else {
-      const l = mode === LINEAR_LINK ? 15 : 10;
-      const x1 = p[2] = ax + dx(sd) * l;
-      const y1 = p[3] = ay + dy(sd) * l;
-      const x2 = bx + dx(ed) * l;
-      const y2 = by + dy(ed) * l;
-      if (mode === STRAIGHT_LINK) {
-        p[4] = p[6] = (x1 + x2) * 0.5;
-        p[5] = y1;
-        p[7] = y2;
-        this.n = 6;
-      } else {
-        this.n = 4;
-      }
-      p[2 * this.n - 4] = x2;
-      p[2 * this.n - 3] = y2;
+      this.points(4);
+      this.point(0, ax, ay);
+      this.point(1, ax + (startControl ? startControl[0] || 0 : dx(sd) * d), ay + (startControl ? startControl[1] || 0 : dy(sd) * d));
+      this.point(2, bx + (endControl ? endControl[0] || 0 : dx(ed) * d), by + (endControl ? endControl[1] || 0 : dy(ed) * d));
+      this.point(3, bx, by);
+      this.measureSpline();
+      return;
     }
-    p[2 * this.n - 2] = bx;
-    p[2 * this.n - 1] = by;
-    this.measure();
+    const l = mode === LINEAR_LINK ? 15 : 10;
+    const x1 = ax + dx(sd) * l;
+    const y1 = ay + dy(sd) * l;
+    const x2 = bx + dx(ed) * l;
+    const y2 = by + dy(ed) * l;
+    const straight = mode === STRAIGHT_LINK;
+    this.points(straight ? 6 : 4);
+    this.point(0, ax, ay);
+    this.point(1, x1, y1);
+    if (straight) {
+      this.point(2, (x1 + x2) * 0.5, y1);
+      this.point(3, (x1 + x2) * 0.5, y2);
+    }
+    this.point(this.n - 2, x2, y2);
+    this.point(this.n - 1, bx, by);
+    this.measurePolyline();
+    this.cx = (x1 + x2) * 0.5;
+    this.cy = (y1 + y2) * 0.5;
+    this.angle = straight ? Math.abs(y2 - y1) < 4 ? 0 : Math.sign(y2 - y1) * Math.PI / 2 : Math.atan2(y2 - y1, x2 - x1);
   }
-  measure() {
-    const { p, n, at, box } = this;
+  /**
+   * Turns the path set() gave into steps between the same ends: across at the start's height, then down or up,
+   * then a stub into the end along its direction, with the corners rounded.
+   */
+  step(endDir) {
+    const [ax, ay] = this.a;
+    const [bx, by] = this.b;
+    const ed = endDir || LEFT;
+    const ex = bx + dx(ed) * STUB;
+    const ey = by + dy(ed) * STUB;
+    const rise = Math.abs(ey - ay) * 0.5;
+    this.spline = false;
+    this.n = 0;
+    this.add(ax, ay);
+    this.corner(ex, ay, ax, ay, ex, ey, Math.min(CORNER, Math.abs(ex - ax), rise));
+    this.corner(ex, ey, ex, ay, bx, by, Math.min(CORNER, rise, Math.abs(bx - ex) + Math.abs(by - ey)));
+    this.add(bx, by);
+    this.measurePolyline();
+    this.centre();
+  }
+  /**
+   * Turns the path into a wave, or winds a coil around it. `u0` is how far along its link the segment starts, so
+   * either carries on across reroutes; both grow from nothing at an end that is a slot. Effects ride a wave, as they
+   * rode v1's zigzag, but keep to the path inside a coil, whose loops run back along it.
+   */
+  bend(coil, u0, fromSlot, toSlot) {
+    const len = this.length;
+    if (!len) return;
+    const count2 = Math.min(MOST_POINTS, Math.ceil(len / (coil ? PITCH / 12 : WAVELENGTH / 16)) + 1);
+    if (samples.length < 2 * count2 + 2) samples = new Float64Array(4 * count2 + 2);
+    const offset = (d, i) => {
+      this.find(d, here$2);
+      const fade = (fromSlot ? smooth(d / TAPER) : 1) * (toSlot ? smooth((len - d) / TAPER) : 1);
+      const turn = 2 * Math.PI * (u0 + d) / (coil ? PITCH : WAVELENGTH);
+      const across = (coil ? COIL : WAVE) * Math.sin(turn) * fade;
+      const along = coil ? 0.6 * COIL * Math.cos(turn) * fade : 0;
+      samples[i] = here$2[0] + here$2[2] * along - here$2[3] * across;
+      samples[i + 1] = here$2[1] + here$2[3] * along + here$2[2] * across;
+    };
+    for (let i = 0; i < count2; i++) offset(len * i / (count2 - 1), 2 * i);
+    offset(len / 2, 2 * count2);
+    const [cx, cy] = [samples[2 * count2], samples[2 * count2 + 1]];
+    const angle = Math.atan2(here$2[3], here$2[2]);
+    if (coil) {
+      if (this.loops.length < 2 * count2) this.loops = new Float64Array(4 * count2);
+      this.loops.set(samples.subarray(0, 2 * count2));
+      this.looped = count2;
+      this.bound(this.loops, count2);
+    } else {
+      this.spline = false;
+      this.n = 0;
+      for (let i = 0; i < count2; i++) this.add(samples[2 * i], samples[2 * i + 1]);
+      this.measurePolyline();
+    }
+    [this.cx, this.cy, this.angle] = [cx, cy, angle];
+  }
+  /**
+   * Writes the point at u, from 0 at the start to 1 at the end: the bezier parameter on a spline, the fraction of
+   * the length on a polyline. Then the path's direction there, as a unit tangent: x, y, tx, ty.
+   */
+  at(u, out) {
+    if (!this.spline) {
+      this.find(u * this.length, out);
+      return;
+    }
+    out[0] = this.bezier(u, 0);
+    out[1] = this.bezier(u, 1);
+    let tx = this.slope(u, 0);
+    let ty = this.slope(u, 1);
+    if (Math.abs(tx) + Math.abs(ty) < 1e-9) {
+      const i = Math.min(CHORDS - 1, Math.floor(u * CHORDS));
+      tx = this.bezier((i + 1) / CHORDS, 0) - this.bezier(i / CHORDS, 0);
+      ty = this.bezier((i + 1) / CHORDS, 1) - this.bezier(i / CHORDS, 1);
+    }
+    const norm = Math.hypot(tx, ty) || 1;
+    out[2] = tx / norm;
+    out[3] = ty / norm;
+  }
+  /** Writes the point `d` px along the path, clamped to it, and the path's direction there: x, y, then the unit tangent. */
+  find(d, out) {
+    const { p, cum } = this;
+    const target = Math.min(this.length, Math.max(0, d));
+    const i = this.seek(target);
+    const span = cum[i + 1] - cum[i];
+    const f = span ? (target - cum[i]) / span : 0;
+    let tx;
+    let ty;
+    if (this.spline) {
+      const t = (i + f) / CHORDS;
+      out[0] = this.bezier(t, 0);
+      out[1] = this.bezier(t, 1);
+      tx = this.slope(t, 0);
+      ty = this.slope(t, 1);
+      if (Math.abs(tx) + Math.abs(ty) < 1e-9) {
+        tx = this.bezier((i + 1) / CHORDS, 0) - this.bezier(i / CHORDS, 0);
+        ty = this.bezier((i + 1) / CHORDS, 1) - this.bezier(i / CHORDS, 1);
+      }
+    } else {
+      out[0] = p[2 * i] + (p[2 * i + 2] - p[2 * i]) * f;
+      out[1] = p[2 * i + 1] + (p[2 * i + 3] - p[2 * i + 1]) * f;
+      let leg = i;
+      while (leg > 0 && cum[leg + 1] === cum[leg]) leg--;
+      while (leg < this.n - 2 && cum[leg + 1] === cum[leg]) leg++;
+      tx = p[2 * leg + 2] - p[2 * leg];
+      ty = p[2 * leg + 3] - p[2 * leg + 1];
+    }
+    const norm = Math.hypot(tx, ty) || 1;
+    out[2] = tx / norm;
+    out[3] = ty / norm;
+  }
+  /** Adds the path, or a coil's loops, to a context's current path or to a Path2D. */
+  trace(path) {
+    const [p, n] = this.looped ? [this.loops, this.looped] : [this.p, this.n];
+    path.moveTo(p[0], p[1]);
+    if (this.spline && !this.looped) path.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
+    else for (let i = 1; i < n; i++) path.lineTo(p[2 * i], p[2 * i + 1]);
+  }
+  /** Strokes the path the way v1's renderers stroked theirs: 0.8 × `thickness` wide. */
+  draw(ctx, color, thickness) {
+    ctx.beginPath();
+    this.trace(ctx);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.stroke();
+  }
+  /** The path as native keeps it for hit testing. */
+  hit() {
+    const path = new Path2D();
+    this.trace(path);
+    return path;
+  }
+  /** Makes room for `count` points. */
+  points(count2) {
+    if (this.p.length < 2 * count2) this.p = new Float64Array(4 * count2);
+    this.n = count2;
+  }
+  point(i, x, y) {
+    this.p[2 * i] = x;
+    this.p[2 * i + 1] = y;
+  }
+  /** Appends a polyline point, unless it is where the last one is. */
+  add(x, y) {
+    const { n } = this;
+    if (n && this.p[2 * n - 2] === x && this.p[2 * n - 1] === y) return;
+    if (this.p.length < 2 * n + 2) {
+      const grown = new Float64Array(4 * n + 4);
+      grown.set(this.p);
+      this.p = grown;
+    }
+    this.n = n + 1;
+    this.point(n, x, y);
+  }
+  /** Appends the corner at (x, y) between a leg from (px, py) and one to (qx, qy), rounded with radius r when the legs are at right angles. */
+  corner(x, y, px, py, qx, qy, r) {
+    const [ux, uy] = [Math.sign(x - px), Math.sign(y - py)];
+    const [vx, vy] = [Math.sign(qx - x), Math.sign(qy - y)];
+    if (r <= 0 || ux * vx + uy * vy !== 0 || !(ux || uy) || !(vx || vy)) {
+      this.add(x, y);
+      return;
+    }
+    for (let i = 0; i <= 4; i++) {
+      const angle = i * Math.PI / 8;
+      const back = r * (1 - Math.sin(angle));
+      const on = r * (1 - Math.cos(angle));
+      this.add(x - ux * back + vx * on, y - uy * back + vy * on);
+    }
+  }
+  /** The spline's polynomial, its length along CHORDS chords and its box; the centre where native puts it (pathRenderer.ts L654-682). */
+  measureSpline() {
+    const { p, k, cum } = this;
+    for (const axis of [0, 1]) {
+      const c = 3 * (p[2 + axis] - p[axis]);
+      const b = 3 * (p[4 + axis] - p[2 + axis]) - c;
+      k[3 * axis] = p[6 + axis] - p[axis] - c - b;
+      k[3 * axis + 1] = b;
+      k[3 * axis + 2] = c;
+    }
+    if (cum.length < CHORDS + 1) this.cum = new Float64Array(CHORDS + 1);
+    this.cum[0] = 0;
+    let [x, y] = [p[0], p[1]];
+    for (let i = 1; i <= CHORDS; i++) {
+      const nx = this.bezier(i / CHORDS, 0);
+      const ny = this.bezier(i / CHORDS, 1);
+      this.cum[i] = this.cum[i - 1] + Math.hypot(nx - x, ny - y);
+      [x, y] = [nx, ny];
+    }
+    this.length = this.cum[CHORDS];
+    this.bound();
+    this.cx = this.bezier(0.5, 0);
+    this.cy = this.bezier(0.5, 1);
+    this.angle = Math.atan2(this.bezier(0.51, 1) - this.cy, this.bezier(0.51, 0) - this.cx);
+  }
+  measurePolyline() {
+    if (this.n === 1) {
+      this.points(2);
+      this.point(1, this.p[0], this.p[1]);
+    }
+    const { p, n } = this;
+    if (this.cum.length < n) this.cum = new Float64Array(2 * n);
+    const { cum } = this;
+    cum[0] = 0;
+    for (let i = 1; i < n; i++) cum[i] = cum[i - 1] + Math.hypot(p[2 * i] - p[2 * i - 2], p[2 * i + 1] - p[2 * i - 1]);
+    this.length = cum[n - 1];
+    this.bound();
+  }
+  /** Puts the centre halfway along the path. */
+  centre() {
+    this.find(this.length / 2, here$2);
+    [this.cx, this.cy, this.angle] = [here$2[0], here$2[1], Math.atan2(here$2[3], here$2[2])];
+  }
+  bound(p = this.p, n = this.n) {
+    const { box } = this;
     box[0] = box[2] = p[0];
     box[1] = box[3] = p[1];
     for (let i = 1; i < n; i++) {
@@ -1624,87 +613,675 @@ class LinkPath {
       box[2] = Math.max(box[2], p[2 * i]);
       box[3] = Math.max(box[3], p[2 * i + 1]);
     }
-    if (this.spline) {
-      this.length = 0;
-      let x = p[0];
-      let y = p[1];
-      for (let i = 1; i <= 40; i++) {
-        const nx = this.bezier(i / 40, 0);
-        const ny = this.bezier(i / 40, 1);
-        this.length += Math.hypot(nx - x, ny - y);
-        x = nx;
-        y = ny;
-      }
-      this.cx = this.bezier(0.5, 0);
-      this.cy = this.bezier(0.5, 1);
-      this.angle = Math.atan2(this.bezier(0.51, 1) - this.cy, this.bezier(0.51, 0) - this.cx);
-      return;
+  }
+  /** The interval of `cum` that holds a length: the last i with cum[i] <= d, short of the end. */
+  seek(d) {
+    let lo = 0;
+    let hi = (this.spline ? CHORDS : this.n - 1) - 1;
+    while (lo < hi) {
+      const mid = lo + hi + 1 >> 1;
+      if (this.cum[mid] <= d) lo = mid;
+      else hi = mid - 1;
     }
-    at[0] = 0;
-    for (let i = 1; i < n; i++) at[i] = at[i - 1] + Math.hypot(p[2 * i] - p[2 * i - 2], p[2 * i + 1] - p[2 * i - 1]);
-    this.length = at[n - 1];
-    const x1 = p[2];
-    const y1 = p[3];
-    const x2 = p[2 * n - 4];
-    const y2 = p[2 * n - 3];
-    this.cx = (x1 + x2) * 0.5;
-    this.cy = (y1 + y2) * 0.5;
-    if (n === 4) this.angle = Math.atan2(y2 - y1, x2 - x1);
-    else this.angle = Math.abs(y2 - y1) < 4 ? 0 : Math.sign(y2 - y1) * Math.PI / 2;
+    return Math.max(0, lo);
   }
   /** x (axis 0) or y (axis 1) of the spline at t. */
   bezier(t, axis) {
-    const { p } = this;
-    const mt = 1 - t;
-    return mt * mt * mt * p[axis] + 3 * mt * mt * t * p[2 + axis] + 3 * mt * t * t * p[4 + axis] + t * t * t * p[6 + axis];
+    const { k } = this;
+    return k[3 * axis] * t ** 3 + k[3 * axis + 1] * t ** 2 + k[3 * axis + 2] * t + this.p[axis];
   }
-  getLength() {
-    return this.length;
+  slope(t, axis) {
+    const { k } = this;
+    return 3 * k[3 * axis] * t * t + 2 * k[3 * axis + 1] * t + k[3 * axis + 2];
   }
-  /** The point at t counted from `from`: the start, or the end, from which Cosmic Weave, DNA Helix and Stellar Plasma count. */
-  getPoint(from, _to, t) {
-    const u = from === this.b ? 1 - t : t;
-    if (this.spline) return [this.bezier(u, 0), this.bezier(u, 1)];
-    const { p, at } = this;
-    const target = Math.min(this.length, Math.max(0, u * this.length));
-    let i = 1;
-    while (i < this.n - 1 && at[i] < target) i++;
-    const span = at[i] - at[i - 1];
-    const f = span ? (target - at[i - 1]) / span : 0;
-    return [p[2 * i - 2] + (p[2 * i] - p[2 * i - 2]) * f, p[2 * i - 1] + (p[2 * i + 1] - p[2 * i - 1]) * f];
+}
+const here$1 = new Float64Array(4);
+function elements(s, count2, last, each) {
+  for (let i = 0; i < count2 + (last ? 1 : 0); i++) {
+    const T = i / count2;
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here$1);
+    each(T, i);
   }
-  /** Strokes the path the way v2's spline stroked its own. */
-  draw(ctx, _start, _end, color, thickness) {
-    const { p } = this;
+}
+function sacredFlow(ctx, s, phase) {
+  const { thickness, glowIntensity } = L;
+  const { primary, accent } = s.pal;
+  const hidden = s.linkStyle === "hidden";
+  elements(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality)), true, (T) => {
     ctx.beginPath();
-    ctx.moveTo(p[0], p[1]);
-    if (this.spline) ctx.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
-    else for (let i = 1; i < this.n; i++) ctx.lineTo(p[2 * i], p[2 * i + 1]);
-    ctx.strokeStyle = color;
+    ctx.arc(
+      here$1[0] + Math.sin(T * Math.PI * SACRED.TRINITY + phase) * 10 * Math.sin(T * Math.PI + phase) * 0.3,
+      here$1[1] + Math.cos(T * Math.PI * SACRED.TRINITY + phase) * 10 * Math.sin(T * Math.PI + phase) * 0.3,
+      thickness * 0.8,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = accent;
+    ctx.shadowColor = hidden ? accent : primary;
+    ctx.shadowBlur = hidden ? glowIntensity * 0.7 : glowIntensity;
+    ctx.globalAlpha = 0.4 + Math.sin(phase + T * Math.PI * 2) * 0.2;
+    ctx.fill();
+  });
+}
+function crystalStream(ctx, s, phase) {
+  const { thickness } = L;
+  const { primary, secondary } = s.pal;
+  elements(s, Math.max(1, Math.floor(SACRED.HARMONY * L.quality)), false, (T) => {
     ctx.lineWidth = thickness * 0.8;
+    ctx.globalAlpha = 1;
+    createCrystal(ctx, here$1[0], here$1[1], thickness * 3 * (1 + Math.sin(phase + T * Math.PI * 2) * 0.2), T * Math.PI * 2 + phase * 0.2, primary, secondary, L.glowIntensity);
+  });
+}
+function quantumField(ctx, s, phase) {
+  const { primary, secondary } = s.pal;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality)));
+  for (let f = 0; f < SACRED.QUANTUM; f++) {
+    const fieldPhase = phase + f * Math.PI * 2 / SACRED.QUANTUM;
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$1);
+      const uncertainty = 8 * Math.sin(T * Math.PI * 2 + fieldPhase);
+      const x = here$1[0] + uncertainty * Math.cos(fieldPhase);
+      const y = here$1[1] + uncertainty * Math.sin(fieldPhase);
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    const color = f % 2 === 0 ? primary : secondary;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = L.thickness * 0.5;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = L.glowIntensity;
+    ctx.globalAlpha = 0.3;
     ctx.stroke();
   }
+}
+function cosmicWeave(ctx, s, phase) {
+  const colors = [s.pal.primary, s.pal.secondary, s.pal.accent];
+  const dir = L.direction;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality)));
+  for (let strand = 0; strand < SACRED.TRINITY; strand++) {
+    const strandPhase = phase + strand * Math.PI * 2 / SACRED.TRINITY;
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$1);
+      const weave = Math.sin((1 - T) * Math.PI * 6 + strandPhase * dir) * 10;
+      const x = here$1[0] + weave * Math.cos(strandPhase);
+      const y = here$1[1] + weave * Math.sin(strandPhase);
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    ctx.strokeStyle = colors[strand];
+    ctx.lineWidth = L.thickness * 0.7;
+    ctx.shadowColor = colors[strand];
+    ctx.shadowBlur = L.glowIntensity;
+    ctx.globalAlpha = 0.5;
+    ctx.stroke();
+  }
+}
+function energyPulse(ctx, s, phase) {
+  const { secondary } = s.pal;
+  elements(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality)), false, (T) => {
+    ctx.beginPath();
+    ctx.arc(here$1[0], here$1[1], L.thickness * 2 * (1 + Math.sin(phase + T * Math.PI * 2) * 0.3), 0, Math.PI * 2);
+    ctx.fillStyle = secondary;
+    ctx.shadowColor = secondary;
+    ctx.shadowBlur = L.glowIntensity * 2;
+    ctx.globalAlpha = 0.4 + Math.sin(phase + T * Math.PI * 2) * 0.2;
+    ctx.fill();
+  });
+}
+function dnaHelix(ctx, s, phase) {
+  const { primary, secondary, accent } = s.pal;
+  const { thickness, glowIntensity } = L;
+  const radius = 10;
+  const rotations = 4;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.COMPLETION * L.quality * 2)));
+  for (let strand = 0; strand < 2; strand++) {
+    const side = strand === 0 ? 1 : -1;
+    ctx.beginPath();
+    for (let j = 0; j < m; j++) {
+      const T = ts[j];
+      s.path.at(s.local(T), here$1);
+      const angle = T * Math.PI * rotations * 2 + phase;
+      const x = here$1[0] + Math.cos(angle) * radius * side;
+      const y = here$1[1] + Math.sin(angle) * radius * side;
+      if (j) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    const color = strand === 0 ? primary : secondary;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness * 1.2;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = glowIntensity;
+    ctx.globalAlpha = 1;
+    ctx.stroke();
+  }
+  elements(s, rotations * 4, true, (T) => {
+    const angle = T * Math.PI * rotations * 2 + phase;
+    ctx.strokeStyle = accent;
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = glowIntensity * 0.5;
+    ctx.lineWidth = thickness * 0.8;
+    ctx.globalAlpha = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(here$1[0] + Math.cos(angle) * radius, here$1[1] + Math.sin(angle) * radius);
+    ctx.lineTo(here$1[0] - Math.cos(angle) * radius, here$1[1] - Math.sin(angle) * radius);
+    ctx.stroke();
+  });
+}
+function lavaFlow(ctx, s, phase) {
+  const { primary, secondary, accent } = s.pal;
+  const m = vertices(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality * 12)));
+  ctx.beginPath();
+  for (let j = 0; j < m; j++) {
+    const T = ts[j];
+    s.path.at(s.local(T), here$1);
+    const across = Math.sin(T * Math.PI * 3 + phase * 1.2) * (15 * 0.7) * Math.sin(phase * 0.6 + T * Math.PI * 2);
+    const x = here$1[0] - here$1[3] * across;
+    const y = here$1[1] + here$1[2] * across;
+    if (j) ctx.lineTo(x, y);
+    else ctx.moveTo(x, y);
+  }
+  const gradient = linkGradient(ctx, s, 1);
+  gradient.addColorStop(0, primary);
+  gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondary);
+  gradient.addColorStop(1, accent);
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = L.thickness * 5;
+  ctx.lineCap = "round";
+  ctx.shadowColor = secondary;
+  ctx.shadowBlur = L.glowIntensity * 1.5;
+  ctx.stroke();
+}
+function stellarPlasma(ctx, s, phase) {
+  const { primary, secondary, accent } = s.pal;
+  const { thickness, glowIntensity, quality } = L;
+  const segments = Math.max(5, Math.floor(Math.min(Math.floor(s.chain / 30), 20) * quality * 0.5));
+  elements(s, segments, true, (T, i) => {
+    const wave = Math.sin(T * Math.PI * 2 + phase * 0.5) * 8;
+    const size = thickness * (0.8 + Math.sin(phase + T * Math.PI) * 0.2);
+    const color = T < 0.5 ? primary : secondary;
+    ctx.beginPath();
+    ctx.arc(here$1[0], here$1[1] + wave, size, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = glowIntensity;
+    ctx.globalAlpha = 0.6;
+    ctx.fill();
+    if (i % 3 !== 0 || quality <= 1) return;
+    ctx.beginPath();
+    ctx.arc(here$1[0], here$1[1] + wave * 1.2, size * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = accent;
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = glowIntensity * 0.5;
+    ctx.globalAlpha = 0.4;
+    ctx.fill();
+  });
+}
+const STILL = {
+  1: sacredFlow,
+  2: crystalStream,
+  3: quantumField,
+  4: cosmicWeave,
+  5: energyPulse,
+  6: dnaHelix,
+  7: lavaFlow,
+  8: stellarPlasma
+};
+const LINK_STYLES = {
+  spline: {},
+  straight: { mode: LINEAR_LINK },
+  linear: { mode: STRAIGHT_LINK },
+  hidden: {},
+  dotted: { moving: true },
+  dashed: { moving: true },
+  double: {},
+  stepped: { shape: "step" },
+  zigzag: { shape: "wave" },
+  coil: { shape: "coil" },
+  rope: {},
+  glowpath: {},
+  chain: {},
+  pulse: {},
+  holographic: {}
+};
+const MARCH = 12;
+const TWIST = 3;
+const TWIST_LENGTH = 30;
+const WHITE = "rgba(255, 255, 255, 0.3)";
+const SHADOW = "rgba(0, 0, 0, 0.95)";
+const dash = [0, 0];
+const solid = [];
+const here = new Float64Array(4);
+function dashes(ctx, s, color, thickness, on, off, march) {
+  dash[0] = on;
+  dash[1] = off;
+  ctx.setLineDash(dash);
+  ctx.lineDashOffset = s.u0 - (march ? clock.linkFlow * MARCH : 0);
+  s.path.draw(ctx, color, thickness);
+  ctx.setLineDash(solid);
+  ctx.lineDashOffset = 0;
+}
+function every(s, gap, each) {
+  const { path } = s;
+  for (let d = Math.ceil(s.u0 / gap) * gap - s.u0; d < path.length; d += gap) {
+    path.find(d, here);
+    each();
+  }
+}
+function beside(ctx, s, step, across) {
+  const { path } = s;
+  const count2 = Math.max(2, Math.ceil(path.length / step) + 1);
+  ctx.beginPath();
+  for (let i = 0; i < count2; i++) {
+    const d = path.length * i / (count2 - 1);
+    path.find(d, here);
+    const off = across(s.u0 + d);
+    const x = here[0] - here[3] * off;
+    const y = here[1] + here[2] * off;
+    if (i) ctx.lineTo(x, y);
+    else ctx.moveTo(x, y);
+  }
+}
+function drawBody(ctx, s, color, thickness) {
+  const { path } = s;
+  const alpha = ctx.globalAlpha;
+  switch (s.linkStyle) {
+    case "dotted":
+      ctx.lineCap = "round";
+      dashes(ctx, s, color, thickness, 0, thickness * 3, !s.isStatic);
+      return;
+    case "dashed":
+      dashes(ctx, s, color, thickness, thickness * 4, thickness * 2, !s.isStatic);
+      return;
+    case "double":
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness * 0.4;
+      for (const side of [1, -1]) {
+        beside(ctx, s, 6, () => side * thickness * 0.8);
+        ctx.stroke();
+      }
+      return;
+    case "rope": {
+      const twist = (D) => TWIST * Math.sin(2 * Math.PI * D / TWIST_LENGTH);
+      beside(ctx, s, 3, twist);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness * 1.2;
+      ctx.lineCap = "round";
+      ctx.stroke();
+      beside(ctx, s, 3, twist);
+      ctx.strokeStyle = WHITE;
+      ctx.lineWidth = thickness * 0.4;
+      ctx.stroke();
+      return;
+    }
+    case "glowpath": {
+      path.draw(ctx, color, thickness);
+      const glow2 = ctx.createLinearGradient(s.start[0], s.start[1], s.end[0], s.end[1]);
+      glow2.addColorStop(0, "rgba(255, 255, 255, 0.5)");
+      glow2.addColorStop(0.5, "rgba(255, 255, 255, 0.2)");
+      glow2.addColorStop(1, "rgba(255, 255, 255, 0.5)");
+      ctx.beginPath();
+      path.trace(ctx);
+      ctx.strokeStyle = glow2;
+      ctx.lineWidth = thickness * 2;
+      ctx.globalAlpha = alpha * 0.5;
+      ctx.stroke();
+      ctx.globalAlpha = alpha;
+      return;
+    }
+    case "chain":
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness * 0.4;
+      every(s, thickness * 4, () => {
+        ctx.beginPath();
+        ctx.ellipse(here[0], here[1], thickness * 2, thickness * 1.2, Math.atan2(here[3], here[2]), 0, Math.PI * 2);
+        ctx.stroke();
+      });
+      return;
+    case "pulse":
+      dashes(ctx, s, color, thickness, thickness * 4, thickness * 4, false);
+      ctx.globalAlpha = alpha * 0.3;
+      every(s, thickness * 8, () => {
+        const blob = ctx.createRadialGradient(here[0], here[1], 0, here[0], here[1], thickness * 3);
+        blob.addColorStop(0, color);
+        blob.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.beginPath();
+        ctx.arc(here[0], here[1], thickness * 3, 0, Math.PI * 2);
+        ctx.fillStyle = blob;
+        ctx.fill();
+      });
+      ctx.globalAlpha = alpha;
+      return;
+    case "holographic": {
+      const sheen = ctx.createLinearGradient(s.start[0], s.start[1], s.end[0], s.end[1]);
+      sheen.addColorStop(0, color);
+      sheen.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
+      sheen.addColorStop(1, color);
+      ctx.beginPath();
+      path.trace(ctx);
+      ctx.strokeStyle = sheen;
+      ctx.lineWidth = thickness * 1.2;
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.lineWidth = 1;
+      every(s, thickness * 2, () => {
+        ctx.beginPath();
+        ctx.moveTo(here[0] - here[3] * thickness, here[1] + here[2] * thickness);
+        ctx.lineTo(here[0] + here[3] * thickness, here[1] - here[2] * thickness);
+        ctx.stroke();
+      });
+      return;
+    }
+    default:
+      path.draw(ctx, color, thickness);
+  }
+}
+const BASES = {
+  1: ["none", "glow"],
+  2: ["ghost", "glow"],
+  3: ["ghost", "ghost"],
+  4: ["none", "none"],
+  5: ["ghost", "ghost"],
+  6: ["none", "none"],
+  7: ["none", "none"],
+  8: ["none", "ghost"],
+  9: ["classic", "classic"]
+};
+const shadowBlur = (blur) => L.shadowStyle === "drop" ? L.shadowBlur * 4 : blur;
+const shadowOffset = () => L.shadowStyle === "drop" ? L.shadowOffset * 3 : 0;
+function drawBase(ctx, s, animate, still, plain = false) {
+  const base = BASES[animate]?.[still ? 1 : 0];
+  if (!base || base === "none" || s.linkStyle === "hidden") return false;
+  const { thickness } = L;
+  const color = s.pal.primary;
+  ctx.globalAlpha = 1;
+  if (base === "classic" && L.linkShadowEnabled && !plain) {
+    ctx.shadowColor = SHADOW;
+    ctx.shadowBlur = shadowBlur(L.glowIntensity);
+    ctx.shadowOffsetX = ctx.shadowOffsetY = shadowOffset();
+    ctx.strokeStyle = SHADOW;
+    ctx.lineWidth = thickness * 1.2;
+    drawBody(ctx, s, SHADOW, thickness * 1.2);
+  }
+  ctx.shadowColor = color;
+  ctx.shadowBlur = plain ? 0 : L.glowIntensity;
+  ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = base === "glow" ? thickness * 1.5 : thickness;
+  if (base === "ghost") ctx.globalAlpha = 0.3;
+  drawBody(ctx, s, color, thickness);
+  ctx.globalAlpha = 1;
+  return true;
+}
+function triangle(ctx, size, angle) {
+  for (let i = 0; i <= SACRED.TRINITY; i++) {
+    const a = angle + i / SACRED.TRINITY * Math.PI * 2;
+    if (i) ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
+    else ctx.moveTo(Math.cos(a) * size, Math.sin(a) * size);
+  }
+}
+const MARKERS = {
+  diamond: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size);
+      ctx.lineTo(x + size, y);
+      ctx.lineTo(x, y + size);
+      ctx.lineTo(x - size, y);
+      ctx.closePath();
+    }
+  },
+  circle: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.closePath();
+    }
+  },
+  arrow: {
+    path(ctx, x, y, size, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(size, 0);
+      ctx.lineTo(-size, size);
+      ctx.lineTo(-size * 0.5, 0);
+      ctx.lineTo(-size, -size);
+      ctx.closePath();
+      ctx.restore();
+    },
+    turn: Math.PI * 2,
+    reach: Math.SQRT2
+  },
+  square: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.rect(x - size, y - size, size * 2, size * 2);
+      ctx.closePath();
+    }
+  },
+  triangle: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size);
+      ctx.lineTo(x + size, y + size);
+      ctx.lineTo(x - size, y + size);
+      ctx.closePath();
+    }
+  },
+  star: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 === 0 ? size : size * 0.4;
+        const a = i * Math.PI / 5;
+        if (i) ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        else ctx.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      }
+      ctx.closePath();
+    }
+  },
+  heart: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(size * 0.7, size * 0.7);
+      ctx.moveTo(0, 0.4);
+      ctx.bezierCurveTo(0, 0.3, -0.5, -0.4, -1, -0.4);
+      ctx.bezierCurveTo(-1.5, -0.4, -1.5, 0.2, -1.5, 0.2);
+      ctx.bezierCurveTo(-1.5, 0.6, -0.5, 1.4, 0, 2);
+      ctx.bezierCurveTo(0.5, 1.4, 1.5, 0.6, 1.5, 0.2);
+      ctx.bezierCurveTo(1.5, 0.2, 1.5, -0.4, 1, -0.4);
+      ctx.bezierCurveTo(0.5, -0.4, 0, 0.3, 0, 0.4);
+      ctx.restore();
+      ctx.closePath();
+    },
+    // Its point is 2 × 0.7 sizes down.
+    reach: 1.4
+  },
+  cross: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - size);
+      ctx.lineTo(x, y + size);
+      ctx.moveTo(x - size, y);
+      ctx.lineTo(x + size, y);
+      ctx.closePath();
+    },
+    stroked: true,
+    width: 0.3
+  },
+  hexagon: {
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI / 3;
+        if (i) ctx.lineTo(x + Math.cos(a) * size, y + Math.sin(a) * size);
+        else ctx.moveTo(x + Math.cos(a) * size, y + Math.sin(a) * size);
+      }
+      ctx.closePath();
+    }
+  },
+  flower: {
+    path(ctx, x, y, size) {
+      const inner = size * 0.3;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI * 2 / 6;
+        const next = (i + 1) * Math.PI * 2 / 6;
+        const mid = (a + next) / 2;
+        if (i) ctx.lineTo(x + Math.cos(a) * inner, y + Math.sin(a) * inner);
+        else ctx.moveTo(x + Math.cos(a) * inner, y + Math.sin(a) * inner);
+        ctx.quadraticCurveTo(x + Math.cos(mid) * size * 1.5, y + Math.sin(mid) * size * 1.5, x + Math.cos(next) * inner, y + Math.sin(next) * inner);
+      }
+      ctx.closePath();
+      ctx.moveTo(x + inner, y);
+      ctx.arc(x, y, inner, 0, Math.PI * 2);
+    }
+  },
+  spiral: {
+    // Three turns out from the centre: an open line, which filling would close into a blob.
+    path(ctx, x, y, size) {
+      ctx.beginPath();
+      for (let i = 0; i <= 40; i++) {
+        const t = i / 40;
+        const [r, a] = [size * t, t * 3 * Math.PI * 2];
+        if (i) ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+        else ctx.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      }
+    },
+    stroked: true,
+    width: 0.2
+  },
+  merkaba: {
+    // v1's createMerkaba (old_link_animations.js:1493-1520), which it never drew: two triangles, a sixth of a turn apart.
+    path(ctx, x, y, size, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      triangle(ctx, size, 0);
+      triangle(ctx, size, Math.PI / SACRED.TRINITY);
+      ctx.restore();
+    },
+    stroked: true,
+    width: 0.15,
+    turn: Math.PI / SACRED.TRINITY
+  }
+};
+function mark(ctx, shape, x, y, size, angle, color, glow2, blur, offset = 0) {
+  shape.path(ctx, x, y, size, angle);
+  if (shape.stroked) {
+    ctx.lineWidth = size * shape.width;
+    ctx.lineCap = "round";
+  }
+  shine(ctx, shape, x, y, size, angle, color, glow2, blur, offset);
+}
+function drawMarkers(ctx, s, phase, flow) {
+  const shape = MARKERS[L.markerShape];
+  if (!L.markerEnabled || !shape) return;
+  const size = 3 * L.markerSize;
+  const count2 = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.markerSize * L.particleDensity * 0.5));
+  const { pal } = s;
+  for (let i = 0; i < count2; i++) {
+    const T = flow === void 0 ? i / count2 : wrap(i / count2 + flow * 0.1);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    s.path.at(u, here);
+    const angle = L.markerShape === "arrow" ? Math.atan2(here[3], here[2]) + (L.direction < 0 ? Math.PI : 0) : L.markerShape === "merkaba" ? phase : 0;
+    let color = pal.marker;
+    let alpha = 1;
+    if (L.markerEffects === "pulse") alpha = 0.5 + Math.sin(phase + T * Math.PI * 2) * 0.5;
+    else if (L.markerEffects === "fade") alpha = 1 - T;
+    else if (L.markerEffects === "rainbow") color = rainbow(T * 360 + phase * 50);
+    ctx.globalAlpha = alpha;
+    if (L.markerShadowEnabled) mark(ctx, shape, here[0], here[1], size * 1.2, angle, SHADOW, SHADOW, shadowBlur(L.markerGlow), shadowOffset());
+    mark(ctx, shape, here[0], here[1], size, angle, color, L.markerEffects === "rainbow" ? pal.primary : color, L.markerGlow);
+  }
+}
+const ARROW = 2;
+function centreMarker(canvas, ctx, s) {
+  const shape = canvas.linkMarkerShape;
+  if (!shape || canvas.ds.scale < 0.6 || !canvas.highquality_render) return;
+  const { cx, cy, angle } = s.path;
+  ctx.beginPath();
+  if (shape === ARROW) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    ctx.moveTo(cx - 3.2 * cos + 5 * sin, cy - 3.2 * sin - 5 * cos);
+    ctx.lineTo(cx + 7 * cos, cy + 7 * sin);
+    ctx.lineTo(cx - 3.2 * cos - 5 * sin, cy - 3.2 * sin + 5 * cos);
+  } else {
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+  }
+  ctx.fillStyle = s.pal.native;
+  ctx.fill();
 }
 const LINKS = "Link animation";
 const LOD_SCALE = 0.25;
 const REACH = 120;
-const ARROW = 2;
+const CLASSIC = 9;
 class Segment {
-  native = new LinkPath();
-  start = this.native.a;
-  end = this.native.b;
-  path = this.native;
-  defaultColor = "";
+  path = new LinkPath();
+  /** The link native drew the segment for. */
+  link;
+  /** Whether its path is not the one native drew for it, so the hit data must follow ours. */
+  custom = false;
+  /** The colours it is drawn in. */
+  pal = HIGHLIGHT;
   linkStyle = "";
   isStatic = false;
+  /**
+   * px along the link to the segment's start, the segment's own length and the link's whole length, along the
+   * segments native drew for it: the paths Link.Style takes, before a wave or a coil winds around them.
+   */
+  u0 = 0;
+  len = 0;
+  chain = 0;
+  /** The fractions of the link where the segment starts and ends. */
+  t0 = 0;
+  t1 = 1;
+  /** Whether the segment is a point on a longer link, where two reroutes, or a reroute and a slot, are on one spot: nothing of the link is on it. */
+  get empty() {
+    return this.t0 === this.t1;
+  }
+  get start() {
+    return this.path.a;
+  }
+  get end() {
+    return this.path.b;
+  }
+  /** The segment's own parameter, which its path takes for a point, at fraction T of the whole link: in [0, 1] where T falls on this segment. */
+  local(T) {
+    return (T - this.t0) / (this.t1 - this.t0);
+  }
+  /** Whether the segment draws what is at its own parameter u: what its start holds, up to its end, which only the link's last segment draws. */
+  within(u) {
+    return u >= 0 && (u < 1 || u === 1 && this.t1 === 1);
+  }
 }
 const pool = [];
 let count = 0;
+let first = 0;
+let open = false;
+const ends = /* @__PURE__ */ new Map();
 const shown = [];
-const one = [];
-const moment = { direction: 1, totalTime: 0, phase: 0 };
-const pass = { ctx: void 0, on: false, still: false, calls: 0, highlighted: {} };
-const pose = { phase: Math.PI / 4, stale: true, animate: 0, linkStyle: "", quality: 0, particleDensity: 0 };
+const pass = { ctx: void 0, on: false, still: false, plain: false, calls: 0, bases: 0, highlighted: {} };
+const BUSY = 12;
+const SETTLE_MS = 150;
+const glows = { bases: 0, due: false, scale: 0, x: 0, y: 0, timer: 0 };
+function settle() {
+  glows.due = true;
+  app.canvas.setDirty(true, true);
+}
 let warned = false;
 let foreign = false;
 let told = false;
@@ -1721,23 +1298,40 @@ function defers() {
   }
   return true;
 }
+const LINK_COLOR = "#9A9";
+function enableAntiAliasing(ctx) {
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.miterLimit = 2;
+}
+function moves() {
+  return L.animate !== CLASSIC || L.markerEnabled && L.markerShape !== "none" || Boolean(LINK_STYLES[L.linkStyle].moving);
+}
 function begin(canvas, ctx) {
   count = 0;
+  open = false;
+  ends.clear();
   pass.ctx = ctx;
-  pass.calls = 0;
+  pass.calls = pass.bases = 0;
   pass.on = L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
-  pass.still = L.staticMode || L.pauseDuringRender && env.running || env.reducedMotion;
+  pass.still = L.staticMode || L.pauseDuringRender && env.running || env.reducedMotion || !moves();
   pass.highlighted = canvas.highlighted_links;
-  if (L.animate !== pose.animate || L.linkStyle !== pose.linkStyle || L.quality !== pose.quality || L.particleDensity !== pose.particleDensity) {
-    Object.assign(pose, { animate: L.animate, linkStyle: L.linkStyle, quality: L.quality, particleDensity: L.particleDensity, stale: true });
-  }
-  if (pass.still && pose.stale) {
-    pose.phase = (pose.phase + Math.PI * 2) % (Math.PI * 4);
-    pose.stale = false;
+  const { scale, offset } = canvas.ds;
+  const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
+  [glows.scale, glows.x, glows.y] = [scale, offset[0], offset[1]];
+  pass.plain = pass.on && !glows.due && glows.bases > BUSY && moving;
+  glows.due = false;
+  if (pass.plain) {
+    clearTimeout(glows.timer);
+    glows.timer = window.setTimeout(settle, SETTLE_MS);
   }
 }
 function end(canvas) {
   pass.ctx = void 0;
+  if (open) close();
+  if (!pass.plain) glows.bases = pass.bases;
   if (count && !pass.still) {
     live.links = count;
     wake();
@@ -1750,55 +1344,78 @@ function end(canvas) {
     return;
   }
 }
+function close() {
+  const last = pool[count - 1];
+  const chain = last.u0 + last.len;
+  for (let i = first; i < count; i++) {
+    const s = pool[i];
+    s.chain = chain;
+    s.t0 = s.len === chain ? 0 : s.u0 / chain;
+    s.t1 = s.len === chain ? 1 : (s.u0 + s.len) / chain;
+  }
+  open = false;
+}
 function record(canvas, link, a, b, color, startDir, endDir, extras) {
+  if (open && pool[count - 1].link !== link) close();
+  if (!open) first = count;
   const segment = pool[count++] ??= new Segment();
-  segment.native.set(a, b, startDir, endDir, canvas.links_render_mode, extras?.startControl, extras?.endControl);
-  segment.defaultColor = pass.highlighted[link.id] ? "#FFF" : String(color || LGraphCanvas.link_type_colors[String(link.type)] || canvas.default_link_color);
+  const reroute = extras?.reroute;
+  const from = canvas.graph?.getReroute((reroute ?? link).parentId);
+  const style = LINK_STYLES[L.linkStyle];
+  const mode = style.mode ?? canvas.links_render_mode;
+  segment.link = link;
+  segment.u0 = from && ends.get(from) || 0;
+  segment.path.set(a, b, startDir, endDir, mode, extras?.startControl, extras?.endControl);
+  if (style.shape === "step") segment.path.step(endDir);
+  segment.len = segment.path.length;
+  if (style.shape === "wave" || style.shape === "coil") segment.path.bend(style.shape === "coil", segment.u0, !from, !reroute);
+  segment.custom = Boolean(style.shape) || mode !== canvas.links_render_mode;
+  if (reroute) ends.set(reroute, segment.u0 + segment.len);
+  open = Boolean(reroute);
+  if (!open) close();
+  segment.pal = pass.highlighted[link.id] ? HIGHLIGHT : palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR);
   segment.linkStyle = L.linkStyle;
-  segment.path = L.linkStyle === "spline" ? segment.native : getLinkRenderer(L.linkStyle);
   segment.isStatic = pass.still;
   return segment;
 }
-function bake(canvas, ctx, segment) {
+const marked = () => L.animate === CLASSIC || L.markerAll;
+function place(canvas, ctx, segment) {
+  if (!pass.still && LINK_STYLES[segment.linkStyle].moving) return true;
+  const whole = pass.still && !open;
   ctx.save();
   try {
     enableAntiAliasing(ctx);
-    one[0] = segment;
-    renderStaticStyle(ctx, one, L.animate, pose.phase);
+    if (drawBase(ctx, segment, L.animate, pass.still, pass.plain)) pass.bases++;
+    for (let i = first; whole && i < count; i++) {
+      if (pool[i].empty) continue;
+      STILL[L.animate]?.(ctx, pool[i], STILL_PHASE);
+      if (marked()) drawMarkers(ctx, pool[i], STILL_PHASE);
+    }
   } catch (error) {
     guard.fail(LINKS, error);
     return false;
   } finally {
     ctx.restore();
   }
-  ctx.save();
-  marker(canvas, ctx, segment);
-  ctx.restore();
+  if (whole) {
+    ctx.save();
+    for (let i = first; i < count; i++) centreMarker(canvas, ctx, pool[i]);
+    ctx.restore();
+  }
   return true;
 }
-function marker(canvas, ctx, segment) {
-  const shape = canvas.linkMarkerShape;
-  if (!shape || canvas.ds.scale < 0.6 || !canvas.highquality_render) return;
-  const { cx, cy, angle } = segment.native;
-  ctx.beginPath();
-  if (shape === ARROW) {
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    ctx.moveTo(cx - 3.2 * cos + 5 * sin, cy - 3.2 * sin - 5 * cos);
-    ctx.lineTo(cx + 7 * cos, cy + 7 * sin);
-    ctx.lineTo(cx - 3.2 * cos - 5 * sin, cy - 3.2 * sin + 5 * cos);
-  } else {
-    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-  }
-  ctx.fillStyle = segment.defaultColor;
-  ctx.fill();
+function hit(owner, path) {
+  owner.path = path.hit();
+  owner._pos[0] = path.cx;
+  owner._pos[1] = path.cy;
+  owner._centreAngle = path.angle;
 }
 function motion(canvas, ctx) {
   if (pass.still) return 0;
   const area = canvas.visible_area;
   let n = 0;
   for (let i = 0; i < count; i++) {
-    const { box } = pool[i].native;
+    const { box } = pool[i].path;
     if (box[2] + REACH >= area[0] && box[0] - REACH <= area[0] + area[2] && box[3] + REACH >= area[1] && box[1] - REACH <= area[1] + area[3]) shown[n++] = pool[i];
   }
   shown.length = n;
@@ -1806,18 +1423,23 @@ function motion(canvas, ctx) {
   ctx.save();
   try {
     enableAntiAliasing(ctx);
-    moment.direction = L.direction;
-    moment.totalTime = clock.linkTime;
-    moment.phase = clock.linkPhase;
-    renderAnimatedStyle(ctx, shown, L.animate, clock.linkPhase, moment);
+    if (!STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
+    if (LINK_STYLES[L.linkStyle].moving) for (const segment of shown) drawBase(ctx, segment, L.animate, false);
+    const draw = MOVING[L.animate];
+    for (const segment of shown) {
+      if (segment.empty) continue;
+      draw?.(ctx, segment, clock);
+      if (marked()) drawMarkers(ctx, segment, clock.linkPhase, clock.linkFlow);
+    }
   } catch (error) {
     guard.fail(LINKS, error);
     if (guard.off(LINKS)) canvas.setDirty(true, true);
   } finally {
+    stopSprites();
     ctx.restore();
   }
   ctx.globalAlpha = canvas.editor_alpha;
-  for (const segment of shown) marker(canvas, ctx, segment);
+  for (const segment of shown) centreMarker(canvas, ctx, segment);
   for (const reroute of canvas._visibleReroutes) {
     reroute.draw(ctx, canvas._pattern);
     if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
@@ -1830,6 +1452,7 @@ function installLinks() {
   const renderLink = proto.renderLink;
   foreign = !String(renderLink).includes("renderLinkDirect") || Boolean(globalThis.__LINKFX_V2_BOOTED__);
   warned = told = false;
+  glows.bases = 0;
   proto.drawConnections = function(...args) {
     begin(this, args[0]);
     try {
@@ -1843,7 +1466,12 @@ function installLinks() {
     pass.calls++;
     if (pass.on && ctx === pass.ctx && link && !(skipBorder && flow) && !extras?.disabled) {
       const segment = record(this, link, a, b, color, startDir, endDir, extras);
-      if (!pass.still || bake(this, ctx, segment)) args[0] = dummy();
+      if (place(this, ctx, segment)) {
+        args[0] = dummy();
+        renderLink.apply(this, args);
+        if (segment.custom) hit(extras?.reroute ?? link, segment.path);
+        return;
+      }
     }
     return renderLink.apply(this, args);
   };
@@ -2166,6 +1794,11 @@ function renderLinkMarkerSection(container) {
     "Show flow direction markers on links"
   ));
   body.appendChild(control(
+    "On Every Animation",
+    "🔗 Enhanced Links.Marker.All",
+    "Show the markers over every animation, not only Classic Flow"
+  ));
+  body.appendChild(control(
     "Shape",
     "🔗 Enhanced Links.Marker.Shape",
     "Shape of the flow markers"
@@ -2202,12 +1835,17 @@ function renderLinkShadowSection(container) {
   body.appendChild(control(
     "Link Shadows",
     "🔗 Enhanced Links.Link.Shadow.Enabled",
-    "Enable drop shadows on links"
+    "Dark outline under Classic Flow links"
   ));
   body.appendChild(control(
     "Marker Shadows",
     "🔗 Enhanced Links.Marker.Shadow.Enabled",
-    "Enable drop shadows on markers"
+    "Dark outline under markers"
+  ));
+  body.appendChild(control(
+    "Shadow Style",
+    "🔗 Enhanced Links.Shadow.Style",
+    "Halo as in v1, or an offset drop shadow as in v2"
   ));
   container.appendChild(section);
 }
@@ -2242,7 +1880,7 @@ function renderNodeAnimationSection(container) {
   body.appendChild(control(
     "End Animation",
     "📦 Enhanced Nodes.End Animation.Enabled",
-    "Play completion animation when a node finishes processing"
+    "Fireworks over the output nodes when a run finishes"
   ));
   body.appendChild(control(
     "Pause During Render",

@@ -6,33 +6,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { STILL_PHASE } from '@/core/engine';
 import { preview } from '@/core/settings';
-import { renderAnimatedStyle } from '@/effects/animated-renderers';
-import { renderStaticStyle } from '@/effects/static-renderers';
-import { frames, start, type FakeCanvas } from '../../helpers/fake-litegraph';
-
-/** The settings the node layers hand the node effect or the particles. */
-const handed = vi.hoisted(() => ({ effect: [] as unknown[], particles: [] as unknown[] }));
-
-vi.mock('@/effects/node-effects', async (importOriginal) => ({
-    ...(await importOriginal<typeof import('@/effects/node-effects')>()),
-    getNodeEffect: () => (_ctx: unknown, _node: unknown, settings: unknown) => void handed.effect.push(settings),
-    drawParticles: (_ctx: unknown, _node: unknown, settings: unknown) => void handed.particles.push(settings),
-}));
-
-vi.mock('@/effects/animated-renderers', async (importOriginal) => {
-    const renderers = await importOriginal<typeof import('@/effects/animated-renderers')>();
-    return { ...renderers, renderAnimatedStyle: vi.fn(renderers.renderAnimatedStyle) };
-});
-
-vi.mock('@/effects/static-renderers', async (importOriginal) => {
-    const renderers = await importOriginal<typeof import('@/effects/static-renderers')>();
-    return { ...renderers, renderStaticStyle: vi.fn(renderers.renderStaticStyle) };
-});
+import { STILL } from '@/links/stills';
+import { frames, offscreens, start, type FakeCanvas } from '../../helpers/fake-litegraph';
 
 beforeEach(() => {
-    handed.effect = [];
-    handed.particles = [];
     vi.stubGlobal('requestAnimationFrame', () => 0);
 });
 
@@ -43,11 +22,11 @@ afterEach(() => {
 
 const PARTICLES = {
     '📦 Enhanced Nodes.Particle.Show': true,
-    '📦 Enhanced Nodes.Particle.Density': 2.2,
+    '📦 Enhanced Nodes.Particle.Density': 2,
     '📦 Enhanced Nodes.Particle.Speed': 3.1,
     '📦 Enhanced Nodes.Particle.Intensity': 0.4,
     '📦 Enhanced Nodes.Particle.Size': 2.6,
-    '📦 Enhanced Nodes.Particle.Glow': 1.9,
+    '📦 Enhanced Nodes.Particle.Glow': 0.9,
     '📦 Enhanced Nodes.Quality': 3,
     '📦 Enhanced Nodes.Animation.Size': 1.7,
     '📦 Enhanced Nodes.Direction': -1,
@@ -61,66 +40,86 @@ async function drawNode(settings: Record<string, unknown>, hovered = false): Pro
     return canvas;
 }
 
+/** The paints of a frame in a colour, or in a gradient. */
+const inColour = (canvas: FakeCanvas, style: string) => canvas.front.paints.filter((p) => p.style === style);
+
 describe('node settings', () => {
-    it('reach the node effect', async () => {
-        await drawNode({
+    it("reach Neon Nexus: v1's energy, its bloom, the particles and their colours", async () => {
+        const canvas = await drawNode({
             ...PARTICLES,
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Intensity': 1.3,
             '📦 Enhanced Nodes.Animation.Glow': 0.7,
-            '📦 Enhanced Nodes.Animation.Speed': 2.5,
-            '📦 Enhanced Nodes.Static.Mode': true,
-            '📦 Enhanced Nodes.Glow': 1.2,
-            '📦 Enhanced Nodes.Color.Hover': '#123456',
-            '📦 Enhanced Nodes.Color.Hover.Show': true,
+            '📦 Enhanced Nodes.Color.Mode': 'custom',
+            '📦 Enhanced Nodes.Color.Primary': '#102030',
+            '📦 Enhanced Nodes.Color.Particle': '#405060',
         });
-        const settings = {
-            animation: { intensity: 1.3 * 0.7, direction: -1, animSpeed: 2.5, isStaticMode: true },
-            quality: { quality: 3, animationSize: 1.7, glowIntensity: 1.2 },
-            particles: { showParticles: true, density: 2.2, speed: 3.1, intensity: 0.4, size: 2.6, glowIntensity: 1.9 },
-            colors: { hoverColor: '#123456', showHover: true },
-        };
-        // Around the node and on it.
-        expect(handed.effect).toMatchObject([settings, settings]);
+        // The tube's first layer glows 12 × Intensity × 1.5 × Animation.Glow, and its bright line 20 ×, on each side of
+        // the body's edge; the energy grid's lines in the same colour do not glow.
+        const tube = inColour(canvas, '#102030').filter((p) => p.op === 'stroke' && p.shadowBlur > 0).map((p) => p.shadowBlur);
+        expect(tube).toHaveLength(4);
+        [12, 20, 12, 20].forEach((f, i) => expect(tube[i]).toBeCloseTo(f * 1.3 * 1.5 * 0.7, 9));
+        // Its 70 hexagons in the particle colour, glowing 5 × Particle.Glow, each drawn once or on both sides.
+        const hexes = inColour(canvas, '#405060');
+        expect(hexes.length).toBeGreaterThanOrEqual(70);
+        expect(new Set(hexes.map((p) => p.shadowBlur))).toEqual(new Set([5 * 0.9]));
     });
 
-    it('reach the particles of a node without an effect', async () => {
-        await drawNode(PARTICLES);
-        const settings = {
-            animation: { direction: -1 },
-            quality: { quality: 3, animationSize: 1.7 },
-            particles: { density: 2.2, speed: 3.1, intensity: 0.4, size: 2.6, glowIntensity: 1.9 },
-        };
-        expect(handed.particles).toMatchObject([settings, settings]);
+    it('reach the particles of a node without an effect: Gentle Pulse\'s fireflies', async () => {
+        const canvas = await drawNode(PARTICLES);
+        // floor((8 + 2 × Quality) × Density) fireflies, each a glow and a core in Gentle Pulse's primary colour; some on both sides.
+        const cores = inColour(canvas, '#44aaff');
+        expect(cores.length).toBeGreaterThanOrEqual(28);
+        expect(cores.length).toBeLessThan(2 * 28);
+        // Their core is 0.6 of (4 + Quality) × Animation.Size × Particle.Size, flickering by up to 0.7 + 0.4 + 0.3 of it.
+        for (const p of cores) expect((p.box![2] - p.box![0]) / 2).toBeLessThanOrEqual(0.6 * 7 * 1.7 * 2.6 * 1.4 + 1e-9);
+    });
+
+    it("light the node with v1's halo and frame it while selected", async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 3, '📦 Enhanced Nodes.Glow': 0.6, '📦 Enhanced Nodes.Color.Mode': 'custom', '📦 Enhanced Nodes.Color.Primary': '#102030', '📦 Enhanced Nodes.Color.Secondary': '#203040', '📦 Enhanced Nodes.Color.Accent': '#304050' }, { nodes: [{ pos: [100, 100] }] });
+        canvas.graph._nodes[0].selected = true;
+        frames(1);
+        const body = inColour(canvas, '#353535')[0];
+        expect([body.shadowColor, body.shadowBlur]).toEqual(['#102030', 10 * 0.6]);
+        expect(canvas.front.paints.filter((p) => p.op === 'strokeRect').map((p) => [p.style, p.shadowColor, p.shadowBlur])).toEqual([['#203040', '#304050', 45 * 0.6], ['#203040', '#304050', 45 * 0.6]]);
+        preview('📦 Enhanced Nodes.Selection.Glow', false);
+        canvas.setDirty(true, true);
+        const from = canvas.front.paints.length;
+        frames(1);
+        expect(canvas.front.paints.slice(from).filter((p) => p.op === 'strokeRect')).toEqual([]);
     });
 
     // Colours are stored without '#', as both frontends' colour pickers save them. v2.0.1 passed such a
     // value to the canvas as is, which ignored it, for the hover outline and every title style but neon.
     it('outline a hovered node', async () => {
         const canvas = await drawNode({
-            '📦 Enhanced Nodes.Animate': 1,
+            '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Color.Hover.Show': true,
             '📦 Enhanced Nodes.Color.Hover': '00ff00',
-            '📦 Enhanced Nodes.Glow': 1.2,
+            '📦 Enhanced Nodes.Animation.Glow': 0.8,
         }, true);
         const outlines = canvas.front.paints.filter((p) => p.op === 'strokeRect');
-        expect(outlines.map((p) => [p.style, p.shadowColor, p.shadowBlur])).toEqual([['rgba(0, 255, 0, 0.7)', 'rgba(0, 255, 0, 0.5)', 15 * 1.2]]);
+        expect(outlines.map((p) => [p.style, p.shadowColor, p.shadowBlur])).toEqual([['rgba(0, 255, 0, 0.7)', 'rgba(0, 255, 0, 0.5)', 15 * 0.8], ['rgba(0, 255, 0, 0.7)', 'rgba(0, 255, 0, 0.5)', 15 * 0.8]]);
     });
 
     it('style and place the animated title', async () => {
         const canvas = await drawNode({
             '📦 Enhanced Nodes.Text.Animation.Enabled': true,
             '📦 Enhanced Nodes.Text.Style': 'retro',
+            // Title color is for custom node colours, as in v1.
+            '📦 Enhanced Nodes.Color.Mode': 'custom',
             '📦 Enhanced Nodes.Text.Color': 'ff0000',
             '📦 Enhanced Nodes.Text.Size': 18,
             '📦 Enhanced Nodes.Text.Glow': 0.8,
+            '📦 Enhanced Nodes.Text.Letter.Spacing': 1.5,
             '📦 Enhanced Nodes.Text.Position.X': 7,
             '📦 Enhanced Nodes.Text.Position.Y': -4,
         });
         const trace = canvas.front.trace();
-        expect(trace).toContain('font = 18px Arial');
-        // Retro draws two offset copies, then the title itself: centred over the node, 15 px above it.
-        expect(trace).toContain('fillText("KSampler", 117, -19)');
+        expect(trace).toContain('font = 18px Inter');
+        expect(trace).toContain('letterSpacing = 1.5px');
+        // Retro draws two offset copies, then the title itself: where native's starts, on the title bar's middle, moved by the offsets.
+        expect(trace).toContain('fillText("KSampler", 37, -19)');
         expect(canvas.front.paints.filter((p) => p.op === 'fillText').at(-1)).toMatchObject({ style: '#ff0000', shadowColor: '#ff0000', shadowBlur: 3 * 0.8 });
     });
 });
@@ -136,6 +135,7 @@ async function drawLink(settings: Record<string, unknown>): Promise<FakeCanvas> 
 describe('link settings', () => {
     for (const still of [false, true]) {
         it(`reach Classic Flow ${still ? 'held still' : 'animated'}`, async () => {
+            const made = offscreens.length;
             const canvas = await drawLink({
                 '🔗 Enhanced Links.Static.Mode': still,
                 '🔗 Enhanced Links.Direction': -1,
@@ -144,6 +144,7 @@ describe('link settings', () => {
                 '🔗 Enhanced Links.Glow.Intensity': 7,
                 '🔗 Enhanced Links.Link.Shadow.Enabled': true,
                 '🔗 Enhanced Links.Marker.Shadow.Enabled': false,
+                '🔗 Enhanced Links.Shadow.Style': 'drop',
                 '🔗 Enhanced Links.Shadow.Blur': 2,
                 '🔗 Enhanced Links.Shadow.Offset': 6,
                 '🔗 Enhanced Links.Marker.Size': 4.5,
@@ -151,41 +152,42 @@ describe('link settings', () => {
                 '🔗 Enhanced Links.Marker.Color.Mode': 'custom',
                 '🔗 Enhanced Links.Marker.Color': '#123456',
             });
-            // Still links are drawn into the background, moving ones over it; the node bodies are #353535.
-            const paints = (still ? canvas.back : canvas.front).paints;
-            const strokes = paints.filter((p) => p.op === 'stroke').map((p) => [p.style, p.lineWidth, p.shadowBlur, p.shadowOffsetX]);
-            const marks = paints.filter((p) => p.op === 'fill' && p.style !== '#353535').map((p) => [p.style, p.shadowBlur, p.shadowOffsetX]);
+            // The link's body is drawn into the background, and its markers too while still, else over it; the node bodies are #353535.
+            const strokes = canvas.back.paints.filter((p) => p.op === 'stroke').map((p) => [p.style, p.lineWidth, p.shadowBlur, p.shadowOffsetX]);
+            const marks = (still ? canvas.back : canvas.front).paints.filter((p) => p.op === 'fill' && p.style !== '#353535').map((p) => [p.style, p.shadowBlur, p.shadowOffsetX]);
             // The path strokes at 0.8 × the width it is handed; floor(3 × Quality × Marker.Size × density × 0.5) markers, then the native centre marker.
             expect(strokes).toEqual([['rgba(0, 0, 0, 0.95)', 2.5 * 1.2 * 0.8, 2 * 4, 6 * 3], ['#64b5f6', 2.5 * 0.8, 7, 0]]);
-            expect(marks).toEqual([...Array(3).fill(['#123456', 13, 0]), ['#64b5f6', 0, 0]]);
-            if (!still) expect(vi.mocked(renderAnimatedStyle).mock.lastCall?.[4].direction).toBe(-1);
+            // Moving markers glow from a sprite stamped under each, which the canvas cast with that glow (fx/particles.ts).
+            const glow = still ? 13 : 0;
+            expect(marks).toEqual([...Array(3).fill(['#123456', glow, 0]), ['#64b5f6', 0, 0]]);
+            // Past the front pass's copy of the background.
+            expect(canvas.front.paints.filter((p) => p.op === 'drawImage')).toHaveLength(still ? 1 : 4);
+            const cast = offscreens.slice(made).flatMap((sprite) => sprite.paints).map((p) => [p.op, p.shadowColor, p.shadowBlur]);
+            expect(cast).toEqual(still ? [] : [['fill', '#123456', 13]]);
+            // Going Reverse, the arrows along the level link point back toward its output.
+            const turns = (still ? canvas.back : canvas.front).lines.filter((line) => line.startsWith('rotate('));
+            expect(turns).toEqual(Array(3).fill('rotate(3.14)'));
         });
     }
 
-    it("hold v2's still pose, which moves when Animate, Link.Style, Quality or Particle.Density changed", async () => {
-        const canvas = await drawLink({ '🔗 Enhanced Links.Static.Mode': true });
-        const draw = () => {
+    it("hold v1's first still pose, whatever changed before", async () => {
+        const still = vi.spyOn(STILL, 2);
+        const canvas = await drawLink({ '🔗 Enhanced Links.Static.Mode': true, '🔗 Enhanced Links.Animate': 2 });
+        const pose = () => {
             canvas.setDirty(true, true);
             frames(1);
+            return still.mock.lastCall?.[2];
         };
-        const pose = () => {
-            draw();
-            return vi.mocked(renderStaticStyle).mock.lastCall?.[3];
-        };
-        const [first, again] = [pose(), pose()];
-        preview('🔗 Enhanced Links.Thickness', 5);
-        const afterThickness = pose();
+        const poses = [pose(), pose()];
+        // v2 moved its pose by 2π on the first still frame after Animate, Link.Style, Quality or Particle.Density changed.
         preview('🔗 Enhanced Links.Quality', 2);
-        const afterQuality = pose();
-        // A change that a moving frame saw still moves the next still pose.
+        poses.push(pose());
         preview('🔗 Enhanced Links.Static.Mode', false);
         preview('🔗 Enhanced Links.Link.Style', 'dotted');
-        draw();
+        frames(3);
         preview('🔗 Enhanced Links.Static.Mode', true);
-        const afterStyle = pose();
-        // In eighths of a turn: the pose is π/4 or 9π/4, depending on how often it moved before.
-        const eighths = [first, again, afterThickness, afterQuality, afterStyle].map((phase) => Math.round(phase! / (Math.PI / 4)));
-        const [held, moved] = eighths[0] === 9 ? [9, 1] : [1, 9];
-        expect(eighths).toEqual([held, held, held, moved, held]);
+        poses.push(pose());
+        expect(poses).toEqual(Array(4).fill(STILL_PHASE));
+        expect(STILL_PHASE).toBe((9 * Math.PI) / 4);
     });
 });

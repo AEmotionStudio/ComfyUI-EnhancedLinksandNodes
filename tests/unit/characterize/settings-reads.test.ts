@@ -43,6 +43,7 @@ function nothing(): CanvasRenderingContext2D {
         createLinearGradient: () => gradient,
         createRadialGradient: () => gradient,
         measureText: () => ({ width: 0 }),
+        getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }),
     };
     const noop = () => {};
     return new Proxy({}, {
@@ -54,13 +55,13 @@ function nothing(): CanvasRenderingContext2D {
 describe('settings reads', () => {
     it('Classic Flow at v1 defaults reads nothing per link pass or per link', async () => {
         const canvas = await start(V1_LINK_SETTINGS, links(500));
-        const strokes = () => canvas.front.paints.filter((p) => p.op === 'stroke').length;
+        // Per link: a shadow and a body where native would have drawn it, and over them two markers with their shadows and the centre marker.
+        const drawn = () => [canvas.back.paints.filter((p) => p.op === 'stroke').length, canvas.front.paints.filter((p) => p.op === 'fill' && p.style !== '#353535').length];
         expect(reads(() => frames(1))).toBe(0);
-        // A shadow and a body per link.
-        expect(strokes()).toBe(1000);
+        expect(drawn()).toEqual([1000, 2500]);
         canvas.setDirty(true, true);
         expect(reads(() => frames(2))).toBe(0);
-        expect(strokes()).toBe(3000);
+        expect(drawn()).toEqual([2000, 7500]);
         // Since start()'s reset: both extensions' setup() and these paints.
         expect(fake.legacyCalls).toBe(0);
     });
@@ -92,7 +93,7 @@ describe('settings reads', () => {
         canvas.ctx = canvas.bgctx = nothing();
         expect(reads(() => frames(120))).toBe(0);
         // All of it on screen and moving: each segment, each node's effect and title, and its particles.
-        expect(live).toEqual({ links: 500, nodes: 400, particles: 200 });
+        expect(live).toEqual({ links: 500, nodes: 400, particles: 200, bursts: 0 });
         expect(fake.legacyCalls).toBe(0);
     }, 30_000);
 
@@ -102,7 +103,7 @@ describe('settings reads', () => {
         frames(2);
         const before = { ...clock };
         expect(reads(() => frames(3))).toBe(0);
-        expect(clock.linkPhase).toBeGreaterThan(before.linkPhase);
+        expect(clock.linkPhase).toBeLessThan(before.linkPhase);
         expect(clock.nodePhase).toBeGreaterThan(before.nodePhase);
         expect(fake.legacyCalls).toBe(0);
     });

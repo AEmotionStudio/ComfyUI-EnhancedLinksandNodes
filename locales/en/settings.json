@@ -32,16 +32,18 @@
   },
   "🔗 Enhanced Links_Link_Style": {
     "name": "Link path shape",
+    "tooltip": "Same as ComfyUI follows the Link Render Mode setting.",
     "options": {
-      "Spline": "Spline",
-      "Direct (diagonal)": "Direct (diagonal)",
+      "Same as ComfyUI": "Same as ComfyUI",
+      "Direct": "Direct",
       "Right-angle": "Right-angle",
       "Effect only": "Effect only",
       "Dotted": "Dotted",
       "Dashed": "Dashed",
       "Double": "Double",
       "Stepped": "Stepped",
-      "Zigzag": "Zigzag",
+      "Wave": "Wave",
+      "Coil": "Coil",
       "Rope": "Rope",
       "Glow path": "Glow path",
       "Chain": "Chain",
@@ -63,7 +65,13 @@
   },
   "🔗 Enhanced Links_Particle_Density": {
     "name": "Link particle density",
-    "tooltip": "How many particles or markers each link carries."
+    "tooltip": "How many particles or markers each link carries.",
+    "options": {
+      "Minimal": "Minimal",
+      "Balanced": "Balanced",
+      "Dense": "Dense",
+      "Ultra": "Ultra"
+    }
   },
   "🔗 Enhanced Links_Color_Mode": {
     "name": "Link colors",
@@ -102,7 +110,11 @@
   },
   "🔗 Enhanced Links_Marker_Enabled": {
     "name": "Flow markers",
-    "tooltip": "Shapes gliding along links in Classic Flow."
+    "tooltip": "Shapes gliding along links in Classic Flow, and in the other animations with Markers on every animation."
+  },
+  "🔗 Enhanced Links_Marker_All": {
+    "name": "Markers on every animation",
+    "tooltip": "Flow markers over every link animation, not only Classic Flow."
   },
   "🔗 Enhanced Links_Marker_Shape": {
     "name": "Marker shape",
@@ -118,7 +130,8 @@
       "Cross": "Cross",
       "Hexagon": "Hexagon",
       "Flower": "Flower",
-      "Spiral": "Spiral"
+      "Spiral": "Spiral",
+      "Merkaba": "Merkaba"
     }
   },
   "🔗 Enhanced Links_Marker_Size": {
@@ -126,8 +139,10 @@
   },
   "🔗 Enhanced Links_Marker_Color_Mode": {
     "name": "Marker color",
+    "tooltip": "Same as link follows custom link colors.",
     "options": {
       "Link type color": "Link type color",
+      "Same as link": "Same as link",
       "Custom": "Custom"
     }
   },
@@ -149,17 +164,27 @@
   },
   "🔗 Enhanced Links_Link_Shadow_Enabled": {
     "name": "Link shadow",
-    "tooltip": "Drop shadow under links in Classic Flow."
+    "tooltip": "Dark outline under links in Classic Flow, which makes them stand out."
   },
   "🔗 Enhanced Links_Marker_Shadow_Enabled": {
     "name": "Marker shadow",
-    "tooltip": "Drop shadow under flow markers."
+    "tooltip": "Dark outline under flow markers."
+  },
+  "🔗 Enhanced Links_Shadow_Style": {
+    "name": "Shadow style",
+    "tooltip": "Halo is the soft dark outline v1 drew; Drop shadow is offset, as in v2.",
+    "options": {
+      "Halo (v1)": "Halo (v1)",
+      "Drop shadow (v2)": "Drop shadow (v2)"
+    }
   },
   "🔗 Enhanced Links_Shadow_Blur": {
-    "name": "Drop shadow blur"
+    "name": "Drop shadow blur",
+    "tooltip": "Used by Drop shadow."
   },
   "🔗 Enhanced Links_Shadow_Offset": {
-    "name": "Drop shadow offset"
+    "name": "Drop shadow offset",
+    "tooltip": "Used by Drop shadow."
   },
   "🔗 Enhanced Links_Coexist": {
     "name": "Other link extensions",
@@ -172,7 +197,7 @@
   },
   "📦 Enhanced Nodes_Animate": {
     "name": "Node effect",
-    "tooltip": "Effect drawn on and around every node.",
+    "tooltip": "Effect drawn on and around every node. Node FX in the node menu picks one for a node.",
     "options": {
       "None": "None",
       "Gentle Pulse": "Gentle Pulse",
@@ -183,7 +208,7 @@
   },
   "📦 Enhanced Nodes_Animations_Enabled": {
     "name": "Show base effect",
-    "tooltip": "Off hides the effect but keeps node particles."
+    "tooltip": "Off draws only the effect's own particles."
   },
   "📦 Enhanced Nodes_Animation_Speed": {
     "name": "Node effect speed"
@@ -206,7 +231,7 @@
   },
   "📦 Enhanced Nodes_Animation_Glow": {
     "name": "Node effect bloom",
-    "tooltip": "Multiplies Node effect energy."
+    "tooltip": "Glow of the effect's lines and light, and of the hover outline."
   },
   "📦 Enhanced Nodes_Quality": {
     "name": "Node effect quality",
@@ -219,11 +244,15 @@
   },
   "📦 Enhanced Nodes_Glow_Show": {
     "name": "Node effect glow",
-    "tooltip": "Off draws node effects without glow."
+    "tooltip": "A halo in the effect's primary color around each node with an effect."
   },
   "📦 Enhanced Nodes_Glow": {
     "name": "Node glow strength",
-    "tooltip": "Glow of node effects and the hover outline."
+    "tooltip": "How far the halo and the selection frame glow."
+  },
+  "📦 Enhanced Nodes_Selection_Glow": {
+    "name": "Glowing frame around selected nodes",
+    "tooltip": "On nodes with an effect."
   },
   "📦 Enhanced Nodes_Color_Hover_Show": {
     "name": "Hover outline",
@@ -268,7 +297,13 @@
     "tooltip": "Also drawn when Node effect is None."
   },
   "📦 Enhanced Nodes_Particle_Density": {
-    "name": "Node particle density"
+    "name": "Node particle density",
+    "options": {
+      "Minimal": "Minimal",
+      "Balanced": "Balanced",
+      "Dense": "Dense",
+      "Ultra": "Ultra"
+    }
   },
   "📦 Enhanced Nodes_Particle_Size": {
     "name": "Node particle size"
@@ -285,7 +320,7 @@
   },
   "📦 Enhanced Nodes_Particle_Color_Mode": {
     "name": "Node particle colors",
-    "tooltip": "Complementary is the opposite hue of the node accent color.",
+    "tooltip": "Particle color takes Node particle color with Custom colors, else the effect's primary color; Complementary takes its opposite hue.",
     "options": {
       "Particle color": "Particle color",
       "Rainbow": "Rainbow",
@@ -297,7 +332,7 @@
   },
   "📦 Enhanced Nodes_Color_Particle": {
     "name": "Node particle color",
-    "tooltip": "Used when Node particle colors is Particle color."
+    "tooltip": "Used when Node effect colors is Custom."
   },
   "📦 Enhanced Nodes_Text_Animation_Enabled": {
     "name": "Animated titles",
@@ -314,7 +349,8 @@
     }
   },
   "📦 Enhanced Nodes_Text_Color": {
-    "name": "Title color"
+    "name": "Title color",
+    "tooltip": "Used when Node effect colors is Custom; otherwise titles take the effect's accent color."
   },
   "📦 Enhanced Nodes_Text_Size": {
     "name": "Title size"
@@ -344,10 +380,10 @@
   },
   "📦 Enhanced Nodes_Pause_During_Render": {
     "name": "Pause node effects during runs",
-    "tooltip": "Node effects hold still while the queue is running; their particles keep moving."
+    "tooltip": "Node effects and their particles hold still while the queue is running."
   },
   "📦 Enhanced Nodes_End Animation_Enabled": {
-    "name": "Completion effect",
-    "tooltip": "Has no effect yet."
+    "name": "Fireworks when a run finishes",
+    "tooltip": "Above your run's output nodes. Completion FX in the node menu sets them for one node."
   }
 }

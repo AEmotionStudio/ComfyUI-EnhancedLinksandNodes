@@ -12,7 +12,7 @@
     "gen:settings": "vitest run tests/unit/settings-files.test.ts -u",
     "e2e": "playwright test",
     "e2e:perf": "ELN_PERF=1 playwright test --grep @perf",
-    "e2e:gallery": "ELN_GALLERY=1 playwright test --grep @gallery --project fe157 --project fe1395",
+    "e2e:gallery": "ELN_GALLERY=1 playwright test --grep @gallery --project fe157 --project fe1395 --project v1-ref",
     "e2e:serve": "node tests/e2e/serve.mjs",
     "type-check": "tsc --noEmit && tsc --noEmit -p tests/e2e",
     "lint": "tsc --noEmit && tsc --noEmit -p tests/e2e && echo 'Type check passed'"

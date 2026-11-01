@@ -15,8 +15,16 @@ import { L, N, revision } from '@/core/settings';
 
 type Canvas = typeof app.canvas;
 
-/** v2.0.1's phase rate at speed 1: a turn every 15 s. */
-const TURN = (2 * Math.PI) / 15;
+/** v1's node phase rate at speed 1 (AnimationController.transitionSpeed, old_node_animations.js:71-127): a turn every 15 s. */
+export const TURN = (2 * Math.PI) / 15;
+/** v1's link phase turned PHI² radians a second at speed 1 (old_link_animations.js:260-285), a turn every 2.40 s. */
+const PHI2 = ((1 + Math.sqrt(5)) / 2) ** 2;
+/** A Direction change turns links and nodes around over this many seconds. */
+const TURNAROUND = 0.3;
+/** WCAG 2.3.1: what flashes does so at most three times a second. */
+export const MAX_FLASH_HZ = 3;
+/** Quantum Field's five filaments each sweep round their link once a turn of its phase. */
+const QUANTUM_SWEEPS = 5;
 const MAX_FPS = 60;
 /** rAF timestamps jitter around the display's interval, so a frame this much early still counts. */
 const JITTER_MS = 1;
@@ -25,12 +33,21 @@ const GUARD_MS = 10_000;
 const FAILURES = 5;
 
 /**
- * The animation clock in v2's units: the link phase and flow time (the renderers
- * scale it by speed), the node effect phase and the node particle phase. Only
- * the ticker moves it, never a draw, so a canvas drawn again within a frame (as
- * MagnifyGlass does) shows the same moment.
+ * The animation clock. The links run on v1's (old_link_animations.js:260-303, 2457-2459, 3186-3190): their phase
+ * falls by PHI² × speed radians a second going Forward, and their flow grows by 2 × speed² a second, signed by the
+ * direction, as v1 added speed × the frame's time to its own time twice a frame and its renderers took that times the
+ * speed again. linkDir is the way they run, which turns around over TURNAROUND when Direction changes; nothing wraps.
+ * quantumPhase is the link phase for Quantum Field: it turns as fast, but never so fast that its filaments sweep round
+ * more than MAX_FLASH_HZ times a second, which binds above speed 1.44. The nodes run on v1's 60 Hz rates
+ * (old_node_animations.js:71-127, 2945-2957), whatever the frame rate: their phase turns TURN × speed radians a second,
+ * their particles' time runs Particle.Speed seconds a second and nodeTime one, and nodeDir turns them around as linkDir
+ * does the links. burstTime runs a second a second while a burst plays, from 0 as its show starts. Only the ticker moves
+ * the clock, never a draw, so a canvas drawn again within a frame (as MagnifyGlass does) shows the same moment.
  */
-export const clock = { linkPhase: 0, linkTime: 0, nodePhase: 0, particlePhase: 0 };
+export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0 };
+
+/** The pose of still links: the first frame v1 drew in Static mode (old_link_animations.js:2440-2456). */
+export const STILL_PHASE = (9 * Math.PI) / 4;
 
 /** Whether the queue is running (v2's rule: the global 'status' event), and whether the user asked for less motion. */
 export const env = { running: false, reducedMotion: false };
@@ -41,9 +58,10 @@ export const env = { running: false, reducedMotion: false };
  * styled titles) and particles. A count a pass missed keeps its value, so the
  * ticker runs on until heal() chains the hook that was replaced. The link pass
  * counts the moving segments it records for the same reason: they show only
- * once the link layer's hook runs.
+ * once the link layer's hook runs. bursts counts the particles of the bursts
+ * playing, on screen or not, so that they end.
  */
-export const live = { links: 0, nodes: 0, particles: 0 };
+export const live = { links: 0, nodes: 0, particles: 0, bursts: 0 };
 
 /**
  * A layer of each front pass, in graph space: `over` is false when onRender
@@ -52,15 +70,22 @@ export const live = { links: 0, nodes: 0, particles: 0 };
  */
 type Layer = (canvas: Canvas, ctx: CanvasRenderingContext2D, over: boolean) => void;
 
-/** The layers each extension's setup() puts in place: what the node effects draw around the nodes, under the link motion, and the link motion. */
-export const layers: { nodes?: (canvas: Canvas, ctx: CanvasRenderingContext2D) => void; links?: Layer } = {};
+/**
+ * The layers each extension's setup() puts in place: what the node effects draw around the nodes, under the link
+ * motion; the link motion; and the bursts, over everything.
+ */
+export const layers: { nodes?: (canvas: Canvas, ctx: CanvasRenderingContext2D) => void; links?: Layer; bursts?: (canvas: Canvas, ctx: CanvasRenderingContext2D) => void } = {};
+
+/** A canvas nobody sees: an OffscreenCanvas, or a canvas element where the browser has none. */
+export function offscreen(width: number, height: number): OffscreenCanvas | HTMLCanvasElement {
+    return typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(width, height) : Object.assign(document.createElement('canvas'), { width, height });
+}
 
 let sink: CanvasRenderingContext2D | undefined;
 
 /** A 1×1 canvas nobody sees, where native draws what we draw ourselves (link segments, styled titles), so other wrappers still get their call. */
 export function dummy(): CanvasRenderingContext2D {
-    sink ??= (typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(1, 1) : Object.assign(document.createElement('canvas'), { width: 1, height: 1 }))
-        .getContext('2d') as CanvasRenderingContext2D;
+    sink ??= offscreen(1, 1).getContext('2d') as CanvasRenderingContext2D;
     return sink;
 }
 
@@ -70,17 +95,30 @@ let last = 0;
 
 /** Whether the front canvas needs repainting: anything animated is on screen and the tab shows. */
 function want(): boolean {
-    return !document.hidden && live.links + live.nodes + live.particles > 0;
+    return !document.hidden && live.links + live.nodes + live.particles + live.bursts > 0;
 }
+
+/** Moves a direction toward `to` by what turning around in TURNAROUND allows in `dt`. */
+const toward = (dir: number, to: number, dt: number) => dir + Math.max((-2 * dt) / TURNAROUND, Math.min((2 * dt) / TURNAROUND, to - dir));
 
 function advance(dt: number): void {
     if (live.links) {
-        clock.linkPhase += TURN * Math.max(0.01, L.animationSpeed) * L.direction * dt;
-        // v2 added each frame's delta to the flow time twice: in drawConnections and in its own rAF loop.
-        clock.linkTime += 2 * dt;
+        const speed = L.animationSpeed;
+        clock.linkDir = toward(clock.linkDir, L.direction, dt);
+        clock.linkPhase -= PHI2 * speed * clock.linkDir * dt;
+        clock.linkFlow += 2 * speed * speed * clock.linkDir * dt;
+        clock.quantumPhase -= Math.min(PHI2 * speed, (2 * Math.PI * MAX_FLASH_HZ) / QUANTUM_SWEEPS) * clock.linkDir * dt;
+    } else {
+        // Links that are not moving turn around at once.
+        clock.linkDir = L.direction;
     }
-    if (live.nodes) clock.nodePhase += TURN * N.animationSpeed * N.direction * dt;
-    if (live.particles) clock.particlePhase += TURN * Math.max(0.01, N.particleSpeed) * N.direction * dt;
+    clock.nodeDir = live.nodes || live.particles ? toward(clock.nodeDir, N.direction, dt) : N.direction;
+    if (live.nodes) clock.nodePhase += TURN * N.animationSpeed * clock.nodeDir * dt;
+    if (live.particles) {
+        clock.particleTime += N.particleSpeed * clock.nodeDir * dt;
+        clock.nodeTime += dt;
+    }
+    if (live.bursts) clock.burstTime += dt;
 }
 
 function tick(now: number): void {
@@ -91,6 +129,9 @@ function tick(now: number): void {
     }
     if (!last) {
         last = now;
+        // The clock starts again: links and nodes run the way Direction says, without turning around.
+        clock.linkDir = L.direction;
+        clock.nodeDir = N.direction;
     } else if (now - last >= 1000 / MAX_FPS - JITTER_MS) {
         advance(Math.min((now - last) / 1000, 0.1));
         last = now;
@@ -135,6 +176,7 @@ const hooks = {
         ctx: 0,
         draw(canvas: Canvas, ctx: CanvasRenderingContext2D) {
             layers.links?.(canvas, ctx, true);
+            layers.bursts?.(canvas, ctx);
         },
         installed: undefined as unknown,
         called: false,

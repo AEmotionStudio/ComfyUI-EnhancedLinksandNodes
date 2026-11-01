@@ -162,6 +162,12 @@ function renderLinkMarkerSection(container: HTMLElement): void {
     ));
 
     body.appendChild(control(
+        'On Every Animation',
+        '🔗 Enhanced Links.Marker.All',
+        'Show the markers over every animation, not only Classic Flow'
+    ));
+
+    body.appendChild(control(
         'Shape',
         '🔗 Enhanced Links.Marker.Shape',
         'Shape of the flow markers'
@@ -206,13 +212,19 @@ function renderLinkShadowSection(container: HTMLElement): void {
     body.appendChild(control(
         'Link Shadows',
         '🔗 Enhanced Links.Link.Shadow.Enabled',
-        'Enable drop shadows on links'
+        'Dark outline under Classic Flow links'
     ));
 
     body.appendChild(control(
         'Marker Shadows',
         '🔗 Enhanced Links.Marker.Shadow.Enabled',
-        'Enable drop shadows on markers'
+        'Dark outline under markers'
+    ));
+
+    body.appendChild(control(
+        'Shadow Style',
+        '🔗 Enhanced Links.Shadow.Style',
+        'Halo as in v1, or an offset drop shadow as in v2'
     ));
 
     container.appendChild(section);
@@ -259,7 +271,7 @@ function renderNodeAnimationSection(container: HTMLElement): void {
     body.appendChild(control(
         'End Animation',
         '📦 Enhanced Nodes.End Animation.Enabled',
-        'Play completion animation when a node finishes processing'
+        'Fireworks over the output nodes when a run finishes'
     ));
 
     body.appendChild(control(

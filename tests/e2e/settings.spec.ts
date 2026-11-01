@@ -82,7 +82,8 @@ test.describe('with stored values that need migrating', () => {
         expect(posts.filter(ours)).toEqual([]);
         const saved = await (await request.get('/settings', { headers: { 'comfy-user': user } })).json();
         expect(saved).toMatchObject(stored);
-        expect(await settingValues(page, Object.keys(stored))).toEqual(['none', 2, '#ffff00', 2]);
+        // Node glows take v1's range, 0 to 1, since M4.
+        expect(await settingValues(page, Object.keys(stored))).toEqual(['none', 2, '#ffff00', 1]);
     });
 });
 
@@ -124,7 +125,8 @@ test.describe('with the link extension disabled', () => {
             'Comfy.Extension.Disabled': ['enhanced.link.animations'],
             '📦 Enhanced Nodes.Animate': 1,
             '📦 Enhanced Nodes.Color.Mode': 'custom',
-            '📦 Enhanced Nodes.Color.Primary': '#ff0000',
+            // Gentle Pulse reads a colour's channels at 0 as 255, as v1's did, so one with none at 0 shows as stored.
+            '📦 Enhanced Nodes.Color.Primary': '#ff4020',
         },
     });
 
@@ -155,7 +157,7 @@ test.describe('with the link extension disabled', () => {
             };
             requestAnimationFrame(check);
         }));
-        expect(colours.filter((c) => c.startsWith('rgba(255, 0, 0,'))).not.toEqual([]);
+        expect(colours.filter((c) => c.startsWith('rgba(255, 64, 32,'))).not.toEqual([]);
     });
 });
 

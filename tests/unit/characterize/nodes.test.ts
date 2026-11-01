@@ -1,47 +1,53 @@
 /**
- * Level A node traces: the exported v2 node effects driven with v1 inputs.
- * nodes-rich/ adds Quality 3, the hover outline, half particle glow and each
- * particle colour mode, in v1's colours (v1ParticleColor) rather than v2's
- * getParticleColor. v1-crosscheck.test.ts checks these files against v1's own
- * effects and pins where they differ: Gentle Pulse's colours and Flower of
- * Life's orbiting dots are the port's, not v1's. v1-features.test.ts traces
- * what v2 has no port of.
+ * Level A node traces: v3's node effects (nodes/effects.ts) drawn whole, its
+ * titles (nodes/text.ts) and its fireworks (fx/bursts.ts), in the Classic
+ * config of v1's settings and at v1's clock (v1-inputs.ts), against what v1
+ * drew, compared as level-a.ts says: nodes/, nodes-rich/ (Quality 3, the hover
+ * outline, half the particle glow and each particle colour mode),
+ * nodes-particles-only/ (Show base effect off), text/ and nodes/fireworks.txt. The committed Gentle Pulse and
+ * Flower of Life traces in nodes/ and nodes-rich/ are v2's port of them, which
+ * v1-crosscheck.test.ts shows: v3 draws v1's own, as their deviations say.
+ * Each deviation that names these frames must change at least one.
  */
 
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { drawParticles } from '@/effects/node-effects';
-import { NODE_EFFECTS, V1_PARTICLE_TIME, traceNodes, v1NodeSettings, v1ParticleColor, v2NodeEffect } from './v1-inputs';
+import { describe, it, expect, afterAll, vi } from 'vitest';
+import { compare, stale } from './level-a';
+import { NODE_EFFECTS, V1_NODE_RICH_SETTINGS, V1_PARTICLE_TIME, traceFireworks, traceNodes, v3NodeEffect, v3Title } from './v1-inputs';
 
-afterEach(() => {
+const TEXT_STYLES = ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal'];
+
+afterAll(() => {
     vi.restoreAllMocks();
 });
 
 describe('v1 node traces', () => {
-    for (const [effect, slug, name] of NODE_EFFECTS) {
-        it(name, async () => {
-            const rec = traceNodes(`${name}: v2 node effect with v1 inputs`, V1_PARTICLE_TIME[effect], v2NodeEffect(effect));
-            await expect(rec.trace()).toMatchFileSnapshot(`../__traces__/v1/nodes/${slug}.txt`);
+    NODE_EFFECTS.forEach(([effect, slug, name], i) => {
+        const style = i + 1;
+
+        it(name, () => {
+            compare(`nodes/${slug}.txt`, traceNodes('', V1_PARTICLE_TIME[effect], v3NodeEffect(style)).trace());
         });
 
-        it(`${name} with other v1 settings`, async () => {
-            const rec = traceNodes(`${name}: v2 node effect with Quality 3, the hover outline, Particle.Glow 0.5 and each particle colour mode`, V1_PARTICLE_TIME[effect],
-                v2NodeEffect(effect, true),
-                true,
-            );
-            await expect(rec.trace()).toMatchFileSnapshot(`../__traces__/v1/nodes-rich/${slug}.txt`);
+        it(`${name} with other v1 settings`, () => {
+            compare(`nodes-rich/${slug}.txt`, traceNodes('', V1_PARTICLE_TIME[effect], v3NodeEffect(style, V1_NODE_RICH_SETTINGS), true).trace());
+        });
+
+        it(`${name}, particles only`, () => {
+            compare(`nodes-particles-only/${slug}.txt`, traceNodes('', V1_PARTICLE_TIME[effect], v3NodeEffect(style, { '📦 Enhanced Nodes.Animations.Enabled': false }, true)).trace());
+        });
+    });
+
+    for (const style of TEXT_STYLES) {
+        it(`title text ${style}`, () => {
+            compare(`text/${style}.txt`, traceNodes('', (c) => c.phase, v3Title(style)).trace());
         });
     }
-});
 
-describe('v2 node traces', () => {
-    // Not a v1 reference: v1 drew each style's own particles (v1/nodes-particles-only/).
-    it('particles-only nodes get Gentle Pulse fireflies whatever the style', async () => {
-        const rec = traceNodes('v2 particles-only path: drawParticles from the node centre for every style', V1_PARTICLE_TIME.gentlePulse,
-            (ctx, { node, clock, particleTime }) => {
-                ctx.translate(node.size[0] / 2, node.size[1] / 2);
-                drawParticles(ctx, node, v1NodeSettings(clock.phase), particleTime, v1ParticleColor());
-            },
-        );
-        await expect(rec.trace()).toMatchFileSnapshot('../__traces__/v2/particles-only.txt');
+    it('completion fireworks', () => {
+        compare('nodes/fireworks.txt', traceFireworks('').trace());
+    });
+
+    it('lists only deviations that change a frame, or that the traces cannot show', () => {
+        expect(stale()).toEqual([]);
     });
 });

@@ -247,7 +247,7 @@ test.describe('other extensions', { tag: '@interop' }, () => {
         await openApp(page);
         const graph = await buildGraph(page, graphs.pair);
         // Below 100% its glass draws the canvas again at 100%, then at the view's zoom (OffscreenRenderer.js renderVirtualZoom).
-        // With links on top, only our onDrawForeground draws the moving link, and MagnifyGlass's highlighter wraps that hook.
+        // With links on top, only our onDrawForeground draws the link's motion and centre marker, and MagnifyGlass's highlighter wraps that hook.
         await page.evaluate(() => {
             const { canvas } = window.app;
             canvas.graph.config.links_ontop = true;

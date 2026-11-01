@@ -1,10 +1,12 @@
 /**
  * Self-checks for the characterization harness: the recording context must
- * behave like a browser canvas where traces depend on it.
+ * behave like a browser canvas where traces depend on it, and canonical() keep
+ * apart what paints differently.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { CanvasRecorder, parseColor } from '../../helpers/recording-context';
+import { canonical } from '../../helpers/canonical';
 import { app, api, fake, resetFakeApp } from '../../helpers/fake-app';
 import { frames, start } from '../../helpers/fake-litegraph';
 import { mulberry32 } from '../../helpers/rng';
@@ -128,6 +130,31 @@ describe('recording context', () => {
         expect(rec.counts()).toEqual({ gradients: 1, patterns: 0, shadowBlurSets: 2, path2d: 1 });
         expect(rec.lines.slice(-4, -2)).toEqual(['path1 = Path2D[rect(0, 0, 10, 10)]', 'fill(path1)']);
         expect(rec.paints).toEqual([expect.objectContaining({ op: 'fill', style: 'grad1', shadowBlur: 4 })]);
+    });
+});
+
+describe('canonical', () => {
+    const trace = (paint: (ctx: CanvasRenderingContext2D) => void) => {
+        const rec = new CanvasRecorder();
+        paint(rec.ctx);
+        return canonical(rec.trace());
+    };
+
+    it("tells paints apart by their text's letter spacing and their fill rule", () => {
+        const text = (spacing?: string) => trace((ctx) => {
+            if (spacing) ctx.letterSpacing = spacing;
+            ctx.fillText('KSampler', 30, -15);
+        });
+        expect(text('4px')).not.toBe(text());
+        expect(text('0px')).toBe(text());
+        const star = (rule?: CanvasFillRule) => trace((ctx) => {
+            ctx.beginPath();
+            ctx.rect(0, 0, 10, 10);
+            ctx.rect(2, 2, 6, 6);
+            ctx.fill(...(rule ? [rule] : []));
+        });
+        expect(star('evenodd')).not.toBe(star());
+        expect(star('nonzero')).toBe(star());
     });
 });
 

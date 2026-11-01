@@ -6,11 +6,14 @@
  * @module tests/unit/characterize/v1-inputs
  */
 
-import type { RenderItem } from '@/effects/animated-renderers';
-import { getLinkRenderer } from '@/renderers/link-renderers';
-import { gentlePulse, neonNexus, cosmicRipple, flowerOfLife } from '@/effects/node-effects';
-import type { NodeEffectSettings } from '@/effects/types';
-import { SETTINGS, snapshotOf } from '@/core/settings';
+import { LinkPath } from '@/links/geometry';
+import { Segment } from '@/links/pipeline';
+import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
+import { drawTitle } from '@/nodes/text';
+import { drawBursts, fireworks } from '@/fx/bursts';
+import { SETTINGS, preview } from '@/core/settings';
+import { clock, live } from '@/core/engine';
+import { nodePalette, palette } from '@/core/colors';
 import type { ComfyNode } from '@/core/types';
 import { CanvasRecorder, fmt } from '../../helpers/recording-context';
 import { fake } from '../../helpers/fake-app';
@@ -46,7 +49,7 @@ export const LINK_STYLES: Array<[style: number, slug: string, name: string]> = [
 ];
 
 interface LinkFrame {
-    items: RenderItem[];
+    items: Segment[];
     phase: number;
     totalTime: number;
     direction: number;
@@ -107,13 +110,13 @@ export const V1_LINK_SETTINGS: Record<string, unknown> = {
 };
 
 /**
- * Stores `settings` for v1, which reads them through getSettingValue, and puts them in v2's snapshots as
- * they are: unmigrated, so V1_LINK_SETTINGS' NaN shadows reach the v2 renderers too. Every other setting
- * gets its default.
+ * Stores `settings` for v1, which reads them through getSettingValue, and shows them in v3's snapshots as the settings
+ * store would hand them over; every other setting shows its default. v3 reads no Shadow.Blur or Shadow.Offset for v1's
+ * centred halo, so V1_LINK_SETTINGS' NaN shadows become the defaults there.
  */
 export function storeSettings(settings: Record<string, unknown>): void {
     fake.settings = new Map(Object.entries(settings));
-    for (const s of SETTINGS) snapshotOf(s.id)[s.key] = s.id in settings ? settings[s.id] : s.default;
+    for (const s of SETTINGS) preview(s.id, s.id in settings ? settings[s.id] : s.default);
 }
 
 /**
@@ -154,18 +157,87 @@ const LINKS: Array<[start: [number, number], end: [number, number], color: strin
     [[420, 140], [380, 660], '#B39DDB'], // MODEL
 ];
 
-/** The queue items v1's drawConnections built, with Float32Array endpoints from getConnectionPos, along v2's own path for the style. */
-function linkItems(isStatic: boolean, linkStyle = 'spline'): RenderItem[] {
-    return LINKS.map(([start, end, color], i) => ({
-        start: Float32Array.from(start),
-        end: Float32Array.from(end),
-        color,
-        defaultColor: color,
-        linkStyle,
-        linkId: String(i + 1),
-        isStatic,
-        path: getLinkRenderer(linkStyle),
-    }));
+const dist = (a: ArrayLike<number>, b: ArrayLike<number>) => Math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2);
+const [LEFT, RIGHT, SPLINE] = [3, 4, 2];
+
+/**
+ * v1's own path for a link (old_link_animations.js:406-586, as v2.0.1's renderers/link-renderers.ts ported it), so the
+ * animations take v1's points: its spline, native's with both controls min(0.5 × length, 100) px out along x; its
+ * straight line; and its three legs at right angles, a third of t each. v3 draws the other Link.Style decorations
+ * along the spline. Its length is v1's, measured along 40 chords of the spline.
+ */
+class V1Path extends LinkPath {
+    constructor(private readonly style: string, start: ArrayLike<number>, end: ArrayLike<number>) {
+        super();
+        const bend = Math.min(dist(start, end) * 0.5, 100);
+        this.set(start, end, RIGHT, LEFT, SPLINE, [bend, 0], [-bend, 0]);
+        const midX = (start[0] + end[0]) / 2;
+        if (style === 'straight') this.length = dist(start, end);
+        else if (style === 'linear') this.length = Math.abs(midX - start[0]) + Math.abs(end[1] - start[1]) + Math.abs(end[0] - midX);
+        else {
+            const [point, prev] = [new Float64Array(4), new Float64Array(4)];
+            this.length = 0;
+            super.at(0, prev);
+            for (let i = 1; i <= 40; i++) {
+                super.at(i / 40, point);
+                this.length += dist(prev, point);
+                prev.set(point);
+            }
+        }
+    }
+
+    at(t: number, out: Float64Array): void {
+        const [start, end] = [this.a, this.b];
+        const midX = (start[0] + end[0]) / 2;
+        let leg: number[];
+        if (this.style === 'straight') {
+            [out[0], out[1]] = [start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t];
+            leg = [end[0] - start[0], end[1] - start[1]];
+        } else if (this.style === 'linear') {
+            if (t <= 0.33) [out[0], out[1], leg] = [start[0] + (midX - start[0]) * (t / 0.33), start[1], [midX - start[0], 0]];
+            else if (t <= 0.67) [out[0], out[1], leg] = [midX, start[1] + (end[1] - start[1]) * ((t - 0.33) / 0.34), [0, end[1] - start[1]]];
+            else [out[0], out[1], leg] = [midX + (end[0] - midX) * ((t - 0.67) / 0.33), end[1], [end[0] - midX, 0]];
+        } else {
+            super.at(t, out);
+            return;
+        }
+        const norm = Math.hypot(leg[0], leg[1]) || 1;
+        [out[2], out[3]] = [leg[0] / norm, leg[1] / norm];
+    }
+
+    draw(ctx: CanvasRenderingContext2D, color: string, thickness: number): void {
+        if (this.style !== 'straight' && this.style !== 'linear') {
+            super.draw(ctx, color, thickness);
+            return;
+        }
+        const [start, end] = [this.a, this.b];
+        const midX = (start[0] + end[0]) / 2;
+        ctx.beginPath();
+        ctx.moveTo(start[0], start[1]);
+        if (this.style === 'linear') {
+            ctx.lineTo(midX, start[1]);
+            ctx.lineTo(midX, end[1]);
+        }
+        ctx.lineTo(end[0], end[1]);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = thickness * 0.8;
+        ctx.stroke();
+    }
+}
+
+/**
+ * The queue items v1's drawConnections built, with getConnectionPos's Float32Array ends, as whole links along v1's own
+ * path for the style, in the palettes of their colours. v1's own renderers read `defaultColor`, `color` and `linkId`.
+ */
+function linkItems(isStatic: boolean, linkStyle = 'spline'): Segment[] {
+    return LINKS.map(([start, end, color], i) => {
+        const segment = new Segment();
+        segment.path = new V1Path(linkStyle, Float32Array.from(start), Float32Array.from(end));
+        segment.len = segment.chain = segment.path.length;
+        segment.pal = palette(color)!;
+        Object.assign(segment, { linkStyle, isStatic, defaultColor: color, color, linkId: String(i + 1) });
+        return segment;
+    });
 }
 
 /** One frame per time in TIMES, each drawing all three links in one renderer call. */
@@ -256,10 +328,7 @@ function nodeClock(t: number): NodeClock {
     return { phase: rate * t, particlePhase: rate * t, totalTime: t };
 }
 
-/**
- * The particle clock each v1 effect used; v2 passes ParticleController.phase to all.
- * Particle speed is 1, so v2 multiplying by particles.speed again changes nothing.
- */
+/** The particle clock each v1 effect took, which the traces' frame headers name. */
 export const V1_PARTICLE_TIME: Record<string, (clock: NodeClock) => number> = {
     gentlePulse: (c) => c.particlePhase, // :1225 ParticleController.update
     neonNexus: (c) => c.phase, // :1416 phase * particleSpeed
@@ -275,19 +344,50 @@ export const V1_NODE_RICH_SETTINGS: Record<string, unknown> = {
 };
 
 /**
- * v1 effect inputs from its registered defaults (:146-178) and drawNodeShape
- * (:2088-2099): energy is Intensity × 1.5 and bloom comes from Animation.Glow.
- * 'Glow' (1.0) only drove v1's node halo, which v2 does not draw. `rich` applies
- * V1_NODE_RICH_SETTINGS.
+ * The values v1's node extension read with an empty settings file: the defaultValue of each addSetting
+ * (old_node_animations.js:209-690), DEFAULT_SETTINGS (:146-178) for most. Its effects took energy Intensity × 1.5 and
+ * their bloom from Animation.Glow (:2088-2099); Glow drove the halo and the frame of its drawNodeShape.
  */
-export function v1NodeSettings(phase: number, rich = false): NodeEffectSettings {
-    return {
-        animation: { phase, intensity: 1.0 * 1.5, isStaticMode: false, isPaused: false, animSpeed: 1, direction: 1 },
-        quality: { quality: rich ? 3 : 1, glowIntensity: 0.5, animationSize: 1 },
-        particles: { showParticles: true, density: 0.5, speed: 1, intensity: 1.0, size: 1.0, glowIntensity: rich ? 0.5 : 1.0 },
-        colors: { primary: '#ffb300', secondary: '#fb00ff', accent: '#9d00ff', hoverColor: '#00ff15', showHover: rich },
-    };
-}
+export const V1_NODE_SETTINGS: Record<string, unknown> = {
+    '📦 Enhanced Nodes.Animate': 2,
+    '📦 Enhanced Nodes.Animations.Enabled': true,
+    '📦 Enhanced Nodes.End Animation.Enabled': false,
+    '📦 Enhanced Nodes.Static.Mode': false,
+    '📦 Enhanced Nodes.Direction': 1,
+    '📦 Enhanced Nodes.Animation.Speed': 1,
+    '📦 Enhanced Nodes.Quality': 1,
+    '📦 Enhanced Nodes.Particle.Density': 0.5,
+    '📦 Enhanced Nodes.Intensity': 1,
+    '📦 Enhanced Nodes.Glow': 1,
+    '📦 Enhanced Nodes.Animation.Glow': 0.5,
+    '📦 Enhanced Nodes.Glow.Show': true,
+    '📦 Enhanced Nodes.Color.Mode': 'custom',
+    '📦 Enhanced Nodes.Color.Scheme': 'default',
+    '📦 Enhanced Nodes.Color.Primary': '#ffb300',
+    '📦 Enhanced Nodes.Color.Secondary': '#fb00ff',
+    '📦 Enhanced Nodes.Color.Accent': '#9d00ff',
+    '📦 Enhanced Nodes.Color.Hover': '#00ff15',
+    '📦 Enhanced Nodes.Color.Particle': '#ffb300',
+    '📦 Enhanced Nodes.Particle.Glow': 1,
+    '📦 Enhanced Nodes.Particle.Intensity': 1,
+    '📦 Enhanced Nodes.Particle.Color.Mode': 'default',
+    '📦 Enhanced Nodes.Particle.Size': 1,
+    '📦 Enhanced Nodes.Particle.Speed': 1,
+    '📦 Enhanced Nodes.Color.Hover.Show': false,
+    '📦 Enhanced Nodes.Particle.Show': true,
+    '📦 Enhanced Nodes.Pause.During.Render': true,
+    '📦 Enhanced Nodes.Animation.Size': 1,
+    '📦 Enhanced Nodes.Text.Animation.Enabled': false,
+    '📦 Enhanced Nodes.Text.Color': '#00ffff',
+    '📦 Enhanced Nodes.Text.Glow': 0.5,
+    '📦 Enhanced Nodes.Text.Size': 14,
+    '📦 Enhanced Nodes.Text.Style': 'neon',
+    '📦 Enhanced Nodes.Text.Letter.Spacing': 0,
+    '📦 Enhanced Nodes.Text.Position.Y': 0,
+    '📦 Enhanced Nodes.Text.Position.X': 0,
+    '📦 Enhanced Nodes.Text.Rotation.Radius': 0,
+    '📦 Enhanced Nodes.Text.Rotation.Angle': 0,
+};
 
 const PARTICLE_COLOR_MODES = ['default', 'rainbow', 'complementary', 'energy', 'quantum', 'aurora'];
 
@@ -334,7 +434,7 @@ interface NodeFrame {
 
 type NodeDraw = (ctx: CanvasRenderingContext2D, frame: NodeFrame) => void;
 
-/** The v1 node effects v2 ports: [effect, trace file, name]. */
+/** The v1 node effects: [effect, trace file, name], in Animate order from 1. */
 export const NODE_EFFECTS: Array<[effect: string, slug: string, name: string]> = [
     ['gentlePulse', '1-gentle-pulse', 'Gentle Pulse'],
     ['neonNexus', '2-neon-nexus', 'Neon Nexus'],
@@ -342,15 +442,69 @@ export const NODE_EFFECTS: Array<[effect: string, slug: string, name: string]> =
     ['flowerOfLife', '4-flower-of-life', 'Flower of Life'],
 ];
 
-const V2_EFFECTS: Record<string, typeof gentlePulse> = { gentlePulse, neonNexus, cosmicRipple, flowerOfLife };
+/** Both sides of a node's edge at once: every element of an effect, in v1's order. */
+export const WHOLE: Part = { sides: UNDER | OVER, x0: 0, y0: 0, x1: 0, y1: 0, round: -1 };
 
 /**
- * The v2 port of a v1 effect, given what v1 handed its own (`rich`: V1_NODE_RICH_SETTINGS). nodes.test.ts
- * commits what it draws and v1-crosscheck.test.ts compares that with v1, so both must use this one driver.
+ * v3's effect `style` drawn whole, as v1 drew its effects, in the Classic config: v1's settings with `settings` over
+ * them and the frame's particle colour mode, at v1's clock. v3's particle time is v1's time at speed 1, of which
+ * Gentle Pulse takes TURN × it, as v1's ParticleController did. The traces are of v1's effects alone, so the frame
+ * v1's drawNodeShape drew round them (Selection.Glow) is off.
  */
-export function v2NodeEffect(effect: string, rich = false): NodeDraw {
-    return (ctx, { node, clock, particleTime, particleColorMode }) =>
-        V2_EFFECTS[effect](ctx, node, v1NodeSettings(clock.phase, rich), particleTime, v1ParticleColor(particleColorMode));
+export function v3NodeEffect(style: number, settings: Record<string, unknown> = {}, only = false): NodeDraw {
+    return (ctx, { node, clock, particleColorMode }) => {
+        storeSettings({ ...V1_NODE_SETTINGS, ...settings, '📦 Enhanced Nodes.Particle.Color.Mode': particleColorMode, '📦 Enhanced Nodes.Selection.Glow': false });
+        drawNodeFx(ctx, style, node, node.size[0], node.size[1], { nodePhase: clock.phase, particleTime: clock.totalTime, nodeTime: clock.totalTime }, WHOLE, 1, only);
+    };
+}
+
+/**
+ * v3's title in Text.Style `style`, in the Classic config, where v1's drawNodeShape drew its own (old_node_animations.js:
+ * 2116-2121): centred 16 px into the node, here left-aligned from where that text begins.
+ */
+export function v3Title(style: string): NodeDraw {
+    return (ctx, { node, clock: v1 }) => {
+        storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Text.Style': style });
+        ctx.font = `14px ${LiteGraph.NODE_FONT}`;
+        const width = ctx.measureText(node.title).width;
+        drawTitle(ctx, { text: node.title, width }, node.size[0] / 2 - width / 2, 16, nodePalette(2).title, v1.phase, 1);
+    };
+}
+
+/** The view v1's fireworks trace drew on: a 1600 × 900 canvas at zoom 1, and a node at its origin, as v1's drawNodeShape drew them in the node's space. */
+function fireworksView(): { canvas: Parameters<typeof drawBursts>[0]; node: Parameters<typeof fireworks>[0][number] } {
+    const graph = {};
+    return {
+        canvas: { visible_area: new Float32Array([0, 0, 1600, 900]), ds: { scale: 1 }, graph } as unknown as Parameters<typeof drawBursts>[0],
+        node: { id: 1, pos: [0, 0], graph } as unknown as Parameters<typeof fireworks>[0][number],
+    };
+}
+
+/** v1's completionPhase frames (old_node_animations.js:2921-2923), on clock.burstTime: 0.014 a frame at 60 Hz, 0.84 a second. */
+export const FIREWORK_PHASES = [0.15, 0.5, 0.9];
+
+/** The time on the burst clock, which starts at 0 with each show, at which a show has got exactly to v1's `phase`. */
+function showTime(phase: number): number {
+    const time = phase / 0.84;
+    const ulp = Number.EPSILON * time;
+    return [0, 1, -1, 2, -2].map((n) => time + n * ulp).find((t) => t * 0.84 === phase) ?? time;
+}
+
+/** v3's fireworks in the Classic config, a show over fireworksView()'s node, drawn at each of FIREWORK_PHASES. */
+export function traceFireworks(title: string): CanvasRecorder {
+    storeSettings(V1_NODE_SETTINGS);
+    const { canvas, node } = fireworksView();
+    // Past the end of any show before.
+    clock.burstTime += 1000;
+    fireworks([node], 'run');
+    const rec = traceFrames(title, FIREWORK_PHASES.map((phase) => [`completionPhase=${phase}`, (ctx) => {
+        clock.burstTime = showTime(phase);
+        drawBursts(canvas, ctx);
+    }]));
+    // The show is over, though its particles stay in the pool until the next.
+    clock.burstTime = 1 / 0.84;
+    live.bursts = 0;
+    return rec;
 }
 
 /**

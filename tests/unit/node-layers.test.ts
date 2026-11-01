@@ -1,46 +1,49 @@
 /**
  * The node layers (src/extensions/node-animations.ts) on the fake LiteGraph:
- * each v2 effect draws on its node's body once native filled it, clipped to the
- * body and under the widgets, and what it draws around the body under every
- * node, for every node whose effect reaches the screen. The styled title takes
- * the native title's place. Node modes fade the effects as native fades the
- * node; collapsed nodes, and Vue mode, get none. A failing effect leaves the
- * canvas as it found it, and the guard turns it off.
+ * each effect draws its part on its node's body once native filled it, clipped
+ * to the body and under the widgets, and its part around the body under every
+ * node, for every node whose effect reaches the screen. The body casts v1's
+ * halo. The styled title takes the native title's place. Node modes fade the
+ * effects as native fades the node; collapsed nodes, and Vue mode, get none. A
+ * failing effect leaves the canvas as it found it, and the guard turns it off.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { clock, dummy, guard, layers, live } from '@/core/engine';
-import { preview } from '@/core/settings';
+import { N, preview } from '@/core/settings';
+import * as colors from '@/core/colors';
+import { OVER, UNDER, drawNodeFx } from '@/nodes/effects';
 import { fake } from '../helpers/fake-app';
-import { CanvasRecorder, parseColor } from '../helpers/recording-context';
-import { mulberry32 } from '../helpers/rng';
+import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
 import { FakeCanvas, FakeNode, frames, page, start, type GraphSpec } from '../helpers/fake-litegraph';
+import { WHOLE } from './characterize/v1-inputs';
 
 /**
- * Each call to a node effect or to drawParticles: its context and node, and where its lines and paints start
- * and end on `rec`. With `fail` set the calls move the canvas and throw instead of drawing.
+ * Each call to drawNodeFx: its context, node and sides, and where its lines and paints start and end on `rec`.
+ * With `fail` set the calls move the canvas and throw instead of drawing.
  */
 const probe = vi.hoisted(() => ({
     rec: undefined as CanvasRecorder | undefined,
-    calls: [] as { ctx: CanvasRenderingContext2D; node: unknown; line: number; from: number; to: number }[],
+    calls: [] as { ctx: CanvasRenderingContext2D; node: unknown; sides: number; only: boolean; line: number; from: number; to: number }[],
     fail: false,
 }));
 
-vi.mock('@/effects/node-effects', async (importOriginal) => {
-    const effects = await importOriginal<typeof import('@/effects/node-effects')>();
-    type Effect = typeof effects.gentlePulse;
-    const watch = (draw: Effect): Effect => (...args) => {
-        const [ctx, node] = args;
-        const [line, from] = [probe.rec?.lines.length ?? 0, probe.rec?.paints.length ?? 0];
-        if (probe.fail) {
-            ctx.translate(1, 1);
-            ctx.globalAlpha = 0.5;
-            throw new Error('boom');
-        }
-        draw(...args);
-        probe.calls.push({ ctx, node, line, from, to: probe.rec?.paints.length ?? 0 });
+vi.mock('@/nodes/effects', async (importOriginal) => {
+    const effects = await importOriginal<typeof import('@/nodes/effects')>();
+    return {
+        ...effects,
+        drawNodeFx: (...args: Parameters<typeof effects.drawNodeFx>) => {
+            const [ctx, , node, , , , part, , only] = args;
+            const [line, from] = [probe.rec?.lines.length ?? 0, probe.rec?.paints.length ?? 0];
+            if (probe.fail) {
+                ctx.translate(1, 1);
+                ctx.globalAlpha = 0.5;
+                throw new Error('boom');
+            }
+            effects.drawNodeFx(...args);
+            probe.calls.push({ ctx, node, sides: part.sides, only, line, from, to: probe.rec?.paints.length ?? 0 });
+        },
     };
-    return { ...effects, getNodeEffect: (style: number) => watch(effects.getNodeEffect(style)), drawParticles: watch(effects.drawParticles) };
 });
 
 afterEach(() => {
@@ -65,8 +68,12 @@ function frame(canvas: FakeCanvas) {
     return { lines: canvas.front.lines.slice(first), calls: probe.calls.map((call) => ({ ...call, line: call.line - first })) };
 }
 
-/** Where the fake fills a node's body in a frame's lines: the fill() after native sets the body colour. */
-const bodyFill = (lines: string[], from = 0) => lines.indexOf('fill()', lines.indexOf('fillStyle = #353535', from));
+/** Where the fake fills a node's body in a frame's lines: the fill() after drawNodeShape sets its colours. */
+const bodyFill = (lines: string[], from = 0) => lines.indexOf('fill()', lines.indexOf('strokeStyle = #333333', from));
+
+/** The bodies native fills, in its colour; and the halos, fills off to the side whose shadow alone lands on their node. */
+const bodies = (paints: CanvasRecorder['paints']) => paints.filter((p) => p.op === 'fill' && p.style === '#353535' && p.shadowOffsetX >= 0);
+const halos = (paints: CanvasRecorder['paints']) => paints.filter((p) => p.op === 'fill' && p.shadowOffsetX < 0);
 
 /**
  * How far paints reach past a box (left, top, right, bottom) on each of those sides: their boxes with half
@@ -96,18 +103,52 @@ describe('node effects', () => {
             const under = calls.filter((call) => call.line < fill);
             const [over, ...more] = calls.filter((call) => call.line > fill);
             expect(more).toEqual([]);
+            expect(over.sides).toBe(OVER);
             expect(over.line).toBeLessThan(lines.indexOf('fillRect(10, 10, 200, 20)'));
             // Clipped to the path native filled the body with.
             expect(lines[lines.lastIndexOf('clip()', over.line) - 1]).toBe(lines[fill - 1]);
-            // Around the body only where its drawing reaches past it: within the screen, without the body.
-            const reaches = Math.max(...overhang(canvas.front.paints.slice(over.from, over.to), [300, 300, 520, 420])) > 0;
+            // Around the body only where the whole effect reaches past it: within the screen, without the body.
+            const whole = new CanvasRecorder();
+            drawNodeFx(whole.ctx, animate, canvas.graph._nodes[0], 220, 120, clock, WHOLE, 1, animate === 0);
+            const reaches = Math.max(...overhang(whole.paints, [0, -30, 220, 120])) > 0;
             expect(under).toHaveLength(reaches ? 1 : 0);
             if (!reaches) return;
+            expect(under[0].sides).toBe(UNDER);
             const clip = lines.lastIndexOf('clip("evenodd")', under[0].line);
             expect(lines.slice(clip - 2, clip)).toEqual(['rect(-300, -300, 1600, 900)', lines[fill - 1]]);
             expect(under[0].ctx).toBe(canvas.ctx);
         });
     }
+
+    it('draw between their two parts what they draw whole, each element in the parts it reaches', async () => {
+        const canvas = await start({ ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Color.Hover.Show': true }, { nodes: [KSAMPLER] });
+        const [node] = canvas.graph._nodes;
+        [node.selected, node.mouseOver] = [true, true];
+        for (const [name, animate] of EFFECTS) {
+            preview('📦 Enhanced Nodes.Animate', animate);
+            const paints = (sides: number) => {
+                const rec = new CanvasRecorder();
+                const part = { sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 };
+                drawNodeFx(rec.ctx, animate, node, 220, 120, clock, sides === (UNDER | OVER) ? WHOLE : part, 1, animate === 0);
+                // A gradient's label counts the gradients made before it, which a part makes fewer of.
+                return rec.paints.map((p) => JSON.stringify({ ...p, style: p.style.replace(/^grad\d+$/, 'gradient') }));
+            };
+            const [whole, under, over] = [UNDER | OVER, UNDER, OVER].map(paints);
+            // Each part draws only what the whole does, in its order, and together they draw all of it.
+            const within = (part: string[]) => {
+                let at = 0;
+                for (const p of part) {
+                    at = whole.indexOf(p, at) + 1;
+                    if (!at) return false;
+                }
+                return true;
+            };
+            expect(within(under), `${name}, under`).toBe(true);
+            expect(within(over), `${name}, over`).toBe(true);
+            expect(new Set([...under, ...over]), name).toEqual(new Set(whole));
+            expect(under.length + over.length, name).toBeLessThan(2 * whole.length);
+        }
+    });
 
     it('clip to the body in its shape, and to a box in low quality, as native fills it', async () => {
         const paths: string[] = [];
@@ -116,7 +157,8 @@ describe('node effects', () => {
             canvas.low_quality = lowQuality;
             const { lines, calls } = frame(canvas);
             const fill = bodyFill(lines);
-            expect(lines[lines.lastIndexOf('clip()', calls[0].line) - 1]).toBe(lines[fill - 1]);
+            const over = calls.find((call) => call.sides === OVER)!;
+            expect(lines[lines.lastIndexOf('clip()', over.line) - 1]).toBe(lines[fill - 1]);
             paths.push(lines[fill - 1]);
         }
         expect(paths).toEqual([
@@ -125,7 +167,25 @@ describe('node effects', () => {
         ]);
     });
 
-    it('start from the state v2 drew them in: shadows not offset, whatever native left', async () => {
+    it('cast v1\'s halo under the effect: the body\'s shadow in the effect\'s primary colour, 10 × Glow, on native\'s offset', async () => {
+        for (const scale of [1, 0.5]) {
+            const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 4, '📦 Enhanced Nodes.Glow': 0.8 }, { nodes: [KSAMPLER] });
+            canvas.ds.scale = scale;
+            const { calls } = frame(canvas);
+            const [halo] = halos(canvas.front.paints);
+            const [body] = bodies(canvas.front.paints);
+            // Filled in the body's colour, at the node's alpha, past the right of the screen, so that only its shadow shows, and lands where the body's would.
+            expect([halo.style, halo.globalAlpha, halo.shadowColor, halo.shadowBlur], `zoom ${scale}`).toEqual(['#353535', 1, '#ffcc00', 8]);
+            expect(halo.box![0], `zoom ${scale}`).toBeGreaterThan(1600);
+            expect([halo.box![0] + halo.shadowOffsetX, halo.box![1] + halo.shadowOffsetY, halo.box![2] + halo.shadowOffsetX, halo.box![3] + halo.shadowOffsetY].map((x) => fmt(x)))
+                .toEqual([body.box![0] + 2 * scale, body.box![1] + 2 * scale, body.box![2] + 2 * scale, body.box![3] + 2 * scale].map((x) => fmt(x)));
+            // Before the effect draws round the body, which the body then casts no shadow over.
+            expect(canvas.front.paints.indexOf(halo)).toBeLessThan(calls[0].from);
+            expect(body.shadowColor).toBe('rgba(0, 0, 0, 0)');
+        }
+    });
+
+    it('draw their glows centred, whatever offset native left', async () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 3, ...PARTICLES }, { nodes: [KSAMPLER] });
         frame(canvas);
         const over = probe.calls.at(-1)!;
@@ -135,39 +195,35 @@ describe('node effects', () => {
         expect(glows.every((p) => p.shadowOffsetX === 0 && p.shadowOffsetY === 0)).toBe(true);
     });
 
-    it('fade with the node as native fades it: bypassed, muted and ghost nodes, the styled title and the hover outline too', async () => {
-        // At full glow v2 sets alphas above 1, which the browser ignores, faded or not.
-        const canvas = await start({
-            ...LINKS_OFF, ...PARTICLES, ...TITLES, '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Color.Hover.Show': true,
-            '📦 Enhanced Nodes.Glow': 2, '📦 Enhanced Nodes.Particle.Glow': 2,
-        }, {
+    it('fade with the node as native fades it: bypassed, muted and ghost nodes, with the styled title', async () => {
+        const canvas = await start({ ...LINKS_OFF, ...PARTICLES, ...TITLES, '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Color.Hover.Show': true }, {
             nodes: [{ pos: [100, 100] }, { pos: [400, 100], mode: 4 }, { pos: [100, 400], mode: 2 }, { pos: [400, 400], ghost: true }],
         });
-        // Selected too, so native's selection outline leaves the alpha at 1 before ours.
         for (const node of canvas.graph._nodes) [node.mouseOver, node.selected] = [true, true];
         const alphas = [1, 0.2, 0.4, 0.3];
         const { calls } = frame(canvas);
         const paints = canvas.front.paints;
         const scaled = (painted: CanvasRecorder['paints'], alpha: number) => painted.map((p) => p.globalAlpha * alpha);
         // Native draws each body at that alpha.
-        expect(paints.filter((p) => p.op === 'fill' && p.style === '#353535').map((p) => p.globalAlpha)).toEqual(alphas);
-        // Under the nodes and on them, the same drawing as on the node at full alpha, which sets alphas of its own, with each one scaled.
+        expect(bodies(paints).map((p) => p.globalAlpha)).toEqual(alphas);
+        expect(halos(paints).map((p) => p.globalAlpha)).toEqual(alphas);
+        // Under the nodes and on them, the same drawing as on the node at full alpha, with each of its alphas scaled.
         expect(calls.map((call) => canvas.graph._nodes.indexOf(call.node as FakeNode))).toEqual([0, 1, 2, 3, 0, 1, 2, 3]);
         const drawn = (i: number) => paints.slice(calls[i].from, calls[i].to);
         expect(new Set(drawn(4).map((p) => p.globalAlpha)).size).toBeGreaterThan(5);
         for (const layer of [0, 4]) {
             for (const [i, alpha] of alphas.entries()) {
-                expect(drawn(layer + i).map((p) => p.globalAlpha), `call ${layer + i}`).toEqual(scaled(drawn(layer), alpha));
+                drawn(layer + i).forEach((p, j) => expect(p.globalAlpha, `call ${layer + i}, paint ${j}`).toBeCloseTo(scaled(drawn(layer), alpha)[j], 9));
             }
         }
-        // Neon draws each title four times, the last at an alpha of its own; the outline is the hover colour's rectangle.
+        // Gentle Pulse's hover outline and v1's frame among them.
+        expect(drawn(4).filter((p) => p.op === 'strokeRect').map((p) => p.style)).toEqual(['rgba(255, 255, 21, 0.7)', '#88ccff']);
+        // Neon draws each title four times, the last at an alpha of its own.
         const titles = paints.filter((p) => p.op === 'fillText');
         expect(titles.map((p) => p.globalAlpha)).toEqual(alphas.flatMap((alpha) => scaled(titles.slice(0, 4), alpha)));
-        const outlines = paints.filter((p, i) => p.op === 'strokeRect' && !calls.some((call) => i >= call.from && i < call.to));
-        expect(outlines.map((p) => [p.style, p.globalAlpha])).toEqual(alphas.map((alpha) => ['rgba(0, 255, 21, 0.7)', alpha]));
     });
 
-    it('draw nothing on a collapsed node, not even the hover outline', async () => {
+    it('draw nothing on a collapsed node, nor its halo', async () => {
         const canvas = await start({ ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Color.Hover.Show': true }, {
             nodes: [{ pos: [300, 300], collapsed: true }],
         });
@@ -175,24 +231,92 @@ describe('node effects', () => {
         const { lines, calls } = frame(canvas);
         expect(calls).toEqual([]);
         expect(lines.filter((line) => line.startsWith('strokeRect('))).toEqual([]);
+        expect(canvas.front.paints.find((p) => p.op === 'fill' && p.style === '#353535')!.shadowColor).toBe('rgba(0, 0, 0, 0.5)');
         expect([live.nodes, live.particles]).toEqual([0, 0]);
+    });
+
+    it('draw particles only, and only the halo with no particles, with Show base effect off', async () => {
+        for (const [particles, drawn] of [[true, 2], [false, 0]] as const) {
+            const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2, '📦 Enhanced Nodes.Animations.Enabled': false, '📦 Enhanced Nodes.Particle.Show': particles }, { nodes: [KSAMPLER] });
+            // Nor v1's selection frame, which belongs to the base effect.
+            canvas.graph._nodes[0].selected = true;
+            const { calls, lines } = frame(canvas);
+            expect(calls, `particles ${particles}`).toHaveLength(drawn);
+            expect(lines.filter((line) => line.startsWith('strokeRect(')), `particles ${particles}`).toEqual([]);
+            expect(canvas.front.paints.find((p) => p.op === 'fill' && p.style === '#353535')!.shadowColor, `particles ${particles}`).toBe('#00ff88');
+        }
     });
 });
 
 describe('titles', () => {
-    it("are v2's styled title in place of the native one, which runs on the hidden canvas", async () => {
+    /** The texts of a frame's fillText calls, and where it drew them. */
+    const texts = (lines: string[]) => lines.filter((line) => line.startsWith('fillText('));
+
+    it("take the native title's place, over the node's effect, while native draws its own on the hidden canvas", async () => {
         const native = vi.spyOn(FakeNode.prototype, 'drawTitleText');
-        const canvas = await start({ ...LINKS_OFF, ...TITLES, '📦 Enhanced Nodes.Text.Style': 'retro' }, {
+        const canvas = await start({ ...LINKS_OFF, ...TITLES, '📦 Enhanced Nodes.Animate': 2, '📦 Enhanced Nodes.Text.Style': 'retro' }, {
             nodes: [KSAMPLER, { pos: [700, 300], collapsed: true, title: 'Load' }],
         });
         clock.nodePhase = 0;
-        const { lines } = frame(canvas);
-        // Retro draws two offset copies, then the title: centred on the title bar, 15 px above the body; on a collapsed node's 80 px bar too.
-        expect(lines.filter((line) => line.startsWith('fillText('))).toEqual([
-            'fillText("KSampler", 109, -15)', 'fillText("KSampler", 111, -15)', 'fillText("KSampler", 110, -15)',
-            'fillText("Load", 39, -15)', 'fillText("Load", 41, -15)', 'fillText("Load", 40, -15)',
+        const { lines, calls } = frame(canvas);
+        // Retro draws a copy a pixel either side, then the title: after the title box, on the bar's middle, in native's font; on a collapsed node too.
+        expect(texts(lines)).toEqual([
+            'fillText("KSampler", 29, -15)', 'fillText("KSampler", 31, -15)', 'fillText("KSampler", 30, -15)',
+            'fillText("Load", 29, -15)', 'fillText("Load", 31, -15)', 'fillText("Load", 30, -15)',
         ]);
+        expect(lines).toEqual(expect.arrayContaining(['font = 14px Inter', 'textAlign = left', 'textBaseline = middle']));
         expect(native.mock.calls.map(([ctx]) => ctx === dummy())).toEqual([true, true]);
+        // KSampler's, the first text the frame paints, after its effect's part on the body.
+        const over = calls.find((call) => call.sides === OVER)!;
+        expect(canvas.front.paints.findIndex((p, i) => i >= calls[0].from && p.op === 'fillText')).toBeGreaterThanOrEqual(over.to);
+    });
+
+    it("show native's text: with the pin, cut to the room the title bar leaves, and to 20 characters when collapsed", async () => {
+        const canvas = await start(LINKS_OFF, {
+            nodes: [
+                { pos: [100, 100], size: [140, 80], title: 'A long title for a narrow node' }, { pos: [100, 400], collapsed: true, title: 'Another title that runs on and on' },
+                { pos: [500, 100], title: 'KSampler' },
+            ],
+        });
+        canvas.graph._nodes[0].flags.pinned = true;
+        canvas.graph._nodes[2].flags.pinned = true;
+        const natives = texts(frame(canvas).lines).map((line) => /"(.*)"/.exec(line)![1]);
+        expect(natives).toEqual(['A long t...', 'Another title that r', 'KSampler📌']);
+        preview('📦 Enhanced Nodes.Text.Animation.Enabled', true);
+        canvas.setDirty(true, true);
+        // Neon draws the title four times.
+        expect(texts(frame(canvas).lines).map((line) => /"(.*)"/.exec(line)![1])).toEqual(natives.flatMap((text) => [text, text, text, text]));
+        // Title buttons take their room too.
+        canvas.graph._nodes[0].size = [400, 80];
+        canvas.graph._nodes[0].title_buttons = [{ visible: true, getWidth: () => 200 }];
+        canvas.setDirty(true, true);
+        expect(texts(frame(canvas).lines)[0]).toBe('fillText("A long title for a ...", 30, -15)');
+    });
+
+    it("take Title color with custom node colours, else the accent of their node's effect", async () => {
+        const canvas = await start({ ...LINKS_OFF, ...TITLES, '📦 Enhanced Nodes.Animate': 3, '📦 Enhanced Nodes.Text.Style': 'retro', '📦 Enhanced Nodes.Text.Color': '#123456' }, { nodes: [KSAMPLER] });
+        const colour = () => {
+            const from = canvas.front.paints.length;
+            canvas.setDirty(true, true);
+            frames(1);
+            return canvas.front.paints.slice(from).filter((p) => p.op === 'fillText').at(-1)!.style;
+        };
+        expect(colour()).toBe('#ff40ff');
+        canvas.graph._nodes[0].properties.enhanced_fx_style = 2;
+        expect(colour()).toBe('#00ff44');
+        preview('📦 Enhanced Nodes.Color.Mode', 'custom');
+        expect(colour()).toBe('#123456');
+    });
+
+    it("move on nodes without an effect, and hold v1's still pose when node effects do", async () => {
+        const canvas = await start({ ...LINKS_OFF, ...TITLES, '📦 Enhanced Nodes.Text.Style': 'retro' }, { nodes: [KSAMPLER] });
+        frames(3);
+        expect(live.nodes).toBe(1);
+        preview('📦 Enhanced Nodes.Static.Mode', true);
+        const { lines } = frame(canvas);
+        // Retro's copies sit sin(5 × phase) / 2 px off the title, at v1's still phase, π/4.
+        expect(texts(lines)[0]).toBe(`fillText("KSampler", 29, ${fmt(-15 + Math.sin((5 * Math.PI) / 4) * 0.5)})`);
+        expect(live.nodes).toBe(0);
     });
 
     it('are left to native for a node that draws its own, one without a title, in low quality and with Animated titles off', async () => {
@@ -201,17 +325,16 @@ describe('titles', () => {
         const own = vi.fn();
         const [untitled] = canvas.graph._nodes;
         canvas.graph._nodes[1].onDrawTitleText = own;
-        const texts = () => frame(canvas).lines.filter((line) => line.startsWith('fillText('));
-        expect(texts()).toEqual(['fillText("", 30, -10)']);
+        expect(texts(frame(canvas).lines)).toEqual(['fillText("", 30, -10)']);
         expect(own).toHaveBeenCalledTimes(1);
         // Native draws no title in low quality, titled or not.
         [canvas.low_quality, untitled.title] = [true, 'Titled'];
         canvas.setDirty(true, true);
-        expect(texts()).toEqual([]);
+        expect(texts(frame(canvas).lines)).toEqual([]);
         [canvas.low_quality, untitled.title] = [false, ''];
         canvas.graph._nodes[1].onDrawTitleText = undefined;
         preview('📦 Enhanced Nodes.Text.Animation.Enabled', false);
-        expect(texts()).toEqual(['fillText("", 30, -10)', 'fillText("Own", 30, -10)']);
+        expect(texts(frame(canvas).lines)).toEqual(['fillText("", 30, -10)', 'fillText("Own", 30, -10)']);
         expect(native.mock.calls.every(([ctx]) => ctx === canvas.ctx)).toBe(true);
     });
 
@@ -219,18 +342,19 @@ describe('titles', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
         const native = vi.spyOn(FakeNode.prototype, 'drawTitleText');
         const canvas = await start({ ...LINKS_OFF, ...TITLES }, { nodes: [KSAMPLER] });
-        // The styled title fails as it starts, reading the clock.
+        // The styled title fails as it starts, reading Title glow, which nothing else reads.
         let tries = 0;
-        Object.defineProperty(clock, 'nodePhase', { configurable: true, get: () => { tries++; throw new Error('boom'); } });
+        Object.defineProperty(N, 'textGlow', { configurable: true, get: () => { tries++; throw new Error('boom'); } });
         try {
             for (let i = 0; i < 6; i++) {
                 canvas.setDirty(true, false);
                 frames(1);
             }
         } finally {
-            Object.defineProperty(clock, 'nodePhase', { configurable: true, enumerable: true, writable: true, value: 0 });
+            Object.defineProperty(N, 'textGlow', { configurable: true, enumerable: true, writable: true, value: 0.5 });
         }
-        expect(native.mock.calls.map(([ctx]) => ctx === canvas.ctx)).toEqual([true, true, true, true, true, true]);
+        // Each frame shows native's title: drawn again on the canvas after the styled one failed, then alone.
+        expect(native.mock.calls.map(([ctx]) => (ctx === canvas.ctx ? 'canvas' : 'hidden'))).toEqual([...Array(5).fill(['hidden', 'canvas']).flat(), 'canvas']);
         expect([tries, guard.off('Animated titles')]).toEqual([5, true]);
         expect(warn).toHaveBeenCalledOnce();
         canvas.front.assertBalanced();
@@ -253,6 +377,11 @@ describe('titles', () => {
         canvas.setDirty(true, true);
         frames(1);
         expect(live.nodes).toBe(1);
+        // In low quality native draws no title, so none moves.
+        canvas.low_quality = true;
+        canvas.setDirty(true, true);
+        frames(1);
+        expect(live.nodes).toBe(0);
     });
 });
 
@@ -280,16 +409,27 @@ describe('the over-layer and the title', () => {
         expect(fake.toasts).toEqual([expect.objectContaining({ summary: 'Node effect turned off' })]);
         expect(warn).toHaveBeenCalledTimes(1);
 
-        // Off: the nodes are native, nothing moves and the ticker stops, until a setting changes.
+        // Off: the nodes are native, halo and all, nothing moves and the ticker stops, until a setting changes.
         probe.fail = false;
         canvas.setDirty(true, true);
         expect(frame(canvas).calls).toEqual([]);
+        expect(canvas.front.paints.filter((p) => p.op === 'fill' && p.style === '#353535').at(-1)!.shadowColor).toBe('rgba(0, 0, 0, 0.5)');
         expect(live.nodes).toBe(0);
         page.requests = 0;
         frames(30);
         expect(page.requests).toBe(0);
         preview('📦 Enhanced Nodes.Glow', 0.7);
         expect(frame(canvas).calls).toHaveLength(2);
+    });
+
+    it('restore what an effect saved when it fails inside its own save', async () => {
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const canvas = await start({ ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Color.Particle': '#ffb300' }, { nodes: [KSAMPLER] });
+        // A colour the canvas would not take, for the fireflies Gentle Pulse draws after its save().
+        vi.spyOn(colors, 'particleColour').mockReturnValue('nothing');
+        frame(canvas);
+        canvas.front.assertBalanced();
+        expect(canvas.front.paints.at(-1)).toMatchObject({ op: 'fillRect', box: [310, 310, 510, 330], globalAlpha: 1 });
     });
 });
 
@@ -311,8 +451,8 @@ describe('the under-layer', () => {
         defaults: {},
         smallest: { '📦 Enhanced Nodes.Animation.Size': 0.5, '📦 Enhanced Nodes.Quality': 1, '📦 Enhanced Nodes.Particle.Size': 0.1, '📦 Enhanced Nodes.Glow': 0 },
         largest: {
-            '📦 Enhanced Nodes.Intensity': 3, '📦 Enhanced Nodes.Animation.Glow': 2, '📦 Enhanced Nodes.Glow': 2, '📦 Enhanced Nodes.Animation.Size': 3,
-            '📦 Enhanced Nodes.Quality': 3, '📦 Enhanced Nodes.Particle.Size': 3, '📦 Enhanced Nodes.Particle.Intensity': 3, '📦 Enhanced Nodes.Particle.Glow': 2,
+            '📦 Enhanced Nodes.Intensity': 2, '📦 Enhanced Nodes.Animation.Glow': 1, '📦 Enhanced Nodes.Glow': 1, '📦 Enhanced Nodes.Animation.Size': 3,
+            '📦 Enhanced Nodes.Quality': 3, '📦 Enhanced Nodes.Particle.Size': 3, '📦 Enhanced Nodes.Particle.Intensity': 2, '📦 Enhanced Nodes.Particle.Glow': 1,
             '📦 Enhanced Nodes.Color.Hover.Show': true,
         },
     };
@@ -327,22 +467,18 @@ describe('the under-layer', () => {
                     node.size = [w, h];
                     canvas.setDirty(true, true);
                     frames(1);
-                    // How far its drawing on the body reaches past it, at a few moments.
+                    // How far the whole effect reaches past the node's box, title bar included, at a few moments.
                     const reach = [-Infinity, -Infinity, -Infinity, -Infinity];
                     for (const phase of [0.7, 2.1, 3.6, 5.2]) {
-                        [clock.nodePhase, clock.particlePhase] = [phase, phase * 1.7];
-                        vi.spyOn(Math, 'random').mockImplementation(mulberry32(phase * 10));
-                        probe.rec = new CanvasRecorder();
-                        probe.calls = [];
-                        canvas.drawNodeShape(node, probe.rec.ctx, [w, h], '#333', '#353535', true);
-                        const [{ from, to }] = probe.calls;
-                        overhang(probe.rec.paints.slice(from, to), [0, 0, w, h]).forEach((r, side) => (reach[side] = Math.max(reach[side], r)));
+                        const rec = new CanvasRecorder();
+                        drawNodeFx(rec.ctx, animate, node, w, h, { nodePhase: phase, particleTime: phase * 1.7, nodeTime: phase * 1.3 }, WHOLE, 1, animate === 0);
+                        overhang(rec.paints, [0, -30, w, h]).forEach((r, side) => (reach[side] = Math.max(reach[side], r)));
                     }
                     // With the body off screen, its drawing one pixel onto it from each side it reaches past the area native draws the node in:
-                    // renderArea is 4 px wider on the left, 6 on the right, 5 taller at the bottom, and 34 at the top, with the title bar.
+                    // renderArea is 4 px wider on the left, 6 on the right, 5 taller at the bottom, and 4 at the top.
                     for (const [side, r] of reach.entries()) {
-                        if (r <= [4, 34, 6, 5][side]) continue;
-                        const [x, y] = [[-r + 1 - 1600, h / 2 - 450], [w / 2 - 800, -r + 1 - 900], [w + r - 1, h / 2 - 450], [w / 2 - 800, h + r - 1]][side];
+                        if (r <= [4, 4, 6, 5][side]) continue;
+                        const [x, y] = [[-r + 1 - 1600, h / 2 - 450], [w / 2 - 800, -30 - r + 1 - 900], [w + r - 1, h / 2 - 450], [w / 2 - 800, h + r - 1]][side];
                         canvas.ds.offset = [-x, -y];
                         canvas.setDirty(true, true);
                         frames(1);
@@ -362,5 +498,72 @@ describe('the under-layer', () => {
         const canvas = await start({ ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Animate': 1 }, { nodes: [{ pos: [5000, 5000] }] });
         expect(frame(canvas).calls).toEqual([]);
         expect([live.nodes, live.particles]).toEqual([0, 0]);
+    });
+});
+
+describe('the node menu', () => {
+    type Item = { content: string; has_submenu?: boolean; submenu?: { options: (Item | null)[] }; callback?: () => void };
+    const menu = (node: FakeNode) => (fake.extensions.find((e) => e.name === 'enhanced.node.animations') as unknown as { getNodeMenuItems(node: FakeNode): Item[] }).getNodeMenuItems(node);
+    const labels = (item: Item) => item.submenu!.options.map((option) => option?.content ?? null);
+    const pick = (node: FakeNode, menuName: string, label: string) => menu(node).find((item) => item.content === menuName)!.submenu!.options.find((option) => option?.content.replace('✓ ', '') === label)!.callback!();
+
+    it('offers Node FX and Completion FX, each one submenu level, with the choice ticked', async () => {
+        const canvas = await start(LINKS_OFF, { nodes: [KSAMPLER] });
+        const [node] = canvas.graph._nodes;
+        const items = menu(node);
+        expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true]]);
+        expect(labels(items[0])).toEqual(['✓ Use global', 'None', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Flower of Life', null, 'Particles only']);
+        expect(labels(items[1])).toEqual(['✓ Use global', 'Fireworks', 'Off']);
+        for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
+        node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'off' };
+        expect(labels(menu(node)[0])).toEqual(['Use global', 'None', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(node)[1])).toEqual(['Use global', 'Fireworks', '✓ Off']);
+    });
+
+    it('write a pick to the node as one change the history can undo, and Use global takes it back out', async () => {
+        const canvas = await start(LINKS_OFF, { nodes: [KSAMPLER] });
+        const [node] = canvas.graph._nodes;
+        pick(node, 'Node FX', 'Neon Nexus');
+        pick(node, 'Node FX', 'Particles only');
+        pick(node, 'Completion FX', 'Fireworks');
+        expect(node.properties).toEqual({ enhanced_fx_style: 2, enhanced_fx_particles_only: true, enhanced_fx_completion: 'fireworks' });
+        expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(3).fill(['emitBeforeChange', 'emitAfterChange']).flat());
+        pick(node, 'Node FX', 'Use global');
+        pick(node, 'Completion FX', 'Use global');
+        expect(node.properties).toEqual({});
+    });
+
+    it('give a node its own effect: its style, None for nothing, and its Particles only', async () => {
+        const canvas = await start({ ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Animate': 1 }, { nodes: [KSAMPLER, { pos: [700, 300] }, { pos: [300, 700] }] });
+        const [own, none, only] = canvas.graph._nodes;
+        own.properties.enhanced_fx_style = 3;
+        none.properties.enhanced_fx_style = 0;
+        only.properties.enhanced_fx_particles_only = true;
+        const calls = frame(canvas).calls.filter((call) => call.sides === OVER);
+        expect(calls.map((call) => [canvas.graph._nodes.indexOf(call.node as FakeNode), call.only])).toEqual([[0, false], [2, true]]);
+        // Cosmic Ripple's halo on the first, native's shadow on the second, Gentle Pulse's halo on the third.
+        expect(halos(canvas.front.paints).map((p) => p.shadowColor)).toEqual(['#ff00ff', '#44aaff']);
+        expect(bodies(canvas.front.paints).map((p) => p.shadowColor)).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']);
+    });
+
+    it('ignore what a workflow holds there that is not a choice, and write nothing as nodes are drawn or the menu is built', async () => {
+        const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER, { pos: [700, 300] }, { pos: [300, 700] }] });
+        const [odd, kept, bare] = canvas.graph._nodes;
+        odd.properties = { enhanced_fx_style: 7, enhanced_fx_particles_only: 'yes', enhanced_fx_completion: 'loud' };
+        kept.properties = { enhanced_fx_style: 4, enhanced_fx_completion: 'fireworks', other: 1 };
+        const before = JSON.stringify([odd.properties, kept.properties]);
+        const from = canvas.front.paints.length;
+        const { calls } = frame(canvas);
+        // The odd one draws Animate's Neon Nexus, whole; the other its Flower of Life; the one loaded with nothing set Animate's too.
+        expect(halos(canvas.front.paints.slice(from)).map((p) => p.shadowColor)).toEqual(['#00ff88', '#ffcc00', '#00ff88']);
+        expect(calls.filter((call) => call.sides === OVER).map((call) => call.only)).toEqual([false, false, false]);
+        menu(odd);
+        menu(kept);
+        menu(bare);
+        frames(3);
+        expect(JSON.stringify([odd.properties, kept.properties])).toBe(before);
+        expect(bare.properties).toEqual({});
+        expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual([]);
+        expect(labels(menu(odd)[0])[0]).toBe('✓ Use global');
     });
 });

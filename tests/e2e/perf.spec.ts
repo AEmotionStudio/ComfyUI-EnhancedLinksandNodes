@@ -1,11 +1,15 @@
 // Baselines for native ComfyUI (-native projects), the checkout (fe157 and fe1395), v2.0.1 (v2-ref)
-// and v1 (v1-ref), the last two built from git. They are measurements, not gates: a test fails only if
-// the page breaks. baseline-reporter.ts writes them to perf-baselines/perf-baseline.json and prints a
-// table, with each look's front-paint overhead over native. They only run with ELN_PERF=1, which also
-// runs every test in one worker, so the projects do not share the CPU:
+// and v1 (v1-ref), the last two built from git. A test fails only if the page breaks, but the run
+// fails when the checkout's default look adds more than its budget to native's front paint, or its
+// animated frames leave more than theirs on the heap. baseline-reporter.ts writes them to
+// perf-baselines/perf-baseline.json and prints a table, with each look's front-paint overhead over
+// native. They only run with ELN_PERF=1, which also runs every test in one worker, so the projects do
+// not share the CPU:
 //   pnpm e2e:perf
+// Chromium draws with SwiftShader unless ELN_GPU=1 hands it the GPU, for frame rates that mean something:
+//   ELN_GPU=1 ELN_PERF=1 pnpm e2e --grep "frame rate"
 import type { Page, TestInfo } from '@playwright/test';
-import type { PerfRow } from './baseline-reporter';
+import type { FrameRateRow, PerfRow } from './baseline-reporter';
 import * as graphs from './fixtures/graphs';
 import { perfGraph } from './fixtures/perf';
 import {
@@ -32,6 +36,15 @@ import {
 const LOOKS: Record<string, Record<string, unknown>> = {
     default: {},
     off: { '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 0 },
+};
+
+/** The looks whose frame rate is measured, each over the defaults: the default look without its glow, and three animations whose strokes glow. */
+const ANIMATED: Record<string, Record<string, unknown>> = {
+    default: {},
+    'default without glow': { '🔗 Enhanced Links.Glow.Intensity': 0, '🔗 Enhanced Links.Marker.Glow': 0 },
+    'Sacred Flow': { '🔗 Enhanced Links.Animate': 1 },
+    'DNA Helix': { '🔗 Enhanced Links.Animate': 6 },
+    'Lava Flow': { '🔗 Enhanced Links.Animate': 7 },
 };
 
 interface Sample {
@@ -63,10 +76,13 @@ function record(testInfo: TestInfo, values: Record<string, unknown>): Promise<vo
     return testInfo.attach('baseline', { body: JSON.stringify(values), contentType: 'application/json' });
 }
 
-/** Counts paints, settings reads and long tasks for `ms`, optionally marking canvases dirty every frame, as setDirty(front, back). */
-async function sample(page: Page, ms: number, dirty?: [front: boolean, back: boolean]): Promise<Sample> {
+/**
+ * Counts paints, settings reads and long tasks for `ms`, optionally marking canvases dirty every frame, as setDirty(front, back),
+ * and panning the view a pixel a frame.
+ */
+async function sample(page: Page, ms: number, dirty?: [front: boolean, back: boolean], pan = false): Promise<Sample> {
     await resetProbe(page);
-    return page.evaluate(async ([ms, dirty]) => {
+    return page.evaluate(async ([ms, dirty, pan]) => {
         let longTasks = 0;
         const observer = new PerformanceObserver((list) => {
             longTasks += list.getEntries().length;
@@ -77,6 +93,7 @@ async function sample(page: Page, ms: number, dirty?: [front: boolean, back: boo
         await new Promise<void>((resolve) => {
             const frame = () => {
                 if (performance.now() >= end) return resolve();
+                if (pan) window.app.canvas.ds.offset[0] -= 1;
                 if (dirty) window.app.canvas.setDirty(...dirty);
                 requestAnimationFrame(frame);
             };
@@ -87,15 +104,19 @@ async function sample(page: Page, ms: number, dirty?: [front: boolean, back: boo
         const seconds = (performance.now() - start) / 1000;
         const { front, back, frontMs, backMs, dirty: requests, reads, renderLink } = window.__eln;
         return { seconds, front, back, frontMs, backMs, dirty: requests, reads: reads.getSettingValue + reads.settingGet, readsInPaint: reads.inPaint, renderLink, longTasks };
-    }, [ms, dirty] as const);
+    }, [ms, dirty, pan] as const);
 }
 
-/** Paints and redraw requests over 3 s without input, then paint costs over 2 s with every frame dirty and 2 s with only the front dirty. */
+/**
+ * Paints and redraw requests over 3 s without input, then paint costs over 2 s with every frame dirty and 2 s with only the
+ * front dirty, then the front paints a second over 2 s of panning, which leaves the view a little off where it was.
+ */
 async function measure(page: Page): Promise<Omit<PerfRow, 'frontend' | 'graph' | 'view' | 'look'>> {
     await page.waitForTimeout(1000);
     const idle = await sample(page, 3000);
     const forced = await sample(page, 2000, [true, true]);
     const frontOnly = await sample(page, 2000, [true, false]);
+    const panned = await sample(page, 2000, [true, true], true);
     return {
         idleFront: round(idle.front / idle.seconds),
         idleBack: round(idle.back / idle.seconds),
@@ -107,6 +128,7 @@ async function measure(page: Page): Promise<Omit<PerfRow, 'frontend' | 'graph' |
         back: { p50: percentile(forced.backMs, 0.5), p95: percentile(forced.backMs, 0.95) },
         frontOnly: { p50: percentile(frontOnly.frontMs, 0.5), p95: percentile(frontOnly.frontMs, 0.95) },
         fps: round(forced.front / forced.seconds),
+        panFps: round(panned.front / panned.seconds),
         readsPerFrame: forced.front ? Math.round(forced.readsInPaint / forced.front) : 0,
         renderLinkPerFrame: forced.back ? Math.round(forced.renderLink / forced.back) : 0,
     };
@@ -169,8 +191,41 @@ test.describe('baselines', { tag: '@perf' }, () => {
         });
     }
 
-    // What 120 frames of DNA Helix on every link on screen leave on the heap once garbage is collected (budget 2 MB),
-    // and how much it grew before that collection, which minor collections during the frames make a lower bound.
+    // How fast each look animates by itself on the big graph at zoom 1: the front paints a second the ticker asks for over
+    // 5 s without input, the long tasks in that time, and the renderer Chromium draws with (see ELN_GPU in playwright.config.ts).
+    test('frame rate while animating', async ({ page, profile }, testInfo) => {
+        test.skip(profile === 'native', 'native ComfyUI paints only on input');
+        test.setTimeout(300_000);
+        await buildGraph(page, perfGraph(200, 500));
+        await setView(page, 'zoom 1');
+        const renderer = await page.evaluate(() => {
+            const gl = document.createElement('canvas').getContext('webgl');
+            const info = gl?.getExtension('WEBGL_debug_renderer_info');
+            return info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : 'unknown';
+        });
+        const rows: FrameRateRow[] = [];
+        for (const [look, settings] of Object.entries(ANIMATED)) {
+            const ids = Object.keys(settings);
+            const before = await page.evaluate((ids) => ids.map((id) => window.app.extensionManager.setting.get(id)), ids);
+            for (const id of ids) await setSetting(page, id, settings[id]);
+            await page.waitForTimeout(1000);
+            const s = await sample(page, 5000);
+            rows.push({
+                renderer,
+                look,
+                fps: round(s.front / s.seconds),
+                backPerSecond: round(s.back / s.seconds),
+                front: { p50: percentile(s.frontMs, 0.5), p95: percentile(s.frontMs, 0.95) },
+                longTasks: s.longTasks,
+            });
+            for (const [i, id] of ids.entries()) await setSetting(page, id, before[i]);
+        }
+        await record(testInfo, { frameRate: rows });
+    });
+
+    // What 120 frames of DNA Helix on every link on screen leave on the heap once garbage is collected (budget 2 MB, judged
+    // by the median of three runs), and how much it grew before that collection, which minor collections during the frames
+    // make a lower bound.
     test('heap after 120 animated frames', async ({ page, profile }, testInfo) => {
         test.setTimeout(300_000);
         await buildGraph(page, perfGraph(200, 500));
@@ -182,21 +237,26 @@ test.describe('baselines', { tag: '@perf' }, () => {
             if (collect) await cdp.send('HeapProfiler.collectGarbage');
             return (await cdp.send('Runtime.getHeapUsage')).usedSize / 2 ** 20;
         };
-        const before = await heap(true);
-        // Both canvases dirty every frame until the front one has painted 120 times.
-        const seconds = await page.evaluate(() => new Promise<number>((resolve) => {
-            const probe = window.__eln;
-            const [painted, start] = [probe.front + 120, performance.now()];
-            const frame = () => {
-                if (probe.front >= painted) return resolve((performance.now() - start) / 1000);
-                window.app.canvas.setDirty(true, true);
-                requestAnimationFrame(frame);
-            };
-            frame();
-        }));
-        const grown = await heap(false);
-        const after = await heap(true);
-        await record(testInfo, { heap: { look: profile === 'native' ? 'native' : 'Animate 6', seconds: round(seconds), beforeMB: round(before), grownMB: round(grown - before), retainedMB: round(after - before) } });
+        const runs: { seconds: number; beforeMB: number; grownMB: number; retainedMB: number }[] = [];
+        for (let run = 0; run < 3; run++) {
+            const before = await heap(true);
+            // Both canvases dirty every frame until the front one has painted 120 times.
+            const seconds = await page.evaluate(() => new Promise<number>((resolve) => {
+                const probe = window.__eln;
+                const [painted, start] = [probe.front + 120, performance.now()];
+                const frame = () => {
+                    if (probe.front >= painted) return resolve((performance.now() - start) / 1000);
+                    window.app.canvas.setDirty(true, true);
+                    requestAnimationFrame(frame);
+                };
+                frame();
+            }));
+            const grown = await heap(false);
+            const after = await heap(true);
+            runs.push({ seconds: round(seconds), beforeMB: round(before), grownMB: round(grown - before), retainedMB: round(after - before) });
+        }
+        const retainedMB = [...runs].sort((a, b) => a.retainedMB - b.retainedMB)[1].retainedMB;
+        await record(testInfo, { heap: { look: profile === 'native' ? 'native' : 'Animate 6', retainedMB, runs } });
     });
 
     test('link colours', async ({ page }, testInfo) => {

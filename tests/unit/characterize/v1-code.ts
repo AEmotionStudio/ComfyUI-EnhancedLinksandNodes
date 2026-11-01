@@ -58,6 +58,17 @@ async function run(source: string, name: string, anchor: string, locals: string)
  */
 export async function setupV1(): Promise<{ links: Locals; nodes: Locals }> {
     resetFakeApp({});
+    // v1's node extension wraps drawNodeShape, as native fills the node's body, title bar included, in the shadow its
+    // drawNode set, then turns the shadow off (FE157 LGraphCanvas.ts L5880-5911).
+    Object.assign(fake.LGraphCanvas.prototype, {
+        drawNodeShape(_node: unknown, ctx: CanvasRenderingContext2D, size: [number, number], _fgcolor: string, bgcolor: string) {
+            ctx.fillStyle = bgcolor;
+            ctx.beginPath();
+            ctx.rect(0, -30, size[0], size[1] + 30);
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+        },
+    });
     vi.stubGlobal('requestAnimationFrame', () => 0);
     vi.spyOn(console, 'log').mockImplementation(() => {});
     return {

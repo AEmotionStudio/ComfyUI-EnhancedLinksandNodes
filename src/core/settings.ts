@@ -21,7 +21,8 @@ interface Option {
 type Setting = { id: string; key: string; name: string; tooltip?: string; group: string } & (
     | { type: 'boolean'; default: boolean }
     | { type: 'slider'; default: number; min: number; max: number; step: number }
-    | { type: 'combo'; default: number | string; options: readonly Option[] }
+    /** `snap`: numeric presets, so a number between them stands for the nearest. */
+    | { type: 'combo'; default: number | string; options: readonly Option[]; snap?: true }
     | { type: 'color'; default: string }
 );
 
@@ -43,15 +44,16 @@ const LINK_ANIMATION_OPTIONS = [
 ] as const;
 
 const LINK_STYLE_OPTIONS = [
-    { value: 'spline', text: 'Spline' },
-    { value: 'straight', text: 'Direct (diagonal)' },
+    { value: 'spline', text: 'Same as ComfyUI' },
+    { value: 'straight', text: 'Direct' },
     { value: 'linear', text: 'Right-angle' },
     { value: 'hidden', text: 'Effect only' },
     { value: 'dotted', text: 'Dotted' },
     { value: 'dashed', text: 'Dashed' },
     { value: 'double', text: 'Double' },
     { value: 'stepped', text: 'Stepped' },
-    { value: 'zigzag', text: 'Zigzag' },
+    { value: 'zigzag', text: 'Wave' },
+    { value: 'coil', text: 'Coil' },
     { value: 'rope', text: 'Rope' },
     { value: 'glowpath', text: 'Glow path' },
     { value: 'chain', text: 'Chain' },
@@ -72,6 +74,7 @@ const MARKER_SHAPE_OPTIONS = [
     { value: 'hexagon', text: 'Hexagon' },
     { value: 'flower', text: 'Flower' },
     { value: 'spiral', text: 'Spiral' },
+    { value: 'merkaba', text: 'Merkaba' },
 ] as const;
 
 const MARKER_EFFECT_OPTIONS = [
@@ -81,7 +84,7 @@ const MARKER_EFFECT_OPTIONS = [
     { value: 'rainbow', text: 'Rainbow' },
 ] as const;
 
-const NODE_ANIMATION_OPTIONS = [
+export const NODE_ANIMATION_OPTIONS = [
     { value: 0, text: 'None' },
     { value: 1, text: 'Gentle Pulse' },
     { value: 2, text: 'Neon Nexus' },
@@ -113,6 +116,7 @@ const LINK_COLOR_MODE_OPTIONS = [
 
 const MARKER_COLOR_MODE_OPTIONS = [
     { value: 'default', text: 'Link type color' },
+    { value: 'inherit', text: 'Same as link' },
     { value: 'custom', text: 'Custom' },
 ] as const;
 
@@ -136,6 +140,19 @@ const QUALITY_OPTIONS = [
     { value: 3, text: 'Rich' },
 ] as const;
 
+/** v1's presets (old_link_animations.js:1167-1202). */
+const DENSITY_OPTIONS = [
+    { value: 0.5, text: 'Minimal' },
+    { value: 1, text: 'Balanced' },
+    { value: 2, text: 'Dense' },
+    { value: 3, text: 'Ultra' },
+] as const;
+
+const SHADOW_STYLE_OPTIONS = [
+    { value: 'halo', text: 'Halo (v1)' },
+    { value: 'drop', text: 'Drop shadow (v2)' },
+] as const;
+
 const DIRECTION_OPTIONS = [
     { value: 1, text: 'Forward' },
     { value: -1, text: 'Reverse' },
@@ -157,14 +174,14 @@ const NODES = '📦 Enhanced Nodes.';
 /** Each key is the id after its prefix in camelCase. */
 export const SETTINGS = [
     { id: '🔗 Enhanced Links.Animate', key: 'animate', name: 'Link animation', type: 'combo', options: LINK_ANIMATION_OPTIONS, default: 9, group: 'Links · Effect', tooltip: 'Effect drawn along every link.' },
-    { id: '🔗 Enhanced Links.Animation.Speed', key: 'animationSpeed', name: 'Link animation speed', type: 'slider', min: 0.1, max: 5, step: 0.1, default: 1, group: 'Links · Effect' },
+    { id: '🔗 Enhanced Links.Animation.Speed', key: 'animationSpeed', name: 'Link animation speed', type: 'slider', min: 0.1, max: 3, step: 0.05, default: 1, group: 'Links · Effect' },
     { id: '🔗 Enhanced Links.Direction', key: 'direction', name: 'Link flow direction', type: 'combo', options: DIRECTION_OPTIONS, default: 1, group: 'Links · Effect', tooltip: 'Which way effects travel.' },
     { id: '🔗 Enhanced Links.Static.Mode', key: 'staticMode', name: 'Freeze link animation', type: 'boolean', default: false, group: 'Links · Effect', tooltip: 'Keep the look but stop the motion.' },
 
-    { id: '🔗 Enhanced Links.Link.Style', key: 'linkStyle', name: 'Link path shape', type: 'combo', options: LINK_STYLE_OPTIONS, default: 'spline', group: 'Links · Path' },
+    { id: '🔗 Enhanced Links.Link.Style', key: 'linkStyle', name: 'Link path shape', type: 'combo', options: LINK_STYLE_OPTIONS, default: 'spline', group: 'Links · Path', tooltip: 'Same as ComfyUI follows the Link Render Mode setting.' },
     { id: '🔗 Enhanced Links.Thickness', key: 'thickness', name: 'Link thickness', type: 'slider', min: 1, max: 10, step: 0.5, default: 3, group: 'Links · Path' },
     { id: '🔗 Enhanced Links.Quality', key: 'quality', name: 'Link effect quality', type: 'combo', options: QUALITY_OPTIONS, default: 1, group: 'Links · Path', tooltip: 'More detail, more GPU.' },
-    { id: '🔗 Enhanced Links.Particle.Density', key: 'particleDensity', name: 'Link particle density', type: 'slider', min: 0, max: 2, step: 0.1, default: 0.5, group: 'Links · Path', tooltip: 'How many particles or markers each link carries.' },
+    { id: '🔗 Enhanced Links.Particle.Density', key: 'particleDensity', name: 'Link particle density', type: 'combo', options: DENSITY_OPTIONS, snap: true, default: 0.5, group: 'Links · Path', tooltip: 'How many particles or markers each link carries.' },
 
     { id: '🔗 Enhanced Links.Color.Mode', key: 'colorMode', name: 'Link colors', type: 'combo', options: LINK_COLOR_MODE_OPTIONS, default: 'default', group: 'Links · Color', tooltip: 'Type colors follow your palette.' },
     { id: '🔗 Enhanced Links.Color.Primary', key: 'colorPrimary', name: 'Link primary color', type: 'color', default: '#ffb300', group: 'Links · Color', tooltip: 'Used when Link colors is Custom.' },
@@ -173,54 +190,57 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Color.Scheme', key: 'colorScheme', name: 'Link color boost', type: 'combo', options: COLOR_SCHEME_OPTIONS, default: 'default', group: 'Links · Color', tooltip: 'Filter applied on top of the colors.' },
     { id: '🔗 Enhanced Links.Glow.Intensity', key: 'glowIntensity', name: 'Link glow', type: 'slider', min: 0, max: 20, step: 1, default: 10, group: 'Links · Color' },
 
-    { id: '🔗 Enhanced Links.Marker.Enabled', key: 'markerEnabled', name: 'Flow markers', type: 'boolean', default: true, group: 'Links · Markers', tooltip: 'Shapes gliding along links in Classic Flow.' },
+    { id: '🔗 Enhanced Links.Marker.Enabled', key: 'markerEnabled', name: 'Flow markers', type: 'boolean', default: true, group: 'Links · Markers', tooltip: 'Shapes gliding along links in Classic Flow, and in the other animations with Markers on every animation.' },
+    { id: '🔗 Enhanced Links.Marker.All', key: 'markerAll', name: 'Markers on every animation', type: 'boolean', default: false, group: 'Links · Markers', tooltip: 'Flow markers over every link animation, not only Classic Flow.' },
     { id: '🔗 Enhanced Links.Marker.Shape', key: 'markerShape', name: 'Marker shape', type: 'combo', options: MARKER_SHAPE_OPTIONS, default: 'arrow', group: 'Links · Markers' },
     { id: '🔗 Enhanced Links.Marker.Size', key: 'markerSize', name: 'Marker size', type: 'slider', min: 1, max: 5, step: 0.5, default: 3, group: 'Links · Markers' },
-    { id: '🔗 Enhanced Links.Marker.Color.Mode', key: 'markerColorMode', name: 'Marker color', type: 'combo', options: MARKER_COLOR_MODE_OPTIONS, default: 'default', group: 'Links · Markers' },
+    { id: '🔗 Enhanced Links.Marker.Color.Mode', key: 'markerColorMode', name: 'Marker color', type: 'combo', options: MARKER_COLOR_MODE_OPTIONS, default: 'default', group: 'Links · Markers', tooltip: 'Same as link follows custom link colors.' },
     { id: '🔗 Enhanced Links.Marker.Color', key: 'markerColor', name: 'Marker custom color', type: 'color', default: '#00fff7', group: 'Links · Markers', tooltip: 'Used when Marker color is Custom.' },
     { id: '🔗 Enhanced Links.Marker.Glow', key: 'markerGlow', name: 'Marker glow', type: 'slider', min: 0, max: 20, step: 1, default: 10, group: 'Links · Markers' },
     { id: '🔗 Enhanced Links.Marker.Effects', key: 'markerEffects', name: 'Marker effect', type: 'combo', options: MARKER_EFFECT_OPTIONS, default: 'none', group: 'Links · Markers' },
 
-    { id: '🔗 Enhanced Links.Link.Shadow.Enabled', key: 'linkShadowEnabled', name: 'Link shadow', type: 'boolean', default: false, group: 'Links · Shadows', tooltip: 'Drop shadow under links in Classic Flow.' },
-    { id: '🔗 Enhanced Links.Marker.Shadow.Enabled', key: 'markerShadowEnabled', name: 'Marker shadow', type: 'boolean', default: false, group: 'Links · Shadows', tooltip: 'Drop shadow under flow markers.' },
-    { id: '🔗 Enhanced Links.Shadow.Blur', key: 'shadowBlur', name: 'Drop shadow blur', type: 'slider', min: 0, max: 10, step: 0.5, default: 5, group: 'Links · Shadows' },
-    { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows' },
+    { id: '🔗 Enhanced Links.Link.Shadow.Enabled', key: 'linkShadowEnabled', name: 'Link shadow', type: 'boolean', default: true, group: 'Links · Shadows', tooltip: 'Dark outline under links in Classic Flow, which makes them stand out.' },
+    { id: '🔗 Enhanced Links.Marker.Shadow.Enabled', key: 'markerShadowEnabled', name: 'Marker shadow', type: 'boolean', default: true, group: 'Links · Shadows', tooltip: 'Dark outline under flow markers.' },
+    { id: '🔗 Enhanced Links.Shadow.Style', key: 'shadowStyle', name: 'Shadow style', type: 'combo', options: SHADOW_STYLE_OPTIONS, default: 'halo', group: 'Links · Shadows', tooltip: 'Halo is the soft dark outline v1 drew; Drop shadow is offset, as in v2.' },
+    { id: '🔗 Enhanced Links.Shadow.Blur', key: 'shadowBlur', name: 'Drop shadow blur', type: 'slider', min: 0, max: 10, step: 0.5, default: 5, group: 'Links · Shadows', tooltip: 'Used by Drop shadow.' },
+    { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows', tooltip: 'Used by Drop shadow.' },
 
     { id: '🔗 Enhanced Links.Coexist', key: 'coexist', name: 'Other link extensions', type: 'combo', options: COEXIST_OPTIONS, default: 'auto', group: 'Links · Compatibility', tooltip: 'When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.' },
 
-    { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', tooltip: 'Effect drawn on and around every node.' },
-    { id: '📦 Enhanced Nodes.Animations.Enabled', key: 'animationsEnabled', name: 'Show base effect', type: 'boolean', default: true, group: 'Nodes · Effect', tooltip: 'Off hides the effect but keeps node particles.' },
-    { id: '📦 Enhanced Nodes.Animation.Speed', key: 'animationSpeed', name: 'Node effect speed', type: 'slider', min: 0.1, max: 5, step: 0.1, default: 1, group: 'Nodes · Effect' },
+    { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', tooltip: 'Effect drawn on and around every node. Node FX in the node menu picks one for a node.' },
+    { id: '📦 Enhanced Nodes.Animations.Enabled', key: 'animationsEnabled', name: 'Show base effect', type: 'boolean', default: true, group: 'Nodes · Effect', tooltip: "Off draws only the effect's own particles." },
+    { id: '📦 Enhanced Nodes.Animation.Speed', key: 'animationSpeed', name: 'Node effect speed', type: 'slider', min: 0.1, max: 3, step: 0.1, default: 1, group: 'Nodes · Effect' },
     { id: '📦 Enhanced Nodes.Direction', key: 'direction', name: 'Node effect direction', type: 'combo', options: DIRECTION_OPTIONS, default: 1, group: 'Nodes · Effect' },
     { id: '📦 Enhanced Nodes.Static.Mode', key: 'staticMode', name: 'Freeze node effects', type: 'boolean', default: false, group: 'Nodes · Effect' },
-    { id: '📦 Enhanced Nodes.Intensity', key: 'intensity', name: 'Node effect energy', type: 'slider', min: 0, max: 3, step: 0.1, default: 1, group: 'Nodes · Effect' },
+    { id: '📦 Enhanced Nodes.Intensity', key: 'intensity', name: 'Node effect energy', type: 'slider', min: 0.1, max: 2, step: 0.1, default: 1, group: 'Nodes · Effect' },
     { id: '📦 Enhanced Nodes.Animation.Size', key: 'animationSize', name: 'Node effect size', type: 'slider', min: 0.5, max: 3, step: 0.1, default: 1, group: 'Nodes · Effect' },
-    { id: '📦 Enhanced Nodes.Animation.Glow', key: 'animationGlow', name: 'Node effect bloom', type: 'slider', min: 0, max: 2, step: 0.1, default: 0.5, group: 'Nodes · Effect', tooltip: 'Multiplies Node effect energy.' },
+    { id: '📦 Enhanced Nodes.Animation.Glow', key: 'animationGlow', name: 'Node effect bloom', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Effect', tooltip: "Glow of the effect's lines and light, and of the hover outline." },
     { id: '📦 Enhanced Nodes.Quality', key: 'quality', name: 'Node effect quality', type: 'combo', options: QUALITY_OPTIONS, default: 2, group: 'Nodes · Effect', tooltip: 'More detail, more GPU.' },
 
-    { id: '📦 Enhanced Nodes.Glow.Show', key: 'glowShow', name: 'Node effect glow', type: 'boolean', default: true, group: 'Nodes · Glow & hover', tooltip: 'Off draws node effects without glow.' },
-    { id: '📦 Enhanced Nodes.Glow', key: 'glow', name: 'Node glow strength', type: 'slider', min: 0, max: 2, step: 0.1, default: 0.5, group: 'Nodes · Glow & hover', tooltip: 'Glow of node effects and the hover outline.' },
+    { id: '📦 Enhanced Nodes.Glow.Show', key: 'glowShow', name: 'Node effect glow', type: 'boolean', default: true, group: 'Nodes · Glow & hover', tooltip: "A halo in the effect's primary color around each node with an effect." },
+    { id: '📦 Enhanced Nodes.Glow', key: 'glow', name: 'Node glow strength', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Glow & hover', tooltip: 'How far the halo and the selection frame glow.' },
+    { id: '📦 Enhanced Nodes.Selection.Glow', key: 'selectionGlow', name: 'Glowing frame around selected nodes', type: 'boolean', default: true, group: 'Nodes · Glow & hover', tooltip: 'On nodes with an effect.' },
     { id: '📦 Enhanced Nodes.Color.Hover.Show', key: 'colorHoverShow', name: 'Hover outline', type: 'boolean', default: false, group: 'Nodes · Glow & hover', tooltip: 'Outlines animated nodes while hovered or selected.' },
     { id: '📦 Enhanced Nodes.Color.Hover', key: 'colorHover', name: 'Hover outline color', type: 'color', default: '#00ff15', group: 'Nodes · Glow & hover' },
 
     { id: '📦 Enhanced Nodes.Color.Mode', key: 'colorMode', name: 'Node effect colors', type: 'combo', options: NODE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Color' },
-    { id: '📦 Enhanced Nodes.Color.Primary', key: 'colorPrimary', name: 'Node primary color', type: 'color', default: '#44aaff', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
-    { id: '📦 Enhanced Nodes.Color.Secondary', key: 'colorSecondary', name: 'Node secondary color', type: 'color', default: '#88ccff', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
-    { id: '📦 Enhanced Nodes.Color.Accent', key: 'colorAccent', name: 'Node accent color', type: 'color', default: '#0088ff', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
+    { id: '📦 Enhanced Nodes.Color.Primary', key: 'colorPrimary', name: 'Node primary color', type: 'color', default: '#ffb300', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
+    { id: '📦 Enhanced Nodes.Color.Secondary', key: 'colorSecondary', name: 'Node secondary color', type: 'color', default: '#fb00ff', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
+    { id: '📦 Enhanced Nodes.Color.Accent', key: 'colorAccent', name: 'Node accent color', type: 'color', default: '#9d00ff', group: 'Nodes · Color', tooltip: 'Used when Node effect colors is Custom.' },
     { id: '📦 Enhanced Nodes.Color.Scheme', key: 'colorScheme', name: 'Node color boost', type: 'combo', options: COLOR_SCHEME_OPTIONS, default: 'default', group: 'Nodes · Color', tooltip: 'Filter applied on top of the colors.' },
 
     { id: '📦 Enhanced Nodes.Particle.Show', key: 'particleShow', name: 'Node particles', type: 'boolean', default: false, group: 'Nodes · Particles', tooltip: 'Also drawn when Node effect is None.' },
-    { id: '📦 Enhanced Nodes.Particle.Density', key: 'particleDensity', name: 'Node particle density', type: 'slider', min: 0, max: 3, step: 0.1, default: 1, group: 'Nodes · Particles' },
+    { id: '📦 Enhanced Nodes.Particle.Density', key: 'particleDensity', name: 'Node particle density', type: 'combo', options: DENSITY_OPTIONS, snap: true, default: 1, group: 'Nodes · Particles' },
     { id: '📦 Enhanced Nodes.Particle.Size', key: 'particleSize', name: 'Node particle size', type: 'slider', min: 0.1, max: 3, step: 0.1, default: 1, group: 'Nodes · Particles' },
     { id: '📦 Enhanced Nodes.Particle.Speed', key: 'particleSpeed', name: 'Node particle speed', type: 'slider', min: 0.1, max: 5, step: 0.1, default: 1, group: 'Nodes · Particles' },
-    { id: '📦 Enhanced Nodes.Particle.Intensity', key: 'particleIntensity', name: 'Node particle motion', type: 'slider', min: 0, max: 3, step: 0.1, default: 1, group: 'Nodes · Particles', tooltip: 'How energetic the motion is.' },
-    { id: '📦 Enhanced Nodes.Particle.Glow', key: 'particleGlow', name: 'Node particle glow', type: 'slider', min: 0, max: 2, step: 0.1, default: 0.5, group: 'Nodes · Particles' },
-    { id: '📦 Enhanced Nodes.Particle.Color.Mode', key: 'particleColorMode', name: 'Node particle colors', type: 'combo', options: PARTICLE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Particles', tooltip: 'Complementary is the opposite hue of the node accent color.' },
-    { id: '📦 Enhanced Nodes.Color.Particle', key: 'colorParticle', name: 'Node particle color', type: 'color', default: '#ffff00', group: 'Nodes · Particles', tooltip: 'Used when Node particle colors is Particle color.' },
+    { id: '📦 Enhanced Nodes.Particle.Intensity', key: 'particleIntensity', name: 'Node particle motion', type: 'slider', min: 0.1, max: 2, step: 0.1, default: 1, group: 'Nodes · Particles', tooltip: 'How energetic the motion is.' },
+    { id: '📦 Enhanced Nodes.Particle.Glow', key: 'particleGlow', name: 'Node particle glow', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Particles' },
+    { id: '📦 Enhanced Nodes.Particle.Color.Mode', key: 'particleColorMode', name: 'Node particle colors', type: 'combo', options: PARTICLE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Particles', tooltip: "Particle color takes Node particle color with Custom colors, else the effect's primary color; Complementary takes its opposite hue." },
+    { id: '📦 Enhanced Nodes.Color.Particle', key: 'colorParticle', name: 'Node particle color', type: 'color', default: '#ffb300', group: 'Nodes · Particles', tooltip: 'Used when Node effect colors is Custom.' },
 
     { id: '📦 Enhanced Nodes.Text.Animation.Enabled', key: 'textAnimationEnabled', name: 'Animated titles', type: 'boolean', default: false, group: 'Nodes · Titles', tooltip: 'Draws each node title in the chosen style.' },
     { id: '📦 Enhanced Nodes.Text.Style', key: 'textStyle', name: 'Title style', type: 'combo', options: TEXT_STYLE_OPTIONS, default: 'neon', group: 'Nodes · Titles' },
-    { id: '📦 Enhanced Nodes.Text.Color', key: 'textColor', name: 'Title color', type: 'color', default: '#00ffff', group: 'Nodes · Titles' },
+    { id: '📦 Enhanced Nodes.Text.Color', key: 'textColor', name: 'Title color', type: 'color', default: '#00ffff', group: 'Nodes · Titles', tooltip: "Used when Node effect colors is Custom; otherwise titles take the effect's accent color." },
     { id: '📦 Enhanced Nodes.Text.Size', key: 'textSize', name: 'Title size', type: 'slider', min: 8, max: 24, step: 1, default: 14, group: 'Nodes · Titles' },
     { id: '📦 Enhanced Nodes.Text.Glow', key: 'textGlow', name: 'Title glow', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Titles' },
     { id: '📦 Enhanced Nodes.Text.Letter.Spacing', key: 'textLetterSpacing', name: 'Title letter spacing', type: 'slider', min: -2, max: 10, step: 0.25, default: 0, group: 'Nodes · Titles' },
@@ -230,8 +250,8 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Text.Rotation.Angle', key: 'textRotationAngle', name: 'Title rotation', type: 'slider', min: -180, max: 180, step: 5, default: 0, group: 'Nodes · Titles' },
 
     { id: '🔗 Enhanced Links.Pause.During.Render', key: 'pauseDuringRender', name: 'Pause link animation during runs', type: 'boolean', default: true, group: 'Runs · During a run', tooltip: 'Links hold a still frame while the queue is running.' },
-    { id: '📦 Enhanced Nodes.Pause.During.Render', key: 'pauseDuringRender', name: 'Pause node effects during runs', type: 'boolean', default: true, group: 'Runs · During a run', tooltip: 'Node effects hold still while the queue is running; their particles keep moving.' },
-    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Completion effect', type: 'boolean', default: false, group: 'Runs · Completion', tooltip: 'Has no effect yet.' },
+    { id: '📦 Enhanced Nodes.Pause.During.Render', key: 'pauseDuringRender', name: 'Pause node effects during runs', type: 'boolean', default: true, group: 'Runs · During a run', tooltip: 'Node effects and their particles hold still while the queue is running.' },
+    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Fireworks when a run finishes', type: 'boolean', default: true, group: 'Runs · Completion', tooltip: "Above your run's output nodes. Completion FX in the node menu sets them for one node." },
 ] as const satisfies readonly Setting[];
 
 // =============================================================================
@@ -255,8 +275,13 @@ function normalize(s: Setting, value: unknown): unknown {
             return value === 'true' ? true : value === 'false' ? false : s.default;
         case 'slider':
             return typeof numeric === 'number' && !Number.isNaN(numeric) ? Math.min(s.max, Math.max(s.min, numeric)) : s.default;
-        case 'combo':
-            return s.options.find((o) => o.value === value || o.value === numeric)?.value ?? s.default;
+        case 'combo': {
+            const option = s.options.find((o) => o.value === value || o.value === numeric);
+            if (option) return option.value;
+            // v2's density sliders stored any number from 0, which takes the nearest preset.
+            if (!s.snap || typeof numeric !== 'number' || Number.isNaN(numeric)) return s.default;
+            return s.options.reduce((best, o) => (Math.abs(Number(o.value) - numeric) < Math.abs(Number(best.value) - numeric) ? o : best)).value;
+        }
         case 'color':
             // Whole hex colours only: 1.39.5's hex field stores every keystroke, and '#abc' may be how '#abcdef' starts.
             return typeof value === 'string' && HEX.test(value) ? `#${value.replace('#', '').toLowerCase()}` : value;
