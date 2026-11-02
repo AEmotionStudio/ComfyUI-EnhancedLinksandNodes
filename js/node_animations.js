@@ -1,6 +1,6 @@
 import { app } from "/scripts/app.js";
 import { api } from "/scripts/api.js";
-import { N, t as translucent, r as revision, p as pool, c as clock, n as nodePalette, C as CAP, d as rng, e as env, f as live, w as wake, g as disc, h as NODE_ANIMATION_OPTIONS, j as nodeSettings, i as install, a as installPanel, k as layers, m as guard, o as drawNodeFx, O as OVER, q as dummy, s as holdsStill, u as reach, U as UNDER, S as STILL_NODE, v as startSprites, x as stopSprites } from "./chunks/sidebar-DL7e4t_v.js";
+import { N, H as translucent, I as revision, S as SELECTION_FX, J as nodeMenu, K as nodeSettings, d as install, e as installPanel, M as layers, O as live, P as startSprites, Q as drawBursts, R as guard, U as particlesOnly$1, V as drawNodeFx, W as clock, X as OVER, Y as dummy, D as fireworks, Z as holdsStill, _ as reach, $ as UNDER, a0 as wake, a1 as ownStyle, a2 as STILL_NODE, a3 as nodePalette, a4 as OWN_COMPLETION, a5 as stopSprites } from "./chunks/menus-BcXUDhho.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -139,131 +139,6 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
     ctx.restore();
   }
 }
-const BURSTS = [
-  { x: 0.05, y: -0.2, delay: 0, colour: "#FF3366", size: 3.2 },
-  { x: 0.03, y: -0.15, delay: 0.1, colour: "#33EEFF", size: 2.9 },
-  { x: 0.06, y: -0.15, delay: 0.2, colour: "#FFEE33", size: 3 }
-];
-const RATE = 0.84;
-const SPARKS = 250;
-const SPARKLES = 40;
-const [CORE, SPARK, SPARKLE, GLOW] = [0, 1, 2, 3];
-const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
-const bursts = [];
-const progress = () => clock.burstTime * RATE;
-function hash(text) {
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
-  return h;
-}
-function add(kind, owner, angle = 0, speed = 0, size = 0, colour = 0, trail = 0, seq = 0) {
-  const i = pool.count++;
-  pool.kind[i] = kind;
-  pool.owner[i] = owner;
-  pool.angle[i] = angle;
-  pool.speed[i] = speed;
-  pool.size[i] = size;
-  pool.colour[i] = colour;
-  pool.trail[i] = trail;
-  pool.seq[i] = seq;
-}
-function fireworks(nodes, run) {
-  if (pool.count && progress() < 1 || !nodes.length) return;
-  pool.count = bursts.length = 0;
-  clock.burstTime = 0;
-  const { secondary, accent } = nodePalette(N.animate);
-  for (const node of nodes) {
-    if (pool.count + SHOW > CAP) break;
-    const random = rng(hash(run) ^ hash(String(node.id)));
-    for (const { x, y, delay, size, colour } of BURSTS) {
-      const owner = bursts.push({ node, x, y, delay, size, colours: [colour, secondary, accent, "#FFFFFF"] }) - 1;
-      if (env.reducedMotion) {
-        add(GLOW, owner);
-        break;
-      }
-      add(CORE, owner);
-      for (let i = 0; i < SPARKS; i++) {
-        const speed = 0.3 + random() * 0.7;
-        const shade = Math.floor(random() * 4);
-        add(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
-      }
-      for (let j = 0; j < SPARKLES; j++) add(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
-    }
-  }
-  live.bursts = pool.count;
-  wake();
-}
-function drawBursts(canvas, ctx) {
-  const phase = progress();
-  if (phase >= 1) pool.count = bursts.length = 0;
-  live.bursts = pool.count;
-  if (!pool.count) return;
-  const area = canvas.visible_area;
-  const unit = 1 / canvas.ds.scale;
-  const view = Math.min(area[2], area[3]);
-  ctx.save();
-  try {
-    ctx.globalCompositeOperation = "lighter";
-    for (let i = 0; i < pool.count; i++) {
-      const burst = bursts[pool.owner[i]];
-      const t = phase - burst.delay;
-      if (t <= 0 || burst.node.graph !== canvas.graph) continue;
-      const x = burst.node.pos[0] + area[2] * burst.x;
-      const y = burst.node.pos[1] + area[3] * burst.y;
-      const reach2 = view * 0.2 * burst.size;
-      const colour = burst.colours[pool.colour[i]];
-      switch (pool.kind[i]) {
-        case CORE: {
-          const fade = 1 - t * 1.2;
-          if (fade <= 0) break;
-          const radius = reach2 * (0.1 + 0.5 * t);
-          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-          gradient.addColorStop(0, translucent("#FFFFFF", 0.95 * fade));
-          gradient.addColorStop(0.5, translucent(colour, 0.8 * fade));
-          gradient.addColorStop(1, translucent(colour, 0));
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fill();
-          break;
-        }
-        case SPARK: {
-          const alpha = 1 - t * 1.2;
-          if (alpha <= 0) break;
-          const speed = reach2 * pool.speed[i];
-          const angle = pool.angle[i] + Math.sin(t * 10 + pool.seq[i]) * 0.05;
-          const gravity = 0.2 * reach2;
-          const dy = Math.sin(angle) * speed * t + gravity * t * t;
-          const size = Math.max(1, 3 * (1 - t) * pool.size[i]) * unit;
-          disc(ctx, x + Math.cos(angle) * speed * t, y + dy, size * 1.2, colour, alpha, true);
-          for (let j = 1; j <= pool.trail[i]; j++) {
-            const back = Math.max(0, t - 0.02 * j);
-            disc(ctx, x + Math.cos(angle) * speed * back, y + Math.sin(angle) * speed * back + gravity * back * back, size * (1 - j * 0.2), colour, alpha * (0.7 - j * 0.2), false);
-          }
-          break;
-        }
-        case SPARKLE: {
-          if (t >= 0.3 || pool.seq[i] >= Math.floor(SPARKLES * (1 - t / 0.3))) break;
-          const dist = reach2 * 0.7 * t * pool.speed[i];
-          disc(ctx, x + Math.cos(pool.angle[i]) * dist, y + Math.sin(pool.angle[i]) * dist, (1 + pool.size[i] * 4 * (1 - t)) * unit, colour, 0.95 * (1 - t * 3), false);
-          break;
-        }
-        default: {
-          const radius = reach2 * 0.4;
-          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-          gradient.addColorStop(0, translucent(colour, 0.5 * Math.sin(Math.PI * Math.min(t, 1))));
-          gradient.addColorStop(1, translucent(colour, 0));
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(x, y, radius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    }
-  } finally {
-    ctx.restore();
-  }
-}
 const EFFECT = "Node effect";
 const PARTICLES = "Node particles";
 const TITLES = "Animated titles";
@@ -271,14 +146,6 @@ const FIREWORKS = "Fireworks";
 const [ROUND, CIRCLE, CARD] = [2, 3, 4];
 const [NEVER, BYPASS] = [2, 4];
 const NO_TITLE = 1;
-const OWN_STYLE = "enhanced_fx_style";
-const OWN_ONLY = "enhanced_fx_particles_only";
-const OWN_COMPLETION = "enhanced_fx_completion";
-const STYLES = new Set(NODE_ANIMATION_OPTIONS.map((option) => option.value));
-function ownStyle(node) {
-  const style = node.properties[OWN_STYLE];
-  return STYLES.has(style) ? style : void 0;
-}
 const styleWanted = (node) => ownStyle(node) ?? N.animate;
 function styleOf(node) {
   if (!N.enabled || node.flags.collapsed) return void 0;
@@ -286,10 +153,7 @@ function styleOf(node) {
   if (style > 0) return style;
   return ownStyle(node) === void 0 && N.particleShow ? 0 : void 0;
 }
-function particlesOnly(node, style) {
-  const own = node.properties[OWN_ONLY];
-  return style === 0 || (typeof own === "boolean" ? own : !N.animationsEnabled);
-}
+const particlesOnly = (node, style) => style === 0 || particlesOnly$1(node);
 const draws = (only) => N.particleShow || !only;
 const keyOf = (style) => style ? EFFECT : PARTICLES;
 function modeAlpha(canvas, node) {
@@ -392,16 +256,6 @@ function styledTitle(canvas, ctx, node) {
 }
 let shaping;
 let titled;
-function pick(node, choices) {
-  app.canvas.emitBeforeChange();
-  for (const [key, value] of Object.entries(choices)) {
-    if (value === void 0) delete node.properties[key];
-    else node.properties[key] = value;
-  }
-  app.canvas.emitAfterChange();
-  app.canvas.setDirty(true, false);
-}
-const entry = (content, ticked, callback) => ({ content: ticked ? `✓ ${content}` : content, callback });
 const reached = /* @__PURE__ */ new Set();
 let ranOn;
 function celebrates(node) {
@@ -481,38 +335,9 @@ const ext = {
     });
     console.log("[EnhancedNodes] Extension registered with full animation pipeline.");
   },
-  // One submenu level each, with has_submenu, so the Vue node menu shows them too (FE157 composables/graph/contextMenuConverter.ts L428-447).
-  getNodeMenuItems(node) {
-    const style = ownStyle(node);
-    const only = node.properties[OWN_ONLY];
-    const completion = node.properties[OWN_COMPLETION];
-    const particles = typeof only === "boolean" ? only : !N.animationsEnabled;
-    return [
-      {
-        content: "Node FX",
-        has_submenu: true,
-        submenu: {
-          options: [
-            entry("Use global", style === void 0 && typeof only !== "boolean", () => pick(node, { [OWN_STYLE]: void 0, [OWN_ONLY]: void 0 })),
-            ...NODE_ANIMATION_OPTIONS.map((option) => entry(option.text, style === option.value, () => pick(node, { [OWN_STYLE]: option.value }))),
-            null,
-            entry("Particles only", particles, () => pick(node, { [OWN_ONLY]: !particles }))
-          ]
-        }
-      },
-      {
-        content: "Completion FX",
-        has_submenu: true,
-        submenu: {
-          options: [
-            entry("Use global", completion !== "fireworks" && completion !== "off", () => pick(node, { [OWN_COMPLETION]: void 0 })),
-            entry("Fireworks", completion === "fireworks", () => pick(node, { [OWN_COMPLETION]: "fireworks" })),
-            entry("Off", completion === "off", () => pick(node, { [OWN_COMPLETION]: "off" }))
-          ]
-        }
-      }
-    ];
-  }
+  getNodeMenuItems: nodeMenu,
+  // Per selected item; the toolbox shows each command once (FE157 components/graph/SelectionToolbox.vue L86-99).
+  getSelectionToolboxCommands: (item) => item instanceof LGraphNode && N.enabled ? [SELECTION_FX] : []
 };
 app.registerExtension(ext);
 //# sourceMappingURL=node_animations.js.map

@@ -132,7 +132,7 @@ const DENSE = /* @__PURE__ */ new Set([1, 2, 3, 7, 8]);
 const linksOn = () => L.enabled && L.animate !== 0;
 const markers = () => linksOn() && (L.animate === CLASSIC$2 || L.markerAll) && L.markerEnabled;
 const shadows = () => linksOn() && L.animate === CLASSIC$2 && L.linkShadowEnabled || markers() && L.markerShadowEnabled;
-const effects = () => N.enabled && N.animate !== 0;
+const effects$1 = () => N.enabled && N.animate !== 0;
 const nodesDraw = () => N.enabled && (N.animate !== 0 || N.particleShow || N.textAnimationEnabled);
 const particles = () => N.enabled && N.particleShow;
 const titles = () => N.enabled && N.textAnimationEnabled;
@@ -172,19 +172,19 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Shadow.Offset", key: "shadowOffset", name: "Drop shadow offset", type: "slider", min: 0, max: 10, step: 0.5, default: 3, group: "Links · Shadows", advanced: true, showIf: () => shadows() && L.shadowStyle === "drop", tooltip: "Used by Drop shadow." },
   { id: "📦 Enhanced Nodes.Enabled", key: "enabled", name: "Node effects", type: "boolean", default: true, group: "Nodes · Effect", look: false, tooltip: "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is." },
   { id: "📦 Enhanced Nodes.Animate", key: "animate", name: "Node effect", type: "combo", options: NODE_ANIMATION_OPTIONS, default: 0, group: "Nodes · Effect", showIf: () => N.enabled, tooltip: "Effect drawn on and around every node. Node FX in the node menu picks one for a node." },
-  { id: "📦 Enhanced Nodes.Animations.Enabled", key: "animationsEnabled", name: "Show base effect", type: "boolean", default: true, group: "Nodes · Effect", advanced: true, showIf: effects, tooltip: "Off draws only the effect's own particles." },
-  { id: "📦 Enhanced Nodes.Animation.Speed", key: "animationSpeed", name: "Node effect speed", type: "slider", min: 0.1, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: () => effects() && !N.staticMode },
-  { id: "📦 Enhanced Nodes.Direction", key: "direction", name: "Node effect direction", type: "combo", options: DIRECTION_OPTIONS, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects },
+  { id: "📦 Enhanced Nodes.Animations.Enabled", key: "animationsEnabled", name: "Show base effect", type: "boolean", default: true, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "Off draws only the effect's own particles." },
+  { id: "📦 Enhanced Nodes.Animation.Speed", key: "animationSpeed", name: "Node effect speed", type: "slider", min: 0.1, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: () => effects$1() && !N.staticMode },
+  { id: "📦 Enhanced Nodes.Direction", key: "direction", name: "Node effect direction", type: "combo", options: DIRECTION_OPTIONS, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects$1 },
   { id: "📦 Enhanced Nodes.Static.Mode", key: "staticMode", name: "Freeze node effects", type: "boolean", default: false, group: "Nodes · Effect", showIf: nodesDraw },
-  { id: "📦 Enhanced Nodes.Intensity", key: "intensity", name: "Node effect energy", type: "slider", min: 0.1, max: 2, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects },
-  { id: "📦 Enhanced Nodes.Animation.Size", key: "animationSize", name: "Node effect size", type: "slider", min: 0.5, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects },
-  { id: "📦 Enhanced Nodes.Animation.Glow", key: "animationGlow", name: "Node effect bloom", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Effect", advanced: true, showIf: effects, tooltip: "Glow of the effect's lines and light, and of the hover outline." },
-  { id: "📦 Enhanced Nodes.Quality", key: "quality", name: "Node effect quality", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Effect", advanced: true, showIf: effects, tooltip: "More detail, more GPU." },
-  { id: "📦 Enhanced Nodes.Glow.Show", key: "glowShow", name: "Node effect glow", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects, tooltip: "A halo in the effect's primary color around each node with an effect." },
-  { id: "📦 Enhanced Nodes.Glow", key: "glow", name: "Node glow strength", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Glow & hover", showIf: () => effects() && (N.glowShow || N.selectionGlow), tooltip: "How far the halo and the selection frame glow." },
-  { id: "📦 Enhanced Nodes.Selection.Glow", key: "selectionGlow", name: "Glowing frame around selected nodes", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects, tooltip: "On nodes with an effect." },
-  { id: "📦 Enhanced Nodes.Color.Hover.Show", key: "colorHoverShow", name: "Hover outline", type: "boolean", default: false, group: "Nodes · Glow & hover", advanced: true, showIf: effects, tooltip: "Outlines animated nodes while hovered or selected." },
-  { id: "📦 Enhanced Nodes.Color.Hover", key: "colorHover", name: "Hover outline color", type: "color", default: "#00ff15", group: "Nodes · Glow & hover", advanced: true, showIf: () => effects() && N.colorHoverShow },
+  { id: "📦 Enhanced Nodes.Intensity", key: "intensity", name: "Node effect energy", type: "slider", min: 0.1, max: 2, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects$1 },
+  { id: "📦 Enhanced Nodes.Animation.Size", key: "animationSize", name: "Node effect size", type: "slider", min: 0.5, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects$1 },
+  { id: "📦 Enhanced Nodes.Animation.Glow", key: "animationGlow", name: "Node effect bloom", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "Glow of the effect's lines and light, and of the hover outline." },
+  { id: "📦 Enhanced Nodes.Quality", key: "quality", name: "Node effect quality", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "More detail, more GPU." },
+  { id: "📦 Enhanced Nodes.Glow.Show", key: "glowShow", name: "Node effect glow", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "A halo in the effect's primary color around each node with an effect." },
+  { id: "📦 Enhanced Nodes.Glow", key: "glow", name: "Node glow strength", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Glow & hover", showIf: () => effects$1() && (N.glowShow || N.selectionGlow), tooltip: "How far the halo and the selection frame glow." },
+  { id: "📦 Enhanced Nodes.Selection.Glow", key: "selectionGlow", name: "Glowing frame around selected nodes", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "On nodes with an effect." },
+  { id: "📦 Enhanced Nodes.Color.Hover.Show", key: "colorHoverShow", name: "Hover outline", type: "boolean", default: false, group: "Nodes · Glow & hover", advanced: true, showIf: effects$1, tooltip: "Outlines animated nodes while hovered or selected." },
+  { id: "📦 Enhanced Nodes.Color.Hover", key: "colorHover", name: "Hover outline color", type: "color", default: "#00ff15", group: "Nodes · Glow & hover", advanced: true, showIf: () => effects$1() && N.colorHoverShow },
   { id: "📦 Enhanced Nodes.Color.Mode", key: "colorMode", name: "Node effect colors", type: "combo", options: NODE_COLOR_MODE_OPTIONS, default: "default", group: "Nodes · Color", showIf: nodesDraw },
   { id: "📦 Enhanced Nodes.Color.Primary", key: "colorPrimary", name: "Node primary color", type: "color", default: "#ffb300", group: "Nodes · Color", showIf: () => nodesDraw() && N.colorMode === "custom", tooltip: "Used when Node effect colors is Custom." },
   { id: "📦 Enhanced Nodes.Color.Secondary", key: "colorSecondary", name: "Node secondary color", type: "color", default: "#fb00ff", group: "Nodes · Color", showIf: () => nodesDraw() && N.colorMode === "custom", tooltip: "Used when Node effect colors is Custom." },
@@ -259,6 +259,10 @@ const N = snapshot(NODES);
 let revision = 0;
 const snapshotOf = (id) => id.startsWith(LINKS$1) ? L : N;
 const shown$2 = (id) => snapshotOf(id)[setting(id).key];
+function checked(id) {
+  app.extensionManager.setting.get(id);
+  return shown$2(id);
+}
 const listeners = /* @__PURE__ */ new Set();
 function watch(listener) {
   listeners.add(listener);
@@ -948,6 +952,131 @@ function disc(ctx, x, y, r, colour2, alpha, soft) {
   const h2 = found.half * d / found.size / scale;
   ctx.drawImage(found.image, x - h2, y - h2, 2 * h2, 2 * h2);
   ctx.globalAlpha = before2;
+}
+const BURSTS = [
+  { x: 0.05, y: -0.2, delay: 0, colour: "#FF3366", size: 3.2 },
+  { x: 0.03, y: -0.15, delay: 0.1, colour: "#33EEFF", size: 2.9 },
+  { x: 0.06, y: -0.15, delay: 0.2, colour: "#FFEE33", size: 3 }
+];
+const RATE = 0.84;
+const SPARKS = 250;
+const SPARKLES = 40;
+const [CORE, SPARK, SPARKLE, GLOW] = [0, 1, 2, 3];
+const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
+const bursts = [];
+const progress = () => clock.burstTime * RATE;
+function hash(text2) {
+  let h2 = 2166136261;
+  for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
+  return h2;
+}
+function add$1(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail = 0, seq = 0) {
+  const i = pool$1.count++;
+  pool$1.kind[i] = kind;
+  pool$1.owner[i] = owner;
+  pool$1.angle[i] = angle;
+  pool$1.speed[i] = speed;
+  pool$1.size[i] = size;
+  pool$1.colour[i] = colour2;
+  pool$1.trail[i] = trail;
+  pool$1.seq[i] = seq;
+}
+function fireworks(nodes, run) {
+  if (pool$1.count && progress() < 1 || !nodes.length) return;
+  pool$1.count = bursts.length = 0;
+  clock.burstTime = 0;
+  const { secondary, accent } = nodePalette(N.animate);
+  for (const node2 of nodes) {
+    if (pool$1.count + SHOW > CAP) break;
+    const random = rng(hash(run) ^ hash(String(node2.id)));
+    for (const { x, y, delay, size, colour: colour2 } of BURSTS) {
+      const owner = bursts.push({ node: node2, x, y, delay, size, colours: [colour2, secondary, accent, "#FFFFFF"] }) - 1;
+      if (env.reducedMotion) {
+        add$1(GLOW, owner);
+        break;
+      }
+      add$1(CORE, owner);
+      for (let i = 0; i < SPARKS; i++) {
+        const speed = 0.3 + random() * 0.7;
+        const shade = Math.floor(random() * 4);
+        add$1(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
+      }
+      for (let j = 0; j < SPARKLES; j++) add$1(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
+    }
+  }
+  live.bursts = pool$1.count;
+  wake();
+}
+function drawBursts(canvas, ctx) {
+  const phase = progress();
+  if (phase >= 1) pool$1.count = bursts.length = 0;
+  live.bursts = pool$1.count;
+  if (!pool$1.count) return;
+  const area = canvas.visible_area;
+  const unit = 1 / canvas.ds.scale;
+  const view = Math.min(area[2], area[3]);
+  ctx.save();
+  try {
+    ctx.globalCompositeOperation = "lighter";
+    for (let i = 0; i < pool$1.count; i++) {
+      const burst = bursts[pool$1.owner[i]];
+      const t = phase - burst.delay;
+      if (t <= 0 || burst.node.graph !== canvas.graph) continue;
+      const x = burst.node.pos[0] + area[2] * burst.x;
+      const y = burst.node.pos[1] + area[3] * burst.y;
+      const reach2 = view * 0.2 * burst.size;
+      const colour2 = burst.colours[pool$1.colour[i]];
+      switch (pool$1.kind[i]) {
+        case CORE: {
+          const fade2 = 1 - t * 1.2;
+          if (fade2 <= 0) break;
+          const radius = reach2 * (0.1 + 0.5 * t);
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          gradient.addColorStop(0, translucent("#FFFFFF", 0.95 * fade2));
+          gradient.addColorStop(0.5, translucent(colour2, 0.8 * fade2));
+          gradient.addColorStop(1, translucent(colour2, 0));
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        }
+        case SPARK: {
+          const alpha = 1 - t * 1.2;
+          if (alpha <= 0) break;
+          const speed = reach2 * pool$1.speed[i];
+          const angle = pool$1.angle[i] + Math.sin(t * 10 + pool$1.seq[i]) * 0.05;
+          const gravity = 0.2 * reach2;
+          const dy2 = Math.sin(angle) * speed * t + gravity * t * t;
+          const size = Math.max(1, 3 * (1 - t) * pool$1.size[i]) * unit;
+          disc(ctx, x + Math.cos(angle) * speed * t, y + dy2, size * 1.2, colour2, alpha, true);
+          for (let j = 1; j <= pool$1.trail[i]; j++) {
+            const back = Math.max(0, t - 0.02 * j);
+            disc(ctx, x + Math.cos(angle) * speed * back, y + Math.sin(angle) * speed * back + gravity * back * back, size * (1 - j * 0.2), colour2, alpha * (0.7 - j * 0.2), false);
+          }
+          break;
+        }
+        case SPARKLE: {
+          if (t >= 0.3 || pool$1.seq[i] >= Math.floor(SPARKLES * (1 - t / 0.3))) break;
+          const dist = reach2 * 0.7 * t * pool$1.speed[i];
+          disc(ctx, x + Math.cos(pool$1.angle[i]) * dist, y + Math.sin(pool$1.angle[i]) * dist, (1 + pool$1.size[i] * 4 * (1 - t)) * unit, colour2, 0.95 * (1 - t * 3), false);
+          break;
+        }
+        default: {
+          const radius = reach2 * 0.4;
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          gradient.addColorStop(0, translucent(colour2, 0.5 * Math.sin(Math.PI * Math.min(t, 1))));
+          gradient.addColorStop(1, translucent(colour2, 0));
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+  } finally {
+    ctx.restore();
+  }
 }
 const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
 function wrap(x) {
@@ -3350,9 +3479,9 @@ function tile(scene, ms = FRAME_MS) {
 }
 const lookTile = (look) => tile(lookScene(look), LOOK_MS);
 function seen(entries) {
-  for (const entry of entries) {
-    const t = tiles.get(entry.target);
-    if (!entry.isIntersecting || !entry.target.isConnected) shown.delete(t);
+  for (const entry2 of entries) {
+    const t = tiles.get(entry2.target);
+    if (!entry2.isIntersecting || !entry2.target.isConnected) shown.delete(t);
     else if (!shown.has(t)) {
       shown.add(t);
       paint(t);
@@ -3596,144 +3725,6 @@ function row(s, found = false) {
       }
     }
   };
-}
-const SEEN = "🔗 Enhanced Links.WhatsNew.Seen";
-const NEWS$1 = "3.0.0";
-const IDLE_MS = 1500;
-const NEWS_MS = 1e4;
-const byId = (id) => LOOKS.find((look) => look.id === id);
-const SUBTLE = byId("subtle");
-let card;
-let asking = false;
-let before = null;
-const host = () => document.querySelector(".graph-canvas-panel");
-function installPicker() {
-  if (L.look !== "") return;
-  const wait = () => {
-    if (L.look !== "" || card) return;
-    if (env.running || [...document.querySelectorAll("[role=dialog]")].some((el) => el.checkVisibility())) setTimeout(wait, IDLE_MS);
-    else showPicker();
-  };
-  setTimeout(wait, IDLE_MS);
-  let unanswered = true;
-  watch((id) => {
-    if (id !== LOOK || unanswered === (L.look === "")) return;
-    unanswered = !unanswered;
-    if (unanswered) return;
-    if (asking) close();
-    queueMicrotask(whatsNew);
-  });
-}
-function showPicker() {
-  if (card) return;
-  asking = L.look === "";
-  const looks = ["off", "subtle", "showcase", "performance"].map(byId);
-  const items = looks.map((look) => {
-    const item = h(
-      "button",
-      { type: "button", role: "radio", class: "eln-tile", "data-look": look.id, title: look.description },
-      lookTile(look),
-      h("span", { class: "eln-tile-name" }, look.name),
-      h("span", { class: "eln-tile-text" }, look.description)
-    );
-    hover(item, () => previewLook(look));
-    item.addEventListener("click", () => pick(look));
-    return item;
-  });
-  const grid = h("div", { role: "radiogroup", class: "eln-looks", "aria-label": "Looks" }, ...items);
-  roving(grid, items);
-  const shown2 = currentLook();
-  check(items, shown2 && !changed(shown2) ? looks.indexOf(shown2) : -1);
-  const classic = h("button", { type: "button", class: "eln-link" }, "Classic v1");
-  hover(classic, () => previewLook(byId("classic-v1")));
-  classic.addEventListener("click", () => pick(byId("classic-v1")));
-  const more = h("button", { type: "button", class: "eln-link" }, "More looks…");
-  more.addEventListener("click", () => {
-    close();
-    showTab("looks");
-  });
-  const primary = { class: "eln-button eln-button--primary" };
-  const keeps = !asking ? [button("Done", close, primary)] : customised() ? [button("Keep Subtle", () => pick(SUBTLE)), button("Keep my settings", keepMine, primary)] : [button("Keep Subtle", () => pick(SUBTLE), primary)];
-  card = h(
-    "section",
-    { class: "eln eln-picker", tabindex: -1, "aria-labelledby": "eln-picker-title" },
-    h("header", { class: "eln-picker-head" }, h("span", { class: "eln-icon eln-mark", "aria-hidden": "true" }), h("h2", { id: "eln-picker-title", class: "eln-title" }, "Choose your look")),
-    grid,
-    h("p", { class: "eln-picker-more" }, "The original look? ", classic, " · ", more),
-    h("footer", { class: "eln-picker-foot" }, h("span", { class: "eln-hint" }, "Change it any time in the FX panel."), ...keeps),
-    iconButton("pi-times", "Close", dismiss, { class: "eln-tool eln-picker-close" })
-  );
-  card.classList.toggle("eln--still", L.motion === "reduce");
-  card.classList.toggle("eln--full", L.motion === "full");
-  card.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    event.preventDefault();
-    event.stopPropagation();
-    dismiss();
-  });
-  before = document.activeElement;
-  host().append(card);
-  if (before === document.body || before === app.canvas.canvas) card.focus();
-}
-function close() {
-  if (!card) return;
-  endHover();
-  stopTiles(card);
-  if (card.contains(document.activeElement) && before instanceof HTMLElement) before.focus();
-  card.remove();
-  card = void 0;
-}
-function pick(look) {
-  const visible = changed(look);
-  const undo = applyLook(look);
-  close();
-  if (!visible) return;
-  const again = () => {
-    undo();
-    showPicker();
-  };
-  if (!offerUndo(`${look.name} applied`, again)) undoBar$1(`${look.name} applied`, again);
-}
-function keepMine() {
-  commit(LOOK, "custom");
-}
-function dismiss() {
-  if (!asking) close();
-  else if (customised()) keepMine();
-  else if (changed(SUBTLE)) keepShown();
-  else pick(SUBTLE);
-}
-function undoBar$1(title, undo) {
-  const bar = h("div", { class: "eln eln-picker-undo", role: "status" }, h("span", {}, title), button("Undo", () => {
-    clearTimeout(timer);
-    bar.remove();
-    undo();
-  }));
-  const timer = setTimeout(() => bar.remove(), UNDO_MS);
-  host().append(bar);
-}
-function whatsNew() {
-  if (L.whatsNewSeen === NEWS$1) return;
-  commit(SEEN, NEWS$1);
-  if (!customised()) return;
-  const title = "Enhanced Links & Nodes 3.0";
-  const text2 = "Links stay clickable, v1's look is back, and a new FX panel brings looks with live previews.";
-  const { toast } = app.extensionManager;
-  if ("info" in toast) {
-    const id = toast.info(title, {
-      description: text2,
-      duration: NEWS_MS,
-      action: {
-        label: "What's new",
-        onClick() {
-          toast.dismiss(id);
-          showTab("about");
-        }
-      }
-    });
-    return;
-  }
-  app.extensionManager.toast.add({ severity: "info", summary: title, detail: `${text2} About, in the FX panel, tells more.`, life: NEWS_MS });
 }
 const css = `/*
  * The panel, on ComfyUI's own tokens so it follows the palette: the palette's
@@ -4736,6 +4727,8 @@ a.eln-button {
 }
 `;
 const TAB = "enhanced-links-nodes";
+const TOGGLE = `Workspace.ToggleSidebarTab.${TAB}`;
+const TOGGLE_ALL = "EnhancedLinksNodes.ToggleAll";
 const TITLE = "Enhanced Links & Nodes";
 const LINKS_ON = "🔗 Enhanced Links.Enabled";
 const NODES_ON = "📦 Enhanced Nodes.Enabled";
@@ -4754,14 +4747,20 @@ const TABS = [
   { id: "about", name: "About" }
 ];
 const running = { links: false, nodes: false };
+const DISABLED = {
+  links: "Link effects are off: the enhanced.link.animations extension is disabled in Settings › Extensions.",
+  nodes: "Node effects are off: the enhanced.node.animations extension is disabled in Settings › Extensions."
+};
 const badge = () => !L.enabled && !N.enabled ? "OFF" : L.staticMode || N.staticMode ? "‖" : "";
 const BADGED = /* @__PURE__ */ new Set([LINKS_ON, NODES_ON, ...FROZEN]);
+function installStyle() {
+  document.head.append(h("style", { id: "eln-panel" }, css));
+}
 let installed = false;
 function installPanel(part2) {
   running[part2] = true;
   if (installed) return;
   installed = true;
-  document.head.append(h("style", { id: "eln-panel" }, css));
   app.extensionManager.registerSidebarTab({ id: TAB, title: TITLE, tooltip: TITLE, label: "FX", icon: "eln-icon", iconBadge: badge(), type: "custom", render, destroy });
   watch((id) => {
     const tab = BADGED.has(id) ? app.extensionManager.getSidebarTabs?.().find((t) => t.id === TAB) : void 0;
@@ -4775,7 +4774,7 @@ let body;
 let tabs = [];
 let search;
 let advanced;
-let undoBar;
+let panelUndo;
 let undoText;
 let undoButton;
 let undoTimer = 0;
@@ -4806,7 +4805,7 @@ function render(container) {
     remember();
     refresh();
   }, { "aria-pressed": "false" });
-  const close2 = iconButton("pi-times", "Close", () => void app.extensionManager.command.execute(`Workspace.ToggleSidebarTab.${TAB}`));
+  const close2 = iconButton("pi-times", "Close", () => void app.extensionManager.command.execute(TOGGLE));
   const header = h("header", { class: "eln-head" }, h("span", { class: "eln-icon eln-mark", "aria-hidden": "true" }), h("h2", { class: "eln-title" }, TITLE), advanced, close2);
   tabs = TABS.map((t) => {
     const tab = h("button", { type: "button", role: "tab", id: `eln-tab-${t.id}`, class: "eln-tab", "aria-controls": "eln-body" }, t.name);
@@ -4832,9 +4831,9 @@ function render(container) {
   body = h("div", { id: "eln-body", role: "tabpanel", class: "eln-body scrollbar-custom" });
   undoText = h("span");
   undoButton = h("button", { type: "button", class: "eln-button" }, "Undo");
-  undoBar = h("div", { class: "eln-undo", role: "status", hidden: true }, undoText, undoButton);
+  panelUndo = h("div", { class: "eln-undo", role: "status", hidden: true }, undoText, undoButton);
   const colours = LGraphCanvas.link_type_colors;
-  root = h("div", { class: "eln" }, header, quickBar(), tablist, h("div", { class: "eln-find" }, h("i", { class: "pi pi-search", "aria-hidden": "true" }), search), body, undoBar);
+  root = h("div", { class: "eln" }, header, quickBar(), tablist, h("div", { class: "eln-find" }, h("i", { class: "pi pi-search", "aria-hidden": "true" }), search), body, panelUndo);
   ["IMAGE", "LATENT", "MODEL"].forEach((type, i) => colours[type] && root.style.setProperty(`--eln-link-${i + 1}`, colours[type]));
   container.append(root);
   unwatch = watch(heard);
@@ -4855,11 +4854,15 @@ function destroy() {
   rows = [];
   parts = [];
 }
+const panelShown = () => root?.isConnected === true;
+function showPanel() {
+  if (!panelShown()) void app.extensionManager.command.execute(TOGGLE);
+}
 function showTab(tab) {
-  if (root?.isConnected) return go(tab);
+  if (panelShown()) return go(tab);
   if (root) destroy();
   commit(PANEL_STATE, { ...L.panelState, tab, search: "" });
-  void app.extensionManager.command.execute(`Workspace.ToggleSidebarTab.${TAB}`);
+  void app.extensionManager.command.execute(TOGGLE);
 }
 function go(id, clicked = true) {
   if (clicked) {
@@ -4932,22 +4935,46 @@ function offerUndo(title, undo, look = false) {
       }
     });
     if (look) applied = { undo: all, toast: id, until: Date.now() + UNDO_MS };
-    return true;
+    return;
   }
-  if (!root?.isConnected) return false;
-  undoText.textContent = title;
-  undoButton.onclick = () => {
-    undoBar.hidden = true;
-    run();
-  };
-  undoBar.hidden = false;
-  clearTimeout(undoTimer);
-  undoTimer = window.setTimeout(() => undoBar.hidden = true, UNDO_MS);
+  if (panelShown()) {
+    undoText.textContent = title;
+    undoButton.onclick = () => {
+      panelUndo.hidden = true;
+      run();
+    };
+    panelUndo.hidden = false;
+    clearTimeout(undoTimer);
+    undoTimer = window.setTimeout(() => panelUndo.hidden = true, UNDO_MS);
+  } else {
+    undoBar(title, run);
+  }
   if (look) applied = { undo: all, until: Date.now() + UNDO_MS };
-  return true;
 }
 function apply(look) {
   offerUndo(`${look.name} applied`, applyLook(look), true);
+}
+const surpriseMe = () => apply(surprise());
+function resetEverything() {
+  const undoValues = reset("");
+  const undoLook = applyLook(LOOKS.find((look) => look.id === "subtle"));
+  offerUndo("Every setting reset", () => {
+    undoLook();
+    undoValues();
+  });
+}
+const keyText = (combo) => [combo.ctrl && "Ctrl", combo.alt && "Alt", combo.shift && "Shift", combo.key.length === 1 ? combo.key.toUpperCase() : combo.key].filter(Boolean).join("+");
+const commandKeys = () => new Map(app.extensionManager.command.commands.flatMap((c) => c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : []));
+const MAC_ONLY = /* @__PURE__ */ new Set(["Alt+¬", "Alt+˚"]);
+function keyName(id) {
+  const key = commandKeys().get(id);
+  return key && !MAC_ONLY.has(key) ? key : void 0;
+}
+const toggleLinks = () => commit(LINKS_ON, !L.enabled);
+const toggleNodes = () => commit(NODES_ON, !N.enabled);
+function toggleStatic() {
+  const on = !(L.staticMode && N.staticMode);
+  for (const id of FROZEN) commit(id, on);
 }
 function quickBar() {
   const chip = (label, click) => {
@@ -4955,12 +4982,9 @@ function quickBar() {
     button2.addEventListener("click", click);
     return button2;
   };
-  const links = chip("Link FX", () => commit(LINKS_ON, !L.enabled));
-  const nodes = chip("Node FX", () => commit(NODES_ON, !N.enabled));
-  const frozen = chip("Static", () => {
-    const on = !(L.staticMode && N.staticMode);
-    for (const id of FROZEN) commit(id, on);
-  });
+  const links = chip("Link FX", toggleLinks);
+  const nodes = chip("Node FX", toggleNodes);
+  const frozen = chip("Static", toggleStatic);
   const name = h("span", { class: "eln-look-name" });
   const dot = h("span", { class: "eln-dot", title: "Changed since the look was applied" }, h("span", { class: "eln-sr" }, "Changed since the look was applied"));
   const choose = h(
@@ -5101,8 +5125,8 @@ function results(query) {
 function noticesOf(tab) {
   const all = tab === "looks";
   const list = [];
-  if ((all || tab === "links") && !running.links) list.push({ text: "Link effects are off: the enhanced.link.animations extension is disabled in Settings › Extensions." });
-  if ((all || tab === "nodes") && !running.nodes) list.push({ text: "Node effects are off: the enhanced.node.animations extension is disabled in Settings › Extensions." });
+  if ((all || tab === "links") && !running.links) list.push({ text: DISABLED.links });
+  if ((all || tab === "nodes") && !running.nodes) list.push({ text: DISABLED.nodes });
   if ((all || tab === "nodes") && LiteGraph.vueNodesMode) {
     list.push({ text: "Nodes 2.0 is on, and node effects show on classic nodes only for now.", action: ["Use classic nodes", () => void Promise.resolve(app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)).then(refresh)] });
   }
@@ -5190,7 +5214,7 @@ function looksTab() {
       { class: "eln-section" },
       h("h3", { class: "eln-heading" }, "My looks"),
       list,
-      h("div", { class: "eln-actions" }, button("Save current as look…", () => void saveCurrent()), button("Import…", () => file.click()), button("Surprise me", () => apply(surprise()))),
+      h("div", { class: "eln-actions" }, button("Save current as look…", () => void saveCurrent()), button("Import…", () => file.click()), button("Surprise me", surpriseMe)),
       note,
       file
     )
@@ -5237,26 +5261,43 @@ function download(look) {
   setTimeout(() => URL.revokeObjectURL(url));
 }
 const REPO = "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes";
+const DISCORD = "https://discord.gg/UzC9353mfp";
+const KOFI = "https://ko-fi.com/aemotionstudio";
 const AWAY = { target: "_blank", rel: "noopener noreferrer" };
-const NEWS = [
+const NEWS$1 = [
   "Effects draw on ComfyUI's own links and nodes, so links stay clickable, and reroutes, subgraphs and every link render mode work.",
   "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
   "This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.",
   "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.",
+  "Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.",
   "Much lighter than 2.x on big graphs."
 ];
 const PLACES = [
   ["pi-github", "Report an issue", `${REPO}/issues`],
-  ["pi-discord", "Discord", "https://discord.gg/UzC9353mfp"],
+  ["pi-discord", "Discord", DISCORD],
   ["pi-youtube", "YouTube", "https://www.youtube.com/@aemotionstudio/videos"],
-  ["pi-heart", "Ko-fi", "https://ko-fi.com/aemotionstudio"]
+  ["pi-heart", "Ko-fi", KOFI]
+];
+const BADGES = [
+  { label: `${TITLE} ${"2.0.1"}`, url: REPO, icon: "pi pi-github" },
+  { label: "Æmotion Studio Discord", url: DISCORD, icon: "pi pi-discord" },
+  { label: "Ko-fi", url: KOFI, icon: "pi pi-heart" }
+];
+const COMMANDS = [
+  [TOGGLE, "Toggle Enhanced Links & Nodes Sidebar", "Opens and closes this panel."],
+  [TOGGLE_ALL, "Toggle all effects", "Turns every effect off, or back on."]
 ];
 const KEYS = [
-  ["Toggle Enhanced Links & Nodes Sidebar", "Opens and closes this panel. Give it a key in Settings › Keybinding."],
   ["← → Home End", "Move between the tabs."],
   ["Arrows, Enter, Space", "Move through a gallery or the looks, and pick one."],
   ["Esc", "Clears the search, or closes the Look menu. On the look picker, keeps the look that shows."]
 ];
+function keys() {
+  return [...COMMANDS.map(([id, name, what]) => {
+    const key = keyName(id);
+    return key ? [key, what] : [name, `${what} Give it a key in Settings › Keybinding.`];
+  }), ...KEYS];
+}
 const STUDIO = "Developed by Æmotion Studio, Enhanced Links & Nodes adds beautiful, customizable animations to both links and nodes in your ComfyUI workflow. Contributions are welcome!";
 function aboutTab() {
   const note = h("p", { class: "eln-hint", role: "status" });
@@ -5281,12 +5322,7 @@ function aboutTab() {
   });
   const yes = button("Reset everything", () => {
     sure.hidden = true;
-    const undoValues = reset("");
-    const undoLook = applyLook(LOOKS.find((look) => look.id === "subtle"));
-    offerUndo("Every setting reset", () => {
-      undoLook();
-      undoValues();
-    });
+    resetEverything();
   });
   sure.append(h("p", {}, "Every Enhanced Links & Nodes setting goes back to its default, and the look to Subtle."), yes, button("Cancel", () => {
     sure.hidden = true;
@@ -5308,10 +5344,10 @@ function aboutTab() {
       "section",
       { class: "eln-section" },
       h("h3", { class: "eln-heading" }, "What's new in 3.0"),
-      h("ul", { class: "eln-news" }, ...NEWS.map((item) => h("li", {}, item))),
+      h("ul", { class: "eln-news" }, ...NEWS$1.map((item) => h("li", {}, item))),
       h("div", { class: "eln-actions" }, ...PLACES.map(([icon, label, href]) => h("a", { class: "eln-button", href, ...AWAY }, h("i", { class: `pi ${icon}`, "aria-hidden": "true" }), label)))
     ),
-    h("section", { class: "eln-section" }, h("h3", { class: "eln-heading" }, "Keys"), h("dl", { class: "eln-keys" }, ...KEYS.flatMap(([keys, what]) => [h("dt", {}, keys), h("dd", {}, what)]))),
+    h("section", { class: "eln-section" }, h("h3", { class: "eln-heading" }, "Keys"), h("dl", { class: "eln-keys" }, ...keys().flatMap(([key, what]) => [h("dt", {}, key), h("dd", {}, what)]))),
     h(
       "section",
       { class: "eln-section" },
@@ -5348,35 +5384,274 @@ function diagnostics() {
     ...changes
   ].join("\n");
 }
+const SEEN = "🔗 Enhanced Links.WhatsNew.Seen";
+const NEWS = "3.0.0";
+const IDLE_MS = 1500;
+const NEWS_MS = 1e4;
+const byId = (id) => LOOKS.find((look) => look.id === id);
+const SUBTLE = byId("subtle");
+let card;
+let asking = false;
+let before = null;
+let offer;
+const host = () => document.querySelector(".graph-canvas-panel");
+function installPicker() {
+  if (L.look !== "") return;
+  const wait = () => {
+    if (L.look !== "" || card) return;
+    if (env.running || [...document.querySelectorAll("[role=dialog]")].some((el) => el.checkVisibility())) setTimeout(wait, IDLE_MS);
+    else showPicker();
+  };
+  setTimeout(wait, IDLE_MS);
+  let unanswered = true;
+  watch((id) => {
+    if (id !== LOOK || unanswered === (L.look === "")) return;
+    unanswered = !unanswered;
+    if (unanswered) return;
+    if (asking) close();
+    queueMicrotask(whatsNew);
+  });
+}
+function showPicker() {
+  if (card) return;
+  asking = L.look === "";
+  const looks = ["off", "subtle", "showcase", "performance"].map(byId);
+  const items = looks.map((look) => {
+    const item = h(
+      "button",
+      { type: "button", role: "radio", class: "eln-tile", "data-look": look.id, title: look.description },
+      lookTile(look),
+      h("span", { class: "eln-tile-name" }, look.name),
+      h("span", { class: "eln-tile-text" }, look.description)
+    );
+    hover(item, () => previewLook(look));
+    item.addEventListener("click", () => pick$1(look));
+    return item;
+  });
+  const grid = h("div", { role: "radiogroup", class: "eln-looks", "aria-label": "Looks" }, ...items);
+  roving(grid, items);
+  const shown2 = currentLook();
+  check(items, shown2 && !changed(shown2) ? looks.indexOf(shown2) : -1);
+  const classic = h("button", { type: "button", class: "eln-link" }, "Classic v1");
+  hover(classic, () => previewLook(byId("classic-v1")));
+  classic.addEventListener("click", () => pick$1(byId("classic-v1")));
+  const more = h("button", { type: "button", class: "eln-link" }, "More looks…");
+  more.addEventListener("click", () => {
+    close();
+    showTab("looks");
+  });
+  const primary = { class: "eln-button eln-button--primary" };
+  const key = keyName(TOGGLE);
+  const keeps = !asking ? [button("Done", close, primary)] : customised() ? [button("Keep Subtle", () => pick$1(SUBTLE)), button("Keep my settings", keepMine, primary)] : [button("Keep Subtle", () => pick$1(SUBTLE), primary)];
+  card = h(
+    "section",
+    { class: "eln eln-picker", tabindex: -1, "aria-labelledby": "eln-picker-title" },
+    h("header", { class: "eln-picker-head" }, h("span", { class: "eln-icon eln-mark", "aria-hidden": "true" }), h("h2", { id: "eln-picker-title", class: "eln-title" }, "Choose your look")),
+    grid,
+    h("p", { class: "eln-picker-more" }, "The original look? ", classic, " · ", more),
+    h("footer", { class: "eln-picker-foot" }, h("span", { class: "eln-hint" }, `Change it any time in the FX panel${key ? ` (${key})` : ""}.`), ...keeps),
+    iconButton("pi-times", "Close", dismiss, { class: "eln-tool eln-picker-close" })
+  );
+  card.classList.toggle("eln--still", L.motion === "reduce");
+  card.classList.toggle("eln--full", L.motion === "full");
+  card.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    dismiss();
+  });
+  before = document.activeElement;
+  host().append(card);
+  if (before === document.body || before === app.canvas.canvas) card.focus();
+}
+function close() {
+  if (!card) return;
+  endHover();
+  stopTiles(card);
+  if (card.contains(document.activeElement) && before instanceof HTMLElement) before.focus();
+  card.remove();
+  card = void 0;
+}
+function pick$1(look) {
+  const visible = changed(look);
+  const undo = applyLook(look);
+  close();
+  if (!visible) return;
+  offerUndo(`${look.name} applied`, () => {
+    undo();
+    showPicker();
+  });
+}
+function keepMine() {
+  commit(LOOK, "custom");
+}
+function dismiss() {
+  if (!asking) close();
+  else if (customised()) keepMine();
+  else if (changed(SUBTLE)) keepShown();
+  else pick$1(SUBTLE);
+}
+function undoBar(title, undo) {
+  offer?.remove();
+  const bar = h("div", { class: "eln eln-picker-undo", role: "status" }, h("span", {}, title), button("Undo", () => {
+    clearTimeout(timer);
+    bar.remove();
+    undo();
+  }));
+  const timer = setTimeout(() => bar.remove(), UNDO_MS);
+  offer = bar;
+  host().append(bar);
+}
+function whatsNew() {
+  if (L.whatsNewSeen === NEWS) return;
+  commit(SEEN, NEWS);
+  if (!customised()) return;
+  const title = "Enhanced Links & Nodes 3.0";
+  const text2 = "Links stay clickable, v1's look is back, and a new FX panel brings looks with live previews.";
+  const { toast } = app.extensionManager;
+  if ("info" in toast) {
+    const id = toast.info(title, {
+      description: text2,
+      duration: NEWS_MS,
+      action: {
+        label: "What's new",
+        onClick() {
+          toast.dismiss(id);
+          showTab("about");
+        }
+      }
+    });
+    return;
+  }
+  app.extensionManager.toast.add({ severity: "info", summary: title, detail: `${text2} About, in the FX panel, tells more.`, life: NEWS_MS });
+}
+const OWN_STYLE = "enhanced_fx_style";
+const OWN_ONLY = "enhanced_fx_particles_only";
+const OWN_COMPLETION = "enhanced_fx_completion";
+const SELECTION_FX = "EnhancedLinksNodes.SelectionNodeFX";
+const STYLES = new Set(NODE_ANIMATION_OPTIONS.map((option) => option.value));
+function ownStyle(node2) {
+  const style = node2.properties[OWN_STYLE];
+  return STYLES.has(style) ? style : void 0;
+}
+function pick(nodes, choices) {
+  app.canvas.emitBeforeChange();
+  for (const node2 of nodes) {
+    for (const [key, value] of Object.entries(choices)) {
+      if (value === void 0) delete node2.properties[key];
+      else node2.properties[key] = value;
+    }
+  }
+  app.canvas.emitAfterChange();
+  app.canvas.setDirty(true, false);
+}
+const selectedNodes = () => [...app.canvas.selectedItems].filter((item) => item instanceof LGraphNode);
+function effects() {
+  const global = N.animate ? NODE_ANIMATION_OPTIONS.find((option) => option.value === N.animate).text : "Off";
+  return [
+    {
+      name: `Use global (${global})`,
+      choices: { [OWN_STYLE]: void 0, [OWN_ONLY]: void 0 },
+      has: (node2) => ownStyle(node2) === void 0 && typeof node2.properties[OWN_ONLY] !== "boolean"
+    },
+    ...NODE_ANIMATION_OPTIONS.map((option) => ({ name: option.value ? option.text : "Off", choices: { [OWN_STYLE]: option.value }, has: (node2) => ownStyle(node2) === option.value }))
+  ];
+}
+function particlesOnly(node2) {
+  const own2 = node2.properties[OWN_ONLY];
+  return typeof own2 === "boolean" ? own2 : !N.animationsEnabled;
+}
+const entry = (content, ticked, callback) => ({ content: ticked ? `✓ ${content}` : content, callback });
+function nodeMenu(node2) {
+  const selection = selectedNodes();
+  const nodes = node2.selected && selection.length > 1 ? selection : [node2];
+  const only = nodes.every(particlesOnly);
+  const completion = node2.properties[OWN_COMPLETION];
+  return [
+    {
+      content: nodes.length > 1 ? `Node FX (${nodes.length} selected)` : "Node FX",
+      has_submenu: true,
+      submenu: {
+        options: [
+          ...effects().map((effect) => entry(effect.name, nodes.every(effect.has), () => pick(nodes, effect.choices))),
+          null,
+          entry("Particles only", only, () => pick(nodes, { [OWN_ONLY]: !only }))
+        ]
+      }
+    },
+    {
+      content: "Completion FX",
+      has_submenu: true,
+      submenu: {
+        options: [
+          entry("Use global", completion !== "fireworks" && completion !== "off", () => pick([node2], { [OWN_COMPLETION]: void 0 })),
+          entry("Fireworks", completion === "fireworks", () => pick([node2], { [OWN_COMPLETION]: "fireworks" })),
+          entry("Off", completion === "off", () => pick([node2], { [OWN_COMPLETION]: "off" }))
+        ]
+      }
+    }
+  ];
+}
 export {
-  CAP as C,
+  UNDER as $,
+  effects as A,
+  BADGES as B,
+  pick as C,
+  fireworks as D,
+  resetEverything as E,
+  FROZEN as F,
+  DISABLED as G,
+  translucent as H,
+  revision as I,
+  nodeMenu as J,
+  nodeSettings as K,
+  L,
+  layers as M,
   N,
-  OVER as O,
-  STILL_NODE as S,
-  UNDER as U,
-  installPanel as a,
-  installLinks as b,
-  clock as c,
-  rng as d,
-  env as e,
-  live as f,
-  disc as g,
-  NODE_ANIMATION_OPTIONS as h,
-  install as i,
-  nodeSettings as j,
-  layers as k,
+  live as O,
+  startSprites as P,
+  drawBursts as Q,
+  guard as R,
+  SELECTION_FX as S,
+  TITLE as T,
+  particlesOnly as U,
+  drawNodeFx as V,
+  clock as W,
+  OVER as X,
+  dummy as Y,
+  holdsStill as Z,
+  reach as _,
+  currentLook as a,
+  wake as a0,
+  ownStyle as a1,
+  STILL_NODE as a2,
+  nodePalette as a3,
+  OWN_COMPLETION as a4,
+  stopSprites as a5,
+  TOGGLE_ALL as b,
+  checked as c,
+  install as d,
+  installPanel as e,
+  installLinks as f,
+  commandKeys as g,
+  TOGGLE as h,
+  installStyle as i,
+  keyText as j,
+  keyName as k,
   linkSettings as l,
-  guard as m,
-  nodePalette as n,
-  drawNodeFx as o,
-  pool$1 as p,
-  dummy as q,
-  revision as r,
-  holdsStill as s,
-  translucent as t,
-  reach as u,
-  startSprites as v,
-  wake as w,
-  stopSprites as x
+  NODES_ON as m,
+  toggleStatic as n,
+  showPanel as o,
+  panelShown as p,
+  showPicker as q,
+  running as r,
+  surpriseMe as s,
+  toggleNodes as t,
+  LINKS_ON as u,
+  toggleLinks as v,
+  setting as w,
+  shown$2 as x,
+  commit as y,
+  selectedNodes as z
 };
-//# sourceMappingURL=sidebar-DL7e4t_v.js.map
+//# sourceMappingURL=menus-BcXUDhho.js.map

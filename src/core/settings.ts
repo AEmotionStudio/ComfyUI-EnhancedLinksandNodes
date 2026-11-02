@@ -422,6 +422,16 @@ const snapshotOf = (id: string): Record<string, unknown> => (id.startsWith(LINKS
 /** The value a setting shows: its snapshot's. */
 export const shown = (id: string): unknown => snapshotOf(id)[setting(id).key];
 
+/**
+ * Whether a switch shows on, for a command's check. ComfyUI's menus draw the check in a Vue render, which draws it
+ * again only when something it read changes, so the switch is read from the settings store too, for the render to
+ * track (FE157 components/ui/menu/MenuItemContent.vue L44-56, FE1395 components/sidebar/ComfyMenuButton.vue L46).
+ */
+export function checked(id: string): boolean {
+    app.extensionManager.setting.get(id);
+    return shown(id) as boolean;
+}
+
 const listeners = new Set<(id: string) => void>();
 
 /** Calls `listener` with the id of each setting whose shown value changes, from anywhere, until the returned function is called. */

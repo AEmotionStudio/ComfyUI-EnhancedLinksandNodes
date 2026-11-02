@@ -341,12 +341,11 @@ describe('Perf.MaxFps', () => {
         });
     }
 
-    it('asks for 30 a second at 30, and a paint every frame at Display rate', async () => {
-        expect(await rate({ [MAX_FPS]: 30 }, 60)).toBe(30);
-        expect(await rate({ [MAX_FPS]: 30 }, 144)).toBe(30);
-        expect(await rate({ [MAX_FPS]: 0 }, 75)).toBe(75);
-        expect(await rate({ [MAX_FPS]: 0 }, 144)).toBe(144);
-    });
+    for (const [fps, hz, paints] of [[30, 60, 30], [30, 144, 30], [0, 75, 75], [0, 144, 144]]) {
+        it(`asks for ${paints} paints a second at ${fps || 'Display rate'} on a ${hz} Hz display`, async () => {
+            expect(await rate({ [MAX_FPS]: fps }, hz)).toBe(paints);
+        });
+    }
 
     it('starts afresh after a long frame instead of catching up', async () => {
         const setDirty = warmUp(await start(NODES_ON, PAIR));

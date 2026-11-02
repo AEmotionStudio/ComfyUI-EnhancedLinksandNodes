@@ -387,7 +387,8 @@ export class FakeCanvas {
     };
     visible_area = new Float32Array(4);
     visible_nodes: FakeNode[] = [];
-    selected_nodes: Record<number, FakeNode> = {};
+    /** What is selected: nodes, groups and reroutes (FE157 L895-897, FE1395 L652). */
+    selectedItems = new Set<unknown>();
     renderedPaths = new Set<Link | Reroute>();
     /** FE157 L1050, L1152, FE1395 L733, L813: tests spy on its renderLinkDirect to see what native drew. */
     readonly linkRenderer = { renderLinkDirect };

@@ -1,0 +1,38 @@
+{
+  "EnhancedLinksNodes_ShowPanel": {
+    "label": "Show Enhanced Links & Nodes panel"
+  },
+  "EnhancedLinksNodes_ToggleAll": {
+    "label": "Toggle all effects"
+  },
+  "EnhancedLinksNodes_ToggleLinks": {
+    "label": "Toggle link effects"
+  },
+  "EnhancedLinksNodes_ToggleNodes": {
+    "label": "Toggle node effects"
+  },
+  "EnhancedLinksNodes_ToggleStatic": {
+    "label": "Freeze / unfreeze animation"
+  },
+  "EnhancedLinksNodes_NextLinkStyle": {
+    "label": "Next link animation"
+  },
+  "EnhancedLinksNodes_NextNodeStyle": {
+    "label": "Next node effect"
+  },
+  "EnhancedLinksNodes_ChooseLook": {
+    "label": "Choose a look…"
+  },
+  "EnhancedLinksNodes_SurpriseMe": {
+    "label": "Surprise me (random look)"
+  },
+  "EnhancedLinksNodes_SelectionNodeFX": {
+    "label": "Cycle node effect for selection"
+  },
+  "EnhancedLinksNodes_PreviewCompletion": {
+    "label": "Preview completion effect"
+  },
+  "EnhancedLinksNodes_ResetAll": {
+    "label": "Reset all Enhanced Links & Nodes settings…"
+  }
+}

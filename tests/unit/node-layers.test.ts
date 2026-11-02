@@ -528,16 +528,16 @@ describe('the node menu', () => {
     const labels = (item: Item) => item.submenu!.options.map((option) => option?.content ?? null);
     const pick = (node: FakeNode, menuName: string, label: string) => menu(node).find((item) => item.content === menuName)!.submenu!.options.find((option) => option?.content.replace('✓ ', '') === label)!.callback!();
 
-    it('offers Node FX and Completion FX, each one submenu level, with the choice ticked', async () => {
-        const canvas = await start(LINKS_OFF, { nodes: [KSAMPLER] });
+    it('offers Node FX and Completion FX, each one submenu level, with the choice ticked and Use global naming the global effect', async () => {
+        const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER] });
         const [node] = canvas.graph._nodes;
         const items = menu(node);
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global', 'None', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Flower of Life', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Flower of Life', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Fireworks', 'Off']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'off' };
-        expect(labels(menu(node)[0])).toEqual(['Use global', 'None', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Fireworks', '✓ Off']);
     });
 
@@ -549,9 +549,32 @@ describe('the node menu', () => {
         pick(node, 'Completion FX', 'Fireworks');
         expect(node.properties).toEqual({ enhanced_fx_style: 2, enhanced_fx_particles_only: true, enhanced_fx_completion: 'fireworks' });
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(3).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        pick(node, 'Node FX', 'Use global');
+        pick(node, 'Node FX', 'Use global (Off)');
         pick(node, 'Completion FX', 'Use global');
         expect(node.properties).toEqual({});
+    });
+
+    it('set Node FX for every selected node, in one change, when the node is one of them, and tick what they all have', async () => {
+        const canvas = await start(LINKS_OFF, { nodes: [KSAMPLER, { pos: [700, 300] }, { pos: [300, 700] }] });
+        const [first, second, other] = canvas.graph._nodes;
+        for (const node of [first, second]) {
+            node.selected = true;
+            canvas.selectedItems.add(node);
+        }
+        second.properties.enhanced_fx_style = 2;
+        const [fx, completion] = menu(first);
+        expect(fx.content).toBe('Node FX (2 selected)');
+        // They have no effect in common, and both draw their whole effect.
+        expect(labels(fx).filter((label) => label?.startsWith('✓'))).toEqual([]);
+        pick(first, 'Node FX (2 selected)', 'Cosmic Ripple');
+        pick(first, 'Node FX (2 selected)', 'Particles only');
+        expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
+        expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
+        // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
+        completion.submenu!.options.find((option) => option?.content === 'Fireworks')!.callback!();
+        expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['fireworks', undefined]);
+        expect(menu(other)[0].content).toBe('Node FX');
     });
 
     it('give a node its own effect: its style, None for nothing, and its Particles only', async () => {
@@ -585,6 +608,6 @@ describe('the node menu', () => {
         expect(JSON.stringify([odd.properties, kept.properties])).toBe(before);
         expect(bare.properties).toEqual({});
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual([]);
-        expect(labels(menu(odd)[0])[0]).toBe('✓ Use global');
+        expect(labels(menu(odd)[0])[0]).toBe('✓ Use global (Neon Nexus)');
     });
 });

@@ -6,32 +6,39 @@
  * shows and keeps in step with the settings dialog through watch(). A change
  * of many settings at once, a look or a section's reset, offers its undo: a
  * toast with an Undo button where the frontend has one (1.57+), else a bar at
- * the foot of the panel; looks applied one after another share one offer,
- * which goes back to before the first. The rail icon's badge says when
- * effects are off or frozen. About tells what the extension is and what is
- * new, copies diagnostics, shows the first-run look picker again and resets
+ * the foot of the panel, or where the picker shows while the panel is closed;
+ * looks applied one after another share one offer, which goes back to before
+ * the first. The rail icon's badge says when effects are off or frozen. About
+ * tells what the extension is and what is new, the keys bound now, copies
+ * diagnostics, shows the first-run look picker again and resets everything.
+ * The commands share the quick bar's switches, Surprise me and Reset
  * everything. The panel draws nothing while it is closed.
  *
  * @module sidebar/sidebar
  */
 
-import type { ToastId } from '@comfyorg/comfyui-frontend-types';
+import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, SETTINGS, commit, commitAll, reset, shown, watch, type Setting } from '@/core/settings';
 import { env, guard } from '@/core/engine';
 import { deferring } from '@/links/pipeline';
 import { LOOKS, applyLook, changed, currentLook, deleteLook, exportLook, importLook, light, previewLook, renameLook, saveLook, surprise, userLooks, type Look } from '@/ui/looks';
 import { button, check, endHover, h, hover, hovering, iconButton, roving, row, type Row, type Visible } from './controls';
-import { installPicker, showPicker } from './picker';
+import { installPicker, showPicker, undoBar } from './picker';
 import { lookTile, repaint, stopTiles } from './tiles';
 import css from './sidebar.css?inline';
 
 /** The tab's id, as v2 registered it, so its toggle command and the keys bound to that carry on. */
 const TAB = 'enhanced-links-nodes';
-const TITLE = 'Enhanced Links & Nodes';
-const LINKS_ON = '🔗 Enhanced Links.Enabled';
-const NODES_ON = '📦 Enhanced Nodes.Enabled';
-const FROZEN = ['🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode'];
+/** The command ComfyUI makes for the tab, which opens and closes the panel (FE157 stores/workspace/sidebarTabStore.ts L59-72). */
+export const TOGGLE = `Workspace.ToggleSidebarTab.${TAB}`;
+/** The extension's command that turns every effect off, or back on. */
+export const TOGGLE_ALL = 'EnhancedLinksNodes.ToggleAll';
+export const TITLE = 'Enhanced Links & Nodes';
+/** The master switches and Static's two, which the quick bar and the commands turn over. */
+export const LINKS_ON = '🔗 Enhanced Links.Enabled';
+export const NODES_ON = '📦 Enhanced Nodes.Enabled';
+export const FROZEN = ['🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode'];
 const PANEL_STATE = '🔗 Enhanced Links.Panel.State';
 const COEXIST = '🔗 Enhanced Links.Coexist';
 /** How long an undo is offered. */
@@ -52,11 +59,22 @@ const TABS: { id: string; name: string; part?: string }[] = [
 ];
 
 /** Which extensions' setup() ran: a disabled extension's does not. */
-const running = { links: false, nodes: false };
+export const running = { links: false, nodes: false };
+
+/** What a disabled extension leaves off, which its notice says, and the commands that need it. */
+export const DISABLED = {
+    links: 'Link effects are off: the enhanced.link.animations extension is disabled in Settings › Extensions.',
+    nodes: 'Node effects are off: the enhanced.node.animations extension is disabled in Settings › Extensions.',
+};
 
 /** The rail icon's badge: OFF with both master switches off, ‖ while links or nodes are frozen. */
 const badge = () => (!L.enabled && !N.enabled ? 'OFF' : L.staticMode || N.staticMode ? '‖' : '');
 const BADGED = new Set([LINKS_ON, NODES_ON, ...FROZEN]);
+
+/** Puts the panel's stylesheet on the page, which draws the brand icon of the commands and the action bar's button too. */
+export function installStyle(): void {
+    document.head.append(h('style', { id: 'eln-panel' }, css));
+}
 
 let installed = false;
 
@@ -65,7 +83,6 @@ export function installPanel(part: keyof typeof running): void {
     running[part] = true;
     if (installed) return;
     installed = true;
-    document.head.append(h('style', { id: 'eln-panel' }, css));
     app.extensionManager.registerSidebarTab({ id: TAB, title: TITLE, tooltip: TITLE, label: 'FX', icon: 'eln-icon', iconBadge: badge(), type: 'custom', render, destroy });
     // The rail draws the tab as the sidebar store holds it, which hands out the tab as an object it tracks. The call is
     // deprecated; a frontend without it keeps the badge the tab registered with.
@@ -88,7 +105,7 @@ let body: HTMLElement;
 let tabs: HTMLElement[] = [];
 let search: HTMLInputElement;
 let advanced: HTMLElement;
-let undoBar: HTMLElement;
+let panelUndo: HTMLElement;
 let undoText: HTMLElement;
 let undoButton: HTMLElement;
 let undoTimer = 0;
@@ -125,7 +142,7 @@ function render(container: HTMLElement): void {
         remember();
         refresh();
     }, { 'aria-pressed': 'false' });
-    const close = iconButton('pi-times', 'Close', () => void app.extensionManager.command.execute(`Workspace.ToggleSidebarTab.${TAB}`));
+    const close = iconButton('pi-times', 'Close', () => void app.extensionManager.command.execute(TOGGLE));
     const header = h('header', { class: 'eln-head' }, h('span', { class: 'eln-icon eln-mark', 'aria-hidden': 'true' }), h('h2', { class: 'eln-title' }, TITLE), advanced, close);
 
     tabs = TABS.map((t) => {
@@ -155,10 +172,10 @@ function render(container: HTMLElement): void {
     body = h('div', { id: 'eln-body', role: 'tabpanel', class: 'eln-body scrollbar-custom' });
     undoText = h('span');
     undoButton = h('button', { type: 'button', class: 'eln-button' }, 'Undo');
-    undoBar = h('div', { class: 'eln-undo', role: 'status', hidden: true }, undoText, undoButton);
+    panelUndo = h('div', { class: 'eln-undo', role: 'status', hidden: true }, undoText, undoButton);
 
     const colours = LGraphCanvas.link_type_colors;
-    root = h('div', { class: 'eln' }, header, quickBar(), tablist, h('div', { class: 'eln-find' }, h('i', { class: 'pi pi-search', 'aria-hidden': 'true' }), search), body, undoBar);
+    root = h('div', { class: 'eln' }, header, quickBar(), tablist, h('div', { class: 'eln-find' }, h('i', { class: 'pi pi-search', 'aria-hidden': 'true' }), search), body, panelUndo);
     // The living underline takes the palette's colours of the main link types.
     ['IMAGE', 'LATENT', 'MODEL'].forEach((type, i) => colours[type] && root!.style.setProperty(`--eln-link-${i + 1}`, colours[type]));
     container.append(root);
@@ -181,13 +198,21 @@ function destroy(): void {
     parts = [];
 }
 
+/** Whether the panel shows: the sidebar may have switched to another tab without destroy(). */
+export const panelShown = (): boolean => root?.isConnected === true;
+
+/** Opens the panel, unless it shows. */
+export function showPanel(): void {
+    if (!panelShown()) void app.extensionManager.command.execute(TOGGLE);
+}
+
 /** Opens the panel on `tab`, or turns the open panel to it: for the picker's More looks and What's new. */
 export function showTab(tab: string): void {
-    if (root?.isConnected) return go(tab);
+    if (panelShown()) return go(tab);
     // A panel left behind by a switch to another tab would save its own tab over this one as it went.
     if (root) destroy();
     commit(PANEL_STATE, { ...L.panelState, tab, search: '' });
-    void app.extensionManager.command.execute(`Workspace.ToggleSidebarTab.${TAB}`);
+    void app.extensionManager.command.execute(TOGGLE);
 }
 
 /** Shows a tab: the one clicked, which clears the search, or the one the panel opens on. */
@@ -249,11 +274,10 @@ function keep(): void {
 }
 
 /**
- * Offers to undo a change of many settings for UNDO_MS; false where toasts take no action (1.39.5) and the panel is
- * closed. A look applied while the undo of looks applied before is on offer takes that offer over, so its Undo goes
- * back to before the first.
+ * Offers to undo a change of many settings for UNDO_MS. A look applied while the undo of looks applied before is on
+ * offer takes that offer over, so its Undo goes back to before the first.
  */
-export function offerUndo(title: string, undo: () => void, look = false): boolean {
+export function offerUndo(title: string, undo: () => void, look = false): void {
     const { toast } = app.extensionManager;
     const earlier = look && Date.now() < applied.until ? applied : undefined;
     const all = () => {
@@ -277,30 +301,80 @@ export function offerUndo(title: string, undo: () => void, look = false): boolea
             },
         });
         if (look) applied = { undo: all, toast: id, until: Date.now() + UNDO_MS };
-        return true;
+        return;
     }
-    // 1.39.5's toasts take no action, so the panel's bar offers it, if the panel shows: the sidebar may have switched to
-    // another tab without destroy().
-    if (!root?.isConnected) return false;
-    undoText.textContent = title;
-    undoButton.onclick = () => {
-        undoBar.hidden = true;
-        run();
-    };
-    undoBar.hidden = false;
-    clearTimeout(undoTimer);
-    undoTimer = window.setTimeout(() => (undoBar.hidden = true), UNDO_MS);
+    // 1.39.5's toasts take no action, so the panel's bar offers it while the panel shows, else a bar where the picker shows.
+    if (panelShown()) {
+        undoText.textContent = title;
+        undoButton.onclick = () => {
+            panelUndo.hidden = true;
+            run();
+        };
+        panelUndo.hidden = false;
+        clearTimeout(undoTimer);
+        undoTimer = window.setTimeout(() => (panelUndo.hidden = true), UNDO_MS);
+    } else {
+        undoBar(title, run);
+    }
     if (look) applied = { undo: all, until: Date.now() + UNDO_MS };
-    return true;
 }
 
 function apply(look: Look): void {
     offerUndo(`${look.name} applied`, applyLook(look), true);
 }
 
+/** Surprise me: applies a surprise look, with its undo. */
+export const surpriseMe = (): void => apply(surprise());
+
+/** Puts every setting back to its default and the look to Subtle, with one undo. */
+export function resetEverything(): void {
+    const undoValues = reset('');
+    const undoLook = applyLook(LOOKS.find((look) => look.id === 'subtle')!);
+    offerUndo('Every setting reset', () => {
+        undoLook();
+        undoValues();
+    });
+}
+
+// =============================================================================
+// Keys
+// =============================================================================
+
+type Combo = NonNullable<ComfyExtension['keybindings']>[number]['combo'];
+
+/** How a key reads: Alt+K, say. */
+export const keyText = (combo: Combo): string =>
+    [combo.ctrl && 'Ctrl', combo.alt && 'Alt', combo.shift && 'Shift', combo.key.length === 1 ? combo.key.toUpperCase() : combo.key].filter(Boolean).join('+');
+
+/**
+ * The key each command has now, as it reads, by command: the first of its keys, as the user may have changed them in
+ * Settings › Keybinding (FE157 stores/commandStore.ts L80-82, FE1395 L69-71).
+ */
+export const commandKeys = (): Map<string, string> =>
+    new Map((app.extensionManager.command.commands as { id: string; keybinding?: { combo: Combo } | null }[]).flatMap((c) => (c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : [])));
+
+/** The keys bound for macOS, whose Option types these for L and K: other keyboards cannot type them. */
+const MAC_ONLY = new Set(['Alt+¬', 'Alt+˚']);
+
+/** The key a command has now, as the texts name it: its first, unless only macOS types that one. */
+export function keyName(id: string): string | undefined {
+    const key = commandKeys().get(id);
+    return key && !MAC_ONLY.has(key) ? key : undefined;
+}
+
 // =============================================================================
 // Quick bar
 // =============================================================================
+
+/** The quick bar's switches, which the commands share. */
+export const toggleLinks = (): void => commit(LINKS_ON, !L.enabled);
+export const toggleNodes = (): void => commit(NODES_ON, !N.enabled);
+
+/** Static: freezes links and nodes, or with both frozen frees both. */
+export function toggleStatic(): void {
+    const on = !(L.staticMode && N.staticMode);
+    for (const id of FROZEN) commit(id, on);
+}
 
 function quickBar(): HTMLElement {
     const chip = (label: string, click: () => void) => {
@@ -308,13 +382,9 @@ function quickBar(): HTMLElement {
         button.addEventListener('click', click);
         return button;
     };
-    const links = chip('Link FX', () => commit(LINKS_ON, !L.enabled));
-    const nodes = chip('Node FX', () => commit(NODES_ON, !N.enabled));
-    // Freezes both, or with both frozen frees both.
-    const frozen = chip('Static', () => {
-        const on = !(L.staticMode && N.staticMode);
-        for (const id of FROZEN) commit(id, on);
-    });
+    const links = chip('Link FX', toggleLinks);
+    const nodes = chip('Node FX', toggleNodes);
+    const frozen = chip('Static', toggleStatic);
 
     // A menu button rather than a list box, whose arrow keys would apply every look they pass.
     const name = h('span', { class: 'eln-look-name' });
@@ -472,8 +542,8 @@ interface Notice {
 function noticesOf(tab: string): Notice[] {
     const all = tab === 'looks';
     const list: Notice[] = [];
-    if ((all || tab === 'links') && !running.links) list.push({ text: 'Link effects are off: the enhanced.link.animations extension is disabled in Settings › Extensions.' });
-    if ((all || tab === 'nodes') && !running.nodes) list.push({ text: 'Node effects are off: the enhanced.node.animations extension is disabled in Settings › Extensions.' });
+    if ((all || tab === 'links') && !running.links) list.push({ text: DISABLED.links });
+    if ((all || tab === 'nodes') && !running.nodes) list.push({ text: DISABLED.nodes });
     if ((all || tab === 'nodes') && LiteGraph.vueNodesMode) {
         list.push({ text: 'Nodes 2.0 is on, and node effects show on classic nodes only for now.', action: ['Use classic nodes', () => void Promise.resolve(app.extensionManager.setting.set('Comfy.VueNodes.Enabled', false)).then(refresh)] });
     }
@@ -558,7 +628,7 @@ function looksTab(): HTMLElement[] {
         notices('looks'),
         h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, 'Looks'), lookGrid(LOOKS)),
         h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, 'My looks'), list,
-            h('div', { class: 'eln-actions' }, button('Save current as look…', () => void saveCurrent()), button('Import…', () => file.click()), button('Surprise me', () => apply(surprise()))),
+            h('div', { class: 'eln-actions' }, button('Save current as look…', () => void saveCurrent()), button('Import…', () => file.click()), button('Surprise me', surpriseMe)),
             note, file),
     ];
 }
@@ -611,6 +681,8 @@ function download(look: Look): void {
 // =============================================================================
 
 const REPO = 'https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes';
+const DISCORD = 'https://discord.gg/UzC9353mfp';
+const KOFI = 'https://ko-fi.com/aemotionstudio';
 const AWAY = { target: '_blank', rel: 'noopener noreferrer' };
 
 /** What is new in 3.0, as far as it has shipped. */
@@ -619,24 +691,43 @@ const NEWS = [
     "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
     'This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.',
     'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.',
+    'Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.',
     'Much lighter than 2.x on big graphs.',
 ];
 
 /** The project's and the studio's places, each opening in a tab of its own. */
 const PLACES = [
     ['pi-github', 'Report an issue', `${REPO}/issues`],
-    ['pi-discord', 'Discord', 'https://discord.gg/UzC9353mfp'],
+    ['pi-discord', 'Discord', DISCORD],
     ['pi-youtube', 'YouTube', 'https://www.youtube.com/@aemotionstudio/videos'],
-    ['pi-heart', 'Ko-fi', 'https://ko-fi.com/aemotionstudio'],
+    ['pi-heart', 'Ko-fi', KOFI],
 ];
 
-/** The keys that work now. */
+/** ComfyUI's About page shows these: the project at its version, the studio's Discord, named apart from ComfyUI's own beside it, and Ko-fi. */
+export const BADGES = [
+    { label: `${TITLE} ${__ELN_VERSION__}`, url: REPO, icon: 'pi pi-github' },
+    { label: 'Æmotion Studio Discord', url: DISCORD, icon: 'pi pi-discord' },
+    { label: 'Ko-fi', url: KOFI, icon: 'pi pi-heart' },
+];
+
+/** The commands whose keys About tells, by what ComfyUI calls them, and the keys of the panel itself. */
+const COMMANDS = [
+    [TOGGLE, 'Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel.'],
+    [TOGGLE_ALL, 'Toggle all effects', 'Turns every effect off, or back on.'],
+];
 const KEYS = [
-    ['Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel. Give it a key in Settings › Keybinding.'],
     ['← → Home End', 'Move between the tabs.'],
     ['Arrows, Enter, Space', 'Move through a gallery or the looks, and pick one.'],
     ['Esc', 'Clears the search, or closes the Look menu. On the look picker, keeps the look that shows.'],
 ];
+
+/** The keys that work now: each command's as it is bound, else its name and where to give it one. */
+function keys(): string[][] {
+    return [...COMMANDS.map(([id, name, what]) => {
+        const key = keyName(id);
+        return key ? [key, what] : [name, `${what} Give it a key in Settings › Keybinding.`];
+    }), ...KEYS];
+}
 
 /** In the README's words, for the author to edit. */
 const STUDIO = 'Developed by Æmotion Studio, Enhanced Links & Nodes adds beautiful, customizable animations to both links and nodes in your ComfyUI workflow. Contributions are welcome!';
@@ -665,12 +756,7 @@ function aboutTab(): HTMLElement[] {
     });
     const yes = button('Reset everything', () => {
         sure.hidden = true;
-        const undoValues = reset('');
-        const undoLook = applyLook(LOOKS.find((look) => look.id === 'subtle')!);
-        offerUndo('Every setting reset', () => {
-            undoLook();
-            undoValues();
-        });
+        resetEverything();
     });
     sure.append(h('p', {}, 'Every Enhanced Links & Nodes setting goes back to its default, and the look to Subtle.'), yes, button('Cancel', () => {
         sure.hidden = true;
@@ -682,7 +768,7 @@ function aboutTab(): HTMLElement[] {
                 h('p', { class: 'eln-hint' }, 'by Æmotion Studio · GPL-3.0 · ', h('a', { href: REPO, ...AWAY }, 'Source on GitHub')))),
         h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, "What's new in 3.0"), h('ul', { class: 'eln-news' }, ...NEWS.map((item) => h('li', {}, item))),
             h('div', { class: 'eln-actions' }, ...PLACES.map(([icon, label, href]) => h('a', { class: 'eln-button', href, ...AWAY }, h('i', { class: `pi ${icon}`, 'aria-hidden': 'true' }), label)))),
-        h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, 'Keys'), h('dl', { class: 'eln-keys' }, ...KEYS.flatMap(([keys, what]) => [h('dt', {}, keys), h('dd', {}, what)]))),
+        h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, 'Keys'), h('dl', { class: 'eln-keys' }, ...keys().flatMap(([key, what]) => [h('dt', {}, key), h('dd', {}, what)]))),
         h('section', { class: 'eln-section' }, h('h3', { class: 'eln-heading' }, 'Tools'),
             h('div', { class: 'eln-actions' }, button('Show the look picker', showPicker), button('Copy diagnostics', () => void copy()), ask), sure, note, text),
         h('section', { class: 'eln-section' }, h('details', { class: 'eln-studio' }, h('summary', {}, 'About Æmotion Studio'),

@@ -11,15 +11,16 @@
  * The styled title takes the native title's place, over the effect. Effects
  * fade with the node's mode, as native draws the node; collapsed nodes, nodes
  * in Vue mode, and every node with Node effects off, get none. The node menu's Node FX and Completion FX set a
- * node's own effect and fireworks, which it keeps in its properties.
+ * node's own effect and fireworks, which it keeps in its properties (ui/menus.ts); while node effects are on, the
+ * selection toolbox has a button that steps the selected nodes through the effects.
  *
  * @module extensions/node-animations
  */
 
-import type { ComfyExtension, IContextMenuValue } from '@comfyorg/comfyui-frontend-types';
+import type { ComfyExtension } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import { N, NODE_ANIMATION_OPTIONS, nodeSettings } from '@/core/settings';
+import { N, nodeSettings } from '@/core/settings';
 import { clock, dummy, guard, install, layers, live, wake } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
@@ -27,6 +28,7 @@ import { drawTitle, titleOf } from '@/nodes/text';
 import { drawBursts, fireworks } from '@/fx/bursts';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { installPanel } from '@/sidebar/sidebar';
+import { OWN_COMPLETION, SELECTION_FX, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
 
 /** The guard's keys, which its toast names when it turns one off. */
 const EFFECT = 'Node effect';
@@ -45,19 +47,6 @@ const [NEVER, BYPASS] = [2, 4];
 /** TitleMode.NO_TITLE, for which drawNodeShape draws no title (FE157 LGraphCanvas.ts L5917, FE1395 L5537). */
 const NO_TITLE = 1;
 
-/** Where a node keeps what its menu set: its Node FX style and Particles only, and its Completion FX. */
-const OWN_STYLE = 'enhanced_fx_style';
-const OWN_ONLY = 'enhanced_fx_particles_only';
-const OWN_COMPLETION = 'enhanced_fx_completion';
-
-const STYLES = new Set<unknown>(NODE_ANIMATION_OPTIONS.map((option) => option.value));
-
-/** The Node FX style a node was given, if it is one: a workflow may hold anything there. */
-function ownStyle(node: Node): number | undefined {
-    const style = node.properties[OWN_STYLE];
-    return STYLES.has(style) ? (style as number) : undefined;
-}
-
 /** The style a node's effect takes: its own, else Animate. */
 const styleWanted = (node: Node) => ownStyle(node) ?? N.animate;
 
@@ -73,10 +62,7 @@ function styleOf(node: Node): number | undefined {
 }
 
 /** Whether a node draws its style's particles alone: without an effect, and with its Particles only or Show base effect off. */
-function particlesOnly(node: Node, style: number): boolean {
-    const own = node.properties[OWN_ONLY];
-    return style === 0 || (typeof own === 'boolean' ? own : !N.animationsEnabled);
-}
+const particlesOnly = (node: Node, style: number): boolean => style === 0 || chosenParticlesOnly(node);
 
 /** Whether a node draws more than its halo: its base effect or its particles. */
 const draws = (only: boolean) => N.particleShow || !only;
@@ -224,20 +210,6 @@ function styledTitle(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node):
 let shaping: Node | undefined;
 let titled: TitleOptions | undefined;
 
-/** Sets what a node's menu picked, deleting what is undefined, as one change the workflow's history can undo. */
-function pick(node: Node, choices: Record<string, string | number | boolean | undefined>): void {
-    app.canvas.emitBeforeChange();
-    for (const [key, value] of Object.entries(choices)) {
-        if (value === undefined) delete node.properties[key];
-        else node.properties[key] = value;
-    }
-    app.canvas.emitAfterChange();
-    app.canvas.setDirty(true, false);
-}
-
-/** A menu entry, ticked when it is the node's. */
-const entry = (content: string, ticked: boolean, callback: () => void): IContextMenuValue => ({ content: ticked ? `✓ ${content}` : content, callback });
-
 /**
  * The nodes this client's run reached, by id: the ones it ran and the ones it took from the cache; and the graph on
  * screen as the run started, whose ids those are.
@@ -345,38 +317,10 @@ const ext: ComfyExtension = {
         console.log('[EnhancedNodes] Extension registered with full animation pipeline.');
     },
 
-    // One submenu level each, with has_submenu, so the Vue node menu shows them too (FE157 composables/graph/contextMenuConverter.ts L428-447).
-    getNodeMenuItems(node) {
-        const style = ownStyle(node);
-        const only = node.properties[OWN_ONLY];
-        const completion = node.properties[OWN_COMPLETION];
-        const particles = typeof only === 'boolean' ? only : !N.animationsEnabled;
-        return [
-            {
-                content: 'Node FX',
-                has_submenu: true,
-                submenu: {
-                    options: [
-                        entry('Use global', style === undefined && typeof only !== 'boolean', () => pick(node, { [OWN_STYLE]: undefined, [OWN_ONLY]: undefined })),
-                        ...NODE_ANIMATION_OPTIONS.map((option) => entry(option.text, style === option.value, () => pick(node, { [OWN_STYLE]: option.value }))),
-                        null,
-                        entry('Particles only', particles, () => pick(node, { [OWN_ONLY]: !particles })),
-                    ],
-                },
-            },
-            {
-                content: 'Completion FX',
-                has_submenu: true,
-                submenu: {
-                    options: [
-                        entry('Use global', completion !== 'fireworks' && completion !== 'off', () => pick(node, { [OWN_COMPLETION]: undefined })),
-                        entry('Fireworks', completion === 'fireworks', () => pick(node, { [OWN_COMPLETION]: 'fireworks' })),
-                        entry('Off', completion === 'off', () => pick(node, { [OWN_COMPLETION]: 'off' })),
-                    ],
-                },
-            },
-        ];
-    },
+    getNodeMenuItems: nodeMenu,
+
+    // Per selected item; the toolbox shows each command once (FE157 components/graph/SelectionToolbox.vue L86-99).
+    getSelectionToolboxCommands: (item) => (item instanceof LGraphNode && N.enabled ? [SELECTION_FX] : []),
 };
 
 app.registerExtension(ext);

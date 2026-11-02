@@ -9,7 +9,9 @@
  * nothing is saved but such changes. Once the look is answered, here
  * or in the panel, an upgrader who customised hears what is new in 3.0, once; a
  * fresh install just notes that it was told. About shows the picker again, to
- * choose another look.
+ * choose another look. Where the toasts take no action and the panel is
+ * closed, the undo of a pick, and of any change the panel offers to undo,
+ * shows in a bar where the card shows.
  *
  * @module sidebar/picker
  */
@@ -20,7 +22,7 @@ import { env } from '@/core/engine';
 import { LOOKS, applyLook, changed, currentLook, keepShown, previewLook, type Look } from '@/ui/looks';
 import { button, check, endHover, h, hover, iconButton, roving } from './controls';
 import { lookTile, stopTiles } from './tiles';
-import { UNDO_MS, offerUndo, showTab } from './sidebar';
+import { TOGGLE, UNDO_MS, keyName, offerUndo, showTab } from './sidebar';
 
 const SEEN = '🔗 Enhanced Links.WhatsNew.Seen';
 /** The version whose news the What's new toast tells. */
@@ -37,6 +39,8 @@ let card: HTMLElement | undefined;
 let asking = false;
 /** Where the focus was before the card took it. */
 let before: Element | null = null;
+/** The undo bar while it shows. */
+let offer: HTMLElement | undefined;
 
 /** The canvas's part of the page, beside the sidebar and above the bottom panel, in 1.39.5 and 1.57.1. */
 const host = (): Element => document.querySelector('.graph-canvas-panel')!;
@@ -89,6 +93,7 @@ export function showPicker(): void {
         showTab('looks');
     });
     const primary = { class: 'eln-button eln-button--primary' };
+    const key = keyName(TOGGLE);
     const keeps = !asking ? [button('Done', close, primary)]
         : customised() ? [button('Keep Subtle', () => pick(SUBTLE)), button('Keep my settings', keepMine, primary)]
         : [button('Keep Subtle', () => pick(SUBTLE), primary)];
@@ -98,7 +103,7 @@ export function showPicker(): void {
         h('header', { class: 'eln-picker-head' }, h('span', { class: 'eln-icon eln-mark', 'aria-hidden': 'true' }), h('h2', { id: 'eln-picker-title', class: 'eln-title' }, 'Choose your look')),
         grid,
         h('p', { class: 'eln-picker-more' }, 'The original look? ', classic, ' · ', more),
-        h('footer', { class: 'eln-picker-foot' }, h('span', { class: 'eln-hint' }, 'Change it any time in the FX panel.'), ...keeps),
+        h('footer', { class: 'eln-picker-foot' }, h('span', { class: 'eln-hint' }, `Change it any time in the FX panel${key ? ` (${key})` : ''}.`), ...keeps),
         iconButton('pi-times', 'Close', dismiss, { class: 'eln-tool eln-picker-close' }));
     card.classList.toggle('eln--still', L.motion === 'reduce');
     card.classList.toggle('eln--full', L.motion === 'full');
@@ -130,11 +135,10 @@ function pick(look: Look): void {
     const undo = applyLook(look);
     close();
     if (!visible) return;
-    const again = () => {
+    offerUndo(`${look.name} applied`, () => {
         undo();
         showPicker();
-    };
-    if (!offerUndo(`${look.name} applied`, again)) undoBar(`${look.name} applied`, again);
+    });
 }
 
 /** Keeps the user's own settings: Look is all it saves, and the answer closes the card. */
@@ -150,14 +154,16 @@ function dismiss(): void {
     else pick(SUBTLE);
 }
 
-/** A pick's undo where the toasts take no action (1.39.5) and the panel is closed: a bar where the card was. */
-function undoBar(title: string, undo: () => void): void {
+/** An undo where the toasts take no action (1.39.5) and the panel is closed: a bar where the card shows, which takes the place of the last. */
+export function undoBar(title: string, undo: () => void): void {
+    offer?.remove();
     const bar = h('div', { class: 'eln eln-picker-undo', role: 'status' }, h('span', {}, title), button('Undo', () => {
         clearTimeout(timer);
         bar.remove();
         undo();
     }));
     const timer = setTimeout(() => bar.remove(), UNDO_MS);
+    offer = bar;
     host().append(bar);
 }
 

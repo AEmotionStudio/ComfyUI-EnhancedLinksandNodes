@@ -16,5 +16,16 @@
     "Performance · Budget": "Performance · Budget",
     "Performance · Accessibility": "Performance · Accessibility",
     "Performance · Compatibility": "Performance · Compatibility"
+  },
+  "contextMenu": {
+    "Enhanced FX": "Enhanced FX",
+    "☑ Link effects": "☑ Link effects",
+    "☐ Link effects": "☐ Link effects",
+    "☑ Node effects": "☑ Node effects",
+    "☐ Node effects": "☐ Node effects",
+    "☐ Freeze animation": "☐ Freeze animation",
+    "☑ Freeze animation": "☑ Freeze animation",
+    "Surprise me": "Surprise me",
+    "Open panel": "Open panel"
   }
 }

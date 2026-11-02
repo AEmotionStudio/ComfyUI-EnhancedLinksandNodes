@@ -1,12 +1,16 @@
 /**
- * The files generated from the settings schema: the English text that ComfyUI's
- * settings dialog looks up (locales/en, which the server hands the frontend
- * through /i18n) and docs/SETTINGS.md. They are file snapshots, so CI fails
- * when one is stale; `pnpm gen:settings` rewrites them.
+ * The files generated from the settings schema and the commands: the English
+ * text that ComfyUI's settings dialog, its keybinding settings, the selection
+ * toolbox and the canvas menu look up (locales/en, which the server hands the
+ * frontend through /i18n) and docs/SETTINGS.md. They are file snapshots, so CI
+ * fails when one is stale; `pnpm gen:settings` rewrites them.
  */
 
+import type { ComfyExtension, IContextMenuValue } from '@comfyorg/comfyui-frontend-types';
 import { describe, it, expect } from 'vitest';
-import { SETTINGS, linkSettings, nodeSettings } from '@/core/settings';
+import { SETTINGS, linkSettings, nodeSettings, preview } from '@/core/settings';
+import '@/extensions/link-animations';
+import { app, fake } from '../helpers/fake-app';
 
 type Entry = (typeof SETTINGS)[number];
 
@@ -32,8 +36,31 @@ const categories = [...new Set([...linkSettings, ...nodeSettings]
     .sort((a, b) => b.sortOrder! - a.sortOrder!)
     .flatMap((p) => p.category!.slice(0, 2)))];
 
-/** settingsCategories.<label>, which the dialog's navigation and group headings look up at the top of main.json. */
-const main = json({ settingsCategories: Object.fromEntries(categories.map((c) => [key(c), c])) });
+/** The link extension, which declares the commands for both (src/extensions/link-animations.ts). */
+const links = fake.extensions.find((e) => e.name === 'enhanced.link.animations') as unknown as ComfyExtension;
+
+/** commands.<id>.label, which the selection toolbox's buttons, the Keybinding settings and the Shortcuts panel look up (FE157 ExtensionCommandButton.vue, KeybindingPanel.vue, ShortcutsList.vue). */
+const commands = json(Object.fromEntries(links.commands!.map((c) => [key(c.id), { label: c.label }])));
+
+/**
+ * The canvas menu's Enhanced FX and its items, as they read with the switches on and off, which ComfyUI looks up in
+ * main.json's contextMenu by their whole text (FE157 composables/useContextMenuTranslation.ts L85-90): but the look's,
+ * whose text names the look.
+ */
+function canvasMenu(): string[] {
+    const SWITCHES = ['🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled', '🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode'];
+    const read = (on: boolean) => {
+        SWITCHES.forEach((id, i) => preview(id, i < 2 ? on : !on));
+        const [item] = links.getCanvasMenuItems!(app.canvas as never) as IContextMenuValue[];
+        return [item, ...(item.submenu!.options as IContextMenuValue[])].map((o) => o.content!);
+    };
+    // Off, then on as they start, so they end as they were.
+    const [off, on] = [read(false), read(true)];
+    return [...new Set(on.flatMap((label, i) => [label, off[i]]))].filter((label) => !label.startsWith('Look: '));
+}
+
+/** settingsCategories.<label>, which the dialog's navigation and group headings look up at the top of main.json, and contextMenu.<text>. */
+const main = json({ settingsCategories: Object.fromEntries(categories.map((c) => [key(c), c])), contextMenu: Object.fromEntries(canvasMenu().map((label) => [label, label])) });
 
 function optionsOrRange(s: Exclude<Entry, { type: 'hidden' }>): string {
     switch (s.type) {
@@ -88,6 +115,10 @@ describe('files generated from the settings schema', () => {
         await expect(main).toMatchFileSnapshot('../../locales/en/main.json');
     });
 
+    it('locales/en/commands.json', async () => {
+        await expect(commands).toMatchFileSnapshot('../../locales/en/commands.json');
+    });
+
     it('docs/SETTINGS.md', async () => {
         await expect(docs).toMatchFileSnapshot('../../docs/SETTINGS.md');
     });
@@ -105,7 +136,7 @@ describe('files generated from the settings schema', () => {
                 walk(v);
             }
         };
-        walk({ settings: JSON.parse(settings), ...JSON.parse(main) });
+        walk({ settings: JSON.parse(settings), commands: JSON.parse(commands), ...JSON.parse(main) });
         // Both frontends compile each locale string as a vue-i18n message, whose syntax uses these (escapeI18nMessage, 1.57.1 formatUtil.ts).
         for (const text of texts) expect(text).not.toMatch(/[@${}|%\\]/);
         // vue-i18n's path parser splits a key at these, or gives up on it.

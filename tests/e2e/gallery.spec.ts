@@ -367,7 +367,7 @@ const ROWS: Row[] = [
     {
         slug: 'node-menu',
         title: 'The node menu',
-        look: "v1's Node Animation Style submenu (Use Global, Off and the four styles) beside v3's Node FX (Use global, None, the four styles and Particles only); Completion FX sits beside it.",
+        look: "v1's Node Animation Style submenu (Use Global, Off and the four styles) beside v3's Node FX (Use global, Off, the four styles and Particles only); Completion FX sits beside it.",
         base: V1_NODES,
         settings: {},
         nodes: true,

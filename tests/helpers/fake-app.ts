@@ -4,7 +4,9 @@
  * src code expects, plus matchMedia, which jsdom lacks. Settings behave like
  * the frontend's settingStore (platform/settings/settingStore.ts, the same in
  * 1.39.5 and 1.57.1) where M2 relies on it; tests can also fill the stored
- * values directly.
+ * values directly. Commands and keys behave like its commandStore and
+ * keybindingStore: an extension's keys and commands go in as it registers, and
+ * each command hands out its first key.
  *
  * @module tests/helpers/fake-app
  */
@@ -24,9 +26,21 @@ interface SidebarTab {
     destroy?: () => void;
 }
 
+interface Command {
+    id: string;
+    function: () => unknown;
+}
+
+interface Keybinding {
+    commandId: string;
+    combo: { key: string; ctrl?: boolean; alt?: boolean; shift?: boolean };
+}
+
 interface Extension {
     name: string;
     settings?: Setting[];
+    commands?: Command[];
+    keybindings?: Keybinding[];
     setup?: (app: unknown) => unknown;
     nodeCreated?: (node: unknown, app: unknown) => unknown;
     loadedGraphNode?: (node: unknown, app: unknown) => unknown;
@@ -52,6 +66,13 @@ export const fake = {
     toasts: [] as unknown[],
     /** The commands run through app.extensionManager.command.execute, in order. */
     commands: [] as string[],
+    /** The commands registered, by id: each extension's, a sidebar tab's toggle, and any a test adds. */
+    registeredCommands: new Map<string, Command>(),
+    /** The keys bound, in the order the keybinding store got them. */
+    keybindings: [] as Keybinding[],
+    /** The options of each dialog.confirm, in order, and what the user answers. */
+    confirms: [] as unknown[],
+    confirmed: true,
     /** The user's data files by path, as the server's /userdata keeps them. */
     userData: new Map<string, string>(),
     /** What matchMedia('(prefers-reduced-motion: reduce)') returns: tests set matches, then dispatch 'change'. */
@@ -137,19 +158,41 @@ export const app = {
     },
     extensionManager: {
         setting: { get: read, set },
-        registerSidebarTab: (tab: SidebarTab) => void fake.tabs.push(tab),
+        // The sidebar store makes the tab's toggle command (FE157 stores/workspace/sidebarTabStore.ts L59-72); here it toggles nothing.
+        registerSidebarTab: (tab: SidebarTab) => {
+            fake.tabs.push(tab);
+            fake.registeredCommands.set(`Workspace.ToggleSidebarTab.${tab.id}`, { id: `Workspace.ToggleSidebarTab.${tab.id}`, function: () => {} });
+        },
         getSidebarTabs: () => fake.tabs,
         toast: { add: (message: unknown) => void fake.toasts.push(message) },
-        command: { execute: async (id: string) => void fake.commands.push(id) },
+        dialog: {
+            confirm: async (options: unknown) => {
+                fake.confirms.push(options);
+                return fake.confirmed;
+            },
+        },
+        command: {
+            /** Each command with the first key bound to it, as ComfyCommandImpl.keybinding hands it out (FE157 stores/commandStore.ts L80-82). */
+            get commands() {
+                return [...fake.registeredCommands.values()].map((command) => ({ ...command, keybinding: fake.keybindings.find((k) => k.commandId === command.id) ?? null }));
+            },
+            execute: async (id: string) => {
+                fake.commands.push(id);
+                await fake.registeredCommands.get(id)?.function();
+            },
+        },
     },
     canvas,
     graph: {
         canvas,
         setDirtyCanvas: () => {},
     },
-    // extensionService.registerExtension registers an extension's settings whether or not it is disabled.
+    // extensionService.registerExtension registers an extension's keys, commands and settings whether or not it is
+    // disabled (FE157 services/extensionService.ts L39-53).
     registerExtension: (extension: Extension) => {
         fake.extensions.push(extension);
+        fake.keybindings.push(...(extension.keybindings ?? []));
+        for (const command of extension.commands ?? []) fake.registeredCommands.set(command.id, command);
         extension.settings?.forEach(addSetting);
     },
 };
@@ -197,6 +240,8 @@ export function resetFakeApp(settings: Record<string, unknown> = {}): void {
     fake.posts = [];
     fake.toasts = [];
     fake.commands = [];
+    fake.confirms = [];
+    fake.confirmed = true;
     fake.LGraphCanvas = installLiteGraph();
     fake.registered.forEach(load);
 }

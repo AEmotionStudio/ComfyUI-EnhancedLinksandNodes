@@ -36,8 +36,11 @@ const [CORE, SPARK, SPARKLE, GLOW] = [0, 1, 2, 3];
 /** The particles of one anchor's show. */
 const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
 
+/** What a show goes off over: a node, or a point of the graph it is in; its id seeds the show. */
+export type Anchor = Pick<LGraphNode, 'pos' | 'graph'> & { id: unknown };
+
 interface Burst {
-    node: LGraphNode;
+    node: Anchor;
     x: number;
     y: number;
     delay: number;
@@ -72,7 +75,7 @@ function add(kind: number, owner: number, angle = 0, speed = 0, size = 0, colour
 }
 
 /** Starts the show of run `run` over `nodes`, unless one is playing; nodes past what the pool holds, the fifth on, get none. */
-export function fireworks(nodes: LGraphNode[], run: string): void {
+export function fireworks(nodes: Anchor[], run: string): void {
     if ((pool.count && progress() < 1) || !nodes.length) return;
     pool.count = bursts.length = 0;
     clock.burstTime = 0;
