@@ -564,11 +564,10 @@ function hide(canvas: Canvas, args: RenderLink): void {
 /**
  * Focus.OnTop: draws the focused links again over the nodes as their pass drew them: native's calls, or our segments
  * with what moves on them and their bases, plain, as glows drawn in every front pass would cost each frame what the
- * background pass paid once. Then the run's visuals on them, and the focused reroutes over them. Nodes 2.0 waits for
- * its overlay.
+ * background pass paid once. Then the run's visuals on them, and the focused reroutes over them.
  */
 function raise(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
-    if (!L.focusOnTop || !pass.focus || LiteGraph.vueNodesMode) return;
+    if (!L.focusOnTop || !pass.focus) return;
     if (!cull(canvas, isFocused) && !raised.length) return;
     for (const args of raised) {
         args[0] = ctx;

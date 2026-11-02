@@ -10,8 +10,10 @@
  * motion; what falls on the node goes over its body, from drawNodeShape, under
  * its slots and widgets.
  * The styled title takes the native title's place, over the effect. Effects
- * fade with the node's mode, as native draws the node; collapsed nodes, nodes
- * in Vue mode, and every node with Node effects off, get none; a Calm run halves them. The node menu's Node FX and
+ * fade with the node's mode, as native draws the node; collapsed nodes, and
+ * every node with Node effects off, get none; a Calm run halves them. In Nodes
+ * 2.0, whose DOM nodes these hooks never reach, nodes/vue.ts's stylesheet draws
+ * the halo and the effects, and the under-layer their particles. The node menu's Node FX and
  * Completion FX set a node's own effect and where the fireworks go, which it keeps in its properties (ui/menus.ts);
  * while node effects are on, the selection toolbox has a button that steps the selected nodes through the effects.
  *
@@ -23,13 +25,14 @@ import { app } from '/scripts/app.js';
 import { N, nodeSettings } from '@/core/settings';
 import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
-import { OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
+import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
 import { drawTitle, titleOf } from '@/nodes/text';
+import { vueNodes } from '@/nodes/vue';
 import { FIREWORKS, drawBursts } from '@/fx/bursts';
 import { installRuns } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { installPanel } from '@/sidebar/sidebar';
-import { SELECTION_FX, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
+import { SELECTION_FX, effectOf, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
 
 /** The guard's keys, which its toast names when it turns one off. */
 const EFFECT = 'Node effect';
@@ -42,13 +45,8 @@ type TitleOptions = Parameters<Node['drawTitleText']>[1];
 
 /** RenderShape.ROUND, CIRCLE and CARD (litegraph types/globalEnums.ts); a node of any other shape is a box. */
 const [ROUND, CIRCLE, CARD] = [2, 3, 4];
-/** LGraphEventMode.NEVER (muted) and BYPASS. */
-const [NEVER, BYPASS] = [2, 4];
 /** TitleMode.NO_TITLE, for which drawNodeShape draws no title (FE157 LGraphCanvas.ts L5917, FE1395 L5537). */
 const NO_TITLE = 1;
-
-/** The style a node's effect takes: its own, else Animate. */
-const styleWanted = (node: Node) => ownStyle(node) ?? N.animate;
 
 /**
  * The effect a node shows: its style, 0 for the fireflies of a node with particles and no effect, or none. A node given
@@ -56,7 +54,7 @@ const styleWanted = (node: Node) => ownStyle(node) ?? N.animate;
  */
 function styleOf(node: Node): number | undefined {
     if (!N.enabled || node.flags.collapsed) return undefined;
-    const style = styleWanted(node);
+    const style = effectOf(node);
     if (style > 0) return style;
     return ownStyle(node) === undefined && N.particleShow ? 0 : undefined;
 }
@@ -142,19 +140,22 @@ function halo(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node, style: 
  * It takes the nodes whose box, grown by their effect's reach, is on screen, and counts what moves.
  */
 function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    vueNodes(canvas);
     const { graph } = canvas;
-    // In Vue mode the DOM draws the nodes and none of the node hooks run; Nodes 2.0 comes with M8.
-    if (!graph || LiteGraph.vueNodesMode) return;
+    if (!graph) return;
+    // In Nodes 2.0 the DOM draws the nodes and none of the node hooks run: the halo and the effects are nodes/vue.ts's
+    // stylesheet's, and this layer draws the particles alone, under the DOM nodes.
+    const vue = LiteGraph.vueNodesMode;
     const moving = !holdsStill();
-    const titles = N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
+    const titles = !vue && N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
     const area = canvas.visible_area;
     // Canvas px to a graph unit: the canvas is only scaled and moved.
     const scale = ctx.getTransform().a;
     for (const node of graph.nodes) {
         const style = styleOf(node);
-        const only = style !== undefined && particlesOnly(node, style);
+        const only = style !== undefined && (vue || particlesOnly(node, style));
         const shown = style !== undefined && draws(only) && !guard.off(keyOf(style));
-        const glows = lit(canvas, style);
+        const glows = !vue && lit(canvas, style);
         const reach = shown ? effectReach(style, node.size[0], node.size[1], only) : 0;
         if (!overlaps(node.renderArea, area, Math.max(0, reach))) continue;
         // Where drawTitleText draws the styled title: not for a node that draws its own, nor one without a title bar.
@@ -195,7 +196,7 @@ function styledTitle(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node):
     try {
         const height = LiteGraph.NODE_TITLE_HEIGHT;
         const phase = (holdsStill() ? STILL_NODE : clock).nodePhase;
-        drawTitle(ctx, titleOf(ctx, node), height, -height / 2, nodePalette(styleWanted(node)).title, phase, modeAlpha(canvas, node));
+        drawTitle(ctx, titleOf(ctx, node), height, -height / 2, nodePalette(effectOf(node)).title, phase, modeAlpha(canvas, node));
         return true;
     } catch (error) {
         guard.fail(TITLES, error);

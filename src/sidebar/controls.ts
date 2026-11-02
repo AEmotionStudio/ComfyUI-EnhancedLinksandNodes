@@ -5,12 +5,14 @@
  * effect, a gallery of live tiles that preview on the canvas while hovered.
  * Each row marks a value that is not the default and offers to reset it, hides
  * while the setting cannot apply, and says what it needs from another section,
- * with a button that sets it. Sliders and colour wells preview while they move
- * and commit where they stop; everything else commits at once.
+ * or classic nodes, with a button that sets it. Sliders and colour wells
+ * preview while they move and commit where they stop; everything else commits
+ * at once.
  *
  * @module sidebar/controls
  */
 
+import { app } from '/scripts/app.js';
 import { HEX, commit, preview, restore, setting, shown, type Setting } from '@/core/settings';
 import { linkScene, nodeScene, tile, type Scene } from './tiles';
 
@@ -251,9 +253,11 @@ export function row(s: Visible, found = false): Row {
             control.el.toggleAttribute('inert', Boolean(needs));
             control.el.classList.toggle('eln-off', Boolean(needs));
             if (needs) {
+                // Ours, or one of ComfyUI's, which goes through its own settings store.
+                const ours = setting(needs.id) as Setting | undefined;
                 reason.textContent = needs.reason;
-                fix.textContent = `Use ${text(setting(needs.id) as Visible, needs.value)}`;
-                fix.onclick = () => commit(needs.id, needs.value);
+                fix.textContent = needs.label ?? `Use ${text(ours as Visible, needs.value)}`;
+                fix.onclick = () => (ours ? commit(needs.id, needs.value) : void app.extensionManager.setting.set(needs.id, needs.value));
             }
         },
     };

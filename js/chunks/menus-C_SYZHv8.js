@@ -167,6 +167,7 @@ const focusOn = () => L.focusEnabled;
 const runsChange = () => L.pauseMode !== "ignore";
 const titles = () => N.enabled && N.textAnimationEnabled;
 const customNodes = () => N.colorMode === "custom" ? void 0 : { reason: "Used when Node effect colors is Custom.", id: "📦 Enhanced Nodes.Color.Mode", value: "custom" };
+const classicNodes = () => LiteGraph.vueNodesMode ? { reason: "Classic nodes only.", id: "Comfy.VueNodes.Enabled", value: false, label: "Use classic nodes" } : void 0;
 const LINKS$1 = "🔗 Enhanced Links.";
 const NODES = "📦 Enhanced Nodes.";
 const LOOK = "🔗 Enhanced Links.Look";
@@ -213,8 +214,8 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Glow.Show", key: "glowShow", name: "Node effect glow", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "A halo in the effect's primary color around each node with an effect." },
   { id: "📦 Enhanced Nodes.Glow", key: "glow", name: "Node glow strength", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Glow & hover", showIf: () => effects$1() && (N.glowShow || N.selectionGlow), tooltip: "How far the halo and the selection frame glow." },
   { id: "📦 Enhanced Nodes.Selection.Glow", key: "selectionGlow", name: "Glowing frame around selected nodes", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "On nodes with an effect." },
-  { id: "📦 Enhanced Nodes.Color.Hover.Show", key: "colorHoverShow", name: "Hover outline", type: "boolean", default: false, group: "Nodes · Glow & hover", advanced: true, showIf: effects$1, tooltip: "Outlines animated nodes while hovered or selected." },
-  { id: "📦 Enhanced Nodes.Color.Hover", key: "colorHover", name: "Hover outline color", type: "color", default: "#00ff15", group: "Nodes · Glow & hover", advanced: true, showIf: () => effects$1() && N.colorHoverShow },
+  { id: "📦 Enhanced Nodes.Color.Hover.Show", key: "colorHoverShow", name: "Hover outline", type: "boolean", default: false, group: "Nodes · Glow & hover", advanced: true, showIf: effects$1, needs: classicNodes, tooltip: "Outlines animated nodes while hovered or selected." },
+  { id: "📦 Enhanced Nodes.Color.Hover", key: "colorHover", name: "Hover outline color", type: "color", default: "#00ff15", group: "Nodes · Glow & hover", advanced: true, showIf: () => effects$1() && N.colorHoverShow, needs: classicNodes },
   { id: "📦 Enhanced Nodes.Color.Mode", key: "colorMode", name: "Node effect colors", type: "combo", options: NODE_COLOR_MODE_OPTIONS, default: "default", group: "Nodes · Color", showIf: nodesDraw },
   { id: "📦 Enhanced Nodes.Color.Primary", key: "colorPrimary", name: "Node primary color", type: "color", default: "#ffb300", group: "Nodes · Color", showIf: () => nodesDraw() && N.colorMode === "custom", tooltip: "Used when Node effect colors is Custom." },
   { id: "📦 Enhanced Nodes.Color.Secondary", key: "colorSecondary", name: "Node secondary color", type: "color", default: "#fb00ff", group: "Nodes · Color", showIf: () => nodesDraw() && N.colorMode === "custom", tooltip: "Used when Node effect colors is Custom." },
@@ -228,24 +229,24 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Particle.Glow", key: "particleGlow", name: "Node particle glow", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Particles", advanced: true, showIf: particles },
   { id: "📦 Enhanced Nodes.Particle.Color.Mode", key: "particleColorMode", name: "Node particle colors", type: "combo", options: PARTICLE_COLOR_MODE_OPTIONS, default: "default", group: "Nodes · Particles", showIf: particles, tooltip: "Particle color takes Node particle color with Custom colors, else the effect's primary color; Complementary takes its opposite hue." },
   { id: "📦 Enhanced Nodes.Color.Particle", key: "colorParticle", name: "Node particle color", type: "color", default: "#ffb300", group: "Nodes · Particles", showIf: () => particles() && (N.particleColorMode === "default" || N.particleColorMode === "complementary"), needs: customNodes, tooltip: "Used when Node effect colors is Custom." },
-  { id: "📦 Enhanced Nodes.Text.Animation.Enabled", key: "textAnimationEnabled", name: "Animated titles", type: "boolean", default: false, group: "Nodes · Titles", showIf: () => N.enabled, tooltip: "Draws each node title in the chosen style." },
-  { id: "📦 Enhanced Nodes.Text.Style", key: "textStyle", name: "Title style", type: "combo", options: TEXT_STYLE_OPTIONS, default: "neon", group: "Nodes · Titles", showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Color", key: "textColor", name: "Title color", type: "color", default: "#00ffff", group: "Nodes · Titles", showIf: titles, needs: customNodes, tooltip: "Used when Node effect colors is Custom; otherwise titles take the effect's accent color." },
-  { id: "📦 Enhanced Nodes.Text.Size", key: "textSize", name: "Title size", type: "slider", min: 8, max: 24, step: 1, default: 14, group: "Nodes · Titles", showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Glow", key: "textGlow", name: "Title glow", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Titles", advanced: true, showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Letter.Spacing", key: "textLetterSpacing", name: "Title letter spacing", type: "slider", min: -2, max: 10, step: 0.25, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Position.X", key: "textPositionX", name: "Title offset X", type: "slider", min: -50, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Position.Y", key: "textPositionY", name: "Title offset Y", type: "slider", min: -50, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
-  { id: "📦 Enhanced Nodes.Text.Rotation.Radius", key: "textRotationRadius", name: "Title orbit radius", type: "slider", min: 0, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, tooltip: "Circles the title around its position." },
-  { id: "📦 Enhanced Nodes.Text.Rotation.Angle", key: "textRotationAngle", name: "Title rotation", type: "slider", min: -180, max: 180, step: 5, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
+  { id: "📦 Enhanced Nodes.Text.Animation.Enabled", key: "textAnimationEnabled", name: "Animated titles", type: "boolean", default: false, group: "Nodes · Titles", showIf: () => N.enabled, needs: classicNodes, tooltip: "Draws each node title in the chosen style." },
+  { id: "📦 Enhanced Nodes.Text.Style", key: "textStyle", name: "Title style", type: "combo", options: TEXT_STYLE_OPTIONS, default: "neon", group: "Nodes · Titles", showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Color", key: "textColor", name: "Title color", type: "color", default: "#00ffff", group: "Nodes · Titles", showIf: titles, needs: () => classicNodes() ?? customNodes(), tooltip: "Used when Node effect colors is Custom; otherwise titles take the effect's accent color." },
+  { id: "📦 Enhanced Nodes.Text.Size", key: "textSize", name: "Title size", type: "slider", min: 8, max: 24, step: 1, default: 14, group: "Nodes · Titles", showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Glow", key: "textGlow", name: "Title glow", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Letter.Spacing", key: "textLetterSpacing", name: "Title letter spacing", type: "slider", min: -2, max: 10, step: 0.25, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Position.X", key: "textPositionX", name: "Title offset X", type: "slider", min: -50, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Position.Y", key: "textPositionY", name: "Title offset Y", type: "slider", min: -50, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Text.Rotation.Radius", key: "textRotationRadius", name: "Title orbit radius", type: "slider", min: 0, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes, tooltip: "Circles the title around its position." },
+  { id: "📦 Enhanced Nodes.Text.Rotation.Angle", key: "textRotationAngle", name: "Title rotation", type: "slider", min: -180, max: 180, step: 5, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, needs: classicNodes },
   { id: "🔗 Enhanced Links.Focus.Enabled", key: "focusEnabled", name: "Selection focus", type: "boolean", default: true, group: "Focus & Flow · Selection focus", look: false, tooltip: "Make the selection's connections stand out." },
   { id: "🔗 Enhanced Links.Focus.Mode", key: "focusMode", name: "Selection focus mode", type: "combo", options: FOCUS_MODE_OPTIONS, default: "highlight", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
   { id: "🔗 Enhanced Links.Focus.Color", key: "focusColor", name: "Focused link color", type: "combo", options: FOCUS_COLOR_OPTIONS, default: "native", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
   { id: "🔗 Enhanced Links.Focus.Depth", key: "focusDepth", name: "Focus reach", type: "combo", options: FOCUS_DEPTH_OPTIONS, default: "direct", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
   { id: "🔗 Enhanced Links.Focus.OnTop", key: "focusOnTop", name: "Bring focused links to front", type: "boolean", default: true, group: "Focus & Flow · Selection focus", look: false, showIf: focusOn, tooltip: "Draws them above nodes." },
-  { id: "🔗 Enhanced Links.Focus.Hover", key: "focusHover", name: "Focus on hover", type: "boolean", default: false, group: "Focus & Flow · Selection focus", look: false, showIf: focusOn, tooltip: "Hover a node to focus it without selecting." },
+  { id: "🔗 Enhanced Links.Focus.Hover", key: "focusHover", name: "Focus on hover", type: "boolean", default: false, group: "Focus & Flow · Selection focus", look: false, showIf: focusOn, needs: classicNodes, tooltip: "Hover a node to focus it without selecting." },
   { id: "🔗 Enhanced Links.Focus.Dim", key: "focusDim", name: "Dimmed link opacity", type: "slider", min: 5, max: 60, step: 5, default: 20, group: "Focus & Flow · Selection focus", advanced: true, look: false, showIf: () => focusOn() && L.focusMode === "dim" },
-  { id: "🔗 Enhanced Links.Navigate.DoubleClick", key: "navigateDoubleClick", name: "Double-click a slot to jump", type: "boolean", default: true, group: "Focus & Flow · Navigation", look: false, tooltip: "Fly to the other end; repeat to cycle." },
+  { id: "🔗 Enhanced Links.Navigate.DoubleClick", key: "navigateDoubleClick", name: "Double-click a slot to jump", type: "boolean", default: true, group: "Focus & Flow · Navigation", look: false, needs: classicNodes, tooltip: "Fly to the other end; repeat to cycle." },
   { id: "🔗 Enhanced Links.Navigate.Follow", key: "navigateFollow", name: "Follow execution", type: "boolean", default: false, group: "Focus & Flow · Navigation", look: false, tooltip: "Pan to each node as your run reaches it." },
   { id: "🔗 Enhanced Links.Pause.Mode", key: "pauseMode", name: "During a run", type: "combo", options: PAUSE_MODE_OPTIONS, default: "spotlight", group: "Focus & Flow · During a run", tooltip: "Reacts to your own runs only." },
   { id: "🔗 Enhanced Links.Pause.During.Render", key: "pauseDuringRender", name: "Apply run behavior to links", type: "boolean", default: true, group: "Focus & Flow · During a run", advanced: true, showIf: runsChange, tooltip: "Off = links ignore runs." },
@@ -333,7 +334,7 @@ function present(s, value) {
 const stored = /* @__PURE__ */ new Map();
 let migrated;
 let writing;
-const own$1 = /* @__PURE__ */ new Set();
+const own$2 = /* @__PURE__ */ new Set();
 function params(prefix) {
   return SETTINGS.flatMap((s, i) => s.id.startsWith(prefix) ? [{
     // The package types id as keyof Settings, the core ids only; the settings store takes any string.
@@ -353,8 +354,8 @@ function params(prefix) {
     onChange: (value, old) => {
       const chosen = old !== void 0 && writing !== s.id;
       if (old === void 0 && s.type !== "hidden") {
-        if (migrated === s.id && value !== (V2_DEFAULTS[s.id] ?? s.default)) own$1.add(s.id);
-        else own$1.delete(s.id);
+        if (migrated === s.id && value !== (V2_DEFAULTS[s.id] ?? s.default)) own$2.add(s.id);
+        else own$2.delete(s.id);
         if (s.id in V2_DEFAULTS && value === V2_DEFAULTS[s.id]) overlaid.add(s.id);
         else overlaid.delete(s.id);
       } else if (chosen) overlaid.delete(s.id);
@@ -367,7 +368,7 @@ function params(prefix) {
 }
 const linkSettings = params(LINKS$1);
 const nodeSettings = params(NODES);
-const customised = () => own$1.size > 0;
+const customised = () => own$2.size > 0;
 const unsaved = /* @__PURE__ */ new Map();
 let saving = Promise.resolve();
 function saved(id) {
@@ -525,11 +526,71 @@ function wake() {
 function need() {
   app.canvas.setDirty(true, true);
 }
+const PANE = '[data-testid="transform-pane"]';
+const nodes2 = { onFlip: void 0 };
+let vue = false;
+let found = null;
+let own$1;
+let ownCtx = null;
+function transformPane() {
+  if (!found?.isConnected) found = document.querySelector(PANE);
+  return found;
+}
+function ours(main) {
+  const pane = transformPane();
+  if (!pane) return null;
+  if (!own$1) {
+    own$1 = document.createElement("canvas");
+    own$1.className = "eln-overlay";
+    own$1.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none";
+    ownCtx = own$1.getContext("2d");
+  }
+  if (pane.nextElementSibling !== own$1) pane.after(own$1);
+  if (own$1.width !== main.width || own$1.height !== main.height) {
+    own$1.width = main.width;
+    own$1.height = main.height;
+  } else ownCtx?.clearRect(0, 0, own$1.width, own$1.height);
+  return ownCtx;
+}
+function drop() {
+  own$1?.remove();
+  own$1 = void 0;
+  ownCtx = null;
+}
+function foreground(canvas, ctx) {
+  layers.links?.(canvas, ctx, true);
+  layers.runs?.(canvas, ctx);
+  layers.marks?.(canvas, ctx);
+  layers.bursts?.(canvas, ctx);
+}
+function overNodes(canvas, ctx) {
+  if (!LiteGraph.vueNodesMode) {
+    if (own$1) drop();
+    return foreground(canvas, ctx);
+  }
+  const main = canvas.canvas;
+  const top = "overlayCtx" in canvas ? canvas.overlayCtx : ours(main);
+  if (!top) return foreground(canvas, ctx);
+  top.save();
+  try {
+    const scale2 = top.canvas.width / (top.canvas.clientWidth || 1);
+    top.setTransform(scale2, 0, 0, scale2, 0, 0);
+    canvas.ds.toCanvasContext(top);
+    foreground(canvas, top);
+  } finally {
+    top.restore();
+  }
+}
 const hooks = {
   /** onRender(canvas element, ctx) starts each front pass, in screen space between the background and the nodes. */
   onRender: {
     ctx: 1,
     draw(canvas, ctx) {
+      if (LiteGraph.vueNodesMode !== vue) {
+        vue = LiteGraph.vueNodesMode;
+        found = null;
+        nodes2.onFlip?.();
+      }
       live.nodes = live.particles = 0;
       canvas.ds.toCanvasContext(ctx);
       layers.nodes?.(canvas, ctx);
@@ -539,15 +600,10 @@ const hooks = {
     called: false,
     running: false
   },
-  /** onDrawForeground(ctx, visible area), in graph space over the nodes. */
+  /** onDrawForeground(ctx, visible area), in graph space over the nodes; in Nodes 2.0 on the overlay above them. */
   onDrawForeground: {
     ctx: 0,
-    draw(canvas, ctx) {
-      layers.links?.(canvas, ctx, true);
-      layers.runs?.(canvas, ctx);
-      layers.marks?.(canvas, ctx);
-      layers.bursts?.(canvas, ctx);
-    },
+    draw: overNodes,
     installed: void 0,
     called: false,
     running: false
@@ -960,24 +1016,24 @@ function sprite(shape, size, angle, width, colour2, blur) {
   if (!byColour) sprites.set(shape, byColour = /* @__PURE__ */ new Map());
   let byKey = byColour.get(colour2);
   if (!byKey) byColour.set(colour2, byKey = /* @__PURE__ */ new Map());
-  let found = byKey.get(key);
-  if (!found) {
-    byKey.set(key, found = cast(shape, cs, turn ? t / TURNS * turn : 0, cw, colour2, blur, half));
+  let found2 = byKey.get(key);
+  if (!found2) {
+    byKey.set(key, found2 = cast(shape, cs, turn ? t / TURNS * turn : 0, cw, colour2, blur, half));
     if (pixels > BUDGET) evict();
   }
-  found.used = pass$1;
-  return found;
+  found2.used = pass$1;
+  return found2;
 }
 function stamp(ctx, shape, x, y, size, angle, paint2, colour2, blur, offset) {
   const d = shape.stroked ? Math.max(size * scale, LEAST) : size * scale;
   if (d < LEAST) return true;
-  const found = sprite(shape, d, angle, shape.stroked ? ctx.lineWidth * scale : 0, colour2, blur);
-  if (!found) return false;
+  const found2 = sprite(shape, d, angle, shape.stroked ? ctx.lineWidth * scale : 0, colour2, blur);
+  if (!found2) return false;
   const alpha = ctx.globalAlpha;
   ctx.globalAlpha = alpha * opacity(paint2);
-  const h2 = found.half * d / found.size / scale;
+  const h2 = found2.half * d / found2.size / scale;
   const o = offset / scale;
-  ctx.drawImage(found.image, x + o - h2, y + o - h2, 2 * h2, 2 * h2);
+  ctx.drawImage(found2.image, x + o - h2, y + o - h2, 2 * h2, 2 * h2);
   ctx.globalAlpha = alpha;
   return true;
 }
@@ -1026,18 +1082,18 @@ function disc(ctx, x, y, r, colour2, alpha, soft) {
   let byKey = discs.get(colour2);
   if (!byKey) discs.set(colour2, byKey = /* @__PURE__ */ new Map());
   const key = (s + 16) * 2 + Number(soft);
-  let found = byKey.get(key);
-  if (!found) {
+  let found2 = byKey.get(key);
+  if (!found2) {
     const size = 2 ** (s / STEPS);
     const half = Math.ceil(size) + 1;
     const image = offscreen(2 * half, 2 * half);
     paintDisc(image.getContext("2d"), half, half, size, colour2, 1, soft);
-    byKey.set(key, found = { image, size, half, used: pass$1 });
+    byKey.set(key, found2 = { image, size, half, used: pass$1 });
   }
   const before2 = ctx.globalAlpha;
   ctx.globalAlpha = before2 * alpha;
-  const h2 = found.half * d / found.size / scale;
-  ctx.drawImage(found.image, x - h2, y - h2, 2 * h2, 2 * h2);
+  const h2 = found2.half * d / found2.size / scale;
+  ctx.drawImage(found2.image, x - h2, y - h2, 2 * h2, 2 * h2);
   ctx.globalAlpha = before2;
 }
 const FIREWORKS = "Fireworks";
@@ -1239,6 +1295,7 @@ function syncRuns(canvas) {
   }
 }
 const stepInto = (link2) => into.get(Number(link2.target_id))?.step;
+const stepOf = (node2) => into.get(Number(node2.id))?.step;
 const flowsShown = () => (L.flowRiver || L.flowTrail) && shown$2.length > 0 && !guard.off(RUNS) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT);
 function riverAlpha(step2, t, still) {
   if (still) return step2.end === Infinity ? 1 : 0;
@@ -1353,7 +1410,7 @@ function failure(ctx, node2, step2, t) {
 function drawSteps(canvas, ctx) {
   syncRuns(canvas);
   live.rings = 0;
-  if (!N.enabled || LiteGraph.vueNodesMode || !shown$2.length || guard.off(RUNS)) return;
+  if (!N.enabled || !shown$2.length || guard.off(RUNS)) return;
   const t = clock.runTime;
   const still = env.reducedMotion || during(N.pauseDuringRender) === "pause";
   const area = canvas.visible_area;
@@ -1443,7 +1500,7 @@ function installRuns(part2) {
   }
   if (listening) return;
   listening = true;
-  const ours = (detail) => env.running && detail.prompt_id === run.prompt;
+  const ours2 = (detail) => env.running && detail.prompt_id === run.prompt;
   api.addEventListener("execution_start", ({ detail }) => {
     if (performance.now() - celebrated < BATCH_MS) endBursts();
     Object.assign(run, { prompt: detail.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
@@ -1455,10 +1512,10 @@ function installRuns(part2) {
     changed$2(true);
   });
   api.addEventListener("execution_cached", ({ detail }) => {
-    if (ours(detail)) for (const id of detail.nodes) cached.add(String(id));
+    if (ours2(detail)) for (const id of detail.nodes) cached.add(String(id));
   });
   api.addEventListener("progress_state", ({ detail }) => {
-    if (!ours(detail)) return;
+    if (!ours2(detail)) return;
     let moved2 = false;
     for (const { state: state2, value, max, node_id, display_node_id } of Object.values(detail.nodes)) {
       const id = String(display_node_id ?? node_id);
@@ -1480,12 +1537,12 @@ function installRuns(part2) {
     changed$2(moved2);
   });
   api.addEventListener("execution_success", ({ detail }) => {
-    if (!ours(detail)) return;
+    if (!ours2(detail)) return;
     finish();
     celebrate(detail.prompt_id);
   });
   api.addEventListener("execution_error", ({ detail }) => {
-    if (!ours(detail)) return;
+    if (!ours2(detail)) return;
     const id = detail.node_id == null ? void 0 : String(detail.node_id);
     if (id !== void 0) {
       const step2 = steps.get(id) ?? { start: clock.runTime, end: Infinity, progress: NaN, failed: false };
@@ -1497,7 +1554,7 @@ function installRuns(part2) {
     if (node2) held$1.set(id, signature(node2));
   });
   api.addEventListener("execution_interrupted", ({ detail }) => {
-    if (ours(detail)) finish();
+    if (ours2(detail)) finish();
   });
   api.addEventListener("reconnected", () => {
     if (env.running) finish();
@@ -3223,7 +3280,7 @@ function hide(canvas, args) {
   ctx.restore();
 }
 function raise(canvas, ctx) {
-  if (!L.focusOnTop || !pass.focus || LiteGraph.vueNodesMode) return;
+  if (!L.focusOnTop || !pass.focus) return;
   if (!cull(canvas, isFocused) && !raised.length) return;
   for (const args of raised) {
     args[0] = ctx;
@@ -3633,6 +3690,7 @@ const STILL_NODE = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
 const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion;
 const UNDER = 1;
 const OVER = 2;
+const [NEVER, BYPASS] = [2, 4];
 let part$1;
 let fade = 1;
 let held = false;
@@ -4094,7 +4152,7 @@ function drawNodeFx(ctx, style, node2, w, h2, k2, p, alpha, only) {
   part$1 = p;
   fade = alpha;
   held = holdsStill();
-  outlined = style > 0 && N.colorHoverShow && Boolean(node2.selected || node2.mouseOver);
+  outlined = style > 0 && N.colorHoverShow && !LiteGraph.vueNodesMode && Boolean(node2.selected || node2.mouseOver);
   const pal = nodePalette(style);
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
@@ -4429,7 +4487,7 @@ function text(s, value) {
   return String(value);
 }
 let ids$1 = 0;
-function row(s, found = false) {
+function row(s, found2 = false) {
   const id = `eln-${++ids$1}`;
   const label = `${id}-label`;
   const control = s.type === "boolean" ? toggle(s, id) : s.type === "slider" ? slider(s, id) : s.type === "combo" ? choice(s, id, label) : colour(s, id);
@@ -4448,7 +4506,7 @@ function row(s, found = false) {
   const fix = h("button", { type: "button", class: "eln-link" });
   const need2 = h("p", { class: "eln-need" }, reason, " ", fix);
   const head = h("div", { class: "eln-row-head" }, h("span", { class: "eln-dot", "aria-hidden": "true" }), name);
-  if (found && "advanced" in s) head.append(h("span", { class: "eln-tag" }, "Advanced"));
+  if (found2 && "advanced" in s) head.append(h("span", { class: "eln-tag" }, "Advanced"));
   head.append(reset2);
   if (!control.wide) head.append(control.el);
   const el = h("div", { class: "eln-row", "data-setting": s.id }, head);
@@ -4463,15 +4521,16 @@ function row(s, found = false) {
       const changed2 = value !== s.default;
       el.classList.toggle("eln-row--modified", changed2);
       modified.hidden = reset2.hidden = !changed2;
-      el.hidden = !found && !(s.showIf?.() ?? true);
+      el.hidden = !found2 && !(s.showIf?.() ?? true);
       const needs = s.needs?.();
       need2.hidden = !needs;
       control.el.toggleAttribute("inert", Boolean(needs));
       control.el.classList.toggle("eln-off", Boolean(needs));
       if (needs) {
+        const ours2 = setting(needs.id);
         reason.textContent = needs.reason;
-        fix.textContent = `Use ${text(setting(needs.id), needs.value)}`;
-        fix.onclick = () => commit(needs.id, needs.value);
+        fix.textContent = needs.label ?? `Use ${text(ours2, needs.value)}`;
+        fix.onclick = () => ours2 ? commit(needs.id, needs.value) : void app.extensionManager.setting.set(needs.id, needs.value);
       }
     }
   };
@@ -5605,7 +5664,7 @@ function render(container) {
   ["IMAGE", "LATENT", "MODEL"].forEach((type, i) => colours[type] && root.style.setProperty(`--eln-link-${i + 1}`, colours[type]));
   container.append(root);
   unwatch = watch(heard);
-  guard.onTrip = refresh;
+  guard.onTrip = nodes2.onFlip = refresh;
   go(state.tab, false);
   void userData(async () => {
   });
@@ -5614,7 +5673,7 @@ function destroy() {
   endHover();
   if (root) stopTiles(root);
   unwatch?.();
-  guard.onTrip = void 0;
+  guard.onTrip = nodes2.onFlip = void 0;
   clearTimeout(undoTimer);
   applied.until = 0;
   keep();
@@ -5888,13 +5947,13 @@ function results(query) {
     if (finds(s.name, s.tooltip ?? "", s.group, s.id, ...s.type === "combo" ? s.options.map((o) => o.text) : [])) groups.set(s.group, [...groups.get(s.group) ?? [], s]);
   }
   if (!looks.length && !groups.size) return [h("p", { class: "eln-hint" }, `Nothing matches “${query}”.`)];
-  const found = looks.length ? [h("section", { class: "eln-section" }, h("h3", { class: "eln-crumb" }, "Looks"), lookGrid(looks))] : [];
+  const found2 = looks.length ? [h("section", { class: "eln-section" }, h("h3", { class: "eln-crumb" }, "Looks"), lookGrid(looks))] : [];
   for (const [group, settings] of groups) {
     const own2 = settings.map((s) => row(s, true));
     rows.push(...own2);
-    found.push(h("section", { class: "eln-section" }, h("h3", { class: "eln-crumb" }, group.replace(" · ", " › ")), h("div", { class: "eln-section-body" }, ...own2.map((r) => r.el))));
+    found2.push(h("section", { class: "eln-section" }, h("h3", { class: "eln-crumb" }, group.replace(" · ", " › ")), h("div", { class: "eln-section-body" }, ...own2.map((r) => r.el))));
   }
-  return found;
+  return found2;
 }
 function noticesOf(tab) {
   const all2 = tab === "looks";
@@ -5902,7 +5961,10 @@ function noticesOf(tab) {
   if ((all2 || tab === "links") && !running.links) list.push({ text: DISABLED.links });
   if ((all2 || tab === "nodes") && !running.nodes) list.push({ text: DISABLED.nodes });
   if ((all2 || tab === "nodes") && LiteGraph.vueNodesMode) {
-    list.push({ text: "Nodes 2.0 is on, and node effects show on classic nodes only for now.", action: ["Use classic nodes", () => void Promise.resolve(app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)).then(refresh)] });
+    list.push({
+      text: "Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.",
+      action: ["Use classic nodes", () => void app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)]
+    });
   }
   if ((all2 || tab === "links") && deferring()) list.push({ text: L.coexist === "defer" ? "Link effects are set to always step aside for other link extensions." : "Another extension draws links, so link effects step aside for it.", action: ["Keep Enhanced link effects", () => commit(COEXIST, "ours")] });
   for (const key of tab === "perf" ? [] : guard.tripped()) {
@@ -6326,6 +6388,7 @@ function ownStyle(node2) {
   const style = node2.properties[OWN_STYLE];
   return STYLES.has(style) ? style : void 0;
 }
+const effectOf = (node2) => ownStyle(node2) ?? N.animate;
 function pick(nodes, choices) {
   app.canvas.emitBeforeChange();
   for (const node2 of nodes) {
@@ -6575,13 +6638,18 @@ function installFollow() {
     api.addEventListener("executing", ({ detail }) => {
       if (detail != null && env.running) follow(String(detail));
     });
+    for (const type of ["wheel", "pointermove"]) {
+      document.addEventListener(type, (event) => {
+        if (env.running && event.target.closest?.(PANE)) interrupted(event);
+      }, { capture: true, passive: true });
+    }
   }
   watched = app.canvas;
   app.canvas.canvas.addEventListener("wheel", interrupted, { passive: true });
   app.canvas.canvas.addEventListener("pointermove", interrupted, { passive: true });
 }
 export {
-  live as $,
+  syncRuns as $,
   toggleStatic as A,
   BADGES as B,
   toggleFocus as C,
@@ -6606,30 +6674,36 @@ export {
   goAlong as V,
   translucent as W,
   revision as X,
-  nodeMenu as Y,
-  nodeSettings as Z,
-  layers as _,
+  transformPane as Y,
+  holdsStill as Z,
+  during as _,
   TOGGLE_ALL as a,
-  startSprites as a0,
-  drawBursts as a1,
-  guard as a2,
-  FIREWORKS as a3,
-  particlesOnly as a4,
-  drawNodeFx as a5,
-  clock as a6,
-  OVER as a7,
-  dummy as a8,
-  holdsStill as a9,
-  reach as aa,
-  overlaps as ab,
-  UNDER as ac,
-  wake as ad,
-  ownStyle as ae,
-  during as af,
-  CALM_ALPHA as ag,
-  STILL_NODE as ah,
-  nodePalette as ai,
-  stopSprites as aj,
+  nodePalette as a0,
+  effectOf as a1,
+  particlesOnly as a2,
+  stepOf as a3,
+  BYPASS as a4,
+  NEVER as a5,
+  nodeMenu as a6,
+  nodeSettings as a7,
+  layers as a8,
+  live as a9,
+  startSprites as aa,
+  drawBursts as ab,
+  guard as ac,
+  FIREWORKS as ad,
+  drawNodeFx as ae,
+  clock as af,
+  OVER as ag,
+  dummy as ah,
+  reach as ai,
+  overlaps as aj,
+  UNDER as ak,
+  wake as al,
+  ownStyle as am,
+  CALM_ALPHA as an,
+  STILL_NODE as ao,
+  stopSprites as ap,
   install as b,
   checked as c,
   installPanel as d,
@@ -6656,4 +6730,4 @@ export {
   toggleNodes as y,
   N as z
 };
-//# sourceMappingURL=menus-CKk-joPo.js.map
+//# sourceMappingURL=menus-C_SYZHv8.js.map

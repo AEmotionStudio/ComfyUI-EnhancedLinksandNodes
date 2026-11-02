@@ -318,7 +318,7 @@ describe('the modes', () => {
         expect([dot(canvas.back, back), canvas._visibleReroutes.has(reroute)]).toEqual([true, true]);
     });
 
-    it('draws the focused links again over the nodes, ours without their glow, or native, unless OnTop is off, in Vue mode, or the graph puts links over the nodes', async () => {
+    it('draws the focused links again over the nodes, ours without their glow, or native, unless OnTop is off or the graph puts links over the nodes', async () => {
         /** The stroke of link 1's base a frame draws on the front canvas after the nodes' bodies, if any. */
         const over = (canvas: FakeCanvas) => {
             const from = canvas.front.paints.length;
@@ -333,9 +333,6 @@ describe('the modes', () => {
         // Drawn in every front pass, it goes without the glow the background drew once.
         expect(over(canvas)?.shadowBlur).toBe(0);
         expect(canvas.back.paints.filter((p) => p.op === 'stroke' && p.style === WHITE && onLink(p.box, 1)).at(-1)?.shadowBlur).toBe(10);
-        LiteGraph.vueNodesMode = true;
-        expect(over(canvas)).toBeUndefined();
-        LiteGraph.vueNodesMode = false;
         canvas.graph.config.links_ontop = true;
         expect(strokes(canvas, 'front', 1).filter(([style]) => style === WHITE)).toHaveLength(1);
         canvas.graph.config.links_ontop = false;

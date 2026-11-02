@@ -4,8 +4,9 @@
  * to the body and under the widgets, and its part around the body under every
  * node, for every node whose effect reaches the screen. The body casts v1's
  * halo. The styled title takes the native title's place. Node modes fade the
- * effects as native fades the node; collapsed nodes, and Vue mode, get none. A
- * failing effect leaves the canvas as it found it, and the guard turns it off.
+ * effects as native fades the node; collapsed nodes get none, and Vue mode the
+ * particles alone. A failing effect leaves the canvas as it found it, and the
+ * guard turns it off.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
@@ -52,7 +53,8 @@ afterEach(() => {
 });
 
 const LINKS_OFF = { '🔗 Enhanced Links.Animate': 0 };
-const PARTICLES = { '📦 Enhanced Nodes.Particle.Show': true };
+const PARTICLE_SHOW = '📦 Enhanced Nodes.Particle.Show';
+const PARTICLES = { [PARTICLE_SHOW]: true };
 const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
@@ -455,11 +457,17 @@ describe('the over-layer and the title', () => {
 });
 
 describe('the under-layer', () => {
-    it('draws and counts nothing in Vue mode, so the ticker stops', async () => {
+    it('draws the particles alone in Vue mode, around the DOM node, without the halo or titles, and nothing without them, so the ticker stops', async () => {
         const canvas = await start({ ...LINKS_OFF, ...PARTICLES, ...TITLES, '📦 Enhanced Nodes.Animate': 1 }, { nodes: [KSAMPLER] });
         frames(5);
         (globalThis as unknown as { LiteGraph: { vueNodesMode: boolean } }).LiteGraph.vueNodesMode = true;
         canvas.setDirty(true, true);
+        // The halo is cast before the effect is drawn, so the whole frame is looked at.
+        const from = canvas.front.paints.length;
+        const { calls } = frame(canvas);
+        expect(calls.map(({ sides, only }) => [sides, only])).toEqual([[UNDER, true]]);
+        expect([halos(canvas.front.paints.slice(from)), live.nodes, live.particles]).toEqual([[], 1, 1]);
+        preview(PARTICLE_SHOW, false);
         expect(frame(canvas).calls).toEqual([]);
         expect([live.nodes, live.particles]).toEqual([0, 0]);
         page.requests = 0;

@@ -3,8 +3,9 @@
  * requestAnimationFrame ticker that asks app.canvas for front paints while
  * anything animated is on screen and stops otherwise; the onRender and
  * onDrawForeground hooks, chained with whatever else uses them, which draw the
- * extensions' layers in each front pass; and a guard that turns off what keeps
- * failing.
+ * extensions' layers in each front pass, those over the nodes on a canvas
+ * above them in Nodes 2.0, whose nodes are DOM elements over the main canvas;
+ * and a guard that turns off what keeps failing.
  *
  * @module core/engine
  */
@@ -190,6 +191,83 @@ function need(): void {
     app.canvas.setDirty(true, true);
 }
 
+/** The element Nodes 2.0's nodes are in (FE157 and FE1395 renderer/core/layout/transform/TransformPane.vue). */
+export const PANE = '[data-testid="transform-pane"]';
+
+/** Told when a front pass finds Nodes 2.0 turned on or off, which LiteGraph.vueNodesMode follows: the open panel, which shows what works there. */
+export const nodes2 = { onFlip: undefined as (() => void) | undefined };
+/** Whether the last front pass drew in Nodes 2.0. */
+let vue = false;
+
+/** The transform pane as last found, let go as the mode turns. */
+let found: Element | null = null;
+let own: HTMLCanvasElement | undefined;
+let ownCtx: CanvasRenderingContext2D | null = null;
+
+/** The transform pane, once it mounts after the mode turns on; Vue makes it anew as it renders it again, so it is looked for again once it is gone. */
+export function transformPane(): Element | null {
+    if (!found?.isConnected) found = document.querySelector(PANE);
+    return found;
+}
+
+/**
+ * 1.39.5 has no overlay: ours goes right after the transform pane, so it stacks above the DOM nodes, sized to the
+ * main canvas in device pixels as FE157's LinkOverlayCanvas.vue sizes its own, and cleared for each pass.
+ */
+function ours(main: HTMLCanvasElement): CanvasRenderingContext2D | null {
+    const pane = transformPane();
+    if (!pane) return null;
+    if (!own) {
+        own = document.createElement('canvas');
+        own.className = 'eln-overlay';
+        own.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+        ownCtx = own.getContext('2d');
+    }
+    if (pane.nextElementSibling !== own) pane.after(own);
+    if (own.width !== main.width || own.height !== main.height) {
+        own.width = main.width;
+        own.height = main.height;
+    } else ownCtx?.clearRect(0, 0, own.width, own.height);
+    return ownCtx;
+}
+
+function drop(): void {
+    own?.remove();
+    own = undefined;
+    ownCtx = null;
+}
+
+function foreground(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    layers.links?.(canvas, ctx, true);
+    layers.runs?.(canvas, ctx);
+    layers.marks?.(canvas, ctx);
+    layers.bursts?.(canvas, ctx);
+}
+
+/**
+ * Draws the layers over the nodes, in graph space: on `ctx`, the main canvas's, in classic mode; in Nodes 2.0 on the
+ * overlay above the DOM nodes, which core clears in each Vue front pass before onDrawForeground (FE157 LGraphCanvas.ts
+ * _drawOverlayLinks), with its transform set as _drawOverlayLinks sets it. Until the overlay mounts they stay on `ctx`.
+ */
+function overNodes(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    if (!LiteGraph.vueNodesMode) {
+        if (own) drop();
+        return foreground(canvas, ctx);
+    }
+    const main = canvas.canvas;
+    const top = 'overlayCtx' in canvas ? canvas.overlayCtx : ours(main);
+    if (!top) return foreground(canvas, ctx);
+    top.save();
+    try {
+        const scale = top.canvas.width / (top.canvas.clientWidth || 1);
+        top.setTransform(scale, 0, 0, scale, 0, 0);
+        canvas.ds.toCanvasContext(top);
+        foreground(canvas, top);
+    } finally {
+        top.restore();
+    }
+}
+
 /**
  * Our handlers on app.canvas. Per hook: which argument is the context, what it draws there before calling
  * the handler it chained to, our handler as installed, whether a front pass called it since the ticker last
@@ -200,6 +278,11 @@ const hooks = {
     onRender: {
         ctx: 1,
         draw(canvas: Canvas, ctx: CanvasRenderingContext2D) {
+            if (LiteGraph.vueNodesMode !== vue) {
+                vue = LiteGraph.vueNodesMode;
+                found = null;
+                nodes2.onFlip?.();
+            }
             // The node layer counts afresh; the link layer sets its own count wherever it draws.
             live.nodes = live.particles = 0;
             canvas.ds.toCanvasContext(ctx);
@@ -210,15 +293,10 @@ const hooks = {
         called: false,
         running: false,
     },
-    /** onDrawForeground(ctx, visible area), in graph space over the nodes. */
+    /** onDrawForeground(ctx, visible area), in graph space over the nodes; in Nodes 2.0 on the overlay above them. */
     onDrawForeground: {
         ctx: 0,
-        draw(canvas: Canvas, ctx: CanvasRenderingContext2D) {
-            layers.links?.(canvas, ctx, true);
-            layers.runs?.(canvas, ctx);
-            layers.marks?.(canvas, ctx);
-            layers.bursts?.(canvas, ctx);
-        },
+        draw: overNodes,
         installed: undefined as unknown,
         called: false,
         running: false,

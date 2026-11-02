@@ -27,11 +27,15 @@ interface Option {
 /** Setting values by id. */
 export type Values = Readonly<Record<string, unknown>>;
 
-/** What a setting needs to take effect, while that is missing: why, and the setting and value that give it. */
+/**
+ * What a setting needs to take effect, while that is missing: why, and the setting and value that give it, ours or
+ * one of ComfyUI's, which the panel has no name for and so comes with the label its fix shows.
+ */
 interface Need {
     reason: string;
     id: string;
     value: unknown;
+    label?: string;
 }
 
 /** What the panel shows: its tab, whether Advanced is open, and what is searched for. */
@@ -272,6 +276,13 @@ const titles = (): boolean => N.enabled && N.textAnimationEnabled;
 const customNodes = (): Need | undefined =>
     N.colorMode === 'custom' ? undefined : { reason: 'Used when Node effect colors is Custom.', id: '📦 Enhanced Nodes.Color.Mode', value: 'custom' };
 
+/**
+ * The fix for what only classic nodes do, while Nodes 2.0 draws the nodes: the styled titles and the hover outline,
+ * and focus on hover and double-click jumps, as the DOM nodes keep the pointer from the canvas.
+ */
+const classicNodes = (): Need | undefined =>
+    LiteGraph.vueNodesMode ? { reason: 'Classic nodes only.', id: 'Comfy.VueNodes.Enabled', value: false, label: 'Use classic nodes' } : undefined;
+
 // =============================================================================
 // Schema
 // =============================================================================
@@ -330,8 +341,8 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Glow.Show', key: 'glowShow', name: 'Node effect glow', type: 'boolean', default: true, group: 'Nodes · Glow & hover', showIf: effects, tooltip: "A halo in the effect's primary color around each node with an effect." },
     { id: '📦 Enhanced Nodes.Glow', key: 'glow', name: 'Node glow strength', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Glow & hover', showIf: (): boolean => effects() && (N.glowShow || N.selectionGlow), tooltip: 'How far the halo and the selection frame glow.' },
     { id: '📦 Enhanced Nodes.Selection.Glow', key: 'selectionGlow', name: 'Glowing frame around selected nodes', type: 'boolean', default: true, group: 'Nodes · Glow & hover', showIf: effects, tooltip: 'On nodes with an effect.' },
-    { id: '📦 Enhanced Nodes.Color.Hover.Show', key: 'colorHoverShow', name: 'Hover outline', type: 'boolean', default: false, group: 'Nodes · Glow & hover', advanced: true, showIf: effects, tooltip: 'Outlines animated nodes while hovered or selected.' },
-    { id: '📦 Enhanced Nodes.Color.Hover', key: 'colorHover', name: 'Hover outline color', type: 'color', default: '#00ff15', group: 'Nodes · Glow & hover', advanced: true, showIf: (): boolean => effects() && N.colorHoverShow },
+    { id: '📦 Enhanced Nodes.Color.Hover.Show', key: 'colorHoverShow', name: 'Hover outline', type: 'boolean', default: false, group: 'Nodes · Glow & hover', advanced: true, showIf: effects, needs: classicNodes, tooltip: 'Outlines animated nodes while hovered or selected.' },
+    { id: '📦 Enhanced Nodes.Color.Hover', key: 'colorHover', name: 'Hover outline color', type: 'color', default: '#00ff15', group: 'Nodes · Glow & hover', advanced: true, showIf: (): boolean => effects() && N.colorHoverShow, needs: classicNodes },
 
     { id: '📦 Enhanced Nodes.Color.Mode', key: 'colorMode', name: 'Node effect colors', type: 'combo', options: NODE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Color', showIf: nodesDraw },
     { id: '📦 Enhanced Nodes.Color.Primary', key: 'colorPrimary', name: 'Node primary color', type: 'color', default: '#ffb300', group: 'Nodes · Color', showIf: (): boolean => nodesDraw() && N.colorMode === 'custom', tooltip: 'Used when Node effect colors is Custom.' },
@@ -348,26 +359,26 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Particle.Color.Mode', key: 'particleColorMode', name: 'Node particle colors', type: 'combo', options: PARTICLE_COLOR_MODE_OPTIONS, default: 'default', group: 'Nodes · Particles', showIf: particles, tooltip: "Particle color takes Node particle color with Custom colors, else the effect's primary color; Complementary takes its opposite hue." },
     { id: '📦 Enhanced Nodes.Color.Particle', key: 'colorParticle', name: 'Node particle color', type: 'color', default: '#ffb300', group: 'Nodes · Particles', showIf: (): boolean => particles() && (N.particleColorMode === 'default' || N.particleColorMode === 'complementary'), needs: customNodes, tooltip: 'Used when Node effect colors is Custom.' },
 
-    { id: '📦 Enhanced Nodes.Text.Animation.Enabled', key: 'textAnimationEnabled', name: 'Animated titles', type: 'boolean', default: false, group: 'Nodes · Titles', showIf: (): boolean => N.enabled, tooltip: 'Draws each node title in the chosen style.' },
-    { id: '📦 Enhanced Nodes.Text.Style', key: 'textStyle', name: 'Title style', type: 'combo', options: TEXT_STYLE_OPTIONS, default: 'neon', group: 'Nodes · Titles', showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Color', key: 'textColor', name: 'Title color', type: 'color', default: '#00ffff', group: 'Nodes · Titles', showIf: titles, needs: customNodes, tooltip: "Used when Node effect colors is Custom; otherwise titles take the effect's accent color." },
-    { id: '📦 Enhanced Nodes.Text.Size', key: 'textSize', name: 'Title size', type: 'slider', min: 8, max: 24, step: 1, default: 14, group: 'Nodes · Titles', showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Glow', key: 'textGlow', name: 'Title glow', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Titles', advanced: true, showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Letter.Spacing', key: 'textLetterSpacing', name: 'Title letter spacing', type: 'slider', min: -2, max: 10, step: 0.25, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Position.X', key: 'textPositionX', name: 'Title offset X', type: 'slider', min: -50, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Position.Y', key: 'textPositionY', name: 'Title offset Y', type: 'slider', min: -50, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles },
-    { id: '📦 Enhanced Nodes.Text.Rotation.Radius', key: 'textRotationRadius', name: 'Title orbit radius', type: 'slider', min: 0, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, tooltip: 'Circles the title around its position.' },
-    { id: '📦 Enhanced Nodes.Text.Rotation.Angle', key: 'textRotationAngle', name: 'Title rotation', type: 'slider', min: -180, max: 180, step: 5, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles },
+    { id: '📦 Enhanced Nodes.Text.Animation.Enabled', key: 'textAnimationEnabled', name: 'Animated titles', type: 'boolean', default: false, group: 'Nodes · Titles', showIf: (): boolean => N.enabled, needs: classicNodes, tooltip: 'Draws each node title in the chosen style.' },
+    { id: '📦 Enhanced Nodes.Text.Style', key: 'textStyle', name: 'Title style', type: 'combo', options: TEXT_STYLE_OPTIONS, default: 'neon', group: 'Nodes · Titles', showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Color', key: 'textColor', name: 'Title color', type: 'color', default: '#00ffff', group: 'Nodes · Titles', showIf: titles, needs: (): Need | undefined => classicNodes() ?? customNodes(), tooltip: "Used when Node effect colors is Custom; otherwise titles take the effect's accent color." },
+    { id: '📦 Enhanced Nodes.Text.Size', key: 'textSize', name: 'Title size', type: 'slider', min: 8, max: 24, step: 1, default: 14, group: 'Nodes · Titles', showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Glow', key: 'textGlow', name: 'Title glow', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Letter.Spacing', key: 'textLetterSpacing', name: 'Title letter spacing', type: 'slider', min: -2, max: 10, step: 0.25, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Position.X', key: 'textPositionX', name: 'Title offset X', type: 'slider', min: -50, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Position.Y', key: 'textPositionY', name: 'Title offset Y', type: 'slider', min: -50, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Text.Rotation.Radius', key: 'textRotationRadius', name: 'Title orbit radius', type: 'slider', min: 0, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes, tooltip: 'Circles the title around its position.' },
+    { id: '📦 Enhanced Nodes.Text.Rotation.Angle', key: 'textRotationAngle', name: 'Title rotation', type: 'slider', min: -180, max: 180, step: 5, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, needs: classicNodes },
 
     { id: '🔗 Enhanced Links.Focus.Enabled', key: 'focusEnabled', name: 'Selection focus', type: 'boolean', default: true, group: 'Focus & Flow · Selection focus', look: false, tooltip: "Make the selection's connections stand out." },
     { id: '🔗 Enhanced Links.Focus.Mode', key: 'focusMode', name: 'Selection focus mode', type: 'combo', options: FOCUS_MODE_OPTIONS, default: 'highlight', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
     { id: '🔗 Enhanced Links.Focus.Color', key: 'focusColor', name: 'Focused link color', type: 'combo', options: FOCUS_COLOR_OPTIONS, default: 'native', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
     { id: '🔗 Enhanced Links.Focus.Depth', key: 'focusDepth', name: 'Focus reach', type: 'combo', options: FOCUS_DEPTH_OPTIONS, default: 'direct', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
     { id: '🔗 Enhanced Links.Focus.OnTop', key: 'focusOnTop', name: 'Bring focused links to front', type: 'boolean', default: true, group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn, tooltip: 'Draws them above nodes.' },
-    { id: '🔗 Enhanced Links.Focus.Hover', key: 'focusHover', name: 'Focus on hover', type: 'boolean', default: false, group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn, tooltip: 'Hover a node to focus it without selecting.' },
+    { id: '🔗 Enhanced Links.Focus.Hover', key: 'focusHover', name: 'Focus on hover', type: 'boolean', default: false, group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn, needs: classicNodes, tooltip: 'Hover a node to focus it without selecting.' },
     { id: '🔗 Enhanced Links.Focus.Dim', key: 'focusDim', name: 'Dimmed link opacity', type: 'slider', min: 5, max: 60, step: 5, default: 20, group: 'Focus & Flow · Selection focus', advanced: true, look: false, showIf: (): boolean => focusOn() && L.focusMode === 'dim' },
 
-    { id: '🔗 Enhanced Links.Navigate.DoubleClick', key: 'navigateDoubleClick', name: 'Double-click a slot to jump', type: 'boolean', default: true, group: 'Focus & Flow · Navigation', look: false, tooltip: 'Fly to the other end; repeat to cycle.' },
+    { id: '🔗 Enhanced Links.Navigate.DoubleClick', key: 'navigateDoubleClick', name: 'Double-click a slot to jump', type: 'boolean', default: true, group: 'Focus & Flow · Navigation', look: false, needs: classicNodes, tooltip: 'Fly to the other end; repeat to cycle.' },
     { id: '🔗 Enhanced Links.Navigate.Follow', key: 'navigateFollow', name: 'Follow execution', type: 'boolean', default: false, group: 'Focus & Flow · Navigation', look: false, tooltip: 'Pan to each node as your run reaches it.' },
 
     { id: '🔗 Enhanced Links.Pause.Mode', key: 'pauseMode', name: 'During a run', type: 'combo', options: PAUSE_MODE_OPTIONS, default: 'spotlight', group: 'Focus & Flow · During a run', tooltip: 'Reacts to your own runs only.' },

@@ -156,6 +156,9 @@ export function syncRuns(canvas: Canvas): void {
 /** The step of the node a link of the graph shown leads into, if the run reached it. */
 export const stepInto = (link: { target_id: unknown }): Step | undefined => into.get(Number(link.target_id))?.step;
 
+/** The step a node of the graph shown shows, if the run reached it. */
+export const stepOf = (node: Node): Step | undefined => into.get(Number(node.id))?.step;
+
 /** Whether the run's visuals are on links of the graph shown: from the first node's start until the trail, or else the last river, is gone. */
 export const flowsShown = (): boolean =>
     (L.flowRiver || L.flowTrail) && shown.length > 0 && !guard.off(RUNS) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT);
@@ -299,11 +302,11 @@ function failure(ctx: CanvasRenderingContext2D, node: Node, step: Step, t: numbe
     return !steady;
 }
 
-/** Over the classic nodes on screen, with node effects on: each running node's ring and each failed node's outline, as Run.Ring and Run.Error say. Nodes 2.0 waits for its overlay. */
+/** Over the nodes on screen, with node effects on: each running node's ring and each failed node's outline, as Run.Ring and Run.Error say. */
 function drawSteps(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     syncRuns(canvas);
     live.rings = 0;
-    if (!N.enabled || LiteGraph.vueNodesMode || !shown.length || guard.off(RUNS)) return;
+    if (!N.enabled || !shown.length || guard.off(RUNS)) return;
     const t = clock.runTime;
     const still = env.reducedMotion || during(N.pauseDuringRender) === 'pause';
     const area = canvas.visible_area;

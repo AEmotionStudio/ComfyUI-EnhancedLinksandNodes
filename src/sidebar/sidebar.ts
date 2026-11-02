@@ -20,7 +20,7 @@
 import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, SETTINGS, commit, commitAll, reset, shown, watch, type Setting } from '@/core/settings';
-import { env, guard } from '@/core/engine';
+import { env, guard, nodes2 } from '@/core/engine';
 import { deferring } from '@/links/pipeline';
 import { LOOKS, applyLook, changed, currentLook, deleteLook, exportLook, importLook, light, previewLook, renameLook, saveLook, surprise, userLooks, type Look } from '@/ui/looks';
 import { button, check, endHover, h, hover, hovering, iconButton, roving, row, type Row, type Visible } from './controls';
@@ -182,7 +182,7 @@ function render(container: HTMLElement): void {
     ['IMAGE', 'LATENT', 'MODEL'].forEach((type, i) => colours[type] && root!.style.setProperty(`--eln-link-${i + 1}`, colours[type]));
     container.append(root);
     unwatch = watch(heard);
-    guard.onTrip = refresh;
+    guard.onTrip = nodes2.onFlip = refresh;
     go(state.tab, false);
     void userData(async () => {});
 }
@@ -191,7 +191,7 @@ function destroy(): void {
     endHover();
     if (root) stopTiles(root);
     unwatch?.();
-    guard.onTrip = undefined;
+    guard.onTrip = nodes2.onFlip = undefined;
     clearTimeout(undoTimer);
     applied.until = 0;
     keep();
@@ -549,7 +549,10 @@ function noticesOf(tab: string): Notice[] {
     if ((all || tab === 'links') && !running.links) list.push({ text: DISABLED.links });
     if ((all || tab === 'nodes') && !running.nodes) list.push({ text: DISABLED.nodes });
     if ((all || tab === 'nodes') && LiteGraph.vueNodesMode) {
-        list.push({ text: 'Nodes 2.0 is on, and node effects show on classic nodes only for now.', action: ['Use classic nodes', () => void Promise.resolve(app.extensionManager.setting.set('Comfy.VueNodes.Enabled', false)).then(refresh)] });
+        list.push({
+            text: 'Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.',
+            action: ['Use classic nodes', () => void app.extensionManager.setting.set('Comfy.VueNodes.Enabled', false)],
+        });
     }
     if ((all || tab === 'links') && deferring()) list.push({ text: L.coexist === 'defer' ? 'Link effects are set to always step aside for other link extensions.' : 'Another extension draws links, so link effects step aside for it.', action: ['Keep Enhanced link effects', () => commit(COEXIST, 'ours')] });
     for (const key of tab === 'perf' ? [] : guard.tripped()) {

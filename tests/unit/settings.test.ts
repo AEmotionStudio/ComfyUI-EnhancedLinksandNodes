@@ -376,7 +376,21 @@ describe('how the panel shows each setting', () => {
         expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([fix, fix]);
         preview(fix.id, fix.value);
         expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([undefined, undefined]);
-        expect(SETTINGS.filter((s) => 'needs' in s).map((s) => s.id)).toEqual(['📦 Enhanced Nodes.Color.Particle', '📦 Enhanced Nodes.Text.Color']);
+    });
+
+    it('disables the titles, the hover outline, focus on hover and double-click jumps in Nodes 2.0, with a fix that turns classic nodes back on, ahead of the colours they need', () => {
+        showing({ '📦 Enhanced Nodes.Text.Animation.Enabled': true });
+        const needing = () => SETTINGS.flatMap((s) => ('needs' in s && s.needs() ? [s.id.slice(s.id.indexOf('.') + 1)] : []));
+        expect(needing()).toEqual(['Color.Particle', 'Text.Color']);
+        LiteGraph.vueNodesMode = true;
+        try {
+            const titles = ['Text.Animation.Enabled', 'Text.Style', 'Text.Color', 'Text.Size', 'Text.Glow', 'Text.Letter.Spacing', 'Text.Position.X', 'Text.Position.Y', 'Text.Rotation.Radius', 'Text.Rotation.Angle'];
+            expect(needing()).toEqual(['Color.Hover.Show', 'Color.Hover', 'Color.Particle', ...titles, 'Focus.Hover', 'Navigate.DoubleClick']);
+            const color = SETTINGS.find((s) => s.id === '📦 Enhanced Nodes.Text.Color')!;
+            expect('needs' in color && color.needs()).toEqual({ reason: 'Classic nodes only.', id: 'Comfy.VueNodes.Enabled', value: false, label: 'Use classic nodes' });
+        } finally {
+            LiteGraph.vueNodesMode = false;
+        }
     });
 });
 

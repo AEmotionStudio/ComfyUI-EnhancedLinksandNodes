@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { z as N, W as translucent, X as revision, S as SELECTION_FX, Y as nodeMenu, Z as nodeSettings, b as install, d as installPanel, e as installRuns, _ as layers, $ as live, a0 as startSprites, a1 as drawBursts, a2 as guard, a3 as FIREWORKS, a4 as particlesOnly$1, a5 as drawNodeFx, a6 as clock, a7 as OVER, a8 as dummy, a9 as holdsStill, aa as reach, ab as overlaps, ac as UNDER, ad as wake, ae as ownStyle, af as during, ag as CALM_ALPHA, ah as STILL_NODE, ai as nodePalette, aj as stopSprites } from "./chunks/menus-CKk-joPo.js";
+import { z as N, W as translucent, X as revision, Y as transformPane, Z as holdsStill, _ as during, $ as syncRuns, a0 as nodePalette, a1 as effectOf, a2 as particlesOnly$1, a3 as stepOf, a4 as BYPASS, a5 as NEVER, S as SELECTION_FX, a6 as nodeMenu, a7 as nodeSettings, b as install, d as installPanel, e as installRuns, a8 as layers, a9 as live, aa as startSprites, ab as drawBursts, ac as guard, ad as FIREWORKS, ae as drawNodeFx, af as clock, ag as OVER, ah as dummy, ai as reach, aj as overlaps, ak as UNDER, al as wake, am as ownStyle, an as CALM_ALPHA, ao as STILL_NODE, ap as stopSprites } from "./chunks/menus-C_SYZHv8.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -27,7 +27,7 @@ function cut(ctx, text, room) {
   }
   return `${text.substring(0, fits)}...`;
 }
-const shown = /* @__PURE__ */ new WeakMap();
+const shown$1 = /* @__PURE__ */ new WeakMap();
 function titleOf(ctx, node) {
   setFont(ctx);
   let room = node.renderingSize[0] - LiteGraph.NODE_TITLE_HEIGHT * 2;
@@ -36,11 +36,11 @@ function titleOf(ctx, node) {
   if (buttons > 0) room -= buttons - 20;
   const { title, pinned } = node;
   const collapsed = Boolean(node.flags.collapsed);
-  let last = shown.get(node);
+  let last = shown$1.get(node);
   if (!last || last.title !== title || last.pinned !== pinned || last.collapsed !== collapsed || last.room !== room || last.since !== revision) {
     const full = title + (pinned ? "📌" : "");
     const text = collapsed ? full.substring(0, 20) : cut(ctx, full, room);
-    shown.set(node, last = { text, width: ctx.measureText(text).width, title, pinned, collapsed, room, since: revision });
+    shown$1.set(node, last = { text, width: ctx.measureText(text).width, title, pinned, collapsed, room, since: revision });
   }
   return last;
 }
@@ -138,16 +138,146 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
     ctx.restore();
   }
 }
+const FX = ["", "gentle", "neon", "cosmic", "flower"];
+const SELECTED = 8;
+const RUNNING = 16;
+const FAILED = 32;
+const BYPASSED = 64;
+const MUTED = 128;
+const ONLY = 256;
+const COLLAPSED = 512;
+const ATTRIBUTES = ["data-eln-fx", "data-eln-only", "data-eln-collapsed", "data-eln-sel", "data-eln-run", "data-eln-mode"];
+let observed = null;
+let observer;
+let sheet;
+let written = -1;
+let pace = "";
+let given = /* @__PURE__ */ new WeakMap();
+let shown;
+function lookOf(node, selected) {
+  const fx = effectOf(node);
+  const only = fx > 0 && particlesOnly$1(node);
+  const step = stepOf(node);
+  return fx | (only ? ONLY : 0) | (fx && node.flags.collapsed ? COLLAPSED : 0) | (fx && !only && N.selectionGlow && selected.has(node) ? SELECTED : 0) | (step?.end === Infinity ? N.runRing ? RUNNING : 0 : step?.failed && N.runError ? FAILED : 0) | (node.mode === BYPASS ? BYPASSED : node.mode === NEVER ? MUTED : 0);
+}
+const put = (el, name, value) => value ? el.setAttribute(name, value) : el.removeAttribute(name);
+function mark(el, look) {
+  put(el, "data-eln-fx", FX[look & 7]);
+  el.toggleAttribute("data-eln-only", (look & ONLY) > 0);
+  el.toggleAttribute("data-eln-collapsed", (look & COLLAPSED) > 0);
+  el.toggleAttribute("data-eln-sel", (look & SELECTED) > 0);
+  put(el, "data-eln-run", look & RUNNING ? "running" : look & FAILED ? "failed" : "");
+  put(el, "data-eln-mode", look & BYPASSED ? "bypass" : look & MUTED ? "muted" : "");
+}
+function mounted(records) {
+  const { canvas } = app;
+  for (const record of records) {
+    for (const el of record.addedNodes) {
+      if (!(el instanceof HTMLElement)) continue;
+      const node = canvas.graph?.getNodeById(el.dataset.nodeId);
+      if (!node) continue;
+      const look = lookOf(node, canvas.selectedItems);
+      given.set(node, look);
+      mark(el, look);
+    }
+  }
+}
+const SHORTEST = 0.8;
+const period = (seconds) => `calc(${Math.max(SHORTEST, seconds / N.animationSpeed).toFixed(2)}s * var(--eln-slow, 1))`;
+function stylesheet() {
+  const { glow, animationGlow, animationSize: size, intensity } = N;
+  const bloom = Math.round((6 + 24 * animationGlow) * size);
+  const light = `color-mix(in srgb, var(--eln-c2) ${Math.round(Math.min(100, 45 * intensity))}%, transparent)`;
+  const halo2 = N.glowShow && glow > 0 ? `0 0 ${Math.round(36 * glow)}px color-mix(in srgb, var(--eln-c1) 60%, transparent)` : "";
+  const withHalo = (shadows) => halo2 ? `${halo2}, ${shadows}` : shadows;
+  const r = Math.round(4 * size);
+  const turn = Array.from({ length: 9 }, (_, i) => `${i * 12.5}%{transform:translate(${(r * Math.cos(i * Math.PI / 4)).toFixed(1)}px,${(r * Math.sin(i * Math.PI / 4)).toFixed(1)}px)}`).join("");
+  const colours = FX.slice(1).map((fx, i) => {
+    const { primary, secondary, accent } = nodePalette(i + 1);
+    return `.lg-node[data-eln-fx=${fx}]{--eln-c1:${primary};--eln-c2:${secondary};--eln-c3:${accent}}`;
+  });
+  return [
+    ...colours,
+    '.lg-node:is([data-eln-fx],[data-eln-run])::after{content:"";position:absolute;inset:-6px;z-index:-1;border-radius:18px;pointer-events:none;--eln-a:calc(var(--eln-mode, 1) * var(--eln-calm, 1));opacity:var(--eln-a)}',
+    `.lg-node[data-eln-fx=gentle]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-breathe ${period(3)} ease-in-out infinite alternate}`,
+    `.lg-node[data-eln-fx=neon]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 4px var(--eln-c1), 0 0 ${bloom}px ${light}`)}}`,
+    `.lg-node[data-eln-fx=cosmic]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-ripple ${period(3)} ease-out infinite}`,
+    `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
+    `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
+    `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo2 || "none"};animation:none}`,
+    ".lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}",
+    ".lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, var(--primary-background) 60%, transparent);animation:none;opacity:1}",
+    ".lg-node[data-eln-run=failed]::after{border:0;box-shadow:0 0 16px 2px rgb(255 59 48 / 55%);animation:none;opacity:1}",
+    ".lg-node[data-eln-mode=bypass]{--eln-mode:0.4}",
+    ".lg-node[data-eln-mode=muted]{--eln-mode:0.8}",
+    ":root[data-eln-pace=still] .lg-node::after, .disable-animations .lg-node::after{animation:none}",
+    ":root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}",
+    "@keyframes eln-breathe{from{opacity:calc(var(--eln-a) * 0.35)}}",
+    `@keyframes eln-ripple{0%{opacity:0;transform:scale(0.98)}20%{opacity:var(--eln-a);transform:none}100%{opacity:0;transform:scale(${(1 + 0.08 * size).toFixed(2)})}}`,
+    `@keyframes eln-turn{${turn}}`
+  ].join("\n");
+}
+function off() {
+  observer?.disconnect();
+  sheet?.remove();
+  sheet = void 0;
+  for (const el of observed?.querySelectorAll(ATTRIBUTES.map((name) => `[${name}]`).join()) ?? []) for (const name of ATTRIBUTES) el.removeAttribute(name);
+  observed = null;
+  shown = void 0;
+  pace = "";
+  document.documentElement.removeAttribute("data-eln-pace");
+}
+function vueNodes(canvas) {
+  const { graph } = canvas;
+  const pane = LiteGraph.vueNodesMode && N.enabled ? transformPane() : null;
+  if (!graph || !pane) {
+    if (sheet || observed) off();
+    return;
+  }
+  if (pane !== observed) {
+    observed = pane;
+    observer ??= new MutationObserver(mounted);
+    observer.disconnect();
+    observer.observe(pane, { childList: true });
+    shown = void 0;
+  }
+  if (!sheet) {
+    sheet = Object.assign(document.createElement("style"), { id: "eln-vue" });
+    document.head.append(sheet);
+    written = -1;
+  }
+  if (written !== revision) {
+    written = revision;
+    const css = stylesheet();
+    if (sheet.textContent !== css) sheet.textContent = css;
+  }
+  const now = holdsStill() ? "still" : during(N.pauseDuringRender) === "calm" ? "calm" : "";
+  if (now !== pace) {
+    pace = now;
+    put(document.documentElement, "data-eln-pace", pace);
+  }
+  if (graph !== shown) {
+    shown = graph;
+    given = /* @__PURE__ */ new WeakMap();
+  }
+  syncRuns(canvas);
+  const selected = canvas.selectedItems;
+  for (const node of graph.nodes) {
+    const look = lookOf(node, selected);
+    if (given.get(node) === look) continue;
+    given.set(node, look);
+    const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
+    if (el) mark(el, look);
+  }
+}
 const EFFECT = "Node effect";
 const PARTICLES = "Node particles";
 const TITLES = "Animated titles";
 const [ROUND, CIRCLE, CARD] = [2, 3, 4];
-const [NEVER, BYPASS] = [2, 4];
 const NO_TITLE = 1;
-const styleWanted = (node) => ownStyle(node) ?? N.animate;
 function styleOf(node) {
   if (!N.enabled || node.flags.collapsed) return void 0;
-  const style = styleWanted(node);
+  const style = effectOf(node);
   if (style > 0) return style;
   return ownStyle(node) === void 0 && N.particleShow ? 0 : void 0;
 }
@@ -200,17 +330,19 @@ function halo(canvas, ctx, node, style, scale) {
   ctx.fill();
 }
 function under(canvas, ctx) {
+  vueNodes(canvas);
   const { graph } = canvas;
-  if (!graph || LiteGraph.vueNodesMode) return;
+  if (!graph) return;
+  const vue = LiteGraph.vueNodesMode;
   const moving = !holdsStill();
-  const titles = N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
+  const titles = !vue && N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
   const area = canvas.visible_area;
   const scale = ctx.getTransform().a;
   for (const node of graph.nodes) {
     const style = styleOf(node);
-    const only = style !== void 0 && particlesOnly(node, style);
+    const only = style !== void 0 && (vue || particlesOnly(node, style));
     const shown2 = style !== void 0 && draws(only) && !guard.off(keyOf(style));
-    const glows = lit(canvas, style);
+    const glows = !vue && lit(canvas, style);
     const reach$1 = shown2 ? reach(style, node.size[0], node.size[1], only) : 0;
     if (!overlaps(node.renderArea, area, Math.max(0, reach$1))) continue;
     if (titles && node.title && !node.onDrawTitleText && node.title_mode !== NO_TITLE) live.nodes++;
@@ -243,7 +375,7 @@ function styledTitle(canvas, ctx, node) {
   try {
     const height = LiteGraph.NODE_TITLE_HEIGHT;
     const phase = (holdsStill() ? STILL_NODE : clock).nodePhase;
-    drawTitle(ctx, titleOf(ctx, node), height, -height / 2, nodePalette(styleWanted(node)).title, phase, modeAlpha(canvas, node));
+    drawTitle(ctx, titleOf(ctx, node), height, -height / 2, nodePalette(effectOf(node)).title, phase, modeAlpha(canvas, node));
     return true;
   } catch (error) {
     guard.fail(TITLES, error);

@@ -25,7 +25,7 @@ import type { IContextMenuValue, LLink, LinkId } from '@comfyorg/comfyui-fronten
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
 import { L, N, NODE_ANIMATION_OPTIONS } from '@/core/settings';
-import { clock, env, layers, live, overlaps, wake } from '@/core/engine';
+import { PANE, clock, env, layers, live, overlaps, wake } from '@/core/engine';
 import { accent } from '@/core/colors';
 import { OWN_COMPLETION, RED, errorNodes, running, shownAs, trace } from '@/fx/execution';
 import { CHIP_MS, chip } from '@/sidebar/picker';
@@ -48,6 +48,9 @@ export function ownStyle(node: Node): number | undefined {
     const style = node.properties[OWN_STYLE];
     return STYLES.has(style) ? (style as number) : undefined;
 }
+
+/** The style a node's effect takes: its own, else Animate. */
+export const effectOf = (node: Node): number => ownStyle(node) ?? N.animate;
 
 type Choices = Record<string, string | number | boolean | undefined>;
 
@@ -408,7 +411,7 @@ function interrupted(event: MouseEvent): void {
     chip('Following paused', ['Resume', resume], PAUSE_MS);
 }
 
-/** The link extension's setup() calls this: follows each node this client's run starts, and hears the user's pans on the canvas. */
+/** The link extension's setup() calls this: follows each node this client's run starts, and hears the user's pans on the canvas and over the Vue nodes. */
 export function installFollow(): void {
     if (watched === app.canvas) return;
     if (!watched) {
@@ -416,6 +419,12 @@ export function installFollow(): void {
         api.addEventListener('executing', ({ detail }) => {
             if (detail != null && env.running) follow(String(detail));
         });
+        // Nodes 2.0's nodes are DOM elements over the canvas, whose drags and wheels it does not always pass on to it.
+        for (const type of ['wheel', 'pointermove']) {
+            document.addEventListener(type, (event) => {
+                if (env.running && (event.target as Element).closest?.(PANE)) interrupted(event as MouseEvent);
+            }, { capture: true, passive: true });
+        }
     }
     watched = app.canvas;
     app.canvas.canvas.addEventListener('wheel', interrupted, { passive: true });

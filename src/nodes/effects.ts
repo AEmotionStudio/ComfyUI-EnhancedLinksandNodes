@@ -48,6 +48,9 @@ export const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) |
 export const UNDER = 1;
 export const OVER = 2;
 
+/** LGraphEventMode.NEVER (muted) and BYPASS, which fade a node and its effect. */
+export const [NEVER, BYPASS] = [2, 4];
+
 /**
  * What a call draws: the elements on `sides` of the node's edge, the edge of the shape native fills, from (x0, y0) to
  * (x1, y1) in node space with corners `round` px round, or -1 for a circle. Both sides draw every element, wherever
@@ -611,7 +614,8 @@ export function drawNodeFx(ctx: CanvasRenderingContext2D, style: number, node: C
     part = p;
     fade = alpha;
     held = holdsStill();
-    outlined = style > 0 && N.colorHoverShow && Boolean(node.selected || node.mouseOver);
+    // Classic nodes only: Nodes 2.0's DOM nodes keep the pointer from the canvas.
+    outlined = style > 0 && N.colorHoverShow && !LiteGraph.vueNodesMode && Boolean(node.selected || node.mouseOver);
     const pal = nodePalette(style);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;

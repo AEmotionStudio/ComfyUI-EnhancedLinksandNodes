@@ -9,7 +9,7 @@ import { L, N } from '@/core/settings';
 import { guard } from '@/core/engine';
 import { LOOKS } from '@/ui/looks';
 import { app, fake } from '../helpers/fake-app';
-import { start } from '../helpers/fake-litegraph';
+import { frames, start } from '../helpers/fake-litegraph';
 
 const TAB = 'enhanced-links-nodes';
 const PANEL_STATE = '🔗 Enhanced Links.Panel.State';
@@ -85,6 +85,35 @@ describe('the panel', () => {
         expect(L.staticMode).toBe(false);
         await settle();
         expect(fake.posts.map(([id]) => id)).toEqual(['🔗 Enhanced Links.Static.Mode', '🔗 Enhanced Links.Static.Mode']);
+    });
+
+    it('says what works in Nodes 2.0 as the mode turns on, and disables the titles with a fix that turns classic nodes back on through ComfyUI, as ours go through our store', async () => {
+        const slot = await open('nodes', { '📦 Enhanced Nodes.Text.Animation.Enabled': true });
+        const canvas = app.canvas as unknown as { setDirty(fg: boolean, bg: boolean): void };
+        const titles = rowOf(slot, '📦 Enhanced Nodes.Text.Animation.Enabled');
+        const need = titles.querySelector<HTMLElement>('.eln-need')!;
+        expect([slot.querySelector('.eln-notice'), need.hidden]).toEqual([null, true]);
+        // The pass after the frontend flips the mode.
+        LiteGraph.vueNodesMode = true;
+        canvas.setDirty(true, true);
+        frames(1);
+        try {
+            expect(slot.querySelector('.eln-notice')!.textContent).toBe('Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. ' +
+                'The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.Use classic nodes');
+            expect([need.hidden, need.textContent, titles.querySelector('[role=switch]')!.hasAttribute('inert')]).toEqual([false, 'Classic nodes only. Use classic nodes', true]);
+            buttonOf(need, 'Use classic nodes')!.click();
+            await settle();
+            expect(fake.posts).toEqual([['Comfy.VueNodes.Enabled', false]]);
+        } finally {
+            LiteGraph.vueNodesMode = false;
+        }
+        canvas.setDirty(true, true);
+        frames(1);
+        expect([slot.querySelector('.eln-notice'), need.hidden, titles.querySelector('[role=switch]')!.hasAttribute('inert')]).toEqual([null, true, false]);
+        // The title colour's fix sets one of ours, through our store, which shows it at once.
+        buttonOf(rowOf(slot, '📦 Enhanced Nodes.Text.Color'), 'Use Custom')!.click();
+        expect(N.colorMode).toBe('custom');
+        close(slot);
     });
 
     it('Link FX and Node FX save their master switches alone, and leave the animations as they are', async () => {
