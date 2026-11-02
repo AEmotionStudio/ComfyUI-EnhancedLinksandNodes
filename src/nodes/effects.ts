@@ -22,11 +22,16 @@
  * v1's vanished; and Flower of Life's particles circle its pattern without the
  * base effect, where v1's fell into its centre.
  *
+ * Nodes of one palette and size make the same gradients and colours at one
+ * moment, so each side's part makes them once a frame for them all, and once
+ * only while the effects hold still. Perf.Adaptive thins the particles out,
+ * then holds the effects still.
+ *
  * @module nodes/effects
  */
 
 import { N, revision } from '@/core/settings';
-import { TURN, env, heldByRun } from '@/core/engine';
+import { HELD, THIN, TURN, adaptive, env, heldByRun } from '@/core/engine';
 import { nodePalette, particleColour, translucent, type NodePalette } from '@/core/colors';
 import { noise } from '@/fx/particles';
 import type { ComfyNode } from '@/core/types';
@@ -41,8 +46,8 @@ interface NodeMoment {
 /** v1's pose for still effects and titles: State.staticPhase (old_node_animations.js:56), at time 0, where v1's first still frame was. */
 export const STILL_NODE: NodeMoment = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
 
-/** Whether node effects hold still: in Static mode, while this client's run holds them (Pause.Mode), and with reduced motion. */
-export const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion;
+/** Whether node effects hold still: in Static mode, while this client's run holds them (Pause.Mode), with reduced motion, and while Perf.Adaptive holds them. */
+export const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion || adaptive.level >= HELD;
 
 /** The sides of a node's edge: around its body, drawn under every node, and on it, drawn over its fill. */
 export const UNDER = 1;
@@ -67,12 +72,88 @@ export interface Part {
 
 /**
  * The call being drawn: its part; the alpha native draws the node at, which every alpha the effect sets is scaled by;
- * whether it holds still; and whether the node is hovered or selected with the hover outline on.
+ * whether it holds still; whether the node is hovered or selected with the hover outline on; and what its particle
+ * counts are scaled by, a half while Perf.Adaptive thins them.
  */
 let part: Part | undefined;
 let fade = 1;
 let held = false;
 let outlined = false;
+let thin = 1;
+
+/**
+ * What the effects made on a context for the nodes of a palette and a size at a moment: their gradients and colours, by
+ * the sides of the edge a call drew and by slot. Valid while the moment, the pose and the thinning are those they were
+ * made at.
+ */
+interface Made {
+    phase: number;
+    particles: number;
+    time: number;
+    held: boolean;
+    thin: number;
+    slots: (CanvasGradient | string | undefined)[][];
+}
+
+/**
+ * What was made on each context, by palette, width and height, and the settings it was made for: dropped when a setting
+ * changes, or once SIZES are kept, as a node being resized makes a size a frame.
+ */
+interface Store {
+    since: number;
+    sizes: number;
+    made: Map<NodePalette, Map<number, Map<number, Made>>>;
+}
+const stores = new WeakMap<CanvasRenderingContext2D, Store>();
+const SIZES = 256;
+/** What the call being drawn made and keeps. */
+let mine: (CanvasGradient | string | undefined)[];
+
+/** Finds or makes what the nodes of `pal` with a w × h body make on ctx at moment k, for the sides of the part drawn. */
+function makes(ctx: CanvasRenderingContext2D, pal: NodePalette, w: number, h: number, k: NodeMoment, sides: number): (CanvasGradient | string | undefined)[] {
+    let store = stores.get(ctx);
+    if (!store) stores.set(ctx, (store = { since: revision, sizes: 0, made: new Map() }));
+    if (store.since !== revision || store.sizes > SIZES) {
+        store.made.clear();
+        store.since = revision;
+        store.sizes = 0;
+    }
+    let byWidth = store.made.get(pal);
+    if (!byWidth) store.made.set(pal, (byWidth = new Map()));
+    let byHeight = byWidth.get(w);
+    if (!byHeight) byWidth.set(w, (byHeight = new Map()));
+    let m = byHeight.get(h);
+    if (!m) {
+        byHeight.set(h, (m = { phase: NaN, particles: NaN, time: NaN, held: false, thin: 1, slots: [[], [], [], []] }));
+        store.sizes++;
+    }
+    if (m.phase !== k.nodePhase || m.particles !== k.particleTime || m.time !== k.nodeTime || m.held !== held || m.thin !== thin) {
+        m.phase = k.nodePhase;
+        m.particles = k.particleTime;
+        m.time = k.nodeTime;
+        m.held = held;
+        m.thin = thin;
+        for (const slots of m.slots) slots.fill(undefined);
+    }
+    return m.slots[sides];
+}
+
+/** What the call being drawn made in `slot`, if anything yet. */
+const kept = <T extends CanvasGradient | string>(slot: number) => mine[slot] as T | undefined;
+
+/** Keeps `value` in `slot` for the nodes like the one being drawn. */
+function keep<T extends CanvasGradient | string>(slot: number, value: T): T {
+    mine[slot] = value;
+    return value;
+}
+
+/** The slots: the hover outline's colours, then each effect's, its elements' after its fixed ones. */
+const [OUTLINE_SHADOW, OUTLINE_STROKE] = [0, 1];
+const [LIGHT, HALO, FIREFLY_SHADOW, FIREFLIES] = [2, 3, 4, 5];
+const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
+const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
+const [CORE, DOTS] = [2, 3];
+
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
 
@@ -127,9 +208,9 @@ function pale(colour: string, alpha: number): string {
 function outline(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, selected: boolean | undefined, colour: (colour: string, alpha: number) => string): void {
     save(ctx);
     const blur = 15 * N.animationGlow;
-    ctx.shadowColor = colour(N.colorHover, 0.5);
+    ctx.shadowColor = kept<string>(OUTLINE_SHADOW) ?? keep(OUTLINE_SHADOW, colour(N.colorHover, 0.5));
     ctx.shadowBlur = selected ? blur * 1.5 : blur;
-    ctx.strokeStyle = colour(N.colorHover, 0.7);
+    ctx.strokeStyle = kept<string>(OUTLINE_STROKE) ?? keep(OUTLINE_STROKE, colour(N.colorHover, 0.7));
     ctx.lineWidth = 2;
     ctx.globalAlpha = fade;
     ctx.strokeRect(x, y, w, h);
@@ -139,7 +220,6 @@ function outline(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
 /** 1. Gentle Pulse (old_node_animations.js:1203-1398): a light breathing on the node, white at its core, and fireflies about it. */
 function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
     const { quality, animationGlow: glow, animationSize: size, particleSpeed: speed, particleIntensity: motion } = N;
-    const { primary, secondary, accent } = pal;
     const phase = k.nodePhase;
     // v1's ParticleController phase.
     const time = held ? phase : TURN * k.particleTime;
@@ -160,11 +240,7 @@ function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, 
         const outer = radius * (1.2 + glow * 0.4) * pulse;
         if (circle(cx, cy, inner)) {
             const alpha = 0.2 * glow * (0.5 + breathe * 0.5);
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, inner);
-            gradient.addColorStop(0, pale('#ffffff', Math.min(alpha + 0.15, 1)));
-            gradient.addColorStop(0.3, pale(primary, alpha));
-            gradient.addColorStop(0.7, pale(secondary, alpha * 0.6));
-            gradient.addColorStop(1, pale(accent, 0));
+            const gradient = kept<CanvasGradient>(LIGHT) ?? keep(LIGHT, light(ctx, inner, alpha, pal));
             ctx.beginPath();
             ctx.arc(0, 0, inner, 0, Math.PI * 2);
             ctx.fillStyle = gradient;
@@ -173,10 +249,7 @@ function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, 
         }
         if (circle(cx, cy, outer)) {
             const alpha = 0.1 * glow * (0.5 + breathe * 0.5);
-            const gradient = ctx.createRadialGradient(0, 0, radius * 0.6 * pulse, 0, 0, outer);
-            gradient.addColorStop(0, pale(secondary, alpha));
-            gradient.addColorStop(0.6, pale(accent, alpha * 0.5));
-            gradient.addColorStop(1, pale(accent, 0));
+            const gradient = kept<CanvasGradient>(HALO) ?? keep(HALO, halo(ctx, radius * 0.6 * pulse, outer, alpha, pal));
             ctx.beginPath();
             ctx.arc(0, 0, outer, 0, Math.PI * 2);
             ctx.fillStyle = gradient;
@@ -185,14 +258,14 @@ function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, 
         }
         // Above Fast quality the fireflies glow.
         if (quality > 1) {
-            ctx.shadowColor = pale(secondary, 0.3);
+            ctx.shadowColor = kept<string>(FIREFLY_SHADOW) ?? keep(FIREFLY_SHADOW, pale(pal.secondary, 0.3));
             ctx.shadowBlur = blur = 10 * glow * (quality * 0.5);
         }
     }
 
     if (N.particleShow) {
         const { particleGlow: dotGlow } = N;
-        const count = Math.floor((8 + quality * 2) * N.particleDensity);
+        const count = Math.floor((8 + quality * 2) * N.particleDensity * thin);
         const base = (4 + quality) * size * N.particleSize;
         const wobble = quality > 1 ? 12 : 6;
         const rate = held ? 0 : TURN * speed * speed;
@@ -215,11 +288,8 @@ function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, 
             const s = held ? base : base * (0.7 + Math.sin(time * 0.5 * speed + i) * 0.4 + noise(tick + i) * 0.3);
             if (!circle(cx + x, cy + y, s * 2.0 + 1.5 * blur)) continue;
 
-            const colour = particleColour(pal, i, time * speed, rate);
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, s * 2.0);
-            gradient.addColorStop(0, pale(colour, 0.8 * dotGlow));
-            gradient.addColorStop(0.4, pale(colour, 0.4 * dotGlow));
-            gradient.addColorStop(1, pale(colour, 0));
+            const colour = kept<string>(FIREFLIES + 2 * i) ?? keep(FIREFLIES + 2 * i, particleColour(pal, i, time * speed, rate));
+            const gradient = kept<CanvasGradient>(FIREFLIES + 2 * i + 1) ?? keep(FIREFLIES + 2 * i + 1, firefly(ctx, x, y, s * 2.0, colour, dotGlow));
             const blinkOffset = Math.abs((Math.sin(i * 12.9898) * 43758.5453) % (2 * Math.PI));
             const blinkSpeed = 1.2 + Math.sin(i * 0.7) * 0.6;
             const blink = held ? 0.8 : 0.4 + 0.8 * Math.pow(Math.sin(time * blinkSpeed * speed + blinkOffset), 2);
@@ -239,6 +309,51 @@ function gentlePulse(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, 
         }
     }
     restore(ctx);
+}
+
+/** Gentle Pulse's light, `r` out: white at its core, then the effect's colours, at `alpha`. */
+function light(ctx: CanvasRenderingContext2D, r: number, alpha: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    gradient.addColorStop(0, pale('#ffffff', Math.min(alpha + 0.15, 1)));
+    gradient.addColorStop(0.3, pale(pal.primary, alpha));
+    gradient.addColorStop(0.7, pale(pal.secondary, alpha * 0.6));
+    gradient.addColorStop(1, pale(pal.accent, 0));
+    return gradient;
+}
+
+/** The halo round Gentle Pulse's light, from `r0` out to `r1`, at `alpha`. */
+function halo(ctx: CanvasRenderingContext2D, r0: number, r1: number, alpha: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createRadialGradient(0, 0, r0, 0, 0, r1);
+    gradient.addColorStop(0, pale(pal.secondary, alpha));
+    gradient.addColorStop(0.6, pale(pal.accent, alpha * 0.5));
+    gradient.addColorStop(1, pale(pal.accent, 0));
+    return gradient;
+}
+
+/** A firefly's glow about (x, y), `r` out, in `colour` at `alpha`. */
+function firefly(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, colour: string, alpha: number): CanvasGradient {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+    gradient.addColorStop(0, pale(colour, 0.8 * alpha));
+    gradient.addColorStop(0.4, pale(colour, 0.4 * alpha));
+    gradient.addColorStop(1, pale(colour, 0));
+    return gradient;
+}
+
+/** Neon Nexus's scan line, a band of white 20 px tall about y. */
+function scanLine(ctx: CanvasRenderingContext2D, y: number): CanvasGradient {
+    const gradient = ctx.createLinearGradient(0, y - 10, 0, y + 10);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    return gradient;
+}
+
+/** Neon Nexus's white pulse about (x, y), `r` out, at `pulse`. */
+function pulseLight(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, pulse: number): CanvasGradient {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+    gradient.addColorStop(0, `rgba(255,255,255,${0.15 * pulse})`);
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    return gradient;
 }
 
 /** Neon Nexus's three faint hologram outlines. */
@@ -315,11 +430,7 @@ function neonNexus(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h:
 
         const scan = h * (Math.sin(phase * 2) * 0.5 + 0.5);
         if (!held && shows(0, scan - 10, w, scan + 10)) {
-            const gradient = ctx.createLinearGradient(0, scan - 10, 0, scan + 10);
-            gradient.addColorStop(0, 'rgba(255,255,255,0)');
-            gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
-            gradient.addColorStop(1, 'rgba(255,255,255,0)');
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = kept<CanvasGradient>(SCAN) ?? keep(SCAN, scanLine(ctx, scan));
             ctx.fillRect(0, scan - 10, w, 20);
         }
     }
@@ -335,7 +446,7 @@ function neonNexus(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h:
             const y = (row - 2) * spacing + Math.sin(phase + row) * 2;
             const s = base + Math.sin(phase * 2 + i) * (base * 0.3);
             if (!circle(x, y, s + 1.5 * 5 * dotGlow)) continue;
-            const colour = particleColour(pal, i, time, rate);
+            const colour = kept<string>(HEXAGONS + i) ?? keep(HEXAGONS + i, particleColour(pal, i, time, rate));
             save(ctx);
             ctx.translate(x, y);
             ctx.rotate(phase + (i * Math.PI / 8));
@@ -385,15 +496,12 @@ function neonNexus(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h:
         save(ctx);
         ctx.globalCompositeOperation = 'lighter';
         const pulse = 0.5 + 0.5 * Math.sin(phase * 3);
-        const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
-        gradient.addColorStop(0, `rgba(255,255,255,${0.15 * pulse})`);
-        gradient.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = gradient;
+        ctx.fillStyle = kept<CanvasGradient>(PULSE) ?? keep(PULSE, pulseLight(ctx, w / 2, h / 2, Math.max(w, h) * 0.7, pulse));
         roundedRect(ctx, 0, 0, w, h, radius);
         ctx.fill();
-        ctx.strokeStyle = `rgba(255,255,255,${0.7 * pulse})`;
+        ctx.strokeStyle = kept<string>(PULSE_STROKE) ?? keep(PULSE_STROKE, `rgba(255,255,255,${0.7 * pulse})`);
         ctx.lineWidth = line * 2;
-        ctx.shadowColor = `rgba(255,255,255,${0.5 * pulse})`;
+        ctx.shadowColor = kept<string>(PULSE_SHADOW) ?? keep(PULSE_SHADOW, `rgba(255,255,255,${0.5 * pulse})`);
         ctx.shadowBlur = 15 * intensity;
         roundedRect(ctx, 0, 0, w, h, radius);
         ctx.stroke();
@@ -403,7 +511,6 @@ function neonNexus(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h:
 
 /** 3. Cosmic Ripple (old_node_animations.js:1645-1748): five rings blooming from the centre, inside a turning corona of motes. */
 function cosmicRipple(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
-    const { primary, secondary, accent } = pal;
     const { animationGlow: glow, particleGlow: dotGlow, particleIntensity: motion } = N;
     const cx = w / 2;
     const cy = h / 2;
@@ -422,21 +529,16 @@ function cosmicRipple(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
             if (!circle(cx, cy, r + line / 2 + 1.5 * blur)) continue;
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            const gradient = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
-            const alpha = Math.max(0, 1 - at);
-            gradient.addColorStop(0, translucent(secondary, alpha * 0.8));
-            gradient.addColorStop(0.5, translucent(primary, alpha));
-            gradient.addColorStop(1, translucent(accent, alpha * 0.8));
-            ctx.strokeStyle = gradient;
+            ctx.strokeStyle = kept<CanvasGradient>(RINGS + i) ?? keep(RINGS + i, ring(ctx, cx, cy, r, Math.max(0, 1 - at), pal));
             ctx.lineWidth = line;
-            ctx.shadowColor = translucent(secondary, 0.5);
+            ctx.shadowColor = kept<string>(RING_SHADOW) ?? keep(RING_SHADOW, translucent(pal.secondary, 0.5));
             ctx.shadowBlur = blur;
             ctx.stroke();
         }
     }
 
     if (N.particleShow) {
-        const count = Math.floor(Math.min(100, 30 + Math.floor(motion * 20)) * N.particleDensity);
+        const count = Math.floor(Math.min(100, 30 + Math.floor(motion * 20)) * N.particleDensity * thin);
         const corona = Math.max(1, Math.max(w, h) * 0.7);
         const time = k.nodeTime;
         for (let i = 0; i < count; i++) {
@@ -448,26 +550,50 @@ function cosmicRipple(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
             const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion);
             const trail = Math.max(1, s * 2);
             if (!circle(x, y, trail + 1.5 * 15 * dotGlow)) continue;
-            const colour = particleColour(pal, i, time, 1);
+            const slot = MOTES + 5 * i;
+            const colour = kept<string>(slot) ?? keep(slot, particleColour(pal, i, time, 1));
 
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, trail);
-            gradient.addColorStop(0, translucent(colour, 0.7 * dotGlow));
-            gradient.addColorStop(1, translucent(colour, 0));
-            ctx.fillStyle = gradient;
-            ctx.shadowColor = translucent(colour, dotGlow * 0.5);
+            ctx.fillStyle = kept<CanvasGradient>(slot + 1) ?? keep(slot + 1, mote(ctx, x, y, trail, colour, dotGlow));
+            ctx.shadowColor = kept<string>(slot + 2) ?? keep(slot + 2, translucent(colour, dotGlow * 0.5));
             ctx.shadowBlur = 10 * dotGlow;
             ctx.beginPath();
             ctx.arc(x, y, trail, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = translucent(colour, 0.7);
-            ctx.shadowColor = translucent(colour, dotGlow);
+            ctx.fillStyle = kept<string>(slot + 3) ?? keep(slot + 3, translucent(colour, 0.7));
+            ctx.shadowColor = kept<string>(slot + 4) ?? keep(slot + 4, translucent(colour, dotGlow));
             ctx.shadowBlur = 15 * dotGlow;
             ctx.beginPath();
             ctx.arc(x, y, s, 0, Math.PI * 2);
             ctx.fill();
         }
     }
+}
+
+/** A ripple of Cosmic Ripple about (x, y), `r` out, at `alpha`. */
+function ring(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, alpha: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createLinearGradient(x - r, y, x + r, y);
+    gradient.addColorStop(0, translucent(pal.secondary, alpha * 0.8));
+    gradient.addColorStop(0.5, translucent(pal.primary, alpha));
+    gradient.addColorStop(1, translucent(pal.accent, alpha * 0.8));
+    return gradient;
+}
+
+/** A mote's glow about (x, y), `r` out, in `colour` at `alpha`. */
+function mote(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, colour: string, alpha: number): CanvasGradient {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+    gradient.addColorStop(0, translucent(colour, 0.7 * alpha));
+    gradient.addColorStop(1, translucent(colour, 0));
+    return gradient;
+}
+
+/** Flower of Life's white core about (x, y), `r` out, at `pulse`. */
+function core(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, pulse: number): CanvasGradient {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+    gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
+    gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.2 * pulse})`);
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    return gradient;
 }
 
 /** Flower of Life's points: its centre, then each ring's circles, 6 to a ring more than the ring inside it; 127 at Quality 3. */
@@ -553,11 +679,7 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
         }
 
         if (circle(cx, cy, radius * 2 + 1.5 * blur)) {
-            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 2);
-            gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
-            gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.2 * pulse})`);
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = kept<CanvasGradient>(CORE) ?? keep(CORE, core(ctx, cx, cy, radius * 2, pulse));
             ctx.globalAlpha = 0.3 * fade;
             ctx.beginPath();
             ctx.arc(cx, cy, radius * 2, 0, Math.PI * 2);
@@ -566,7 +688,7 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
     }
 
     if (N.particleShow) {
-        const count = Math.floor(5 * N.particleDensity * motion);
+        const count = Math.floor(5 * N.particleDensity * motion * thin);
         const dot = 2 * quality * N.particleSize;
         const rate = held ? 0 : TURN * N.animationSpeed * speed;
         for (let j = 0; j < n; j++) {
@@ -575,7 +697,7 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
                 const x = xs[j] + Math.cos(angle) * (radius * 0.5 * motion);
                 const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion);
                 if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
-                const colour = particleColour(pal, j * count + p, time, rate);
+                const colour = kept<string>(DOTS + j * count + p) ?? keep(DOTS + j * count + p, particleColour(pal, j * count + p, time, rate));
                 ctx.beginPath();
                 ctx.arc(x, y, dot, 0, Math.PI * 2);
                 ctx.fillStyle = colour;
@@ -614,9 +736,11 @@ export function drawNodeFx(ctx: CanvasRenderingContext2D, style: number, node: C
     part = p;
     fade = alpha;
     held = holdsStill();
+    thin = adaptive.level >= THIN ? 0.5 : 1;
     // Classic nodes only: Nodes 2.0's DOM nodes keep the pointer from the canvas.
     outlined = style > 0 && N.colorHoverShow && !LiteGraph.vueNodesMode && Boolean(node.selected || node.mouseOver);
     const pal = nodePalette(style);
+    mine = makes(ctx, pal, w, h, held ? STILL_NODE : k, p.sides);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0;

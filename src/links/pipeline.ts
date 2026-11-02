@@ -6,13 +6,17 @@
  * such call records its segment along the path its Link.Style gives it, and
  * draws what does not move where native would have drawn the link: the
  * animation's base with its glow and shadow, or the whole still frame
- * (Static.Mode, a run that holds them, reduced motion, or a look with nothing that
- * moves). Where that is slow, the bases go without their glow while the view
- * or the graph moves. What moves is drawn over the background in every front
- * pass, under the nodes. A shape of our own takes the segment's hit data with
- * it, so clicks and the link menu follow what is drawn. When another extension
- * draws links too, Coexist can leave every link to it; Link effects off
- * leaves every link to native.
+ * (Static.Mode, a run that holds them, reduced motion, more animated links on
+ * screen than Perf.StaticAbove, or a look with nothing that moves). Where many
+ * glow, the bases go on a layer of their own, kept while nothing changes and
+ * moved along as the view pans, so only what comes into view is drawn again;
+ * while the view zooms, nodes are dragged or still links pan, they go without
+ * their glow. What moves is drawn over the background in every front pass,
+ * under the nodes, adding up where it crosses with Blend's additive glow on a
+ * dark palette. A shape of our own takes the segment's hit data with it, so
+ * clicks and the link menu follow what is drawn. When another extension draws
+ * links too, Coexist can leave every link to it; Link effects off leaves every
+ * link to native.
  *
  * Selection focus (links/focus.ts) works on the same calls, with link effects
  * on or off: the links it leaves out are drawn natively, dimmed or not at all,
@@ -28,9 +32,9 @@
 
 import type { CanvasColour, LLink, Point, Reroute } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { L } from '@/core/settings';
-import { CALM_ALPHA, STILL_PHASE, clock, dummy, during, env, guard, heldByRun, layers, live, wake } from '@/core/engine';
-import { HIGHLIGHT, palette, type Palette } from '@/core/colors';
+import { L, revision } from '@/core/settings';
+import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, wake } from '@/core/engine';
+import { HIGHLIGHT, dark, palette, type Palette } from '@/core/colors';
 import { drawFlows, flowsShown, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { MOVING, STROKES, moving } from './animations';
@@ -78,6 +82,9 @@ export class Segment {
     width = 1;
     /** The run's step of the node its link leads into, while the run's visuals show. */
     flow?: Step;
+    /** Whether the pass before did not record it: it came on screen since, as native skips the links off it; and the pass that recorded it last. */
+    fresh = false;
+    pass = 0;
     /**
      * px along the link to the segment's start, the segment's own length and the link's whole length, along the
      * segments native drew for it: the paths Link.Style takes, before a wave or a coil winds around them.
@@ -130,14 +137,20 @@ export class Segment {
     }
 }
 
-/** The segments of the last pass are pool[0, count); the pool only grows. */
-const pool: Segment[] = [];
+/** Each segment as last recorded, by the reroute it leads into, else its link. */
+const segments = new WeakMap<LLink | Reroute, Segment>();
+/** The segments of the last pass are pool[0, count), and those of the pass before it before[0, counted). */
+let pool: Segment[] = [];
+let before: Segment[] = [];
 let count = 0;
+let counted = 0;
 /** Where the current link's segments start in the pool, and whether its last segment is still to come. */
 let first = 0;
 let open = false;
 /** Where along its link each reroute's segment ended in this pass. */
 const ends = new Map<Reroute, number>();
+/** How many passes there were. */
+let passes = 0;
 /** The ones a layer of the last front pass drew. */
 const shown: Segment[] = [];
 /** The calls of the focused links native drew in the last pass, to draw again over the nodes. */
@@ -147,14 +160,18 @@ const flowing: Segment[] = [];
 
 /**
  * The link pass: its context while drawConnections runs, whether we draw its links, whether they are still, whether
- * their bases go without their glows and halos, how many renderLink calls it saw, how many bases it drew, the
+ * their bases go without their glows and halos, whether they go on the glow layer, whether it keeps the layer as it is
+ * and whether a segment changed since the pass before, how many renderLink calls it saw, how many bases it drew, the
  * highlighted links (the selected nodes' links), what selection focus does in it (focusIn()), whether the focused
  * links take the focus colour, and whether the run's visuals show on its links.
  */
 const pass = {
-    ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, plain: false, calls: 0, bases: 0, highlighted: {} as Record<string, boolean>,
-    focus: '' as '' | 'highlight' | 'animate' | 'dim' | 'hide', tinted: false, runs: false,
+    ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, plain: false, layered: false, kept: false, changed: false,
+    calls: 0, bases: 0, highlighted: {} as Record<string, boolean>, focus: '' as '' | 'highlight' | 'animate' | 'dim' | 'hide', tinted: false, runs: false,
 };
+
+/** Whether the last pass had more animated segments on screen than Perf.StaticAbove, which holds the links still. */
+let crowded = false;
 
 /** Native's renderLink, or what another extension put in its place before ours. */
 let original: (this: Canvas, ...args: RenderLink) => void;
@@ -164,18 +181,191 @@ let original: (this: Canvas, ...args: RenderLink) => void;
  * spends about 0.8 ms of each frame on a base's glow and halo, with or without a GPU, and does it outside JavaScript.
  */
 const BUSY = 12;
-/** How long after the last pass drawn plain, in ms, one with the glows comes back. */
+/** How long after the last pass drawn plain or panned, in ms, one drawn whole comes back. */
 const SETTLE_MS = 150;
 
 /**
- * The passes with glows: how many bases the last one drew, and whether the next one must be one; where the view was at
- * the last pass; and the timer that asks for one once the view and the graph keep still.
+ * The passes with glows: how many bases the last one drawn whole drew, and whether the next one must be drawn whole;
+ * where the view was at the last pass; and the timer that asks for one once the view and the graph keep still.
  */
 const glows = { bases: 0, due: false, scale: 0, x: 0, y: 0, timer: 0 };
 
 function settle(): void {
     glows.due = true;
     app.canvas.setDirty(true, true);
+}
+
+/**
+ * The glow layer, where a pass with glows that drew more than BUSY bases draws its bases, unless the links are still: a
+ * canvas the size of the background, copied onto it once native has drawn the links. A pass drawn whole draws it in the
+ * background's transform `at`, at offset (x0, y0). A pass where the view only panned since moves it along, by whole
+ * pixels, and draws only the strips that came into view, in the transform `at` moved to (e, f) for offset (x, y), so the
+ * glows stay; one where nothing moved keeps it as it is. Either draws it whole again where a segment changed, and again
+ * where one native left out lay. What the links looked like as it was drawn whole, which those passes must find
+ * unchanged: the graph and its version, the settings, the highlighted links and the palette's background; and the pass
+ * that drew it last, which must be the pass before theirs.
+ */
+const layer = {
+    ctx: undefined as CanvasRenderingContext2D | undefined, at: undefined as DOMMatrix | undefined, scale: 0, x0: 0, y0: 0, e: 0, f: 0, x: 0, y: 0,
+    graph: undefined as unknown, version: 0, revision: 0, highlighted: undefined as unknown, background: '', pass: 0,
+};
+/** The strips of the layer's pixels the pan of this pass brought into view, from (x0, y0) to (x1, y1), and how many; none while it is drawn whole. */
+const strips = [new Float64Array(4), new Float64Array(4)];
+let stripCount = 0;
+
+/**
+ * Readies the layer to be drawn whole in the background's transform. It is kept in memory rather than on the GPU, where
+ * Chromium keeps LiteGraph's background canvas too, even with a GPU: copying a GPU canvas onto it reads its pixels back.
+ */
+function paintWhole(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    const { width, height } = ctx.canvas;
+    if (!layer.ctx || layer.ctx.canvas.width !== width || layer.ctx.canvas.height !== height) {
+        layer.ctx = offscreen(width, height).getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+    }
+    const { ds, graph } = canvas;
+    const at = ctx.getTransform();
+    const own = layer.ctx;
+    own.setTransform(1, 0, 0, 1, 0, 0);
+    own.clearRect(0, 0, width, height);
+    own.setTransform(at);
+    own.globalAlpha = canvas.editor_alpha;
+    Object.assign(layer, {
+        at, scale: ds.scale, x0: ds.offset[0], y0: ds.offset[1], e: at.e, f: at.f, x: ds.offset[0], y: ds.offset[1],
+        graph, version: graph?._version, revision, highlighted: canvas.highlighted_links, background: canvas.clear_background_color,
+    });
+}
+
+/**
+ * Whether the layer shows the links as they look now, but for where the view is: drawn by the pass before, as big as the
+ * background, at its zoom, for the graph as it is, the settings, the highlighted links and the palette; nor are nodes
+ * dragged, nor did selection focus change.
+ */
+function shows(canvas: Canvas, ctx: CanvasRenderingContext2D, refocused: boolean): boolean {
+    const own = layer.ctx;
+    return own !== undefined && layer.pass === passes - 1 && own.canvas.width === ctx.canvas.width && own.canvas.height === ctx.canvas.height
+        && canvas.ds.scale === layer.scale
+        && !canvas.isDragging && !refocused && layer.graph === canvas.graph && layer.version === canvas.graph?._version && layer.revision === revision
+        && layer.highlighted === canvas.highlighted_links && layer.background === canvas.clear_background_color;
+}
+
+/**
+ * Moves the layer along with the view, which only panned since the last pass, and readies it to draw the strips that
+ * came into view. False where it cannot: the links look otherwise than as it was drawn (shows()), or the view moved by
+ * part of a pixel or by the screen's width or height.
+ */
+function pan(canvas: Canvas, ctx: CanvasRenderingContext2D, refocused: boolean): boolean {
+    if (!shows(canvas, ctx, refocused)) return false;
+    const own = layer.ctx!;
+    const at = layer.at!;
+    const { width, height } = ctx.canvas;
+    const { offset } = canvas.ds;
+    const dx = at.a * (offset[0] - layer.x);
+    const dy = at.d * (offset[1] - layer.y);
+    const x = Math.round(dx);
+    const y = Math.round(dy);
+    if (Math.abs(dx - x) > 0.01 || Math.abs(dy - y) > 0.01 || Math.abs(x) >= width || Math.abs(y) >= height) return false;
+    // A hundredth of a pixel or less: the layer does as it is.
+    if (!x && !y) return (pass.kept = true);
+    own.setTransform(1, 0, 0, 1, 0, 0);
+    own.globalCompositeOperation = 'copy';
+    own.drawImage(own.canvas, x, y);
+    own.globalCompositeOperation = 'source-over';
+    // The columns that came in, then the rows that came in beside them.
+    stripCount = 0;
+    if (x) strip(x > 0 ? 0 : width + x, 0, x > 0 ? x : width, height);
+    if (y) strip(x > 0 ? x : 0, y > 0 ? 0 : height + y, x < 0 ? width + x : width, y > 0 ? y : height);
+    layer.x = offset[0];
+    layer.y = offset[1];
+    layer.e = at.e + at.a * (offset[0] - layer.x0);
+    layer.f = at.f + at.d * (offset[1] - layer.y0);
+    own.setTransform(at.a, 0, 0, at.d, layer.e, layer.f);
+    return true;
+}
+
+function strip(x0: number, y0: number, x1: number, y1: number): void {
+    const s = strips[stripCount++];
+    s[0] = x0;
+    s[1] = y0;
+    s[2] = x1;
+    s[3] = y1;
+}
+
+/** Whether a segment's base reaches a strip of the layer. */
+function reaches(s: Segment, within: Float64Array): boolean {
+    const { box } = s.path;
+    const { a, d } = layer.at!;
+    const { e, f } = layer;
+    return box[2] + REACH >= (within[0] - e) / a && box[0] - REACH <= (within[2] - e) / a && box[3] + REACH >= (within[1] - f) / d && box[1] - REACH <= (within[3] - f) / d;
+}
+
+/** Clips ctx, the layer's, to a strip of its pixels. */
+function clipTo(ctx: CanvasRenderingContext2D, within: Float64Array): void {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.beginPath();
+    ctx.rect(within[0], within[1], within[2] - within[0], within[3] - within[1]);
+    ctx.clip();
+    ctx.setTransform(layer.at!.a, 0, 0, layer.at!.d, layer.e, layer.f);
+}
+
+/** Draws the layer whole again, at the end of a pass that kept or panned it and found a segment changed: the bases of what it recorded. */
+function repaint(canvas: Canvas): void {
+    const own = layer.ctx!;
+    own.setTransform(1, 0, 0, 1, 0, 0);
+    own.clearRect(0, 0, own.canvas.width, own.canvas.height);
+    own.setTransform(layer.at!.a, 0, 0, layer.at!.d, layer.e, layer.f);
+    pass.kept = false;
+    for (let i = 0; i < count; i++) if (!LINK_STYLES[pool[i].linkStyle].moving) draw(canvas, own, pool[i], false);
+}
+
+/** The pixels of the layer that mend() draws again. */
+const mended = new Float64Array(4);
+
+/**
+ * Draws the layer again, at the end of a pass that kept or panned it, where the base of a segment native left out of
+ * the pass can be: native leaves out a link whose ends are off screen even where its curve is still on it.
+ */
+function mend(canvas: Canvas, gone: Segment): void {
+    const own = layer.ctx!;
+    const { a, d } = layer.at!;
+    const { box } = gone.path;
+    mended[0] = Math.max(0, Math.floor((box[0] - REACH) * a + layer.e));
+    mended[1] = Math.max(0, Math.floor((box[1] - REACH) * d + layer.f));
+    mended[2] = Math.min(own.canvas.width, Math.ceil((box[2] + REACH) * a + layer.e));
+    mended[3] = Math.min(own.canvas.height, Math.ceil((box[3] + REACH) * d + layer.f));
+    if (mended[0] >= mended[2] || mended[1] >= mended[3]) return;
+    own.setTransform(1, 0, 0, 1, 0, 0);
+    own.clearRect(mended[0], mended[1], mended[2] - mended[0], mended[3] - mended[1]);
+    for (let i = 0; i < count; i++) if (reaches(pool[i], mended)) draw(canvas, own, pool[i], false, mended);
+}
+
+/** What a segment a pass that keeps or pans the layer records again was in the pass before: its box, length, start along its link and width. */
+const held = new Float64Array(7);
+
+function hold(s: Segment): void {
+    held.set(s.path.box);
+    held[4] = s.path.length;
+    held[5] = s.u0;
+    held[6] = s.width;
+}
+
+const holds = (s: Segment) => {
+    const { box, length } = s.path;
+    return held[0] === box[0] && held[1] === box[1] && held[2] === box[2] && held[3] === box[3] && held[4] === length && held[5] === s.u0 && held[6] === s.width;
+};
+
+/** Copies the layer onto the background, then draws the reroutes on screen over it again, as native drew them over the links. */
+function blit(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowColor = 'transparent';
+    ctx.drawImage(layer.ctx!.canvas, 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = canvas.editor_alpha;
+    drawReroutes(canvas, ctx, false);
+    ctx.restore();
 }
 
 /** Whether this page warned that another extension draws links without calling renderLink. */
@@ -244,6 +434,11 @@ function focusIn(): typeof pass.focus {
 }
 
 function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    passes++;
+    const last = before;
+    before = pool;
+    pool = last;
+    counted = count;
     count = 0;
     open = false;
     ends.clear();
@@ -252,30 +447,52 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     pass.calls = pass.bases = 0;
     pass.on = L.enabled && L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
     // Native's links never move.
-    pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves();
+    pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves() || crowded || adaptive.level >= HELD;
     pass.highlighted = canvas.highlighted_links;
     syncRuns(canvas);
     // With link effects on, the run's visuals go over the links, those native draws too, as with Animation None.
     pass.runs = L.enabled && flowsShown() && !defers() && canvas.ds.scale >= LOD_SCALE;
-    syncFocus(canvas);
+    const refocused = syncFocus(canvas);
     pass.focus = focusIn();
     pass.tinted = (pass.focus === 'highlight' || pass.focus === 'dim' || pass.focus === 'hide') && !deferring();
-    // While a graph with many glowing links on screen is panned, zoomed or has nodes dragged, its bases go plain.
+    // A graph with many glowing links on screen draws them on the glow layer, which a pan moves along. While it is
+    // zoomed, has nodes dragged or otherwise cannot pan the layer, the bases go plain, as they do while Perf.Adaptive
+    // draws glows plain. A pass drawn whole follows once the view and the graph keep still.
     const { scale, offset } = canvas.ds;
     const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
-    [glows.scale, glows.x, glows.y] = [scale, offset[0], offset[1]];
-    pass.plain = pass.on && !glows.due && glows.bases > BUSY && moving;
-    glows.due = false;
-    if (pass.plain) {
+    glows.scale = scale;
+    glows.x = offset[0];
+    glows.y = offset[1];
+    pass.plain = pass.on && adaptive.level >= PLAIN;
+    const glowing = L.glowIntensity > 0 || (L.animate === CLASSIC && L.linkShadowEnabled);
+    const busy = pass.on && glowing && glows.bases > BUSY;
+    // Still links are drawn once, as they were, in place.
+    if (!busy || pass.plain || pass.still) layer.ctx = undefined;
+    // Not over the nodes (links_ontop), nor where another extension draws the links again, as MagnifyGlass does.
+    const layered = busy && !pass.plain && !pass.still && ctx === canvas.bgctx;
+    stripCount = 0;
+    pass.kept = pass.changed = false;
+    if (busy && moving && !glows.due) {
+        pass.layered = layered && pan(canvas, ctx, refocused);
+        pass.plain ||= !pass.layered;
         clearTimeout(glows.timer);
         glows.timer = window.setTimeout(settle, SETTLE_MS);
+    } else {
+        pass.layered = layered;
+        // Where nothing moved, the layer may do as it is: end() finds whether a segment changed.
+        pass.kept = layered && !moving && !glows.due && layer.x === offset[0] && layer.y === offset[1] && shows(canvas, ctx, refocused);
+        if (layered && !pass.kept) paintWhole(canvas, ctx);
     }
+    glows.due = false;
 }
 
 function end(canvas: Canvas): void {
+    const ctx = pass.ctx!;
     pass.ctx = undefined;
     if (open) close();
-    if (!pass.plain) glows.bases = pass.bases;
+    if (pass.changed) repaint(canvas);
+    else if (pass.kept || stripCount) for (let i = 0; i < counted; i++) if (before[i].pass !== passes) mend(canvas, before[i]);
+    if (!pass.plain && !stripCount && !pass.kept) glows.bases = pass.bases;
     // Moving segments show only once the motion layer draws them, and it counts those on screen. Until then they count,
     // so the ticker runs and chains its hook again if another extension replaced it.
     if (count && !pass.still) {
@@ -294,6 +511,16 @@ function end(canvas: Canvas): void {
         canvas._visibleReroutes.delete(reroute);
     }
     unseen.length = 0;
+    if (pass.layered) {
+        layer.pass = passes;
+        blit(canvas, ctx);
+    }
+    // More animated segments on screen than Perf.StaticAbove hold the links still, as Static would, from the next pass.
+    const crowd = L.perfStaticAbove > 0 && cull(canvas, all) > L.perfStaticAbove;
+    if (crowd !== crowded) {
+        crowded = crowd;
+        canvas.setDirty(true, true);
+    }
     if (pass.calls || warned) return;
     // Native calls renderLink for every link and reroute it lists here, unless that end is being dragged.
     for (const segment of canvas.renderedPaths) {
@@ -334,8 +561,17 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     startDir: number, endDir: number, extras: RenderLink[9], focused: boolean, flow: Step | undefined): Segment {
     if (open && pool[count - 1].link !== link) close();
     if (!open) first = count;
-    const segment = (pool[count++] ??= new Segment());
     const reroute = extras?.reroute;
+    let segment = segments.get(reroute ?? link);
+    if (!segment) segments.set(reroute ?? link, (segment = new Segment()));
+    pool[count++] = segment;
+    segment.fresh = segment.pass !== passes - 1;
+    segment.pass = passes;
+    // What the segment was in the pass before, which a pass that keeps or pans the layer compares it with.
+    const compared = pass.kept || stripCount > 0;
+    const heldPal = segment.pal;
+    const heldStyle = segment.linkStyle;
+    if (compared) hold(segment);
     // The reroute the segment starts from (LinkSegment.parentId), where the segment into it ended; none where the link starts.
     const from = canvas.graph?.getReroute((reroute ?? link).parentId);
     segment.link = link;
@@ -355,6 +591,8 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     segment.isStatic = pass.still;
     segment.flow = flow;
     if (flow) flowing.push(segment);
+    // One come on screen since is not on the layer a pass keeps, and one a pan brings in is drawn whole on it.
+    if (compared) pass.changed ||= segment.fresh ? pass.kept : heldPal !== segment.pal || heldStyle !== segment.linkStyle || !holds(segment);
     return segment;
 }
 
@@ -362,15 +600,26 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
 const marked = () => L.animate === CLASSIC || L.markerAll;
 
 /**
- * Draws what does not move where native would have drawn the segment: the animation's base, unless it marches. While
- * still, the link's last segment also draws the still animation and markers of all its segments, which are counted
- * along the whole link, and then their centre markers. False if it failed.
+ * Draws what does not move where native would have drawn the segment, or on the glow layer: the animation's base, unless
+ * it marches. While still, the link's last segment also draws the still animation and markers of all its segments, which
+ * are counted along the whole link, and then their centre markers. A pass that panned the layer draws a base that was on
+ * screen before in the strips that came into view alone, and one that keeps it draws nothing. False if it failed.
  */
 function place(canvas: Canvas, ctx: CanvasRenderingContext2D, segment: Segment): boolean {
     if (!pass.still && LINK_STYLES[segment.linkStyle].moving) return true;
     const whole = pass.still && !open;
+    if (!pass.layered) return draw(canvas, ctx, segment, whole);
+    if (pass.kept) return true;
+    if (!stripCount || segment.fresh) return draw(canvas, layer.ctx!, segment, false);
+    for (let i = 0; i < stripCount; i++) if (reaches(segment, strips[i]) && !draw(canvas, layer.ctx!, segment, false, strips[i])) return false;
+    return true;
+}
+
+/** Draws what place() draws on ctx, in `within`, a strip of the glow layer, alone if given. False if it failed. */
+function draw(canvas: Canvas, ctx: CanvasRenderingContext2D, segment: Segment, whole: boolean, within?: Float64Array): boolean {
     ctx.save();
     try {
+        if (within) clipTo(ctx, within);
         enableAntiAliasing(ctx);
         if (drawBase(ctx, segment, L.animate, pass.still, pass.plain)) pass.bases++;
         for (let i = first; whole && i < count; i++) {
@@ -421,18 +670,27 @@ function cull(canvas: Canvas, keep: (segment: Segment) => boolean): number {
     return n;
 }
 
-/** Draws what moves on the segments shown, and their flow markers, at half their alpha while a Calm run plays. */
+/**
+ * Draws what moves on the segments shown, and their flow markers: at half their alpha while a Calm run plays, without
+ * glows or with half the particles as Perf.Adaptive steps down, and adding up where they cross with Blend's additive
+ * glow on a dark palette, but for the markers, whose dark shadows would vanish.
+ */
 function moveShown(ctx: CanvasRenderingContext2D): void {
-    const draw = MOVING[L.animate];
+    const animation = MOVING[L.animate];
+    const additive = L.blend === 'additive' && dark(app.canvas.clear_background_color);
     moving.alpha = during(L.pauseDuringRender) === 'calm' ? CALM_ALPHA : 1;
+    moving.glow = adaptive.level >= PLAIN ? 0 : 1;
+    moving.density = adaptive.level >= THIN ? 0.5 : 1;
     try {
         for (const segment of shown) {
             if (segment.empty) continue;
-            draw?.(ctx, segment, clock);
+            if (additive) ctx.globalCompositeOperation = 'lighter';
+            animation?.(ctx, segment, clock);
+            ctx.globalCompositeOperation = 'source-over';
             if (marked()) drawMarkers(ctx, segment, clock.linkPhase, clock.linkFlow);
         }
     } finally {
-        moving.alpha = 1;
+        moving.alpha = moving.glow = moving.density = 1;
     }
 }
 
@@ -444,6 +702,11 @@ function moveShown(ctx: CanvasRenderingContext2D): void {
 function overShown(canvas: Canvas, ctx: CanvasRenderingContext2D, focused: boolean): void {
     ctx.globalAlpha = canvas.editor_alpha;
     for (const segment of shown) centreMarker(canvas, ctx, segment);
+    drawReroutes(canvas, ctx, focused);
+}
+
+/** Draws the reroutes on screen, the focused ones alone if `focused`, as native draws them after every segment. */
+function drawReroutes(canvas: Canvas, ctx: CanvasRenderingContext2D, focused: boolean): void {
     for (const reroute of canvas._visibleReroutes) {
         if (focused && !focus.reroutes.has(reroute.id)) continue;
         reroute.draw(ctx, canvas._pattern);

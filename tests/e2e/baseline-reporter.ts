@@ -50,6 +50,17 @@ export interface FrameRateRow {
     longTasks: number;
 }
 
+/** A look of perf.spec.ts's Nodes 2.0 test on 500x200 at zoom 1. */
+export interface Nodes2Row {
+    look: string;
+    /** Front paints a second without input; null for native ComfyUI, which paints only on input. */
+    fps: number | null;
+    /** Front paint durations in ms over an unchanged background. */
+    frontOnly: { p50: number; p95: number };
+    /** Front paints a second while the view pans a pixel a frame. */
+    panFps: number;
+}
+
 /** M3's frame budget (open question 9): what the default look may add to native's median front-only paint on 500x200, in ms. */
 const OVERHEAD_BUDGET = 8;
 /** What the heap may keep of 120 animated frames once garbage is collected, the median of three runs, in MB. */
@@ -127,8 +138,15 @@ export default class BaselineReporter implements Reporter {
                 name, r.renderer, r.look, r.fps, r.backPerSecond, `${r.front.p50} / ${r.front.p95}`, r.longTasks,
             ].map(String)));
         }
+        const nodes2 = names.flatMap((name) => ((this.projects[name].nodes2 ?? []) as Nodes2Row[]).map((row) => ({ name, row })));
+        if (nodes2.length) {
+            console.log('\nNodes 2.0, 500x200 at zoom 1:');
+            printTable(['project', 'look', 'fps', 'front-only ms p50/p95', 'pan fps'], nodes2.map(({ name, row: r }) => [
+                name, r.look, r.fps ?? '–', `${r.frontOnly.p50} / ${r.frontOnly.p95}`, r.panFps,
+            ].map(String)));
+        }
         for (const name of names) {
-            const other = Object.entries(this.projects[name]).filter(([key]) => key !== 'perf' && key !== 'frameRate');
+            const other = Object.entries(this.projects[name]).filter(([key]) => key !== 'perf' && key !== 'frameRate' && key !== 'nodes2');
             if (other.length) console.log(`${name}: ${JSON.stringify(Object.fromEntries(other))}`);
             const heap = this.projects[name].heap as { retainedMB: number } | undefined;
             if (/^fe\d+$/.test(name) && heap && heap.retainedMB > HEAP_BUDGET) over.push(`${name}: 120 animated frames keep ${heap.retainedMB} MB on the heap, over the ${HEAP_BUDGET} MB budget`);

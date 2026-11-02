@@ -14,7 +14,7 @@ import { clock, dummy, guard, layers, live } from '@/core/engine';
 import { N, preview } from '@/core/settings';
 import * as colors from '@/core/colors';
 import { OVER, UNDER, drawNodeFx } from '@/nodes/effects';
-import { fake } from '../helpers/fake-app';
+import { app, fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
 import { FakeCanvas, FakeNode, frames, page, run, start, type GraphSpec } from '../helpers/fake-litegraph';
 import { WHOLE } from './characterize/v1-inputs';
@@ -95,6 +95,40 @@ function overhang(paints: CanvasRecorder['paints'], [left, top, right, bottom]: 
     }
     return out;
 }
+
+describe('what node effects make', () => {
+    /** `n` nodes of one size, all on screen. */
+    const row = (n: number): GraphSpec => ({ nodes: Array.from({ length: n }, (_, i) => ({ pos: [60 + (i % 5) * 300, 80 + Math.floor(i / 5) * 260], size: [220, 120] as [number, number] })) });
+
+    /** The gradients the front passes of five frames made, from the same moment on; with `still`, frames whose front is dirty though nothing moves. */
+    function gradients(canvas: FakeCanvas, still = false): number {
+        [clock.nodePhase, clock.particleTime, clock.nodeTime] = [2.1, 3.3, 3.3];
+        const from = canvas.front.lines.length;
+        for (let i = 0; i < 5; i++) {
+            if (still) canvas.setDirty(true, false);
+            frames(1);
+        }
+        return canvas.front.lines.slice(from).filter((line) => /= create(Radial|Linear)Gradient\(/.test(line)).length;
+    }
+
+    for (const [name, animate] of EFFECTS) {
+        it(`${name} makes its gradients once a frame for all the nodes of a palette and size, and none more while it holds still`, async () => {
+            const settings = { ...LINKS_OFF, ...PARTICLES, '📦 Enhanced Nodes.Animate': animate, '📦 Enhanced Nodes.Particle.Color.Mode': 'rainbow' };
+            const made: number[] = [];
+            for (const n of [1, 10]) {
+                const canvas = await start(settings, row(n));
+                frames(2);
+                made.push(gradients(canvas));
+            }
+            expect(made[1], name).toBe(made[0]);
+            expect(made[0], name).toBeGreaterThan(0);
+            preview('📦 Enhanced Nodes.Static.Mode', true);
+            const canvas = app.canvas as unknown as FakeCanvas;
+            frames(2);
+            expect(gradients(canvas, true), `${name}, still`).toBe(0);
+        });
+    }
+});
 
 describe('node effects', () => {
     for (const [name, animate] of EFFECTS) {

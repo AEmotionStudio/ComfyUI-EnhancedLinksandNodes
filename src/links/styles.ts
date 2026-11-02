@@ -437,7 +437,7 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, s: Segment, phase: nu
     const shape = MARKERS[L.markerShape];
     if (!L.markerEnabled || !shape) return;
     const size = 3 * L.markerSize;
-    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.markerSize * L.particleDensity * 0.5));
+    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.markerSize * L.particleDensity * moving.density * 0.5));
     const { pal } = s;
     for (let i = 0; i < count; i++) {
         const T = flow === undefined ? i / count : wrap(i / count + flow * 0.1);
@@ -451,9 +451,9 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, s: Segment, phase: nu
         else if (L.markerEffects === 'fade') alpha = 1 - T;
         else if (L.markerEffects === 'rainbow') color = rainbow(T * 360 + phase * 50);
         ctx.globalAlpha = alpha * moving.alpha;
-        if (L.markerShadowEnabled) mark(ctx, shape, here[0], here[1], size * 1.2, angle, SHADOW, SHADOW, shadowBlur(L.markerGlow), shadowOffset());
+        if (L.markerShadowEnabled) mark(ctx, shape, here[0], here[1], size * 1.2, angle, SHADOW, SHADOW, shadowBlur(L.markerGlow * moving.glow), shadowOffset());
         // A rainbow marker glows in the link's colour.
-        mark(ctx, shape, here[0], here[1], size, angle, color, L.markerEffects === 'rainbow' ? pal.primary : color, L.markerGlow);
+        mark(ctx, shape, here[0], here[1], size, angle, color, L.markerEffects === 'rainbow' ? pal.primary : color, L.markerGlow * moving.glow);
     }
 }
 

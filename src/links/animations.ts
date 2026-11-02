@@ -23,8 +23,12 @@ import type { Segment } from './pipeline';
 /** v1's pattern counts (old_link_animations.js:8-17). */
 export const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
 
-/** What every alpha the motion sets is scaled by: a half while a Calm run plays (core/engine.ts), else 1. */
-export const moving = { alpha: 1 };
+/**
+ * What the motion layer scales what it draws by (links/pipeline.ts), 1 elsewhere: every alpha it sets, a half while a Calm
+ * run plays (core/engine.ts); every glow, none while Perf.Adaptive draws them plain; and its particle counts, half while
+ * it thins them.
+ */
+export const moving = { alpha: 1, glow: 1, density: 1 };
 
 /** The clock the motion is drawn at (src/core/engine.ts). */
 interface Moment {
@@ -112,7 +116,8 @@ const moved = (turn: (x: number) => number, T: number, cp: number) => turn(T * M
 
 /** 1. Sacred Flow: a glowing ribbon that wobbles in a rotating flow field, and twinkling beads drifting along it. */
 function sacredFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
-    const { thickness, glowIntensity } = L;
+    const { thickness } = L;
+    const glowIntensity = L.glowIntensity * moving.glow;
     const { primary, accent } = s.pal;
     const cp = k.linkFlow * 0.25;
     // v1 drew the ribbon through floor(3 × Quality × Particle.Density) + 1 points, which at its defaults made a straight
@@ -136,7 +141,7 @@ function sacredFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void 
     ctx.globalAlpha = moving.alpha;
     ctx.stroke();
 
-    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity));
+    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity * moving.density));
     for (let i = 0; i < count; i++) {
         const T = wrap(i / count + cp * 0.5);
         const u = s.local(T);
@@ -155,7 +160,7 @@ function crystalStream(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
     const { thickness } = L;
     const { primary, secondary } = s.pal;
     const cp = k.linkFlow;
-    const count = Math.max(1, Math.floor(SACRED.HARMONY * L.quality * L.particleDensity));
+    const count = Math.max(1, Math.floor(SACRED.HARMONY * L.quality * L.particleDensity * moving.density));
     for (let i = 0; i < count; i++) {
         const T = wrap(i / count + cp);
         const u = s.local(T);
@@ -164,7 +169,7 @@ function crystalStream(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
         // v1's crystals took the width of the base drawn before them.
         ctx.lineWidth = thickness * 0.8;
         ctx.globalAlpha = moving.alpha;
-        createCrystal(ctx, here[0], here[1], 5 * thickness * (1 + Math.sin(cp + T * Math.PI)), T * Math.PI * 2 + cp, primary, secondary, L.glowIntensity);
+        createCrystal(ctx, here[0], here[1], 5 * thickness * (1 + Math.sin(cp + T * Math.PI)), T * Math.PI * 2 + cp, primary, secondary, L.glowIntensity * moving.glow);
     }
 }
 
@@ -188,7 +193,7 @@ function quantumField(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): voi
         ctx.strokeStyle = color;
         ctx.lineWidth = L.thickness * 0.5;
         ctx.shadowColor = color;
-        ctx.shadowBlur = L.glowIntensity;
+        ctx.shadowBlur = L.glowIntensity * moving.glow;
         ctx.globalAlpha = 0.3 * moving.alpha;
         ctx.stroke();
     }
@@ -214,7 +219,7 @@ function cosmicWeave(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
         ctx.strokeStyle = colors[strand];
         ctx.lineWidth = L.thickness * 0.7;
         ctx.shadowColor = colors[strand];
-        ctx.shadowBlur = L.glowIntensity;
+        ctx.shadowBlur = L.glowIntensity * moving.glow;
         ctx.globalAlpha = 0.5 * moving.alpha;
         ctx.stroke();
     }
@@ -224,7 +229,7 @@ function cosmicWeave(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
 function energyPulse(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
     const { secondary } = s.pal;
     const cp = k.linkFlow * 0.25;
-    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality));
+    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * moving.density));
     for (let i = 0; i < count; i++) {
         const T = wrap(i / count + cp);
         const u = s.local(T);
@@ -235,14 +240,15 @@ function energyPulse(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
         const r = L.thickness * 2 * (1 - trip);
         DOT.path(ctx, here[0], here[1], r, 0);
         ctx.globalAlpha = 0.5 * (1 - trip) * moving.alpha;
-        shine(ctx, DOT, here[0], here[1], r, 0, secondary, secondary, L.glowIntensity * 2);
+        shine(ctx, DOT, here[0], here[1], r, 0, secondary, secondary, L.glowIntensity * moving.glow * 2);
     }
 }
 
 /** 6. DNA Helix: two strands winding four turns around the path, joined by sixteen rungs, the twist screwing toward the input. */
 function dnaHelix(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
     const { primary, secondary, accent } = s.pal;
-    const { thickness, glowIntensity } = L;
+    const { thickness } = L;
+    const glowIntensity = L.glowIntensity * moving.glow;
     const radius = 10;
     const rotations = 4;
     // Its angles are counted from the input, as v1 counted them.
@@ -304,7 +310,8 @@ const LAVA = [
 /** 7. Lava Flow: a molten core in a glowing sheath, both rippling across the path downstream, and flickering embers. */
 function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
     const { primary, secondary, accent } = s.pal;
-    const { thickness, glowIntensity } = L;
+    const { thickness } = L;
+    const glowIntensity = L.glowIntensity * moving.glow;
     const cp = k.linkFlow;
     const tube = thickness * 7;
     const m = vertices(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality * 12)));
@@ -339,7 +346,7 @@ function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
         ctx.stroke();
     }
 
-    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity * 3));
+    const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity * moving.density * 3));
     for (let i = 0; i < count; i++) {
         const T = wrap(i / count + cp * 0.5);
         const u = s.local(T);
@@ -359,10 +366,11 @@ function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
 /** 8. Stellar Plasma: a snaking chain of plasma beads on a wave rolling toward the input, and sparks streaming along it. */
 function stellarPlasma(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
     const { primary, secondary, accent } = s.pal;
-    const { thickness, glowIntensity } = L;
+    const { thickness } = L;
+    const glowIntensity = L.glowIntensity * moving.glow;
     const f = k.linkFlow;
     // A bead every 20 px or so; one at least, where v1 drew none under 20 px. Counted from the input, as v1 counted them.
-    const segments = Math.floor(s.chain / 20) * L.quality * L.particleDensity || 1;
+    const segments = Math.floor(s.chain / 20) * L.quality * L.particleDensity * moving.density || 1;
     const first = (t: number) => (L.direction > 0 ? t < 0.5 : t > 0.5);
     for (let i = 0; i <= segments; i++) {
         const t = i / segments;

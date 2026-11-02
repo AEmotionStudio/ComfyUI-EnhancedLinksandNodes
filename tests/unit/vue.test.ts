@@ -291,6 +291,32 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toContain(':root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}');
     });
 
+    it('holds the glows still while more nodes whose glow moves are on screen than a quarter of Perf.StaticAbove, but for steady glows and nodes off screen', async () => {
+        const STATIC_ABOVE = '🔗 Enhanced Links.Perf.StaticAbove';
+        // Twelve Gentle Pulse nodes on screen and four off it.
+        const canvas = await start({ '📦 Enhanced Nodes.Animate': 1, [STATIC_ABOVE]: 40 }, {
+            nodes: Array.from({ length: 16 }, (_, i) => ({ pos: [i < 12 ? 100 + (i % 6) * 250 : 5000, i < 12 ? 100 + Math.floor(i / 6) * 300 : 100] })),
+        });
+        LiteGraph.vueNodesMode = true;
+        mountNodes(mountPane(), ...canvas.graph._nodes.map((n) => Number(n.id)));
+        frames(1);
+        expect(pace()).toBe('still');
+        preview(STATIC_ABOVE, 48);
+        frames(1);
+        expect(pace()).toBeNull();
+        preview(STATIC_ABOVE, 44);
+        frames(1);
+        expect(pace()).toBe('still');
+        // Neon Nexus holds a steady edge, which moves nothing.
+        preview('📦 Enhanced Nodes.Animate', 2);
+        frames(1);
+        expect(pace()).toBeNull();
+        preview('📦 Enhanced Nodes.Animate', 1);
+        preview(STATIC_ABOVE, 0);
+        frames(1);
+        expect(pace()).toBeNull();
+    });
+
     it('leaves one stylesheet and one pane observed at most after five times on and off, the root without its pace, and no listener', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Static.Mode': true }, CHAIN);
         const pane = mountPane();

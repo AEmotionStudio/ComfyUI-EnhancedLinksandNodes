@@ -13,7 +13,9 @@
  * particles alone; a selected, running or failed node glows steadily, and a
  * collapsed one, which classic mode draws no effect on, only with its run. They
  * hold still or go calm with the canvas effects, as an attribute on the page's
- * root says, and hold still while ComfyUI disables animations. The particles
+ * root says, hold still while ComfyUI disables animations, and while more of
+ * them move on screen than a quarter of Perf.StaticAbove, as 1.57.1 paints the
+ * drop shadow under each node again for each glow that moves. The particles
  * stay on the main canvas, under the DOM nodes; the patterns inside a node, the
  * hover outline and the styled titles need classic nodes.
  *
@@ -22,8 +24,8 @@
 
 import type { NodeId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { N, revision } from '@/core/settings';
-import { during, transformPane } from '@/core/engine';
+import { L, N, revision } from '@/core/settings';
+import { during, overlaps, transformPane } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, holdsStill } from '@/nodes/effects';
 import { stepOf, syncRuns } from '@/fx/execution';
@@ -42,6 +44,9 @@ const BYPASSED = 64;
 const MUTED = 128;
 const ONLY = 256;
 const COLLAPSED = 512;
+/** What shows a steady glow, if any, whatever its effect; and the effects whose glow moves: Gentle Pulse's, Cosmic Ripple's and Flower of Life's. */
+const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
+const MOVES = [false, true, false, true, true];
 const ATTRIBUTES = ['data-eln-fx', 'data-eln-only', 'data-eln-collapsed', 'data-eln-sel', 'data-eln-run', 'data-eln-mode'];
 
 /** The pane observed, the stylesheet and the settings it was written for, and what the page's root says of the effects' pace. */
@@ -184,22 +189,25 @@ export function vueNodes(canvas: Canvas): void {
         const css = stylesheet();
         if (sheet.textContent !== css) sheet.textContent = css;
     }
-    const now = holdsStill() ? 'still' : during(N.pauseDuringRender) === 'calm' ? 'calm' : '';
-    if (now !== pace) {
-        pace = now;
-        put(document.documentElement, 'data-eln-pace', pace);
-    }
     if (graph !== shown) {
         shown = graph;
         given = new WeakMap();
     }
     syncRuns(canvas);
     const selected = canvas.selectedItems;
+    let moving = 0;
     for (const node of graph.nodes) {
         const look = lookOf(node, selected);
+        if (MOVES[look & 7] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
         if (given.get(node) === look) continue;
         given.set(node, look);
         const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
         if (el) mark(el, look);
+    }
+    const crowded = L.perfStaticAbove > 0 && moving > L.perfStaticAbove / 4;
+    const now = holdsStill() || crowded ? 'still' : during(N.pauseDuringRender) === 'calm' ? 'calm' : '';
+    if (now !== pace) {
+        pace = now;
+        put(document.documentElement, 'data-eln-pace', pace);
     }
 }

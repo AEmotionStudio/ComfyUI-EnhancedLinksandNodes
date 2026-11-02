@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { clock, guard, live } from '@/core/engine';
+import { PLAIN as GLOWS_PLAIN, adaptive, clock, guard, live } from '@/core/engine';
 import { palette } from '@/core/colors';
 import { L, preview } from '@/core/settings';
 import { STILL } from '@/links/stills';
@@ -18,7 +18,7 @@ import { drawMarkers } from '@/links/styles';
 import { fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt } from '../helpers/recording-context';
 import type { Segment } from '@/links/pipeline';
-import { FakeCanvas, frames, page, start, type GraphSpec } from '../helpers/fake-litegraph';
+import { FakeCanvas, frames, offscreens, page, start, type GraphSpec } from '../helpers/fake-litegraph';
 
 vi.mock('@/links/styles', async (importOriginal) => {
     const styles = await importOriginal<typeof import('@/links/styles')>();
@@ -702,24 +702,40 @@ describe('glows', () => {
 });
 
 describe('a graph with many glowing links on screen', () => {
-    /** `n` links one above another, all on screen. */
-    function rows(n: number): GraphSpec {
+    /** `n` links one above another, from nodes at x = `left`, all on screen but the left nodes. */
+    function rows(n: number, left = 100): GraphSpec {
         return {
-            nodes: Array.from({ length: n }, (_, i) => [{ pos: [100, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
+            nodes: Array.from({ length: n }, (_, i) => [{ pos: [left, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
             links: Array.from({ length: n }, (_, i) => ({ from: 2 * i, to: 2 * i + 1 })),
         };
     }
 
-    /** A background pass, and what its link bodies and halos were stroked in, with their blurs, once each. */
-    function bake(canvas: FakeCanvas): [string, number][] {
+    /** The glow layer: the last canvas the size of the background made off screen. */
+    const layerOf = (canvas: FakeCanvas) => offscreens.filter((rec) => rec.ctx.canvas.width === canvas.back.ctx.canvas.width).at(-1);
+
+    /** What link bodies and halos were stroked in, with their blurs, once each. */
+    const kinds = (paints: CanvasRecorder['paints']) => [...new Set(paints.filter((p) => p.op === 'stroke').map((p) => JSON.stringify([p.style, p.shadowBlur])))].map((s) => JSON.parse(s));
+
+    /** A background pass: what it stroked on the background and on the glow layer, and the lines it added to the layer. */
+    function bake(canvas: FakeCanvas) {
         canvas.setDirty(true, true);
-        const strokes = frame(canvas).back.filter((p) => p.op === 'stroke').map((p) => JSON.stringify([p.style, p.shadowBlur]));
-        return [...new Set(strokes)].map((stroke) => JSON.parse(stroke));
+        const before = layerOf(canvas);
+        const [paints, lines] = [before?.paints.length ?? 0, before?.lines.length ?? 0];
+        const { back } = frame(canvas);
+        const after = layerOf(canvas);
+        const fresh = after !== before;
+        return { back: kinds(back), layer: after ? kinds(after.paints.slice(fresh ? 0 : paints)) : [], lines: after?.lines.slice(fresh ? 0 : lines) ?? [] };
+    }
+
+    /** A background pass that draws the layer whole, for a graph changed since the last. */
+    function bakeWhole(canvas: FakeCanvas) {
+        canvas.graph._version++;
+        return bake(canvas);
     }
 
     /** A canvas for `spec` whose last background pass drew its glows, whatever the tests before it left the view at. */
-    async function settled(spec: GraphSpec): Promise<FakeCanvas> {
-        const canvas = await start({}, spec);
+    async function settled(spec: GraphSpec, settings = {}): Promise<FakeCanvas> {
+        const canvas = await start(settings, spec);
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
         bake(canvas);
         vi.advanceTimersByTime(150);
@@ -734,31 +750,251 @@ describe('a graph with many glowing links on screen', () => {
         vi.useRealTimers();
     });
 
-    it('bakes its bases plain while the view moves or nodes are dragged, and with their glows 150 ms after the last of it', async () => {
+    it('draws its bases with their glows on a layer copied onto the background, under the reroutes', async () => {
+        const { nodes, links = [] } = rows(13);
+        const canvas = await settled({ nodes, links: [...links.slice(1), { from: 0, to: 1, reroutes: [[350, 120]] }] });
+        const back = canvas.back.lines.length;
+        expect(bakeWhole(canvas)).toEqual(expect.objectContaining({ back: [], layer: GLOWING }));
+        const drawn = canvas.back.lines.slice(back);
+        // The layer, in the background's pixels, then the reroute again over it.
+        const blit = drawn.indexOf('drawImage(image(1600x900), 0, 0)');
+        expect(drawn.lastIndexOf('setTransform(1, 0, 0, 1, 0, 0)', blit)).toBeGreaterThan(drawn.lastIndexOf('save()', blit));
+        expect(drawn.slice(blit).some((line) => line.startsWith('arc(350, 120'))).toBe(true);
+    });
+
+    it('keeps the layer as it is through a pass where nothing changed, and draws it whole again where a link did: its node moved, its colour changed', async () => {
         const canvas = await settled(rows(13));
-        expect(bake(canvas), 'still').toEqual(GLOWING);
-        for (const [i, move] of [() => { canvas.ds.offset = [-10, 0]; }, () => { canvas.ds.scale = 0.9; }, () => { canvas.isDragging = true; }].entries()) {
+        const kept = bake(canvas);
+        expect([kept.back, kept.layer, kept.lines]).toEqual([[], [], []]);
+        // Still copied onto the background.
+        const back = canvas.back.lines.length;
+        expect(bake(canvas).back).toEqual([]);
+        expect(canvas.back.lines.slice(back)).toContain('drawImage(image(1600x900), 0, 0)');
+        canvas.graph._nodes[0].pos[1] += 10;
+        const moved = bake(canvas);
+        expect([moved.back, moved.layer, moved.lines.slice(0, 2)]).toEqual([[], GLOWING, ['setTransform(1, 0, 0, 1, 0, 0)', 'clearRect(0, 0, 1600, 900)']]);
+        expect(bake(canvas).layer).toEqual([]);
+        // Both its nodes moved alike, the link as long as it was.
+        canvas.graph._nodes[2].pos[1] += 10;
+        canvas.graph._nodes[3].pos[1] += 10;
+        expect(bake(canvas).lines.slice(0, 2)).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'clearRect(0, 0, 1600, 900)']);
+        // A palette's link colour, the background left as it was.
+        canvas.default_link_color = '#ff0000';
+        expect(bake(canvas).layer).toEqual(expect.arrayContaining([['#ff0000', 10]]));
+        // A node dragged a little and let go: the passes drawn plain meanwhile did not draw the layer, so it is drawn whole.
+        canvas.isDragging = true;
+        canvas.graph._nodes[2].pos[1] += 10;
+        expect(bake(canvas)).toEqual(expect.objectContaining({ layer: [] }));
+        canvas.isDragging = false;
+        expect(bake(canvas).layer).toEqual(GLOWING.map(([style, blur]) => [style === HALO ? style : '#ff0000', blur]));
+    });
+
+    it('moves the layer along as the view pans and draws only what comes into view, with its glows; zooming or dragging nodes bakes them plain until 150 ms after', async () => {
+        const canvas = await settled(rows(13, -200));
+        expect(bakeWhole(canvas), 'still').toEqual(expect.objectContaining({ back: [], layer: GLOWING }));
+        // Panned 40 px right: the layer moves 40 px, and the links crossing the strip at the left are drawn again there alone.
+        canvas.ds.offset = [40, 0];
+        const panned = bake(canvas);
+        expect([panned.back, panned.layer], 'panned').toEqual([[], GLOWING]);
+        expect(panned.lines.slice(0, 3)).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'globalCompositeOperation = copy', 'drawImage(image(1600x900), 40, 0)']);
+        expect(panned.lines).toContain('rect(0, 0, 40, 900)');
+        // The pan of part of a pixel, a zoom and a node dragged cannot move the layer.
+        for (const [i, move] of [() => { canvas.ds.offset = [40.5, 0]; }, () => { canvas.ds.scale = 0.9; }, () => { canvas.isDragging = true; }].entries()) {
             move();
-            expect(bake(canvas), `move ${i}`).toEqual(PLAIN);
+            expect(bake(canvas), `move ${i}`).toEqual(expect.objectContaining({ back: PLAIN, layer: [] }));
             vi.advanceTimersByTime(100);
         }
         // A node held still under the pointer still counts as dragged; what brings the glows back is the time since the last plain pass.
         expect(canvas.dirty_bgcanvas).toBe(false);
         vi.advanceTimersByTime(50);
         expect(canvas.dirty_bgcanvas).toBe(true);
-        expect(bake(canvas), 'settled').toEqual(GLOWING);
+        expect(bake(canvas), 'settled').toEqual(expect.objectContaining({ back: [], layer: GLOWING }));
+        // Let go of where it lay, the node leaves the layer as it is.
         canvas.isDragging = false;
-        expect(bake(canvas), 'let go').toEqual(GLOWING);
+        expect(bake(canvas), 'let go').toEqual(expect.objectContaining({ back: [], layer: [] }));
         vi.advanceTimersByTime(1000);
         expect(canvas.dirty_bgcanvas).toBe(false);
     });
 
-    it('is any graph whose last pass with glows drew more than 12 bases; others keep their glows however they move', async () => {
-        for (const [n, moving] of [[12, GLOWING], [13, PLAIN]] as const) {
-            const canvas = await settled(rows(n));
-            canvas.ds.offset = [-10, 0];
-            expect(bake(canvas), `${n} links`).toEqual(moving);
+    it('draws whole on the layer a link a pan brings on screen, which native skipped in the pass before, unclipped by the strips', async () => {
+        const canvas = await settled(rows(14));
+        // Native skips a link off screen, or one whose end is dragged.
+        const [first] = Object.values(canvas.graph.links);
+        first._dragging = true;
+        bake(canvas);
+        first._dragging = false;
+        // The strip a 40 px pan brings in reaches none of the links: what the layer strokes is the link come back, whole.
+        canvas.ds.offset = [40, 0];
+        const { back, layer, lines } = bake(canvas);
+        expect([back, layer]).toEqual([[], GLOWING]);
+        expect(lines.filter((line) => line === 'clip()')).toEqual([]);
+    });
+
+    /** Where a background pass drew the links from on the layer, once each. */
+    const starts = (lines: string[]) => [...new Set(lines.filter((line) => line.startsWith('moveTo(')))];
+
+    it('draws the layer again where a link native leaves out lay, in a pass that keeps it or pans it, and whole once it is back', async () => {
+        const canvas = await settled(rows(13));
+        // Native leaves out a link whose end is dragged, or whose ends are off screen even where its curve is on it.
+        const [first] = Object.values(canvas.graph.links);
+        first._dragging = true;
+        const gone = bake(canvas);
+        // Its box grown by how far effects reach, and the links that reach there drawn again in it alone.
+        expect(gone.lines.slice(0, 2)).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'clearRect(191, 0, 539, 184)']);
+        expect(starts(gone.lines)).toEqual(['moveTo(311, 124)', 'moveTo(311, 184)', 'moveTo(311, 244)', 'moveTo(311, 304)']);
+        expect(gone.lines.filter((line) => line === 'clip()')).toHaveLength(4);
+        first._dragging = false;
+        expect(bake(canvas).lines.slice(0, 2)).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'clearRect(0, 0, 1600, 900)']);
+        // Left out in a pass that pans the layer 40 px.
+        first._dragging = true;
+        canvas.ds.offset = [40, 0];
+        const panned = bake(canvas);
+        expect(panned.lines).toContain('clearRect(231, 0, 539, 184)');
+        expect(starts(panned.lines)).not.toContain('moveTo(311, 64)');
+        first._dragging = false;
+    });
+
+    it('draws the layer whole again where a pan finds a link moved, and keeps it as it is through a pan of a hundredth of a pixel', async () => {
+        const canvas = await settled(rows(13));
+        canvas.ds.offset = [40, 0];
+        canvas.graph._nodes[0].pos[1] += 10;
+        const moved = bake(canvas);
+        expect(moved.lines.slice(0, 3)).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'globalCompositeOperation = copy', 'drawImage(image(1600x900), 40, 0)']);
+        expect(moved.lines).toContain('clearRect(0, 0, 1600, 900)');
+        canvas.ds.offset = [40.004, 0];
+        expect(bake(canvas)).toEqual({ back: [], layer: [], lines: [] });
+    });
+
+    for (const focusOn of [true, false]) it(`draws the layer whole again once the links look otherwise than as it was drawn: the graph, a setting, the palette, the highlighted links${focusOn ? ', selection focus' : ', without selection focus'}`, async () => {
+        const canvas = await settled(rows(13, -200), { '🔗 Enhanced Links.Focus.Enabled': focusOn });
+        const changes: [string, () => void][] = [
+            ['graph', () => { canvas.graph._version++; }],
+            ['setting', () => { preview('🔗 Enhanced Links.Thickness', 4); }],
+            ['palette', () => { canvas.clear_background_color = '#333'; }],
+            ['highlighted', () => { canvas.highlighted_links = { 1: true }; }],
+        ];
+        // Selection focus built again, the highlighted links left as they were.
+        if (focusOn) changes.push(['focus', () => canvas.selectItems([canvas.graph._nodes[2]])]);
+        for (const [name, change] of changes) {
+            canvas.ds.offset = [canvas.ds.offset[0] + 10, 0];
+            expect(bake(canvas).lines.slice(0, 3), `${name}, panned`).toContain('globalCompositeOperation = copy');
+            canvas.ds.offset = [canvas.ds.offset[0] + 10, 0];
+            change();
+            // A pan with the links changed bakes them plain, and the pass after it draws the layer whole.
+            const changed = bake(canvas);
+            expect([changed.back.every(([, blur]) => blur === 0), changed.layer], `${name}, changed`).toEqual([true, []]);
+            vi.advanceTimersByTime(150);
+            const whole = bake(canvas);
+            expect(whole.lines.slice(0, 2), `${name}, whole`).toEqual(['setTransform(1, 0, 0, 1, 0, 0)', 'clearRect(0, 0, 1600, 900)']);
         }
+        preview('🔗 Enhanced Links.Thickness', 3);
+    });
+
+    it('is any graph whose last pass drawn whole drew more than 12 bases; others keep their glows in place however they move', async () => {
+        for (const [n, still, zoomed] of [[12, [GLOWING, []], [GLOWING, []]], [13, [[], GLOWING], [PLAIN, []]]] as const) {
+            const canvas = await settled(rows(n));
+            const at = bakeWhole(canvas);
+            expect([at.back, at.layer], `${n} links, still`).toEqual(still);
+            canvas.ds.scale = 0.9;
+            const moved = bake(canvas);
+            expect([moved.back, moved.layer], `${n} links, zoomed`).toEqual(zoomed);
+            vi.useRealTimers();
+        }
+    });
+
+    it('lets go of the layer while the glows are plain or the links still, and draws on a new one after', async () => {
+        const canvas = await settled(rows(13));
+        expect(bakeWhole(canvas).layer).toEqual(GLOWING);
+        let held = layerOf(canvas);
+        adaptive.level = GLOWS_PLAIN;
+        try {
+            expect(bake(canvas)).toEqual(expect.objectContaining({ back: PLAIN, layer: [] }));
+        } finally {
+            adaptive.level = 0;
+        }
+        expect(bake(canvas).layer).toEqual(GLOWING);
+        expect(layerOf(canvas)).not.toBe(held);
+        held = layerOf(canvas);
+        preview('🔗 Enhanced Links.Static.Mode', true);
+        expect(bake(canvas)).toEqual(expect.objectContaining({ layer: [] }));
+        preview('🔗 Enhanced Links.Static.Mode', false);
+        expect(bake(canvas).layer).toEqual(GLOWING);
+        expect(layerOf(canvas)).not.toBe(held);
+    });
+});
+
+describe('Blend', () => {
+    /** What one front pass painted additively in the link's colour, and how it composited the flow markers it drew. */
+    function blended(canvas: FakeCanvas) {
+        const markers: string[] = [];
+        const draw = vi.mocked(drawMarkers).getMockImplementation()!;
+        vi.mocked(drawMarkers).mockImplementation((ctx, ...rest) => {
+            markers.push(ctx.globalCompositeOperation);
+            draw(ctx, ...rest);
+        });
+        try {
+            const { front } = frame(canvas);
+            const ours = front.filter((p) => p.op !== 'fillText' && p.style !== '#353535' && p.style !== '#222222');
+            return { lighter: ours.filter((p) => p.composite === 'lighter').length, markers };
+        } finally {
+            vi.mocked(drawMarkers).mockImplementation(draw);
+        }
+    }
+
+    it('adds up the moving effects where they cross on a dark palette, but not the markers, whose dark halos would vanish', async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Animate': 5, '🔗 Enhanced Links.Marker.All': true, '🔗 Enhanced Links.Blend': 'additive' }, PAIR);
+        frames(2);
+        const { lighter, markers } = blended(canvas);
+        expect(lighter).toBeGreaterThan(0);
+        expect(markers).toEqual(['source-over']);
+    });
+
+    it('draws normally on a light palette, read from the canvas background however the palette names it, or a transparent one, and with Normal', async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Animate': 5, '🔗 Enhanced Links.Blend': 'additive' }, PAIR);
+        frames(2);
+        // A background image makes the background transparent whatever the palette.
+        for (const background of ['lightgray', '#f0f0f0', 'rgb(220, 220, 210)', 'transparent']) {
+            canvas.clear_background_color = background;
+            expect(blended(canvas).lighter, background).toBe(0);
+        }
+        canvas.clear_background_color = '#141414';
+        expect(blended(canvas).lighter).toBeGreaterThan(0);
+        preview('🔗 Enhanced Links.Blend', 'normal');
+        expect(blended(canvas).lighter).toBe(0);
+    });
+});
+
+describe('Perf.StaticAbove', () => {
+    const STATIC_ABOVE = '🔗 Enhanced Links.Perf.StaticAbove';
+    /** `n` links one above another, all on screen. */
+    const links = (n: number): GraphSpec => ({
+        nodes: Array.from({ length: n }, (_, i) => [{ pos: [100, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
+        links: Array.from({ length: n }, (_, i) => ({ from: 2 * i, to: 2 * i + 1 })),
+    });
+
+    it('holds link motion still, as Static does, above that many animated segments on screen, and never at 0', async () => {
+        const canvas = await start({ [STATIC_ABOVE]: 5 }, links(6));
+        frames(3);
+        expect(live.links).toBe(0);
+        // As Static holds them: the background draws their still markers, the front none, and nothing writes Static.
+        canvas.setDirty(true, true);
+        const { front, back } = frame(canvas);
+        expect(marks(front)).toBe(0);
+        expect(marks(back)).toBeGreaterThan(0);
+        expect(fake.posts).toEqual([]);
+        expect(L.staticMode).toBe(false);
+        // Fewer on screen, or a higher threshold, and they move again.
+        canvas.ds.offset = [0, -250];
+        canvas.setDirty(true, true);
+        frames(3);
+        expect(live.links).toBeGreaterThan(0);
+        canvas.ds.offset = [0, 0];
+        preview(STATIC_ABOVE, 6);
+        frames(3);
+        expect(live.links).toBe(6);
+        preview(STATIC_ABOVE, 0);
+        frames(3);
+        expect(live.links).toBe(6);
     });
 });
 

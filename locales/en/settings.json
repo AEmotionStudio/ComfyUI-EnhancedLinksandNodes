@@ -112,6 +112,14 @@
   "🔗 Enhanced Links_Glow_Intensity": {
     "name": "Link glow"
   },
+  "🔗 Enhanced Links_Blend": {
+    "name": "Glow blending",
+    "tooltip": "Additive glow lets the moving effects brighten where they cross, on dark palettes; light palettes and canvas background images always use Normal.",
+    "options": {
+      "Normal": "Normal",
+      "Additive glow": "Additive glow"
+    }
+  },
   "🔗 Enhanced Links_Marker_Enabled": {
     "name": "Flow markers",
     "tooltip": "Shapes gliding along links in Classic Flow, and in the other animations with Markers on every animation."
@@ -479,6 +487,14 @@
       "60 fps": "60 fps",
       "Display rate": "Display rate"
     }
+  },
+  "🔗 Enhanced Links_Perf_Adaptive": {
+    "name": "Adaptive quality",
+    "tooltip": "While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room."
+  },
+  "🔗 Enhanced Links_Perf_StaticAbove": {
+    "name": "Freeze above N visible links",
+    "tooltip": "Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes."
   },
   "🔗 Enhanced Links_Motion": {
     "name": "Motion",

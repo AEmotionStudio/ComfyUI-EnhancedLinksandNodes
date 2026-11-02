@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { z as N, W as translucent, X as revision, Y as transformPane, Z as holdsStill, _ as during, $ as syncRuns, a0 as nodePalette, a1 as effectOf, a2 as particlesOnly$1, a3 as stepOf, a4 as BYPASS, a5 as NEVER, S as SELECTION_FX, a6 as nodeMenu, a7 as nodeSettings, b as install, d as installPanel, e as installRuns, a8 as layers, a9 as live, aa as startSprites, ab as drawBursts, ac as guard, ad as FIREWORKS, ae as drawNodeFx, af as clock, ag as OVER, ah as dummy, ai as reach, aj as overlaps, ak as UNDER, al as wake, am as ownStyle, an as CALM_ALPHA, ao as STILL_NODE, ap as stopSprites } from "./chunks/menus-C_SYZHv8.js";
+import { z as N, W as translucent, X as revision, Y as transformPane, Z as syncRuns, _ as overlaps, x as L, $ as holdsStill, a0 as during, a1 as nodePalette, a2 as effectOf, a3 as particlesOnly$1, a4 as stepOf, a5 as BYPASS, a6 as NEVER, S as SELECTION_FX, a7 as nodeMenu, a8 as nodeSettings, b as install, d as installPanel, e as installRuns, a9 as layers, aa as live, ab as startSprites, ac as drawBursts, ad as guard, ae as FIREWORKS, af as drawNodeFx, ag as clock, ah as OVER, ai as dummy, aj as reach, ak as UNDER, al as wake, am as ownStyle, an as CALM_ALPHA, ao as STILL_NODE, ap as stopSprites } from "./chunks/menus-1BIQTx7f.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -146,6 +146,8 @@ const BYPASSED = 64;
 const MUTED = 128;
 const ONLY = 256;
 const COLLAPSED = 512;
+const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
+const MOVES = [false, true, false, true, true];
 const ATTRIBUTES = ["data-eln-fx", "data-eln-only", "data-eln-collapsed", "data-eln-sel", "data-eln-run", "data-eln-mode"];
 let observed = null;
 let observer;
@@ -251,23 +253,26 @@ function vueNodes(canvas) {
     const css = stylesheet();
     if (sheet.textContent !== css) sheet.textContent = css;
   }
-  const now = holdsStill() ? "still" : during(N.pauseDuringRender) === "calm" ? "calm" : "";
-  if (now !== pace) {
-    pace = now;
-    put(document.documentElement, "data-eln-pace", pace);
-  }
   if (graph !== shown) {
     shown = graph;
     given = /* @__PURE__ */ new WeakMap();
   }
   syncRuns(canvas);
   const selected = canvas.selectedItems;
+  let moving = 0;
   for (const node of graph.nodes) {
     const look = lookOf(node, selected);
+    if (MOVES[look & 7] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
     if (given.get(node) === look) continue;
     given.set(node, look);
     const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
     if (el) mark(el, look);
+  }
+  const crowded = L.perfStaticAbove > 0 && moving > L.perfStaticAbove / 4;
+  const now = holdsStill() || crowded ? "still" : during(N.pauseDuringRender) === "calm" ? "calm" : "";
+  if (now !== pace) {
+    pace = now;
+    put(document.documentElement, "data-eln-pace", pace);
   }
 }
 const EFFECT = "Node effect";

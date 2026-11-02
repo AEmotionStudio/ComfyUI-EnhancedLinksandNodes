@@ -761,6 +761,11 @@
     color: var(--eln-muted);
 }
 
+.eln-adaptive {
+    margin: 0;
+    padding: 0.5rem 1rem 0.25rem;
+}
+
 .eln-errors {
     margin: 0.25rem 0;
     padding-inline-start: 1.25rem;

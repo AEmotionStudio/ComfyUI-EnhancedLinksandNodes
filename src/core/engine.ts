@@ -57,6 +57,117 @@ export const STILL_PHASE = (9 * Math.PI) / 4;
 /** Whether this client's run is active (fx/execution.ts), and whether effects show still for less motion, as Motion says. */
 export const env = { running: false, reducedMotion: false };
 
+/**
+ * Perf.Adaptive's steps down from full quality: link glows go plain, then the link and node particles thin out too,
+ * then the effects are held still too. adaptive.level is the step taken, and onStep is told of each: the open panel.
+ */
+export const PLAIN = 1;
+export const THIN = 2;
+export const HELD = 3;
+export const adaptive = { level: 0, onStep: undefined as (() => void) | undefined };
+
+/**
+ * Paints are too slow once every one for a second, three at least, took over SLOW times the cap's interval, or the
+ * display's where it gives frames less often: a page busy elsewhere for a while makes one long gap rather than slow
+ * frames. They have room in a second when they took at most ROOMY times it on average.
+ */
+const SLOW = 1.5;
+const ROOMY = 1.2;
+const SECOND = 1000;
+/**
+ * The frames left unpainted before each step down, to see how soon frames come with nothing of ours to draw: what the
+ * display gives, as at 30 Hz or in a browser saving power, where no step down makes paints come sooner. The first may
+ * still wait on the paint before it.
+ */
+const PROBE = 4;
+/** How long paints must have room before a step back up; a step up they cannot keep doubles it, up to LONGEST_MS, until one they keep. */
+const ROOM_MS = 5000;
+const LONGEST_MS = 60_000;
+
+/**
+ * When the slow paints began and how many there have been since; the second being judged for room, when it began and
+ * its paints, and how long paints have had room; when quality last came back up a step, how long the next step back up
+ * waits, the settings revision judged for, and the timer that brings quality back up from HELD, where nothing paints.
+ * Where the view was at the last paint: paints while it pans or zooms, or nodes are dragged, cost what the frontend's
+ * own drawing costs then, so they are not judged. The display's interval as last seen; and while the frames left
+ * unpainted come, how many are to come, the shortest gap between them so far and the slow paints' average gap.
+ */
+const judged = {
+    slow: 0, slowPaints: 0, start: 0, paints: 0, room: 0, raised: -Infinity, wait: ROOM_MS, revision: 0, timer: 0, scale: 0, x: 0, y: 0,
+    display: 0, probe: 0, shortest: 0, gap: 0,
+};
+
+/** Takes a step: down from full quality for `by` 1, back up for -1. A step down within 2 s of a step up doubles the wait for the next. */
+function step(by: number, now: number): void {
+    if (by > 0) judged.wait = now - judged.raised <= 2 * SECOND ? Math.min(2 * judged.wait, LONGEST_MS) : ROOM_MS;
+    if (by < 0) judged.raised = now;
+    adaptive.level += by;
+    judged.room = judged.start = 0;
+    clearTimeout(judged.timer);
+    if (adaptive.level === HELD) judged.timer = window.setTimeout(() => step(-1, performance.now()), judged.wait);
+    need();
+    adaptive.onStep?.();
+}
+
+/** Forgets the paints judged so far and the frames still to be left unpainted, as the ticker stops. */
+function rest(): void {
+    judged.slow = judged.slowPaints = judged.start = judged.probe = judged.gap = 0;
+}
+
+/** Full quality again, judged afresh: for a setting that changed, which repaints both canvases itself. */
+function relax(): void {
+    rest();
+    judged.room = 0;
+    judged.wait = ROOM_MS;
+    judged.revision = revision;
+    clearTimeout(judged.timer);
+    if (!adaptive.level) return;
+    adaptive.level = 0;
+    adaptive.onStep?.();
+}
+
+/** Judges a paint the ticker asked for at `fps` (0: the display's, taken as 60), `since` ms after the one before. */
+function judge(canvas: Canvas, now: number, since: number, fps: number): void {
+    if (!L.perfAdaptive) return;
+    const { scale, offset } = canvas.ds;
+    if (scale !== judged.scale || offset[0] !== judged.x || offset[1] !== judged.y || canvas.isDragging) {
+        judged.scale = scale;
+        judged.x = offset[0];
+        judged.y = offset[1];
+        return rest();
+    }
+    const budget = Math.max(1000 / (fps || 60), judged.display);
+    if (judged.gap) {
+        // The frames left unpainted are in: a step down only where the slow paints came later than the display allows.
+        if (judged.gap > SLOW * budget) step(1, now);
+        return rest();
+    }
+    if (since <= SLOW * budget) judged.slow = judged.slowPaints = 0;
+    else {
+        judged.slow ||= now - since;
+        judged.slowPaints++;
+    }
+    if (judged.slowPaints >= 3 && now - judged.slow >= SECOND - JITTER_MS && adaptive.level < HELD) {
+        judged.gap = (now - judged.slow) / judged.slowPaints;
+        judged.probe = PROBE;
+        judged.shortest = Infinity;
+        return;
+    }
+    if (!judged.start) {
+        judged.start = now;
+        judged.paints = 0;
+        return;
+    }
+    judged.paints++;
+    const span = now - judged.start;
+    if (span < SECOND - JITTER_MS) return;
+    const roomy = span / judged.paints <= ROOMY * budget;
+    judged.start = now;
+    judged.paints = 0;
+    if (!roomy || !adaptive.level) judged.room = 0;
+    else if ((judged.room += span) >= judged.wait) step(-1, now);
+}
+
 /** What this client's run does to the effects of a part whose Pause.During.Render is `applies`: Pause.Mode while the run is active, else nothing. */
 export const during = (applies: boolean): string => (env.running && applies ? L.pauseMode : 'ignore');
 
@@ -117,7 +228,7 @@ export function dummy(): CanvasRenderingContext2D {
 }
 
 let frame = 0;
-/** When the clock last moved; 0 while stopped, so the first frame after a start moves it by nothing. */
+/** When the clock last moved, or held for a frame left unpainted; 0 while stopped, so the first frame after a start moves it by nothing. */
 let last = 0;
 /** When the next paint is due at the Perf.MaxFps cap. */
 let due = 0;
@@ -159,6 +270,7 @@ function tick(now: number): void {
     frame = 0;
     if (!want()) {
         last = 0;
+        rest();
         return;
     }
     if (!last) {
@@ -166,13 +278,19 @@ function tick(now: number): void {
         // The clock starts again: links and nodes run the way Direction says, without turning around.
         clock.linkDir = L.direction;
         clock.nodeDir = N.direction;
+    } else if (judged.probe) {
+        // Nothing of ours paints and the clock holds: how soon this frame came is what the display gives.
+        judged.shortest = Math.min(judged.shortest, now - last);
+        if (!--judged.probe) judged.display = judged.shortest;
+        last = due = now;
     } else if (now >= due - JITTER_MS) {
         advance(clock, Math.min((now - last) / 1000, 0.1), live);
-        last = now;
         // Paced by when each paint is due rather than by the time since the last one, so a cap the display's rate is
         // no multiple of still holds on average: at 60 a 75 Hz display skips one frame in five, not every other one.
         // A paint more than an interval late starts the pacing afresh instead of catching up.
         const fps = calm() ? Math.min(L.perfMaxFps || CALM_FPS, CALM_FPS) : L.perfMaxFps;
+        judge(app.canvas, now, now - last, fps);
+        last = now;
         const interval = fps ? 1000 / fps : 0;
         due = due + interval > now ? due + interval : now + interval;
         heal(app.canvas);
@@ -370,6 +488,8 @@ export function install(): void {
     new MutationObserver(motion).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     watch((id) => {
         if (id === '🔗 Enhanced Links.Motion') motion();
+        // Another look or setting costs what it costs: Perf.Adaptive judges it from full quality.
+        if (judged.revision !== revision) relax();
     });
 }
 

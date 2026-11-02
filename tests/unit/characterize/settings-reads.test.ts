@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { clock, live } from '@/core/engine';
 import { preview } from '@/core/settings';
 import { fake } from '../../helpers/fake-app';
-import { frames, start, type GraphSpec } from '../../helpers/fake-litegraph';
+import { frames, offscreens, start, type GraphSpec } from '../../helpers/fake-litegraph';
 import { freezeTimeAndRandom } from '../../helpers/rng';
 import { V1_LINK_SETTINGS } from './v1-inputs';
 
@@ -29,6 +29,9 @@ function reads(paint: () => void): number {
     paint();
     return fake.reads - before;
 }
+
+/** More animated links on screen than Perf.StaticAbove's default would hold them still. */
+const UNFROZEN = { '🔗 Enhanced Links.Perf.StaticAbove': 0 };
 
 /** `count` IMAGE links on screen, from 50 nodes on the left to 50 on the right. */
 const links = (count: number): GraphSpec => ({
@@ -54,9 +57,14 @@ function nothing(): CanvasRenderingContext2D {
 
 describe('settings reads', () => {
     it('Classic Flow at v1 defaults reads nothing per link pass or per link', async () => {
-        const canvas = await start(V1_LINK_SETTINGS, links(500));
-        // Per link: a shadow and a body where native would have drawn it, and over them two markers with their shadows and the centre marker.
-        const drawn = () => [canvas.back.paints.filter((p) => p.op === 'stroke').length, canvas.front.paints.filter((p) => p.op === 'fill' && p.style !== '#353535').length];
+        const canvas = await start({ ...V1_LINK_SETTINGS, ...UNFROZEN }, links(500));
+        // Per link: a shadow and a body where native would have drawn it, or on the glow layer that goes there, and over them two
+        // markers with their shadows and the centre marker.
+        const below = () => [canvas.back, ...offscreens.filter((rec) => rec.ctx.canvas.width === canvas.back.ctx.canvas.width)];
+        const drawn = () => [
+            below().reduce((n, rec) => n + rec.paints.filter((p) => p.op === 'stroke').length, 0),
+            canvas.front.paints.filter((p) => p.op === 'fill' && p.style !== '#353535').length,
+        ];
         expect(reads(() => frames(1))).toBe(0);
         expect(drawn()).toEqual([1000, 2500]);
         canvas.setDirty(true, true);
@@ -86,7 +94,7 @@ describe('settings reads', () => {
 
     it('500 segments and 200 nodes read nothing over 120 frames', async () => {
         // 450 links, 50 of them through a reroute, between two stacks of 100 nodes.
-        const canvas = await start({ '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true, '📦 Enhanced Nodes.Text.Animation.Enabled': true }, {
+        const canvas = await start({ ...UNFROZEN, '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true, '📦 Enhanced Nodes.Text.Animation.Enabled': true }, {
             nodes: Array.from({ length: 200 }, (_, i) => ({ pos: [(i < 100 ? 100 : 900) + (i % 10) * 30, (i % 100) * 8] })),
             links: Array.from({ length: 450 }, (_, i) => ({ from: i % 100, to: 100 + ((i * 7) % 100), type: 'IMAGE', reroutes: i < 50 ? [[700, 100 + i * 10]] : undefined })),
         });

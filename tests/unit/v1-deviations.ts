@@ -644,27 +644,34 @@ export const DEVIATIONS: Deviation[] = [
         },
     },
     {
-        title: "A busy graph's links pan without their glow",
-        why: "v1 drew every link, with its glow and shadow, in every frame. v3 draws what does not move into the background, where native draws the links; where more than 12 of the links on screen have a glowing base, it redraws the background without the bases' glows and Classic Flow's shadow while the view is panned or zoomed or nodes are dragged, and with them 150 ms after the last of it.",
+        title: "A busy graph's links zoom without their glow",
+        why: "v1 drew every link, with its glow and shadow, in every frame. v3 draws what does not move into the background, where native draws the links; where more than 12 of the links on screen have a glowing base, it draws them on a layer of their own, copied onto the background. While the view pans, the layer moves along and only what comes into view is drawn, glows and all; while the view zooms or nodes are dragged, the background is drawn without the bases' glows and Classic Flow's shadow, and with them 150 ms after the last of it.",
         async proof() {
             const canvas = await start({}, {
-                nodes: Array.from({ length: 13 }, (_, i) => [{ pos: [100, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
+                nodes: Array.from({ length: 13 }, (_, i) => [{ pos: [-200, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
                 links: Array.from({ length: 13 }, (_, i) => ({ from: 2 * i, to: 2 * i + 1 })),
             });
             vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
             try {
+                // What the pass stroked, once each, on the background and on the layer, the last canvas its size made off screen.
                 const bake = () => {
                     canvas.setDirty(true, true);
-                    const from = canvas.back.paints.length;
+                    const layer = () => offscreens.filter((rec) => rec.ctx.canvas.width === canvas.back.ctx.canvas.width).at(-1);
+                    const [before, back] = [layer(), canvas.back.paints.length];
+                    const from = before?.paints.length ?? 0;
                     frames(1);
-                    const strokes = canvas.back.paints.slice(from).filter((p) => p.op === 'stroke').map((p) => JSON.stringify([p.style, p.shadowBlur]));
+                    const after = layer();
+                    const strokes = [...canvas.back.paints.slice(back), ...(after?.paints.slice(after === before ? from : 0) ?? [])]
+                        .filter((p) => p.op === 'stroke').map((p) => JSON.stringify([p.style, p.shadowBlur]));
                     return [...new Set(strokes)].map((stroke) => JSON.parse(stroke));
                 };
                 const glowing = [['rgba(0, 0, 0, 0.95)', 10], ['#99aa99', 10]];
                 bake();
                 vi.advanceTimersByTime(150);
                 expect(bake()).toEqual(glowing);
-                canvas.ds.offset = [-40, -10];
+                canvas.ds.offset = [40, 0];
+                expect(bake()).toEqual(glowing);
+                canvas.ds.scale = 0.9;
                 expect(bake()).toEqual([['#99aa99', 0]]);
                 vi.advanceTimersByTime(150);
                 expect(bake()).toEqual(glowing);

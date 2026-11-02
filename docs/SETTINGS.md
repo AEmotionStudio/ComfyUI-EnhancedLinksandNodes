@@ -33,6 +33,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Link accent color | `🔗 Enhanced Links.Color.Accent` | color | `#rrggbb` | `#9d00ff` | Used when Link colors is Custom. |
 | Link color boost | `🔗 Enhanced Links.Color.Scheme` | combo | `default` Off, `saturated` Saturated, `vivid` Vivid, `contrast` High contrast, `bright` Bright, `muted` Muted | `default` Off | Filter applied on top of the colors. |
 | Link glow | `🔗 Enhanced Links.Glow.Intensity` | slider | 0 to 20, step 1 | `10` |  |
+| Glow blending | `🔗 Enhanced Links.Blend` | combo | `normal` Normal, `additive` Additive glow | `normal` Normal | Additive glow lets the moving effects brighten where they cross, on dark palettes; light palettes and canvas background images always use Normal. |
 
 ## Links · Markers
 
@@ -164,6 +165,8 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Effect frame-rate cap | `🔗 Enhanced Links.Perf.MaxFps` | combo | `30` 30 fps, `60` 60 fps, `0` Display rate | `60` 60 fps | The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows. |
+| Adaptive quality | `🔗 Enhanced Links.Perf.Adaptive` | boolean | `true`, `false` | `true` | While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room. |
+| Freeze above N visible links | `🔗 Enhanced Links.Perf.StaticAbove` | slider | 0 to 5000, step 50 | `400` | Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes. |
 
 ## Performance · Accessibility
 

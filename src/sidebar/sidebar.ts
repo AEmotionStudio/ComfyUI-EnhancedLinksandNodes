@@ -2,13 +2,14 @@
  * The panel, ComfyUI's sidebar tab for Enhanced Links & Nodes: a quick bar with
  * the master switches, Static, Focus and the look; tabs for the looks and for
  * each part of the settings, which the schema lays out; a search over all of
- * them; and notices for what keeps effects from showing. It shows what the
- * canvas shows and keeps in step with the settings dialog through watch(). A
- * change of many settings at once, a look or a section's reset, offers its
- * undo: a toast with an Undo button where the frontend has one (1.57+), else a
- * bar at the foot of the panel, or where the picker shows while the panel is
- * closed; looks applied one after another share one offer, which goes back to
- * before the first. The rail icon's badge says when effects are off or frozen.
+ * them; notices for what keeps effects from showing, and in Perf how far
+ * Perf.Adaptive stepped down. It shows what the canvas shows and keeps in step
+ * with the settings dialog through watch(). A change of many settings at once,
+ * a look or a section's reset, offers its undo: a toast with an Undo button
+ * where the frontend has one (1.57+), else a bar at the foot of the panel, or
+ * where the picker shows while the panel is closed; looks applied one after
+ * another share one offer, which goes back to before the first. The rail icon's
+ * badge says when effects are off or frozen.
  * About tells what the extension is and what is new, the keys bound now, copies
  * diagnostics, shows the first-run look picker again and resets everything. The
  * commands share the quick bar's switches, Surprise me and Reset everything.
@@ -20,7 +21,7 @@
 import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, SETTINGS, commit, commitAll, reset, shown, watch, type Setting } from '@/core/settings';
-import { env, guard, nodes2 } from '@/core/engine';
+import { adaptive, env, guard, nodes2 } from '@/core/engine';
 import { deferring } from '@/links/pipeline';
 import { LOOKS, applyLook, changed, currentLook, deleteLook, exportLook, importLook, light, previewLook, renameLook, saveLook, surprise, userLooks, type Look } from '@/ui/looks';
 import { button, check, endHover, h, hover, hovering, iconButton, roving, row, type Row, type Visible } from './controls';
@@ -182,7 +183,7 @@ function render(container: HTMLElement): void {
     ['IMAGE', 'LATENT', 'MODEL'].forEach((type, i) => colours[type] && root!.style.setProperty(`--eln-link-${i + 1}`, colours[type]));
     container.append(root);
     unwatch = watch(heard);
-    guard.onTrip = nodes2.onFlip = refresh;
+    guard.onTrip = nodes2.onFlip = adaptive.onStep = refresh;
     go(state.tab, false);
     void userData(async () => {});
 }
@@ -191,7 +192,7 @@ function destroy(): void {
     endHover();
     if (root) stopTiles(root);
     unwatch?.();
-    guard.onTrip = nodes2.onFlip = undefined;
+    guard.onTrip = nodes2.onFlip = adaptive.onStep = undefined;
     clearTimeout(undoTimer);
     applied.until = 0;
     keep();
@@ -459,7 +460,22 @@ function settingsTab(tab: string, part: string): HTMLElement[] {
     const groups = new Map<string, Visible[]>();
     for (const s of VISIBLE) if (s.group.startsWith(`${part} · `)) groups.set(s.group, [...(groups.get(s.group) ?? []), s]);
     // A tab of a few sections opens them all, a longer one its first, until the user opens or closes them.
-    return [notices(tab), ...[...groups].map(([group, settings], i) => section(group, settings, i === 0 || groups.size <= 3))];
+    return [notices(tab), ...(tab === 'perf' ? [quality()] : []), ...[...groups].map(([group, settings], i) => section(group, settings, i === 0 || groups.size <= 3))];
+}
+
+/** Perf.Adaptive's steps down, by level. */
+const STEPS = ['full quality', 'link glows plain', 'fewer particles', 'effects held still'];
+
+/** How far Perf.Adaptive stepped down now. */
+const adaptiveNow = () => (L.perfAdaptive ? `Adaptive quality: ${STEPS[adaptive.level]}` : 'Adaptive quality: off');
+
+/** The Perf tab's line that says how far Perf.Adaptive stepped down. */
+function quality(): HTMLElement {
+    const line = h('p', { class: 'eln-hint eln-adaptive', role: 'status' });
+    parts.push(() => {
+        line.textContent = `${adaptiveNow()}.`;
+    });
+    return line;
 }
 
 /**
@@ -799,6 +815,7 @@ function diagnostics(): string {
         `Set up: ${Object.entries(running).flatMap(([part, on]) => (on ? [part] : [])).join(', ') || 'neither extension'}`,
         `Coexist: ${L.coexist}${deferring() ? ', stepping aside for another extension' : ''}`,
         `Reduced motion: ${env.reducedMotion ? 'yes' : 'no'}`,
+        adaptiveNow(),
         `Turned off after failing: ${guard.tripped().join(', ') || 'nothing'}`,
         `Settings changed from the defaults:${changes.length ? '' : ' none'}`,
         ...changes,

@@ -119,7 +119,8 @@ test.describe('with the link extension disabled', () => {
         await openApp(page);
         expect(await registered(page)).toEqual(expect.arrayContaining(Object.keys(SETTINGS)));
         await buildGraph(page, graphs.pair);
-        // Gentle Pulse fills its glow with gradients from the primary colour.
+        // Gentle Pulse fills its glow with gradients from the primary colour, made once for each moment its clock shows,
+        // which a ticker just started may show twice.
         const colours = await page.evaluate(() => new Promise<string[]>((resolve) => {
             const proto = CanvasGradient.prototype;
             const addColorStop = proto.addColorStop;
@@ -132,7 +133,7 @@ test.describe('with the link extension disabled', () => {
             const painted = probe.front;
             window.app.canvas.setDirty(true, true);
             const check = () => {
-                if (probe.front === painted) {
+                if (probe.front < painted + 3) {
                     requestAnimationFrame(check);
                     return;
                 }

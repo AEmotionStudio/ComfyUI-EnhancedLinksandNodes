@@ -8,8 +8,9 @@
 //   pnpm e2e:perf
 // Chromium draws with SwiftShader unless ELN_GPU=1 hands it the GPU, for frame rates that mean something:
 //   ELN_GPU=1 ELN_PERF=1 pnpm e2e --grep "frame rate"
+// Perf.Adaptive is off but where a look says otherwise, so that no sample changes quality halfway through it.
 import type { Page, TestInfo } from '@playwright/test';
-import type { FrameRateRow, PerfRow } from './baseline-reporter';
+import type { FrameRateRow, Nodes2Row, PerfRow } from './baseline-reporter';
 import * as graphs from './fixtures/graphs';
 import { perfGraph } from './fixtures/perf';
 import {
@@ -38,13 +39,25 @@ const LOOKS: Record<string, Record<string, unknown>> = {
     off: { '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 0 },
 };
 
-/** The looks whose frame rate is measured, each over the defaults: the default look without its glow, and three animations whose strokes glow. */
+const ADAPTIVE = '🔗 Enhanced Links.Perf.Adaptive';
+
+/**
+ * The looks whose frame rate is measured, each over the defaults: the default look without its glow, three animations
+ * whose strokes glow, and the heaviest of them with Perf.Adaptive stepping down as it needs.
+ */
 const ANIMATED: Record<string, Record<string, unknown>> = {
     default: {},
     'default without glow': { '🔗 Enhanced Links.Glow.Intensity': 0, '🔗 Enhanced Links.Marker.Glow': 0 },
     'Sacred Flow': { '🔗 Enhanced Links.Animate': 1 },
     'DNA Helix': { '🔗 Enhanced Links.Animate': 6 },
     'Lava Flow': { '🔗 Enhanced Links.Animate': 7 },
+    'Lava Flow, Adaptive': { '🔗 Enhanced Links.Animate': 7, [ADAPTIVE]: true },
+};
+
+/** The looks measured in Nodes 2.0: the default, and Gentle Pulse on every node, whose glows breathe in CSS. */
+const NODES2: Record<string, Record<string, unknown>> = {
+    default: {},
+    'Gentle Pulse on every node': { '📦 Enhanced Nodes.Animate': 1 },
 };
 
 interface Sample {
@@ -160,6 +173,8 @@ function setView(page: Page, view: string): Promise<void> {
 }
 
 test.describe('baselines', { tag: '@perf' }, () => {
+    test.use({ settings: { [ADAPTIVE]: false } });
+
     test.beforeEach(async ({ page }) => {
         // v1 passes a default to every getSettingValue and the frontend warns about each one: over 10k
         // messages a frame, each serialised to Playwright, which would dominate v1's paint times.
@@ -324,7 +339,34 @@ test.describe('baselines', { tag: '@perf' }, () => {
     });
 
     test.describe('Vue nodes', () => {
-        test.use({ settings: { 'Comfy.VueNodes.Enabled': true } });
+        test.use({ settings: { 'Comfy.VueNodes.Enabled': true, [ADAPTIVE]: false } });
+
+        // How the big graph animates and pans at zoom 1 in Nodes 2.0, by each look and natively: the front paints a second
+        // over 5 s without input, the front-only paint, and the front paints a second while the view pans a pixel a frame.
+        test('frame rate in Nodes 2.0', async ({ page, profile }, testInfo) => {
+            test.setTimeout(300_000);
+            await buildGraph(page, perfGraph(200, 500));
+            await expect(page.locator('.lg-node[data-node-id]')).toHaveCount(200, { timeout: 60_000 });
+            await setView(page, 'zoom 1');
+            const rows: Nodes2Row[] = [];
+            for (const look of profile === 'native' ? ['native'] : Object.keys(NODES2)) {
+                const settings = NODES2[look] ?? {};
+                for (const [id, value] of Object.entries(settings)) await setSetting(page, id, value);
+                await page.waitForTimeout(1500);
+                const animating = profile === 'native' ? undefined : await sample(page, 5000);
+                const frontOnly = await sample(page, 2000, [true, false]);
+                const panned = await sample(page, 3000, [true, true], true);
+                await setView(page, 'zoom 1');
+                rows.push({
+                    look,
+                    fps: animating ? round(animating.front / animating.seconds) : null,
+                    frontOnly: { p50: percentile(frontOnly.frontMs, 0.5), p95: percentile(frontOnly.frontMs, 0.95) },
+                    panFps: round(panned.front / panned.seconds),
+                });
+                for (const id of Object.keys(settings)) await setSetting(page, id, 0);
+            }
+            await record(testInfo, { nodes2: rows });
+        });
 
         test('where link ends are drawn', async ({ page }, testInfo) => {
             const graph = await buildGraph(page, graphs.pair);

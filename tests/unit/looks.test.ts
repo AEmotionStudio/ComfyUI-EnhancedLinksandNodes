@@ -95,6 +95,7 @@ describe('applying a look', () => {
             ['🔗 Enhanced Links.Quality', 2],
             ['🔗 Enhanced Links.Particle.Density', 2],
             ['🔗 Enhanced Links.Glow.Intensity', 14],
+            ['🔗 Enhanced Links.Blend', 'additive'],
             ['📦 Enhanced Nodes.Animate', 2],
             ['📦 Enhanced Nodes.Intensity', 1.2],
             ['📦 Enhanced Nodes.Glow', 1],
@@ -109,7 +110,7 @@ describe('applying a look', () => {
         fake.posts = [];
         undo();
         await settle();
-        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Glow.Intensity',
+        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend',
             '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
             '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', LOOK]);
         expect(showing()).toEqual(before);

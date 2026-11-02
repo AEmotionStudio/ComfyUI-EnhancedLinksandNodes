@@ -56,12 +56,13 @@ export const LOOKS: readonly Look[] = [
         id: 'showcase',
         name: 'Showcase',
         description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play.',
-        // TODO(M9a, M9c, M9e): additive glow, rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
+        // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Quality': 2,
             '🔗 Enhanced Links.Particle.Density': 2,
             '🔗 Enhanced Links.Glow.Intensity': 14,
+            '🔗 Enhanced Links.Blend': 'additive',
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Intensity': 1.2,
             '📦 Enhanced Nodes.Glow': 1,
@@ -110,7 +111,7 @@ export const LOOKS: readonly Look[] = [
         id: 'neon-night',
         name: 'Neon Night',
         description: 'Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles.',
-        // TODO(M9a): additive glow. TODO(M9b): confetti.
+        // TODO(M9b): confetti.
         values: {
             '🔗 Enhanced Links.Animate': 5,
             '🔗 Enhanced Links.Quality': 2,
@@ -119,6 +120,7 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Color.Secondary': '#ff2bd6',
             '🔗 Enhanced Links.Color.Accent': '#7c4dff',
             '🔗 Enhanced Links.Glow.Intensity': 16,
+            '🔗 Enhanced Links.Blend': 'additive',
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Color.Mode': 'custom',
             '📦 Enhanced Nodes.Color.Primary': '#00e5ff',

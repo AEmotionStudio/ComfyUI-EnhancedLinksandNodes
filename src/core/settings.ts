@@ -198,6 +198,11 @@ const DIRECTION_OPTIONS = [
     { value: -1, text: 'Reverse' },
 ] as const;
 
+const BLEND_OPTIONS = [
+    { value: 'normal', text: 'Normal' },
+    { value: 'additive', text: 'Additive glow' },
+] as const;
+
 const MAX_FPS_OPTIONS = [
     { value: 30, text: '30 fps' },
     { value: 60, text: '60 fps' },
@@ -311,6 +316,7 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Color.Accent', key: 'colorAccent', name: 'Link accent color', type: 'color', default: '#9d00ff', group: 'Links · Color', showIf: (): boolean => linksOn() && L.colorMode === 'custom', tooltip: 'Used when Link colors is Custom.' },
     { id: '🔗 Enhanced Links.Color.Scheme', key: 'colorScheme', name: 'Link color boost', type: 'combo', options: COLOR_SCHEME_OPTIONS, default: 'default', group: 'Links · Color', advanced: true, showIf: linksOn, tooltip: 'Filter applied on top of the colors.' },
     { id: '🔗 Enhanced Links.Glow.Intensity', key: 'glowIntensity', name: 'Link glow', type: 'slider', min: 0, max: 20, step: 1, default: 10, group: 'Links · Color', showIf: linksOn },
+    { id: '🔗 Enhanced Links.Blend', key: 'blend', name: 'Glow blending', type: 'combo', options: BLEND_OPTIONS, default: 'normal', group: 'Links · Color', advanced: true, showIf: linksOn, tooltip: 'Additive glow lets the moving effects brighten where they cross, on dark palettes; light palettes and canvas background images always use Normal.' },
 
     { id: '🔗 Enhanced Links.Marker.Enabled', key: 'markerEnabled', name: 'Flow markers', type: 'boolean', default: true, group: 'Links · Markers', showIf: (): boolean => linksOn() && (L.animate === CLASSIC || L.markerAll), tooltip: 'Shapes gliding along links in Classic Flow, and in the other animations with Markers on every animation.' },
     { id: '🔗 Enhanced Links.Marker.All', key: 'markerAll', name: 'Markers on every animation', type: 'boolean', default: false, group: 'Links · Markers', advanced: true, showIf: (): boolean => linksOn() && L.animate !== CLASSIC, tooltip: 'Flow markers over every link animation, not only Classic Flow.' },
@@ -393,6 +399,8 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Completion.Anchor', key: 'completionAnchor', name: 'Completion anchor', type: 'combo', options: COMPLETION_ANCHOR_OPTIONS, default: 'outputs', group: 'Focus & Flow · Completion', look: false, showIf: (): boolean => N.enabled && N.endAnimationEnabled, tooltip: 'Mark primary nodes in the node menu.' },
 
     { id: '🔗 Enhanced Links.Perf.MaxFps', key: 'perfMaxFps', name: 'Effect frame-rate cap', type: 'combo', options: MAX_FPS_OPTIONS, default: 60, group: 'Performance · Budget', look: false, tooltip: 'The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows.' },
+    { id: '🔗 Enhanced Links.Perf.Adaptive', key: 'perfAdaptive', name: 'Adaptive quality', type: 'boolean', default: true, group: 'Performance · Budget', look: false, tooltip: 'While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room.' },
+    { id: '🔗 Enhanced Links.Perf.StaticAbove', key: 'perfStaticAbove', name: 'Freeze above N visible links', type: 'slider', min: 0, max: 5000, step: 50, default: 400, group: 'Performance · Budget', look: false, tooltip: 'Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes.' },
     { id: '🔗 Enhanced Links.Motion', key: 'motion', name: 'Motion', type: 'combo', options: MOTION_OPTIONS, default: 'system', group: 'Performance · Accessibility', look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },
     { id: '🔗 Enhanced Links.Coexist', key: 'coexist', name: 'Other link extensions', type: 'combo', options: COEXIST_OPTIONS, default: 'auto', group: 'Performance · Compatibility', advanced: true, look: false, tooltip: 'When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.' },
 

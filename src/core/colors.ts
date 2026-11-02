@@ -15,7 +15,7 @@
  */
 
 import { L, N, revision } from '@/core/settings';
-import { MAX_FLASH_HZ } from '@/core/engine';
+import { MAX_FLASH_HZ, dummy } from '@/core/engine';
 
 /** Red, green and blue from 0 to 255, alpha from 0 to 1. */
 type Rgba = [number, number, number, number];
@@ -187,6 +187,30 @@ export function lighter(colour: string): string {
 export function accent(): string {
     const rgba = parse(getComputedStyle(document.body).getPropertyValue('--primary-background'));
     return rgba ? show(rgba) : '#0b8ce9';
+}
+
+/** The WCAG relative luminance of mid grey, CIE L* 50. */
+const MID_GREY = 0.184;
+let background = '';
+let darkBackground = true;
+
+/** A channel from 0 to 255 in linear light (WCAG 2's relative luminance). */
+const linear = (v: number) => (v <= 10 ? v / 3294.6 : ((v / 255 + 0.055) / 1.055) ** 2.4);
+
+/**
+ * Whether a canvas background is darker than mid grey. The canvas reads it, as palettes name colours too: the light
+ * palette's is lightgray. One that shows what is behind it is not, as with Comfy.Canvas.BackgroundImage, which makes it
+ * transparent whatever the palette (FE157 colorPaletteService.ts L153-157, FE1395 L156-160).
+ */
+export function dark(colour: string): boolean {
+    if (colour === background) return darkBackground;
+    background = colour;
+    const ctx = dummy();
+    ctx.fillStyle = '#000';
+    ctx.fillStyle = colour;
+    const [r, g, b, a] = parse(String(ctx.fillStyle))!;
+    darkBackground = a === 1 && 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b) < MID_GREY;
+    return darkBackground;
 }
 
 const hues: string[] = [];

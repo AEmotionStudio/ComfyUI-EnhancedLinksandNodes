@@ -7,10 +7,13 @@
  * guard turns off what keeps failing.
  */
 
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { clock, guard, install, live } from '@/core/engine';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
+import { HELD, PLAIN, THIN, adaptive, clock, guard, install, live } from '@/core/engine';
 import { preview } from '@/core/settings';
 import { MOVING } from '@/links/animations';
+import { drawNodeFx } from '@/nodes/effects';
+import { CanvasRecorder } from '../helpers/recording-context';
+import { WHOLE } from './characterize/v1-inputs';
 import { app, fake } from '../helpers/fake-app';
 import { frames, page, send, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
 
@@ -356,6 +359,152 @@ describe('Perf.MaxFps', () => {
         page.now += 500;
         frames(3, 144);
         expect(setDirty).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('Perf.Adaptive', () => {
+    /** Classic Flow links, and Gentle Pulse nodes with their fireflies. */
+    const ANIMATED = { ...NODES_ON, '🔗 Enhanced Links.Perf.Adaptive': true };
+
+    /** The glow the next background pass strokes the link with. */
+    function glow(canvas: FakeCanvas): number {
+        canvas.setDirty(true, true);
+        const back = canvas.back.paints.length;
+        frames(1);
+        return canvas.back.paints.slice(back).filter((p) => p.op === 'stroke' && p.style === '#99aa99').at(-1)?.shadowBlur ?? NaN;
+    }
+
+    /**
+     * `count` frames of paints that take as long as frames at `paintHz`, where a frame with nothing painted comes as soon
+     * as the display at `hz` gives it.
+     */
+    function heavy(canvas: FakeCanvas, count: number, paintHz = 20, hz = 60): void {
+        let painted = true;
+        for (let i = 0; i < count; i++) {
+            const before = canvas.front.paints.length;
+            frames(1, painted ? paintHz : hz);
+            painted = canvas.front.paints.length > before;
+        }
+    }
+
+    /** The fireflies Gentle Pulse draws whole on the first node, each one's core in its particle colour. */
+    function fireflies(canvas: FakeCanvas): number {
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, 1, canvas.graph._nodes[0], 220, 120, clock, WHOLE, 1, false);
+        return rec.paints.filter((p) => p.op === 'fill' && p.style === '#44aaff').length;
+    }
+
+    // A setting changed judges afresh, as the tests before left it.
+    beforeEach(() => {
+        preview('🔗 Enhanced Links.Perf.Adaptive', false);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("steps down a level a second while every frame takes over 1.5 times the cap's interval: link glows plain, then fewer particles, then still", async () => {
+        const canvas = await start(ANIMATED, PAIR);
+        frames(5);
+        expect([adaptive.level, glow(canvas), fireflies(canvas)]).toEqual([0, 10, 12]);
+        // 50 ms paints at the 60 fps cap: each 3 times its 16.7 ms, and the display's.
+        heavy(canvas, 30);
+        expect([adaptive.level, glow(canvas), fireflies(canvas)]).toEqual([PLAIN, 0, 12]);
+        heavy(canvas, 30);
+        expect([adaptive.level, fireflies(canvas)]).toEqual([THIN, 6]);
+        heavy(canvas, 30);
+        expect(adaptive.level).toBe(HELD);
+        // Held still, nothing animates: the ticker stops.
+        frames(3, 20);
+        const requests = page.requests;
+        frames(60);
+        expect([live.links, live.nodes, page.requests]).toEqual([0, 0, requests]);
+    });
+
+    it('leaves a few frames unpainted before each step, and takes frames as slow as the display gives them, as at 30 Hz, for no slow frames', async () => {
+        const canvas = await start(ANIMATED, PAIR);
+        const setDirty = warmUp(canvas);
+        frames(10 * 30, 30);
+        expect(adaptive.level).toBe(0);
+        // Asked for a paint at each frame but the four after the first slow second.
+        expect(setDirty.mock.calls.length).toBe(10 * 30 - 4);
+        // 100 ms paints there step down.
+        heavy(canvas, 20, 10, 30);
+        expect(adaptive.level).toBe(PLAIN);
+    });
+
+    it('takes a page busy elsewhere for a while, which makes one long gap between quick frames, for no slow frames', async () => {
+        await start(ANIMATED, PAIR);
+        for (let i = 0; i < 4; i++) {
+            frames(20);
+            frames(1, 1.2);
+        }
+        expect(adaptive.level).toBe(0);
+    });
+
+    it("judges no frame while the view pans or zooms or nodes are dragged, which cost what the frontend's own drawing costs", async () => {
+        const canvas = await start(ANIMATED, PAIR);
+        frames(5);
+        for (let i = 0; i < 30; i++) {
+            canvas.ds.offset[0] -= 1;
+            frames(1, 20);
+        }
+        canvas.ds.offset[0] = 0;
+        canvas.isDragging = true;
+        frames(30, 20);
+        canvas.isDragging = false;
+        expect(adaptive.level).toBe(0);
+    });
+
+    it('comes back up a step after 5 s with room, waits twice as long after a step up its frames could not keep, and 5 s again after one they kept', async () => {
+        const canvas = await start(ANIMATED, PAIR);
+        heavy(canvas, 30);
+        expect(adaptive.level).toBe(PLAIN);
+        frames(4.5 * 60);
+        expect(adaptive.level).toBe(PLAIN);
+        let more = 0;
+        for (; adaptive.level && more < 2 * 60; more++) frames(1);
+        expect(adaptive.level).toBe(0);
+        // Slow again at once: the step back down comes a second later.
+        heavy(canvas, 30);
+        expect(adaptive.level).toBe(PLAIN);
+        frames(6.5 * 60);
+        expect(adaptive.level).toBe(PLAIN);
+        frames(5.5 * 60);
+        expect(adaptive.level).toBe(0);
+        frames(3 * 60);
+        heavy(canvas, 30);
+        expect(adaptive.level).toBe(PLAIN);
+        frames(4.5 * 60);
+        expect(adaptive.level).toBe(PLAIN);
+        frames(60);
+        expect(adaptive.level).toBe(0);
+    });
+
+    it('tries a step up from still once the wait is over, as nothing paints to judge it by', async () => {
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+        const canvas = await start(ANIMATED, PAIR);
+        heavy(canvas, 80);
+        expect(adaptive.level).toBe(HELD);
+        vi.advanceTimersByTime(4900);
+        expect(adaptive.level).toBe(HELD);
+        vi.advanceTimersByTime(100);
+        expect(adaptive.level).toBe(THIN);
+        frames(2);
+        expect(live.links).toBeGreaterThan(0);
+    });
+
+    it('brings full quality back with any setting changed, Perf.Adaptive off included, and stays there while it is off', async () => {
+        const canvas = await start(ANIMATED, PAIR);
+        heavy(canvas, 55);
+        expect(adaptive.level).toBe(THIN);
+        preview('🔗 Enhanced Links.Thickness', 4);
+        expect(adaptive.level).toBe(0);
+        heavy(canvas, 30);
+        expect(adaptive.level).toBe(PLAIN);
+        preview('🔗 Enhanced Links.Perf.Adaptive', false);
+        frames(70, 20);
+        expect(adaptive.level).toBe(0);
     });
 });
 
