@@ -23,6 +23,9 @@ import type { Segment } from './pipeline';
 /** v1's pattern counts (old_link_animations.js:8-17). */
 export const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
 
+/** What every alpha the motion sets is scaled by: a half while a Calm run plays (core/engine.ts), else 1. */
+export const moving = { alpha: 1 };
+
 /** The clock the motion is drawn at (src/core/engine.ts). */
 interface Moment {
     linkPhase: number;
@@ -130,7 +133,7 @@ function sacredFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void 
     ctx.lineJoin = 'round';
     ctx.shadowColor = primary;
     ctx.shadowBlur = glowIntensity;
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = moving.alpha;
     ctx.stroke();
 
     const count = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity));
@@ -142,7 +145,7 @@ function sacredFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void 
         const x = here[0] + moved(Math.sin, T, cp);
         const y = here[1] + moved(Math.cos, T, cp);
         DOT.path(ctx, x, y, thickness * 0.75, 0);
-        ctx.globalAlpha = 0.4 + Math.sin(k.linkPhase + T * Math.PI * 2) * 0.2;
+        ctx.globalAlpha = (0.4 + Math.sin(k.linkPhase + T * Math.PI * 2) * 0.2) * moving.alpha;
         shine(ctx, DOT, x, y, thickness * 0.75, 0, accent, accent, glowIntensity);
     }
 }
@@ -160,7 +163,7 @@ function crystalStream(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
         s.path.at(u, here);
         // v1's crystals took the width of the base drawn before them.
         ctx.lineWidth = thickness * 0.8;
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = moving.alpha;
         createCrystal(ctx, here[0], here[1], 5 * thickness * (1 + Math.sin(cp + T * Math.PI)), T * Math.PI * 2 + cp, primary, secondary, L.glowIntensity);
     }
 }
@@ -186,7 +189,7 @@ function quantumField(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): voi
         ctx.lineWidth = L.thickness * 0.5;
         ctx.shadowColor = color;
         ctx.shadowBlur = L.glowIntensity;
-        ctx.globalAlpha = 0.3;
+        ctx.globalAlpha = 0.3 * moving.alpha;
         ctx.stroke();
     }
 }
@@ -212,7 +215,7 @@ function cosmicWeave(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
         ctx.lineWidth = L.thickness * 0.7;
         ctx.shadowColor = colors[strand];
         ctx.shadowBlur = L.glowIntensity;
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.5 * moving.alpha;
         ctx.stroke();
     }
 }
@@ -231,7 +234,7 @@ function energyPulse(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
         const trip = L.direction > 0 ? T : 1 - T;
         const r = L.thickness * 2 * (1 - trip);
         DOT.path(ctx, here[0], here[1], r, 0);
-        ctx.globalAlpha = 0.5 * (1 - trip);
+        ctx.globalAlpha = 0.5 * (1 - trip) * moving.alpha;
         shine(ctx, DOT, here[0], here[1], r, 0, secondary, secondary, L.glowIntensity * 2);
     }
 }
@@ -261,7 +264,7 @@ function dnaHelix(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
         ctx.lineWidth = thickness;
         ctx.shadowColor = color;
         ctx.shadowBlur = glowIntensity;
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = moving.alpha;
         ctx.stroke();
     }
     const bonds = rotations * 4;
@@ -271,7 +274,7 @@ function dnaHelix(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
         if (!s.within(u)) continue;
         s.path.at(u, here);
         ctx.lineWidth = thickness;
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.6 * moving.alpha;
         RUNG.path(ctx, here[0], here[1], radius, angle(T));
         shine(ctx, RUNG, here[0], here[1], radius, angle(T), accent, accent, glowIntensity * 0.5);
     }
@@ -322,7 +325,7 @@ function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
         ctx.shadowBlur = glowIntensity * 1.5;
         if (layer === LAVA[0]) {
             ctx.strokeStyle = secondary;
-            ctx.globalAlpha = 0.3;
+            ctx.globalAlpha = 0.3 * moving.alpha;
             ctx.lineWidth = tube;
         } else {
             const gradient = linkGradient(ctx, s, L.direction);
@@ -330,7 +333,7 @@ function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
             gradient.addColorStop(0.4 + Math.sin(k.linkPhase) * 0.1, secondary);
             gradient.addColorStop(1, accent);
             ctx.strokeStyle = gradient;
-            ctx.globalAlpha = 1;
+            ctx.globalAlpha = moving.alpha;
             ctx.lineWidth = thickness * 5;
         }
         ctx.stroke();
@@ -348,7 +351,7 @@ function lavaFlow(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
         const y = here[1] + here[3] * along + here[2] * across;
         const r = thickness * (0.5 + Math.sin(cp + i) * 0.2);
         DOT.path(ctx, x, y, r, 0);
-        ctx.globalAlpha = 0.6 + Math.sin(cp + i) * 0.4;
+        ctx.globalAlpha = (0.6 + Math.sin(cp + i) * 0.4) * moving.alpha;
         shine(ctx, DOT, x, y, r, 0, accent, secondary, glowIntensity * 1.5);
     }
 }
@@ -370,7 +373,7 @@ function stellarPlasma(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
             const y = here[1] + Math.sin(t * Math.PI * 4 + f) * 15;
             const color = first(t) ? primary : secondary;
             DOT.path(ctx, here[0], y, size, 0);
-            ctx.globalAlpha = 0.7 - Math.abs(t - 0.5) * 0.3;
+            ctx.globalAlpha = (0.7 - Math.abs(t - 0.5) * 0.3) * moving.alpha;
             shine(ctx, DOT, here[0], y, size, 0, color, color, glowIntensity);
         }
         if (i % 3) continue;
@@ -380,7 +383,7 @@ function stellarPlasma(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
         s.path.at(u, here);
         const y = here[1] + Math.sin(spark * Math.PI * 4 + f) * 15;
         DOT.path(ctx, here[0], y, size * 0.5, 0);
-        ctx.globalAlpha = 0.6 - Math.abs(spark - 0.5) * 0.4;
+        ctx.globalAlpha = (0.6 - Math.abs(spark - 0.5) * 0.4) * moving.alpha;
         shine(ctx, DOT, here[0], y, size * 0.5, 0, accent, accent, glowIntensity * 0.5);
     }
 }

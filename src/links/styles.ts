@@ -19,7 +19,7 @@ import { L } from '@/core/settings';
 import { rainbow } from '@/core/colors';
 import { shine, type Shape } from '@/fx/particles';
 import { LINEAR_LINK, STRAIGHT_LINK } from './geometry';
-import { SACRED, wrap } from './animations';
+import { SACRED, moving, wrap } from './animations';
 import type { Segment } from './pipeline';
 
 type Canvas = InstanceType<typeof LGraphCanvas>;
@@ -221,14 +221,14 @@ const shadowBlur = (blur: number) => (L.shadowStyle === 'drop' ? L.shadowBlur * 
 const shadowOffset = () => (L.shadowStyle === 'drop' ? L.shadowOffset * 3 : 0);
 
 /**
- * Draws the segment's base for the animation in its primary colour, with its glow and Classic Flow's shadow unless it
- * is `plain`. Each base sets the glow it is drawn with, where v1's ghosts and Crystal Stream's still link took whatever
+ * Draws the segment's base for the animation in its primary colour, as wide as its width takes Thickness, with its glow
+ * and Classic Flow's shadow unless it is `plain`. Each base sets the glow it is drawn with, where v1's ghosts and Crystal Stream's still link took whatever
  * glow the link before them left. Whether the animation has a base to draw.
  */
 export function drawBase(ctx: CanvasRenderingContext2D, s: Segment, animate: number, still: boolean, plain = false): boolean {
     const base = BASES[animate]?.[still ? 1 : 0];
     if (!base || base === 'none' || s.linkStyle === 'hidden') return false;
-    const { thickness } = L;
+    const thickness = L.thickness * s.width;
     const color = s.pal.primary;
     ctx.globalAlpha = 1;
     if (base === 'classic' && L.linkShadowEnabled && !plain) {
@@ -450,7 +450,7 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, s: Segment, phase: nu
         if (L.markerEffects === 'pulse') alpha = 0.5 + Math.sin(phase + T * Math.PI * 2) * 0.5;
         else if (L.markerEffects === 'fade') alpha = 1 - T;
         else if (L.markerEffects === 'rainbow') color = rainbow(T * 360 + phase * 50);
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = alpha * moving.alpha;
         if (L.markerShadowEnabled) mark(ctx, shape, here[0], here[1], size * 1.2, angle, SHADOW, SHADOW, shadowBlur(L.markerGlow), shadowOffset());
         // A rainbow marker glows in the link's colour.
         mark(ctx, shape, here[0], here[1], size, angle, color, L.markerEffects === 'rainbow' ? pal.primary : color, L.markerGlow);

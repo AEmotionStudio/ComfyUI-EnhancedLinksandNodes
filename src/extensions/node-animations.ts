@@ -3,38 +3,38 @@
  * ComfyUI Enhanced Node Animations Extension
  *
  * Registers the node settings, and draws the node effects (nodes/effects.ts),
- * v1's halo, the styled titles (nodes/text.ts) and the fireworks
- * (fx/bursts.ts) on LiteGraph's own node pass. The halo, and what an effect
+ * v1's halo, the styled titles (nodes/text.ts), the fireworks (fx/bursts.ts)
+ * and this client's run's rings and error outlines (fx/execution.ts) on
+ * LiteGraph's own node pass. The halo, and what an effect
  * draws around a node over it, go under every node, in onRender before the link
  * motion; what falls on the node goes over its body, from drawNodeShape, under
  * its slots and widgets.
  * The styled title takes the native title's place, over the effect. Effects
  * fade with the node's mode, as native draws the node; collapsed nodes, nodes
- * in Vue mode, and every node with Node effects off, get none. The node menu's Node FX and Completion FX set a
- * node's own effect and fireworks, which it keeps in its properties (ui/menus.ts); while node effects are on, the
- * selection toolbox has a button that steps the selected nodes through the effects.
+ * in Vue mode, and every node with Node effects off, get none; a Calm run halves them. The node menu's Node FX and
+ * Completion FX set a node's own effect and where the fireworks go, which it keeps in its properties (ui/menus.ts);
+ * while node effects are on, the selection toolbox has a button that steps the selected nodes through the effects.
  *
  * @module extensions/node-animations
  */
 
 import type { ComfyExtension } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { api } from '/scripts/api.js';
 import { N, nodeSettings } from '@/core/settings';
-import { clock, dummy, guard, install, layers, live, wake } from '@/core/engine';
+import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
 import { drawTitle, titleOf } from '@/nodes/text';
-import { drawBursts, fireworks } from '@/fx/bursts';
+import { FIREWORKS, drawBursts } from '@/fx/bursts';
+import { installRuns } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { installPanel } from '@/sidebar/sidebar';
-import { OWN_COMPLETION, SELECTION_FX, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
+import { SELECTION_FX, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
 
 /** The guard's keys, which its toast names when it turns one off. */
 const EFFECT = 'Node effect';
 const PARTICLES = 'Node particles';
 const TITLES = 'Animated titles';
-const FIREWORKS = 'Fireworks';
 
 type Canvas = InstanceType<typeof LGraphCanvas>;
 type Node = InstanceType<typeof LGraphNode>;
@@ -75,6 +75,9 @@ function modeAlpha(canvas: Canvas, node: Node): number {
     if (node.flags.ghost) return 0.3;
     return node.mode === BYPASS ? 0.2 : node.mode === NEVER ? 0.4 : canvas.editor_alpha;
 }
+
+/** The alpha a node's effect and halo are drawn at: its node's, halved while a Calm run plays. */
+const fxAlpha = (canvas: Canvas, node: Node) => modeAlpha(canvas, node) * (during(N.pauseDuringRender) === 'calm' ? CALM_ALPHA : 1);
 
 /** The corners of a round and a card body, which body() sets to ROUND_RADIUS as it uses them. */
 const ROUND_CORNERS = [0];
@@ -130,13 +133,9 @@ function halo(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node, style: 
     ctx.shadowBlur = 10 * N.glow;
     ctx.shadowOffsetX = 2 * canvas.ds.scale - shift;
     ctx.shadowOffsetY = 2 * canvas.ds.scale;
-    ctx.globalAlpha = modeAlpha(canvas, node);
+    ctx.globalAlpha = fxAlpha(canvas, node);
     ctx.fill();
 }
-
-/** Whether `box` grown by `margin` on each side overlaps `area`. */
-const overlaps = (box: ArrayLike<number>, area: ArrayLike<number>, margin: number) =>
-    box[0] - margin <= area[0] + area[2] && box[0] + box[2] + margin >= area[0] && box[1] - margin <= area[1] + area[3] && box[1] + box[3] + margin >= area[1];
 
 /**
  * The under-layer, before the link motion and every node: each node's halo, and what its effect draws around its body.
@@ -175,7 +174,7 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
                 ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
                 body(canvas, ctx, node);
                 ctx.clip('evenodd');
-                drawNodeFx(ctx, style, node, node.size[0], node.size[1], clock, partOf(canvas, node, UNDER), modeAlpha(canvas, node), only);
+                drawNodeFx(ctx, style, node, node.size[0], node.size[1], clock, partOf(canvas, node, UNDER), fxAlpha(canvas, node), only);
             }
         } catch (error) {
             guard.fail(keyOf(style), error);
@@ -210,21 +209,6 @@ function styledTitle(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node):
 let shaping: Node | undefined;
 let titled: TitleOptions | undefined;
 
-/**
- * The nodes this client's run reached, by id: the ones it ran and the ones it took from the cache; and the graph on
- * screen as the run started, whose ids those are.
- */
-const reached = new Set<string>();
-let ranOn: unknown;
-
-/** Whether a node's run ends with fireworks: as its Completion FX says, else if it is an output node the run reached, with End Animation on. */
-function celebrates(node: Node): boolean {
-    const own = node.properties[OWN_COMPLETION];
-    if (own === 'fireworks') return true;
-    if (own === 'off') return false;
-    return N.endAnimationEnabled && reached.has(String(node.id)) && Boolean((node.constructor as typeof LGraphNode).nodeData?.output_node);
-}
-
 // =============================================================================
 // Extension
 // =============================================================================
@@ -236,6 +220,7 @@ const ext: ComfyExtension = {
     async setup() {
         install();
         installPanel('nodes');
+        installRuns('nodes');
         layers.nodes = under;
         layers.bursts = (canvas, ctx) => {
             if (!live.bursts) return;
@@ -274,7 +259,7 @@ const ext: ComfyExtension = {
                     ctx.beginPath();
                     body(this, ctx, node);
                     ctx.clip();
-                    drawNodeFx(ctx, style, node, size[0], size[1], clock, partOf(this, node, OVER), modeAlpha(this, node), only);
+                    drawNodeFx(ctx, style, node, size[0], size[1], clock, partOf(this, node, OVER), fxAlpha(this, node), only);
                 } catch (error) {
                     guard.fail(keyOf(style), error);
                 } finally {
@@ -296,23 +281,6 @@ const ext: ComfyExtension = {
             args[0] = dummy();
             return drawTitleText.apply(this, args);
         };
-
-        // Fireworks over the output nodes this client's run reached, once it succeeds; the execution events come only to the client that queued it.
-        api.addEventListener('execution_start', () => {
-            reached.clear();
-            ranOn = app.canvas?.graph;
-        });
-        api.addEventListener('executing', ({ detail }) => {
-            if (detail != null) reached.add(String(detail));
-        });
-        api.addEventListener('execution_cached', ({ detail }) => {
-            for (const id of detail.nodes) reached.add(String(id));
-        });
-        // Not over another workflow's nodes, or a subgraph's, that have the same ids.
-        api.addEventListener('execution_success', ({ detail }) => {
-            const graph = app.canvas?.graph;
-            if (N.enabled && graph && graph === ranOn && !guard.off(FIREWORKS)) fireworks(graph.nodes.filter(celebrates), detail.prompt_id);
-        });
 
         console.log('[EnhancedNodes] Extension registered with full animation pipeline.');
     },

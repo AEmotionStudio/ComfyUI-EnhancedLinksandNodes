@@ -12,7 +12,7 @@
 
 import { app } from '/scripts/app.js';
 import { L, N } from '@/core/settings';
-import { STILL_PHASE, advance, clock, env } from '@/core/engine';
+import { STILL_PHASE, advance, clock, env, heldByRun } from '@/core/engine';
 import { nodePalette, palette } from '@/core/colors';
 import { Segment } from '@/links/pipeline';
 import { MOVING } from '@/links/animations';
@@ -43,14 +43,14 @@ const CLASSIC = 9;
 const LINK_COLOR = '#9A9';
 
 /** Everything on a tile moves. */
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0 };
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0 };
 /** The tiles' clock. */
 const k: Clock = { ...clock };
 
 const segment = new Segment();
 
 /** Whether links show still, as the link pass decides it. */
-const linksStill = () => L.staticMode || (L.pauseDuringRender && env.running) || env.reducedMotion;
+const linksStill = () => L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion;
 
 /** A link from an output at `a` to an input at `b` with link animation `animate`, in the palette's IMAGE colours; None draws it as native does. */
 function link(ctx: CanvasRenderingContext2D, animate: number, a: Point, b: Point, k: Clock): void {

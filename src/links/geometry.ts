@@ -43,6 +43,12 @@ const dx = (dir: number) => (dir === LEFT ? -1 : dir === RIGHT ? 1 : 0);
 const dy = (dir: number) => (dir === UP ? -1 : dir === DOWN ? 1 : 0);
 const smooth = (x: number) => (x >= 1 ? 1 : x <= 0 ? 0 : x * x * (3 - 2 * x));
 
+/** Adds a line `length` px out from `point` along slot direction `dir` to a path. */
+export function stub(path: CanvasPath, point: Readonly<ArrayLike<number>>, dir: number, length: number): void {
+    path.moveTo(point[0], point[1]);
+    path.lineTo(point[0] + dx(dir) * length, point[1] + dy(dir) * length);
+}
+
 /** Where the base path of a wave or coil is sampled before the samples become the path. */
 let samples = new Float64Array(64);
 /** The point and direction find() writes while a shape is built. */

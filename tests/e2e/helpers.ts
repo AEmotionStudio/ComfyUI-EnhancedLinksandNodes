@@ -321,7 +321,8 @@ export interface LinkSpec {
     from: string;
     to: string;
     output?: number;
-    input?: number;
+    /** The input's index, or its name. */
+    input?: number | string;
     /** Adds a native reroute at this graph position. */
     reroute?: Point;
     /** Disconnects the input afterwards but keeps the reroute, which leaves a floating link. */

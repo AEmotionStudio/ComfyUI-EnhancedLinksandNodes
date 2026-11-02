@@ -14,6 +14,12 @@
   "EnhancedLinksNodes_ToggleStatic": {
     "label": "Freeze / unfreeze animation"
   },
+  "EnhancedLinksNodes_ToggleFocus": {
+    "label": "Toggle selection focus"
+  },
+  "EnhancedLinksNodes_NextFocusMode": {
+    "label": "Next selection focus mode"
+  },
   "EnhancedLinksNodes_NextLinkStyle": {
     "label": "Next link animation"
   },
@@ -25,6 +31,24 @@
   },
   "EnhancedLinksNodes_SurpriseMe": {
     "label": "Surprise me (random look)"
+  },
+  "EnhancedLinksNodes_GoToRunning": {
+    "label": "Go to running node (or next error)"
+  },
+  "EnhancedLinksNodes_NextError": {
+    "label": "Go to next error"
+  },
+  "EnhancedLinksNodes_ToggleFollow": {
+    "label": "Toggle follow execution"
+  },
+  "EnhancedLinksNodes_GoUpstream": {
+    "label": "Go to input node"
+  },
+  "EnhancedLinksNodes_GoDownstream": {
+    "label": "Go to output node"
+  },
+  "EnhancedLinksNodes_GoBack": {
+    "label": "Go back"
   },
   "EnhancedLinksNodes_SelectionNodeFX": {
     "label": "Cycle node effect for selection"

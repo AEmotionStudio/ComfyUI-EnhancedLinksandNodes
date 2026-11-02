@@ -358,8 +358,8 @@ test.describe('node menus', () => {
         await load(page);
         expect(await state(page, graph.nodes.node)).toEqual({ own: {}, modified: false });
         await pick('Node FX', 'Neon Nexus');
-        await pick('Completion FX', 'Off');
-        await expect.poll(() => state(page, graph.nodes.node)).toEqual({ own: { enhanced_fx_style: 2, enhanced_fx_completion: 'off' }, modified: true });
+        await pick('Completion FX', 'Exclude');
+        await expect.poll(() => state(page, graph.nodes.node)).toEqual({ own: { enhanced_fx_style: 2, enhanced_fx_completion: 'exclude' }, modified: true });
         // The choice is ticked; Use global takes it back out.
         const [x, y] = await toClient(page, await titleOf(page, graph.nodes.node));
         await page.mouse.click(x, y, { button: 'right' });
@@ -388,7 +388,7 @@ test.describe('node menus', () => {
 
     test('a workflow that holds the choices loads without a write, and is not marked modified', async ({ page }) => {
         const graph = await buildGraph(page, NODE);
-        const own = { enhanced_fx_style: 4, enhanced_fx_particles_only: true, enhanced_fx_completion: 'fireworks' };
+        const own = { enhanced_fx_style: 4, enhanced_fx_particles_only: true, enhanced_fx_completion: 'primary' };
         const workflow = await page.evaluate(([id, own]) => {
             const data = window.app.graph.serialize();
             const node = data.nodes.find((n: { id: number }) => Number(n.id) === id);

@@ -9,7 +9,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { L, LOOK, N, commit, setting } from '@/core/settings';
 import { fake } from '../helpers/fake-app';
-import { queue, start } from '../helpers/fake-litegraph';
+import { send, start } from '../helpers/fake-litegraph';
 
 const SEEN = '🔗 Enhanced Links.WhatsNew.Seen';
 const THICKNESS = '🔗 Enhanced Links.Thickness';
@@ -53,10 +53,10 @@ describe('the first-run picker', () => {
     it('shows once the page is idle and no run is going, on a page that loads with the look unanswered, and saves nothing', async () => {
         vi.useFakeTimers({ toFake: ['setTimeout'] });
         await start({ [LOOK]: '' });
-        queue(1);
+        send('execution_start', { prompt_id: 'first', timestamp: 0 });
         vi.advanceTimersByTime(1500);
         expect(card()).toBeNull();
-        queue(0);
+        send('execution_interrupted', { prompt_id: 'first', node_id: '1', node_type: '', executed: [], timestamp: 0 });
         vi.advanceTimersByTime(1500);
         vi.useRealTimers();
         const picker = card()!;

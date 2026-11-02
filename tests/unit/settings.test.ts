@@ -119,12 +119,38 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Look': '',
     '🔗 Enhanced Links.Panel.State': { tab: 'looks', advanced: false, search: '' },
     '🔗 Enhanced Links.WhatsNew.Seen': '',
+    // M7
+    '🔗 Enhanced Links.Focus.Enabled': true,
+    '🔗 Enhanced Links.Focus.Mode': 'highlight',
+    '🔗 Enhanced Links.Focus.Color': 'native',
+    '🔗 Enhanced Links.Focus.Depth': 'direct',
+    '🔗 Enhanced Links.Focus.OnTop': true,
+    '🔗 Enhanced Links.Focus.Hover': false,
+    '🔗 Enhanced Links.Focus.Dim': 20,
+    '🔗 Enhanced Links.Navigate.DoubleClick': true,
+    '🔗 Enhanced Links.Navigate.Follow': false,
+    '🔗 Enhanced Links.Pause.Mode': 'spotlight',
+    '🔗 Enhanced Links.Flow.River': true,
+    '🔗 Enhanced Links.Flow.Trail': true,
+    '🔗 Enhanced Links.Flow.Trail.Fade': 8,
+    '📦 Enhanced Nodes.Run.Ring': true,
+    '📦 Enhanced Nodes.Run.Error': true,
+    '📦 Enhanced Nodes.Completion.Anchor': 'outputs',
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
     '🔗 Enhanced Links.Shadow.Style': ['halo', 'drop'],
     '🔗 Enhanced Links.Perf.MaxFps': [30, 60, 0],
     '🔗 Enhanced Links.Motion': ['system', 'reduce', 'full'],
+    '🔗 Enhanced Links.Focus.Mode': ['highlight', 'animate', 'dim', 'hide'],
+    '🔗 Enhanced Links.Focus.Color': ['native', 'accent', 'type'],
+    '🔗 Enhanced Links.Focus.Depth': ['direct', 'upstream', 'downstream', 'chain'],
+    '🔗 Enhanced Links.Pause.Mode': ['pause', 'calm', 'spotlight', 'ignore'],
+    '📦 Enhanced Nodes.Completion.Anchor': ['outputs', 'primary', 'viewport'],
+};
+const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
+    '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
+    '🔗 Enhanced Links.Flow.Trail.Fade': [2, 30, 1],
 };
 
 /** The v2.0.1 defaults v3 changes, by the milestone that changes them. */
@@ -212,7 +238,7 @@ describe('settings schema', () => {
         expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'combo' ? [[s.id, s.options.map((o) => o.value)]] : []))).toEqual({ ...V2_OPTIONS, ...V3_CHANGED_OPTIONS, ...V3_OPTIONS });
         // The sliders v3 turns into presets are combos now.
         const sliders = Object.fromEntries(Object.entries(V2_RANGES).filter(([id]) => !(id in V3_CHANGED_OPTIONS)));
-        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual({ ...sliders, ...V3_CHANGED_RANGES });
+        expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual({ ...sliders, ...V3_CHANGED_RANGES, ...V3_RANGES });
         // Every v2.0.1 Link.Style, Marker.Shape and Marker.Color.Mode value is still an option.
         for (const id of ['🔗 Enhanced Links.Link.Style', '🔗 Enhanced Links.Marker.Shape', '🔗 Enhanced Links.Marker.Color.Mode']) {
             expect(V3_CHANGED_OPTIONS[id], id).toEqual(expect.arrayContaining(V2_OPTIONS[id]));
@@ -287,14 +313,17 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 36 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(36);
+    it('shows 50 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(50);
     });
 
-    it('lets looks set every setting but the master switches, Perf, Motion, Coexist and the hidden ones', () => {
+    it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
         const alone = SETTINGS.filter((s) => s.type === 'hidden' || ('look' in s && s.look === false)).map((s) => s.id);
         expect(alone).toEqual([
-            '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled', '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
+            '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled',
+            ...['Enabled', 'Mode', 'Color', 'Depth', 'OnTop', 'Hover', 'Dim'].map((key) => `🔗 Enhanced Links.Focus.${key}`),
+            '🔗 Enhanced Links.Navigate.DoubleClick', '🔗 Enhanced Links.Navigate.Follow', '🔗 Enhanced Links.Flow.Trail.Fade', '📦 Enhanced Nodes.Completion.Anchor',
+            '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
             LOOK, '🔗 Enhanced Links.Panel.State', '🔗 Enhanced Links.WhatsNew.Seen',
         ]);
     });
@@ -306,8 +335,10 @@ describe('how the panel shows each setting', () => {
             'L.Enabled', 'L.Animate', 'L.Animation.Speed', 'L.Direction', 'L.Static.Mode', 'L.Link.Style', 'L.Thickness', 'L.Quality', 'L.Particle.Density',
             'L.Color.Mode', 'L.Color.Scheme', 'L.Glow.Intensity', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Size', 'L.Marker.Color.Mode',
             'L.Marker.Glow', 'L.Marker.Effects', 'L.Link.Shadow.Enabled', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style',
-            'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled', 'L.Pause.During.Render', 'N.End Animation.Enabled',
-            'L.Perf.MaxFps', 'L.Motion', 'L.Coexist',
+            'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
+            'L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Navigate.DoubleClick', 'L.Navigate.Follow',
+            'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Error',
+            'N.End Animation.Enabled', 'N.Completion.Anchor', 'L.Perf.MaxFps', 'L.Motion', 'L.Coexist',
         ]);
         showing({
             '🔗 Enhanced Links.Animate': 6, '🔗 Enhanced Links.Static.Mode': true, '🔗 Enhanced Links.Color.Mode': 'custom',
@@ -322,9 +353,17 @@ describe('how the panel shows each setting', () => {
         }
         preview('🔗 Enhanced Links.Marker.All', true);
         expect(visible()).toEqual(expect.arrayContaining(['L.Particle.Density', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style']));
+        preview('🔗 Enhanced Links.Focus.Mode', 'dim');
+        expect(visible()).toContain('L.Focus.Dim');
         preview('🔗 Enhanced Links.Enabled', false);
         preview('📦 Enhanced Nodes.Enabled', false);
-        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', 'L.Perf.MaxFps', 'L.Motion', 'L.Coexist']);
+        // Selection focus, navigation and what a run does to the effects work with the effects off; the run's own visuals need them.
+        const focus = ['L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Focus.Dim', 'L.Navigate.DoubleClick', 'L.Navigate.Follow'];
+        const during = ['L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render'];
+        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', ...focus, ...during, 'L.Perf.MaxFps', 'L.Motion', 'L.Coexist']);
+        preview('🔗 Enhanced Links.Focus.Enabled', false);
+        preview('🔗 Enhanced Links.Pause.Mode', 'ignore');
+        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', 'L.Focus.Enabled', 'L.Navigate.DoubleClick', 'L.Navigate.Follow', 'L.Pause.Mode', 'L.Perf.MaxFps', 'L.Motion', 'L.Coexist']);
     });
 
     it('points the title and particle colours at Custom node colours, which they need, until it is set', () => {

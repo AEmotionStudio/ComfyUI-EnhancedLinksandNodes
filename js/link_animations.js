@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { i as installStyle, c as checked, F as FROZEN, a as currentLook, B as BADGES, T as TITLE, b as TOGGLE_ALL, p as panelShown, S as SELECTION_FX, l as linkSettings, d as install, e as installPanel, f as installLinks, k as keyName, g as commandKeys, h as TOGGLE, j as keyText, r as running, t as toggleNodes, N, m as NODES_ON, n as toggleStatic, L, s as surpriseMe, o as showPanel, q as showPicker, u as LINKS_ON, v as toggleLinks, w as setting, x as shown, y as commit, z as selectedNodes, A as effects, C as pick, D as fireworks, E as resetEverything, G as DISABLED } from "./chunks/menus-BcXUDhho.js";
+import { i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, a as TOGGLE_ALL, p as panelShown, c as checked, F as FROZEN, S as SELECTION_FX, l as linkSettings, b as install, d as installPanel, e as installRuns, f as installFollow, g as installLinks, h as errorNodes, j as currentLook, k as keyName, m as commandKeys, o as TOGGLE, q as keyText, r as running, s as env, t as setting, u as shown, D as DISABLED, v as showPanel, L as LINKS_ON, N as NODES_ON, w as toggleLinks, x as L, y as toggleNodes, z as N, A as toggleStatic, C as toggleFocus, E as FOCUS_ON, G as commit, H as showPicker, I as surpriseMe, J as goBack, K as selectedNodes, M as effects, O as pick, P as fireworks, Q as resetEverything, R as goToRunning, U as nextError, V as goAlong } from "./chunks/menus-CKk-joPo.js";
 const SAY_MS = 2e3;
 const HINT_MS = 5e3;
 let said;
@@ -12,12 +12,26 @@ const needs = (work, part) => () => {
   if (part ? running[part] : running.links || running.nodes) work();
   else say(part ? DISABLED[part] : `${TITLE} is disabled in Settings › Extensions.`, HINT_MS);
 };
+const FOCUS_MODE = "🔗 Enhanced Links.Focus.Mode";
+const FOLLOW = "🔗 Enhanced Links.Navigate.Follow";
+function choices(id) {
+  const s = setting(id);
+  return [s, s.options.findIndex((o) => o.value === shown(id))];
+}
 function next(id) {
-  const { name, options } = setting(id);
-  const option = options[(options.findIndex((o) => o.value === shown(id)) + 1) % options.length];
+  const [{ name, options }, at] = choices(id);
+  const option = options[(at + 1) % options.length];
   commit(id, option.value);
   say(`${name}: ${option.text}`);
 }
+function focusMode() {
+  const [{ options }, at] = choices(FOCUS_MODE);
+  return options[at].text;
+}
+const saying = (work) => () => {
+  const text = work();
+  if (text) say(text);
+};
 function toggleAll() {
   const on = !(L.enabled || N.enabled);
   if (L.enabled !== on) toggleLinks();
@@ -103,6 +117,46 @@ const frozen = {
     say(L.staticMode ? "Animation frozen" : "Animation unfrozen");
   })
 };
+const focus = {
+  id: `${ID}ToggleFocus`,
+  label: "Toggle selection focus",
+  menubarLabel: "Selection focus",
+  category: "view-controls",
+  icon: "pi pi-bullseye",
+  active: () => checked(FOCUS_ON),
+  function: needs(() => {
+    toggleFocus();
+    say(L.focusEnabled ? `Selection focus: ${focusMode()}` : "Selection focus off");
+  }, "links")
+};
+const toRunning = {
+  id: `${ID}GoToRunning`,
+  label: "Go to running node (or next error)",
+  menubarLabel: "Go to running node",
+  category: "essentials",
+  icon: "pi pi-directions",
+  function: needs(saying(goToRunning))
+};
+const toError = {
+  id: `${ID}NextError`,
+  label: "Go to next error",
+  menubarLabel: "Next error",
+  category: "essentials",
+  icon: "pi pi-exclamation-triangle",
+  function: needs(saying(nextError))
+};
+const follow = {
+  id: `${ID}ToggleFollow`,
+  label: "Toggle follow execution",
+  menubarLabel: "Follow execution",
+  category: "view-controls",
+  icon: "pi pi-eye",
+  active: () => checked(FOLLOW),
+  function: needs(() => {
+    commit(FOLLOW, !L.navigateFollow);
+    say(L.navigateFollow ? "Follow execution on" : "Follow execution off");
+  }, "links")
+};
 const look = {
   id: `${ID}ChooseLook`,
   label: "Choose a look…",
@@ -124,6 +178,18 @@ const commands = [
   links,
   nodes,
   frozen,
+  focus,
+  {
+    id: `${ID}NextFocusMode`,
+    label: "Next selection focus mode",
+    category: "view-controls",
+    icon: "pi pi-filter",
+    // Turned on too, so the mode it names shows.
+    function: needs(() => {
+      if (!L.focusEnabled) toggleFocus();
+      next(FOCUS_MODE);
+    }, "links")
+  },
   {
     id: `${ID}NextLinkStyle`,
     label: "Next link animation",
@@ -140,6 +206,20 @@ const commands = [
   },
   look,
   surprise,
+  toRunning,
+  toError,
+  follow,
+  { id: `${ID}GoUpstream`, label: "Go to input node", category: "view-controls", icon: "pi pi-arrow-left", function: needs(saying(() => goAlong(true))) },
+  { id: `${ID}GoDownstream`, label: "Go to output node", category: "view-controls", icon: "pi pi-arrow-right", function: needs(saying(() => goAlong(false))) },
+  {
+    id: `${ID}GoBack`,
+    label: "Go back",
+    category: "view-controls",
+    icon: "pi pi-undo",
+    function: needs(() => {
+      if (!goBack()) say("Nothing to go back to");
+    })
+  },
   { id: SELECTION_FX, label: "Cycle node effect for selection", icon: "pi pi-sparkles", mutatesGraph: true, function: needs(stepSelection, "nodes") },
   { id: `${ID}PreviewCompletion`, label: "Preview completion effect", icon: "pi pi-play", function: needs(preview, "nodes") },
   { id: `${ID}ResetAll`, label: `Reset all ${TITLE} settings…`, icon: "pi pi-refresh", function: needs(() => void resetAll()) }
@@ -148,7 +228,9 @@ const KEYS = [
   { commandId: TOGGLE, combo: { key: "l", alt: true } },
   { commandId: TOGGLE, combo: { key: "¬", alt: true } },
   { commandId: TOGGLE_ALL, combo: { key: "k", alt: true } },
-  { commandId: TOGGLE_ALL, combo: { key: "˚", alt: true } }
+  { commandId: TOGGLE_ALL, combo: { key: "˚", alt: true } },
+  { commandId: toRunning.id, combo: { key: "j", alt: true } },
+  { commandId: toRunning.id, combo: { key: "∆", alt: true } }
 ];
 const run = (command) => () => void app.extensionManager.command.execute(command.id);
 const ext = {
@@ -162,10 +244,11 @@ const ext = {
     const taken = new Set(commandKeys().values());
     return KEYS.filter(({ combo }) => !taken.has(keyText(combo)));
   },
-  // Two groups, which the menu parts with a separator (FE157 stores/menuItemStore.ts L61-65); checks come from active().
+  // Three groups, which the menu parts with separators (FE157 stores/menuItemStore.ts L61-65); checks come from active().
   menuCommands: [
     { path: ["View", TITLE], commands: [panel.id, look.id, surprise.id] },
-    { path: ["View", TITLE], commands: [all.id, links.id, nodes.id, frozen.id] }
+    { path: ["View", TITLE], commands: [all.id, links.id, nodes.id, frozen.id] },
+    { path: ["View", TITLE], commands: [focus.id, follow.id, toRunning.id, toError.id] }
   ],
   // Drawn as it was given, so its icon stays as it is; the tooltip is read whenever the bar draws.
   actionBarButtons: [{
@@ -177,22 +260,32 @@ const ext = {
     onClick: run(all)
   }],
   aboutPageBadges: BADGES,
-  // One item with one submenu level. The switches show their state in their text: the canvas menu has no checks.
-  getCanvasMenuItems: () => [{
-    content: "Enhanced FX",
-    has_submenu: true,
-    submenu: {
-      options: [
-        ...[links, nodes, frozen].map((c) => ({ content: `${c.active() ? "☑" : "☐"} ${c.menubarLabel}`, callback: run(c) })),
-        { content: `Look: ${currentLook()?.name ?? "Custom"}…`, callback: run(look) },
-        { content: surprise.menubarLabel, callback: run(surprise) },
-        { content: "Open panel", callback: run(panel) }
-      ]
-    }
-  }],
+  // One item with one submenu level. The switches show their state in their text: the canvas menu has no checks. Once a
+  // run is over, Go to running node goes to its errors.
+  getCanvasMenuItems: () => {
+    const errors = env.running ? 0 : errorNodes().length;
+    return [{
+      content: "Enhanced FX",
+      has_submenu: true,
+      submenu: {
+        options: [
+          ...[links, nodes, frozen].map((c) => ({ content: `${c.active() ? "☑" : "☐"} ${c.menubarLabel}`, callback: run(c) })),
+          { content: `${focus.active() ? "☑" : "☐"} ${focus.menubarLabel}: ${focusMode()}`, callback: run(focus) },
+          { content: `${follow.active() ? "☑" : "☐"} ${follow.menubarLabel}`, callback: run(follow) },
+          errors ? { content: `${toError.menubarLabel} (${errors})`, callback: run(toError) } : { content: toRunning.menubarLabel, callback: run(toRunning) },
+          { content: `Look: ${currentLook()?.name ?? "Custom"}…`, callback: run(look) },
+          { content: surprise.menubarLabel, callback: run(surprise) },
+          { content: "Open panel", callback: run(panel) }
+        ]
+      }
+    }];
+  },
+  beforeRegisterNodeDef: navigateOnDoubleClick,
   async setup() {
     install();
     installPanel("links");
+    installRuns("links");
+    installFollow();
     installLinks();
     console.log("[EnhancedLinks] Extension registered with full batched rendering pipeline.");
   }

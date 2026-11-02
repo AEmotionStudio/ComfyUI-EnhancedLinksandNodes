@@ -1,9 +1,10 @@
-"""Test-only nodes for the e2e suite: typed links without models, and a Sleep node for runs."""
+"""Test-only nodes for the e2e suite: typed links without models, and Sleep and Fail nodes for runs."""
 import time
 
 import torch
 from typing_extensions import override
 
+import comfy.utils
 from comfy_api.latest import ComfyExtension, io
 
 
@@ -28,8 +29,36 @@ class Sleep(io.ComfyNode):
 
     @classmethod
     def execute(cls, seconds, value=None) -> io.NodeOutput:
-        time.sleep(seconds)
+        # In tenths of a second, each reported as progress, as a sampler reports its steps.
+        steps = max(1, round(seconds * 10))
+        bar = comfy.utils.ProgressBar(steps)
+        for _ in range(steps):
+            time.sleep(seconds / steps)
+            bar.update(1)
         return io.NodeOutput(value)
+
+
+class Fail(io.ComfyNode):
+    """Raises, so the run fails there."""
+
+    @classmethod
+    def define_schema(cls) -> io.Schema:
+        return io.Schema(
+            node_id="ELNFail",
+            display_name="ELN Fail",
+            category="eln_e2e",
+            inputs=[io.AnyType.Input("value", optional=True)],
+            outputs=[io.AnyType.Output()],
+            is_output_node=True,
+        )
+
+    @classmethod
+    def fingerprint_inputs(cls, **kwargs):
+        return float("NaN")
+
+    @classmethod
+    def execute(cls, value=None) -> io.NodeOutput:
+        raise RuntimeError("ELN Fail fails on purpose")
 
 
 def typed_node(comfy_type, input_options, constant):
@@ -86,6 +115,7 @@ class Mix(io.ComfyNode):
 
 NODES = [
     Sleep,
+    Fail,
     Mix,
     typed_node(io.Int, {"force_input": True}, lambda: 0),
     typed_node(io.Float, {"force_input": True}, lambda: 0.0),

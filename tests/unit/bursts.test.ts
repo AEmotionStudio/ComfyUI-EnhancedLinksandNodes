@@ -9,8 +9,8 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { guard, live } from '@/core/engine';
 import * as particles from '@/fx/particles';
-import { api, fake } from '../helpers/fake-app';
-import { frames, page, run, start, type GraphSpec } from '../helpers/fake-litegraph';
+import { app, fake } from '../helpers/fake-app';
+import { frames, page, progress, run, send, start, type GraphSpec } from '../helpers/fake-litegraph';
 
 afterEach(() => {
     vi.restoreAllMocks();
@@ -40,26 +40,29 @@ describe('fireworks', () => {
         expect(canvas.front.paints.length).toBe(from);
     });
 
-    it("go off over the output nodes this client's run reached, ran or taken from the cache, on the graph it started on", async () => {
-        const canvas = await start(LINKS_OFF, { nodes: [{ pos: [300, 400], output: true }, { pos: [900, 400], output: true }, { pos: [600, 700] }] });
-        /** How many nodes a run's show goes off over, each three bursts of a core, 250 sparks and 40 sparkles; then it ends. */
+    it("go off over the output nodes this client's run reached, ran or taken from the cache, in the workflow it ran in", async () => {
+        await start(LINKS_OFF, { nodes: [{ pos: [300, 400], output: true }, { pos: [900, 400], output: true }, { pos: [600, 700] }] });
+        /** How many nodes a run's show goes off over, each three bursts of a core, 250 sparks and 40 sparkles; then it ends, and the next can start 3 s after it. */
         const anchors = (prompt: string, ran: number[], cached: number[] = []) => {
             run(prompt, ran, cached);
             const count = live.bursts / (3 * (1 + 250 + 40));
-            frames(90);
+            frames(100);
             return count;
         };
         expect(anchors('first', [1, 3])).toBe(1);
         // Not over the first run's output node, which the second did not reach.
         expect(anchors('second', [3])).toBe(0);
         expect(anchors('cached', [3], [1, 2])).toBe(2);
-        // A run that succeeds once another graph is on screen, with nodes of the same ids: another workflow, or a subgraph.
-        const send = (type: string, detail: unknown) => api.dispatchEvent(new CustomEvent(type, { detail }));
+        // A run that succeeds once another workflow shows, whose nodes have the same ids: 3 s after the last show, which a show waits for.
+        frames(90);
+        const workflow = app.extensionManager.workflow.activeWorkflow;
         send('execution_start', { prompt_id: 'switched', timestamp: 0 });
-        send('executing', '1');
-        Object.assign(canvas, { graph: { nodes: canvas.graph.nodes } });
+        progress('switched', { 1: 'running' });
+        app.extensionManager.workflow.activeWorkflow = {};
         send('execution_success', { prompt_id: 'switched', timestamp: 0 });
         expect(live.bursts).toBe(0);
+        app.extensionManager.workflow.activeWorkflow = workflow;
+        expect(anchors('back', [1])).toBe(1);
     });
 
     it('draw only over nodes of the graph on screen', async () => {

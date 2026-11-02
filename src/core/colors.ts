@@ -148,6 +148,47 @@ export function palette(colour: unknown): Palette | undefined {
     return p ?? undefined;
 }
 
+const solids = new Map<string, Palette>();
+const lifted = new Map<string, string>();
+let solidsSince = -1;
+
+/** solids and lifted, emptied when a setting changes. */
+function solidCaches(): void {
+    if (solidsSince === revision) return;
+    solids.clear();
+    lifted.clear();
+    solidsSince = revision;
+}
+
+/** A palette with `colour` in every role, as the focus colours draw links: neither Color.Mode nor Color.Scheme changes it. */
+export function solid(colour: string): Palette {
+    solidCaches();
+    let p = solids.get(colour);
+    if (!p) solids.set(colour, (p = { native: colour, primary: colour, secondary: colour, accent: colour, marker: colour }));
+    return p;
+}
+
+/** A channel a fifth of the way to white. */
+const lift = (v: number) => Math.round(v + (255 - v) * 0.2);
+
+/** `colour` lightened 20 %, a fifth of the way to white; a colour the canvas would not take stays as it is. */
+export function lighter(colour: string): string {
+    solidCaches();
+    let light = lifted.get(colour);
+    if (light === undefined) {
+        const rgba = parse(colour);
+        light = rgba ? show([lift(rgba[0]), lift(rgba[1]), lift(rgba[2]), rgba[3]]) : colour;
+        lifted.set(colour, light);
+    }
+    return light;
+}
+
+/** The theme's accent, as the frontend's own controls take it (--primary-background, 1.39.5 to 1.60), and the panel does. */
+export function accent(): string {
+    const rgba = parse(getComputedStyle(document.body).getPropertyValue('--primary-background'));
+    return rgba ? show(rgba) : '#0b8ce9';
+}
+
 const hues: string[] = [];
 let huesSince = -1;
 

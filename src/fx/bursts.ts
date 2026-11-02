@@ -8,7 +8,8 @@
  * they stand over their node in graph space, at the size they took on screen at
  * zoom 1, whatever the zoom. Each spark's speed, colour and trail are drawn once
  * from a seeded stream, where v1 drew new ones every frame. With reduced motion
- * a show is one soft glow over each anchor. One show plays at a time.
+ * a show is one soft glow over each anchor. One show plays at a time; a show
+ * can be cut short.
  *
  * @module fx/bursts
  */
@@ -21,6 +22,9 @@ import { nodePalette, translucent } from '@/core/colors';
 import { CAP, disc, pool, rng } from '@/fx/particles';
 
 type Canvas = typeof app.canvas;
+
+/** The guard's key for the fireworks, which its toast names when it turns them off. */
+export const FIREWORKS = 'Fireworks';
 
 /** v1's bursts: where each stands, as fractions of the view off its node, when it goes off in the show, its colour and size. */
 const BURSTS = [
@@ -36,8 +40,8 @@ const [CORE, SPARK, SPARKLE, GLOW] = [0, 1, 2, 3];
 /** The particles of one anchor's show. */
 const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
 
-/** What a show goes off over: a node, or a point of the graph it is in; its id seeds the show. */
-export type Anchor = Pick<LGraphNode, 'pos' | 'graph'> & { id: unknown };
+/** What a show goes off over: a node, or a point of the graph it is in, where a `small` show's bursts are half their size; its id seeds the show. */
+export type Anchor = Pick<LGraphNode, 'pos' | 'graph'> & { id: unknown; small?: boolean };
 
 interface Burst {
     node: Anchor;
@@ -84,7 +88,7 @@ export function fireworks(nodes: Anchor[], run: string): void {
         if (pool.count + SHOW > CAP) break;
         const random = rng(hash(run) ^ hash(String(node.id)));
         for (const { x, y, delay, size, colour } of BURSTS) {
-            const owner = bursts.push({ node, x, y, delay, size, colours: [colour, secondary, accent, '#FFFFFF'] }) - 1;
+            const owner = bursts.push({ node, x, y, delay, size: node.small ? size / 2 : size, colours: [colour, secondary, accent, '#FFFFFF'] }) - 1;
             if (env.reducedMotion) {
                 add(GLOW, owner);
                 break;
@@ -101,6 +105,12 @@ export function fireworks(nodes: Anchor[], run: string): void {
     }
     live.bursts = pool.count;
     wake();
+}
+
+/** Ends the show playing at once. */
+export function endBursts(): void {
+    pool.count = bursts.length = 0;
+    live.bursts = 0;
 }
 
 /**

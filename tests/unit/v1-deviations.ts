@@ -22,10 +22,11 @@ import { drawBase, drawMarkers } from '@/links/styles';
 import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
 import { drawTitle } from '@/nodes/text';
 import { pool } from '@/fx/particles';
+import { RED } from '@/fx/execution';
 import { fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
 import { canonical } from '../helpers/canonical';
-import { frames, offscreens, queue, run, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
+import { frames, offscreens, progress, queue, run, send, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
 import { HAVE_V1, drawV1Effect, setupV1 } from './characterize/v1-code';
 import {
     FIREWORK_PHASES, NODE_EFFECTS, V1_LINK_SETTINGS, V1_NODE_RICH_SETTINGS, V1_NODE_SETTINGS, V1_PARTICLE_TIME, WHOLE,
@@ -775,7 +776,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: 'Nothing flashes more than three times a second',
-        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst, and the next show waits for this one to end.",
+        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering.",
         async proof() {
             // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the glow it breathes or where it shakes its copies.
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Animation.Speed': 3 });
@@ -790,18 +791,46 @@ export const DEVIATIONS: Deviation[] = [
                 expect(turns(seen) / 2, style).toBeLessThanOrEqual(3 * 2);
                 expect(turns(seen), style).toBeGreaterThan(0);
             }
-            // A run half a second into a show starts none; one after it ends starts the next.
-            await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+            // A run that starts half a second into a show ends it and starts none; the next show starts 3 s after the last.
+            const failing = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
             run('first', [1]);
             frames(30);
-            // The burst clock starts from 0 with each show.
-            const playing = clock.burstTime;
-            expect(playing).toBeGreaterThan(0.4);
+            expect(live.bursts).toBeGreaterThan(0);
             run('second', [1]);
-            expect(clock.burstTime).toBe(playing);
-            frames(60);
+            expect(live.bursts).toBe(0);
+            frames(140);
             run('third', [1]);
-            expect(clock.burstTime).toBe(0);
+            expect(live.bursts).toBe(0);
+            frames(12);
+            run('fourth', [1]);
+            // The burst clock starts from 0 with each show.
+            expect([live.bursts > 0, clock.burstTime]).toEqual([true, 0]);
+            // A failed node's outline over four seconds: in no second more than three flashes, three pulses, then steady.
+            frames(90);
+            send('execution_start', { prompt_id: 'failing', timestamp: 0 });
+            progress('failing', { 1: 'running' });
+            send('execution_error', { prompt_id: 'failing', node_id: '1', node_type: 'ELNInt', executed: [], exception_message: '', exception_type: '', traceback: [], timestamp: 0 });
+            // The alpha of a stroke a frame shows: the last frame's again where the frame paints nothing.
+            let alpha = 0;
+            const strokes = (canvas: FakeCanvas, of: (p: { style: string; lineWidth: number }) => boolean) => {
+                const from = canvas.front.paints.length;
+                frames(1);
+                const paints = canvas.front.paints.slice(from);
+                if (paints.length) alpha = paints.find((p) => p.op === 'stroke' && of(p))?.globalAlpha ?? 0;
+                return alpha;
+            };
+            const outline = Array.from({ length: 240 }, () => strokes(failing, (p) => p.style === RED));
+            for (let second = 0; second < 4; second++) expect(turns(outline.slice(second * 60, second * 60 + 61)) / 2).toBeLessThanOrEqual(3);
+            expect(turns(outline)).toBe(5);
+            expect(outline.slice(185).every((alpha) => alpha === 1)).toBe(true);
+            // The river into a running node, and its sparks, which take its alpha: up once, then down once the node stops.
+            const flowing = await start({}, PAIR);
+            send('execution_start', { prompt_id: 'river', timestamp: 0 });
+            progress('river', { 2: 'running' });
+            const river = Array.from({ length: 120 }, () => strokes(flowing, (p) => p.lineWidth === L.thickness * 1.4));
+            progress('river', { 2: 'finished' });
+            river.push(...Array.from({ length: 60 }, () => strokes(flowing, (p) => p.lineWidth === L.thickness * 1.4)));
+            expect([turns(river), Math.max(...river), river.at(-1)]).toEqual([1, 1, 0]);
             await start({ '🔗 Enhanced Links.Animate': 3, '🔗 Enhanced Links.Animation.Speed': 3 }, PAIR);
             frames(5);
             const before = { ...clock };
@@ -1215,7 +1244,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: "Fireworks play over the run's output nodes, at one size on screen",
-        why: "v1 burst over every node whenever the queue emptied, for anyone's run (its 'status' event), from each node's drawNodeShape, so later nodes covered its bursts, and it placed and sized them by the canvas in graph space, so zooming out shrank them. v3 bursts when this client's own run succeeds (execution_success, which ComfyUI sends only to the client that queued it), over the output nodes the run reached and the nodes whose Completion FX says Fireworks, but not those that say Off, and over all the nodes. It places and sizes them in the view's terms, so at any zoom they are as large on screen as v1's at zoom 1.",
+        why: "v1 burst over every node whenever the queue emptied, for anyone's run (its 'status' event), from each node's drawNodeShape, so later nodes covered its bursts, and it placed and sized them by the canvas in graph space, so zooming out shrank them. v3 bursts when this client's own run succeeds (execution_success, which ComfyUI sends only to the client that queued it), over the nodes whose Completion FX makes them primary and the output nodes the run reached, but not those it excludes, the three nearest the middle of the view, and over all the nodes. It places and sizes them in the view's terms, so at any zoom they are as large on screen as v1's at zoom 1.",
         async proof() {
             const canvas = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
             // The queue emptying, which v1 burst on, is not a run of this client's.
@@ -1240,16 +1269,16 @@ export const DEVIATIONS: Deviation[] = [
             canvas.setDirty(true, false);
             canvas.draw();
             expect(cores(canvas, half).map(([x, y, r]) => [fmt((x - 300) * 0.5), fmt((y - 400) * 0.5), fmt(r * 0.5)])).toEqual(shown.map(([x, y, r]) => [fmt(x - 300), fmt(y - 400), fmt(r)]));
-            // Completion FX: Fireworks over a node the run did not reach, none over one set Off; with End Animation off, only the former.
+            // Completion FX: over a primary node the run did not reach, none over one excluded; with End Animation off, none.
             for (const ended of [true, false]) {
-                // The node set Off stands where no other node does.
+                // The node excluded stands where no other node does.
                 const again = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.End Animation.Enabled': ended }, { nodes: [...RUN.nodes, { pos: [1200, 900], output: true }] });
-                again.graph._nodes[1].properties.enhanced_fx_completion = 'fireworks';
-                again.graph._nodes[3].properties.enhanced_fx_completion = 'off';
+                again.graph._nodes[1].properties.enhanced_fx_completion = 'primary';
+                again.graph._nodes[3].properties.enhanced_fx_completion = 'exclude';
                 run(`set ${ended}`, [1, 4]);
                 frames(5);
                 const xs = new Set(cores(again).map(([x]) => x - 80));
-                expect([...xs].sort(), `End Animation ${ended}`).toEqual(ended ? [300, 900] : [900]);
+                expect([...xs].sort(), `End Animation ${ended}`).toEqual(ended ? [300, 900] : []);
             }
         },
     },

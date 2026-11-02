@@ -6,7 +6,7 @@
  * such call records its segment along the path its Link.Style gives it, and
  * draws what does not move where native would have drawn the link: the
  * animation's base with its glow and shadow, or the whole still frame
- * (Static.Mode, a paused run, reduced motion, or a look with nothing that
+ * (Static.Mode, a run that holds them, reduced motion, or a look with nothing that
  * moves). Where that is slow, the bases go without their glow while the view
  * or the graph moves. What moves is drawn over the background in every front
  * pass, under the nodes. A shape of our own takes the segment's hit data with
@@ -14,17 +14,28 @@
  * draws links too, Coexist can leave every link to it; Link effects off
  * leaves every link to native.
  *
+ * Selection focus (links/focus.ts) works on the same calls, with link effects
+ * on or off: the links it leaves out are drawn natively, dimmed or not at all,
+ * and the ones it holds take the focus colour and, with Focus.OnTop, are drawn
+ * again over the nodes. Where it has nothing to do, a call native draws goes
+ * straight through. The links this client's run flows along (fx/execution.ts)
+ * are drawn whole while its visuals show, whatever focus does to the rest, and
+ * with link effects on the river and the trail go over them: over their motion,
+ * or along native's path where native draws them, as with Animation None.
+ *
  * @module links/pipeline
  */
 
 import type { CanvasColour, LLink, Point, Reroute } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L } from '@/core/settings';
-import { STILL_PHASE, clock, dummy, env, guard, layers, live, wake } from '@/core/engine';
+import { CALM_ALPHA, STILL_PHASE, clock, dummy, during, env, guard, heldByRun, layers, live, wake } from '@/core/engine';
 import { HIGHLIGHT, palette, type Palette } from '@/core/colors';
+import { drawFlows, flowsShown, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
-import { MOVING, STROKES } from './animations';
-import { LinkPath } from './geometry';
+import { MOVING, STROKES, moving } from './animations';
+import { focus, focusPalette, focuses, focusing, syncFocus } from './focus';
+import { LinkPath, stub } from './geometry';
 import { STILL } from './stills';
 import { LINK_STYLES, centreMarker, drawBase, drawMarkers } from './styles';
 
@@ -42,6 +53,8 @@ const REACH = 120;
 
 /** Classic Flow, whose only motion is its markers. */
 const CLASSIC = 9;
+/** The Link.Style that keeps native's path. */
+const NATIVE = 'spline';
 
 /**
  * A segment native drew for a link, as the effects take it. Native draws a link's segments one after another, from
@@ -55,10 +68,16 @@ export class Segment {
     link?: LLink;
     /** Whether its path is not the one native drew for it, so the hit data must follow ours. */
     custom = false;
-    /** The colours it is drawn in. */
+    /** The colours it is drawn in, and the colour native draws its link in, but for the white of a highlighted one. */
     pal: Palette = HIGHLIGHT;
+    colour = '';
     linkStyle = '';
     isStatic = false;
+    /** Whether selection focus holds it, and how much wider than Thickness its base is drawn. */
+    focused = false;
+    width = 1;
+    /** The run's step of the node its link leads into, while the run's visuals show. */
+    flow?: Step;
     /**
      * px along the link to the segment's start, the segment's own length and the link's whole length, along the
      * segments native drew for it: the paths Link.Style takes, before a wave or a coil winds around them.
@@ -94,19 +113,20 @@ export class Segment {
     }
 
     /**
-     * Lays the segment from a to b on the path Link.Style gives it, the render mode's `mode` where that keeps native's:
-     * `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave or a coil starts and ends.
+     * Lays the segment from a to b on the path `linkStyle` gives it, Link.Style's unless given, the render mode's `mode`
+     * where that keeps native's: `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave
+     * or a coil starts and ends.
      */
     lay(a: Readonly<ArrayLike<number>>, b: Readonly<ArrayLike<number>>, startDir: number, endDir: number, mode: number, u0 = 0, fromSlot = true,
-        toSlot = true, startControl?: Readonly<ArrayLike<number>>, endControl?: Readonly<ArrayLike<number>>): void {
-        const style = LINK_STYLES[L.linkStyle];
+        toSlot = true, startControl?: Readonly<ArrayLike<number>>, endControl?: Readonly<ArrayLike<number>>, linkStyle = L.linkStyle): void {
+        const style = LINK_STYLES[linkStyle];
         this.u0 = u0;
         this.path.set(a, b, startDir, endDir, style.mode ?? mode, startControl, endControl);
         if (style.shape === 'step') this.path.step(endDir);
         this.len = this.path.length;
         if (style.shape === 'wave' || style.shape === 'coil') this.path.bend(style.shape === 'coil', u0, fromSlot, toSlot);
         this.custom = Boolean(style.shape) || (style.mode ?? mode) !== mode;
-        this.linkStyle = L.linkStyle;
+        this.linkStyle = linkStyle;
     }
 }
 
@@ -118,15 +138,26 @@ let first = 0;
 let open = false;
 /** Where along its link each reroute's segment ended in this pass. */
 const ends = new Map<Reroute, number>();
-/** The ones the last front pass drew. */
+/** The ones a layer of the last front pass drew. */
 const shown: Segment[] = [];
+/** The calls of the focused links native drew in the last pass, to draw again over the nodes. */
+const raised: RenderLink[] = [];
+/** The segments of the last pass that the run's visuals draw on. */
+const flowing: Segment[] = [];
 
 /**
  * The link pass: its context while drawConnections runs, whether we draw its links, whether they are still, whether
- * their bases go without their glows and halos, how many renderLink calls it saw, how many bases it drew, and the
- * highlighted links (the selected nodes' links).
+ * their bases go without their glows and halos, how many renderLink calls it saw, how many bases it drew, the
+ * highlighted links (the selected nodes' links), what selection focus does in it (focusIn()), whether the focused
+ * links take the focus colour, and whether the run's visuals show on its links.
  */
-const pass = { ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, plain: false, calls: 0, bases: 0, highlighted: {} as Record<string, boolean> };
+const pass = {
+    ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, plain: false, calls: 0, bases: 0, highlighted: {} as Record<string, boolean>,
+    focus: '' as '' | 'highlight' | 'animate' | 'dim' | 'hide', tinted: false, runs: false,
+};
+
+/** Native's renderLink, or what another extension put in its place before ours. */
+let original: (this: Canvas, ...args: RenderLink) => void;
 
 /**
  * A pass with glows that drew more bases than this is too slow to repeat while the view or the graph moves: Chromium
@@ -175,6 +206,17 @@ function defers(): boolean {
 /** LiteGraph.LINK_COLOR (FE157 LiteGraphGlobal.ts L117), for a canvas whose default link colour the canvas would not take. */
 const LINK_COLOR = '#9A9';
 
+/** How far the stubs of a link Hide others leaves out show past their nodes. */
+const STUB = 8;
+/** Native's default slot directions (litegraphLinkAdapter.ts L218-219). */
+const [LEFT, RIGHT] = [3, 4];
+
+/** The hit path of a link Hide others leaves out, which nothing is in. */
+let unhit: Path2D | undefined;
+/** The reroutes of the links Hide others leaves out in this pass, and what they draw until it ends. */
+const unseen: Reroute[] = [];
+const nothing = (): void => {};
+
 /** RenderUtils.enableAntiAliasing (old_link_animations.js:1604-1610), which v1 set before drawing links. */
 function enableAntiAliasing(ctx: CanvasRenderingContext2D): void {
     ctx.imageSmoothingEnabled = true;
@@ -189,15 +231,35 @@ function moves(): boolean {
     return L.animate !== CLASSIC || (L.markerEnabled && L.markerShape !== 'none') || Boolean(LINK_STYLES[L.linkStyle].moving);
 }
 
+/**
+ * What selection focus does in a pass: nothing without a focus, but that Animate only these animates nothing then; while
+ * native draws the links, Animate only these highlights them; and while Coexist leaves them to another extension, only
+ * what keeps its drawing, dimming and hiding.
+ */
+function focusIn(): typeof pass.focus {
+    const mode = (L.focusEnabled ? L.focusMode : '') as typeof pass.focus;
+    if (!focusing()) return pass.on && mode === 'animate' ? mode : '';
+    if (deferring()) return mode === 'dim' || mode === 'hide' ? mode : '';
+    return !pass.on && mode === 'animate' ? 'highlight' : mode;
+}
+
 function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     count = 0;
     open = false;
     ends.clear();
+    raised.length = flowing.length = 0;
     pass.ctx = ctx;
     pass.calls = pass.bases = 0;
     pass.on = L.enabled && L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
-    pass.still = L.staticMode || (L.pauseDuringRender && env.running) || env.reducedMotion || !moves();
+    // Native's links never move.
+    pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves();
     pass.highlighted = canvas.highlighted_links;
+    syncRuns(canvas);
+    // With link effects on, the run's visuals go over the links, those native draws too, as with Animation None.
+    pass.runs = L.enabled && flowsShown() && !defers() && canvas.ds.scale >= LOD_SCALE;
+    syncFocus(canvas);
+    pass.focus = focusIn();
+    pass.tinted = (pass.focus === 'highlight' || pass.focus === 'dim' || pass.focus === 'hide') && !deferring();
     // While a graph with many glowing links on screen is panned, zoomed or has nodes dragged, its bases go plain.
     const { scale, offset } = canvas.ds;
     const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
@@ -220,6 +282,18 @@ function end(canvas: Canvas): void {
         live.links = count;
         wake();
     }
+    if (flowing.length) {
+        live.flows = flowing.length;
+        wake();
+    }
+    // The reroutes Hide others left out drew nothing; nor can they be clicked, out of those native drew, where it looks
+    // for what the pointer is on.
+    for (const reroute of unseen) {
+        delete (reroute as Partial<Reroute>).draw;
+        delete (reroute as Partial<Reroute>).drawSlots;
+        canvas._visibleReroutes.delete(reroute);
+    }
+    unseen.length = 0;
     if (pass.calls || warned) return;
     // Native calls renderLink for every link and reroute it lists here, unless that end is being dragged.
     for (const segment of canvas.renderedPaths) {
@@ -244,9 +318,20 @@ function close(): void {
     open = false;
 }
 
-/** Records the segment of a renderLink call we draw ourselves, from the arguments native gets. */
+/**
+ * The palette of the colour native draws a segment in, but for the white of a highlighted one: pathRenderer.ts
+ * determineLinkColor (L168-183) with what litegraphLinkAdapter.ts hands it (L226-235), which leaves out link.color: the
+ * colour handed in, the type's or the canvas default, the first the canvas takes.
+ */
+const own = (canvas: Canvas, link: LLink, color: CanvasColour | null): Palette =>
+    palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR)!;
+
+/**
+ * Records the segment of a renderLink call from the arguments native gets, along native's path where native draws it;
+ * `focused` if selection focus holds it, with the run's `flow` into its node.
+ */
 function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Point>, color: CanvasColour | null,
-    startDir: number, endDir: number, extras: RenderLink[9]): Segment {
+    startDir: number, endDir: number, extras: RenderLink[9], focused: boolean, flow: Step | undefined): Segment {
     if (open && pool[count - 1].link !== link) close();
     if (!open) first = count;
     const segment = (pool[count++] ??= new Segment());
@@ -254,16 +339,22 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     // The reroute the segment starts from (LinkSegment.parentId), where the segment into it ended; none where the link starts.
     const from = canvas.graph?.getReroute((reroute ?? link).parentId);
     segment.link = link;
-    segment.lay(a, b, startDir, endDir, canvas.links_render_mode, (from && ends.get(from)) || 0, !from, !reroute, extras?.startControl, extras?.endControl);
+    segment.lay(a, b, startDir, endDir, canvas.links_render_mode, (from && ends.get(from)) || 0, !from, !reroute, extras?.startControl, extras?.endControl,
+        pass.on ? L.linkStyle : NATIVE);
     if (reroute) ends.set(reroute, segment.u0 + segment.len);
     // The segment into the input is the link's last.
     open = Boolean(reroute);
     if (!open) close();
-    // pathRenderer.ts determineLinkColor (L168-183) with what litegraphLinkAdapter.ts hands it (L226-235), which leaves out
-    // link.color: white while highlighted, else the colour handed in, the type's or the canvas default, the first the canvas takes.
-    segment.pal = pass.highlighted[link.id] ? HIGHLIGHT : palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link.type)])
-        ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR)!;
+    // A focused link takes the focus colour, a selected node's too, and Highlight widens it; else white while
+    // highlighted, as native draws it.
+    const colours = own(canvas, link, color);
+    segment.pal = focused && pass.tinted ? focusPalette(colours.native) : pass.highlighted[link.id] ? HIGHLIGHT : colours;
+    segment.colour = colours.native;
+    segment.focused = focused;
+    segment.width = focused && pass.focus === 'highlight' ? 1.5 : 1;
     segment.isStatic = pass.still;
+    segment.flow = flow;
+    if (flow) flowing.push(segment);
     return segment;
 }
 
@@ -313,16 +404,57 @@ function hit(owner: LLink | Reroute, path: LinkPath): void {
     owner._centreAngle = path.angle;
 }
 
-/** Draws the moving segments on screen, then what native drew over them: the centre markers and the reroutes. Returns how many it drew. */
-function motion(canvas: Canvas, ctx: CanvasRenderingContext2D): number {
-    if (pass.still) return 0;
+/** Which recorded segments a layer draws: all, the focused ones, or those the run's visuals are on. */
+const all = () => true;
+const isFocused = (segment: Segment) => segment.focused;
+const isFlowing = (segment: Segment) => segment.flow !== undefined;
+
+/** Puts the recorded segments that `keep` takes and whose effects reach the screen in `shown`; how many. */
+function cull(canvas: Canvas, keep: (segment: Segment) => boolean): number {
     const area = canvas.visible_area;
     let n = 0;
     for (let i = 0; i < count; i++) {
         const { box } = pool[i].path;
-        if (box[2] + REACH >= area[0] && box[0] - REACH <= area[0] + area[2] && box[3] + REACH >= area[1] && box[1] - REACH <= area[1] + area[3]) shown[n++] = pool[i];
+        if (keep(pool[i]) && box[2] + REACH >= area[0] && box[0] - REACH <= area[0] + area[2] && box[3] + REACH >= area[1] && box[1] - REACH <= area[1] + area[3]) shown[n++] = pool[i];
     }
     shown.length = n;
+    return n;
+}
+
+/** Draws what moves on the segments shown, and their flow markers, at half their alpha while a Calm run plays. */
+function moveShown(ctx: CanvasRenderingContext2D): void {
+    const draw = MOVING[L.animate];
+    moving.alpha = during(L.pauseDuringRender) === 'calm' ? CALM_ALPHA : 1;
+    try {
+        for (const segment of shown) {
+            if (segment.empty) continue;
+            draw?.(ctx, segment, clock);
+            if (marked()) drawMarkers(ctx, segment, clock.linkPhase, clock.linkFlow);
+        }
+    } finally {
+        moving.alpha = 1;
+    }
+}
+
+/**
+ * Draws again what native drew over the segments shown: their centre markers, as native draws each with its segment,
+ * then the reroutes on screen, the focused ones alone if `focused`, as native draws them after every segment (FE157
+ * LGraphCanvas.ts L6186-6205, FE1395 L5766-5785).
+ */
+function overShown(canvas: Canvas, ctx: CanvasRenderingContext2D, focused: boolean): void {
+    ctx.globalAlpha = canvas.editor_alpha;
+    for (const segment of shown) centreMarker(canvas, ctx, segment);
+    for (const reroute of canvas._visibleReroutes) {
+        if (focused && !focus.reroutes.has(reroute.id)) continue;
+        reroute.draw(ctx, canvas._pattern);
+        if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
+    }
+}
+
+/** Draws the moving segments on screen, then what native drew over them. Returns how many it drew. */
+function motion(canvas: Canvas, ctx: CanvasRenderingContext2D): number {
+    if (pass.still) return 0;
+    const n = cull(canvas, all);
     if (!n) return 0;
     ctx.save();
     try {
@@ -332,12 +464,7 @@ function motion(canvas: Canvas, ctx: CanvasRenderingContext2D): number {
         if (!STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
         // Dotted and dashed links march, so their bodies are drawn here rather than in the background.
         if (LINK_STYLES[L.linkStyle].moving) for (const segment of shown) drawBase(ctx, segment, L.animate, false);
-        const draw = MOVING[L.animate];
-        for (const segment of shown) {
-            if (segment.empty) continue;
-            draw?.(ctx, segment, clock);
-            if (marked()) drawMarkers(ctx, segment, clock.linkPhase, clock.linkFlow);
-        }
+        moveShown(ctx);
     } catch (error) {
         guard.fail(LINKS, error);
         // Turned off: the next background pass draws the links natively.
@@ -346,24 +473,144 @@ function motion(canvas: Canvas, ctx: CanvasRenderingContext2D): number {
         stopSprites();
         ctx.restore();
     }
-    // Native draws each marker with its segment, and the reroutes after every segment (FE157 LGraphCanvas.ts L6186-6205, FE1395 L5766-5785).
-    ctx.globalAlpha = canvas.editor_alpha;
-    for (const segment of shown) centreMarker(canvas, ctx, segment);
-    for (const reroute of canvas._visibleReroutes) {
-        reroute.draw(ctx, canvas._pattern);
-        if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
-    }
+    overShown(canvas, ctx, false);
     return n;
+}
+
+/** Draws the run's visuals on the segments on screen they are on, then what native drew over those. Returns how many move. */
+function flows(canvas: Canvas, ctx: CanvasRenderingContext2D): number {
+    if (!flowing.length || !cull(canvas, isFlowing)) return 0;
+    ctx.save();
+    let n = 0;
+    try {
+        n = drawFlows(ctx, shown);
+    } finally {
+        ctx.restore();
+    }
+    overShown(canvas, ctx, false);
+    return n;
+}
+
+/**
+ * Native draws a focused link's call in the colour handed in, which ComfyUI's white for a selected node's links would
+ * take the place of (pathRenderer.ts determineLinkColor, L173-175), and Highlight's 1.5 × as wide.
+ */
+function widened(canvas: Canvas, args: RenderLink): void {
+    const width = canvas.connections_width;
+    const lit = canvas.highlighted_links;
+    const { id } = args[3]!;
+    const highlighted = lit[id];
+    if (pass.focus === 'highlight') canvas.connections_width = width * 1.5;
+    delete lit[id];
+    try {
+        original.apply(canvas, args);
+    } finally {
+        canvas.connections_width = width;
+        if (highlighted) lit[id] = highlighted;
+    }
+}
+
+/** A focused link native draws, in the focus colour, kept to draw again over the nodes. */
+function tint(canvas: Canvas, args: RenderLink): void {
+    args[6] = focusPalette(own(canvas, args[3]!, args[6]).native).native;
+    raised.push(args);
+    widened(canvas, args);
+}
+
+/** Dim others: native draws a link focus leaves out at Focus.Dim. */
+function dim(canvas: Canvas, args: RenderLink): void {
+    const ctx = args[0];
+    const alpha = ctx.globalAlpha;
+    ctx.globalAlpha = (alpha * L.focusDim) / 100;
+    try {
+        original.apply(canvas, args);
+    } finally {
+        ctx.globalAlpha = alpha;
+    }
+}
+
+/**
+ * Hide others: native draws a link focus leaves out where nobody sees it, so other wrappers still get their call, and
+ * its hit data goes, so it cannot be clicked (the 8×8 centre test and isPointInStroke, FE157 canvas/resolvePointerTarget.ts
+ * L91-112, FE1395 LGraphCanvas.ts L2452-2512). Its reroutes go too: native draws each after every segment (FE157
+ * LGraphCanvas.ts L6186-6205, FE1395 L5766-5785), where they draw nothing. Stubs at its slots show that it is there.
+ */
+function hide(canvas: Canvas, args: RenderLink): void {
+    const [ctx, a, b, link, , , color, startDir, endDir, extras] = args;
+    args[0] = dummy();
+    original.apply(canvas, args);
+    const owner = extras?.reroute ?? link!;
+    owner.path = unhit ??= new Path2D();
+    owner._pos[0] = owner._pos[1] = NaN;
+    if (extras?.reroute) {
+        extras.reroute.draw = extras.reroute.drawSlots = nothing;
+        unseen.push(extras.reroute);
+    }
+    // A segment starts at a slot unless a reroute comes before it, and ends at one unless it leads into a reroute.
+    const fromSlot = !canvas.graph?.getReroute(owner.parentId);
+    if (!fromSlot && extras?.reroute) return;
+    // A slot is half its height inside the node (LGraphNode.getConnectionPos, FE157 L3637, FE1395 L3327).
+    const reach = LiteGraph.NODE_SLOT_HEIGHT * 0.5 + STUB;
+    ctx.save();
+    ctx.beginPath();
+    if (fromSlot) stub(ctx, a, startDir || RIGHT, reach);
+    if (!extras?.reroute) stub(ctx, b, endDir || LEFT, reach);
+    ctx.strokeStyle = own(canvas, link!, color).native;
+    ctx.lineWidth = canvas.connections_width;
+    ctx.stroke();
+    ctx.restore();
+}
+
+/**
+ * Focus.OnTop: draws the focused links again over the nodes as their pass drew them: native's calls, or our segments
+ * with what moves on them and their bases, plain, as glows drawn in every front pass would cost each frame what the
+ * background pass paid once. Then the run's visuals on them, and the focused reroutes over them. Nodes 2.0 waits for
+ * its overlay.
+ */
+function raise(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    if (!L.focusOnTop || !pass.focus || LiteGraph.vueNodesMode) return;
+    if (!cull(canvas, isFocused) && !raised.length) return;
+    for (const args of raised) {
+        args[0] = ctx;
+        widened(canvas, args);
+    }
+    // While native draws the links, the segments recorded are those the run's visuals are on.
+    if (pass.on) {
+        ctx.save();
+        try {
+            enableAntiAliasing(ctx);
+            if (!pass.still && !STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
+            for (const segment of shown) {
+                drawBase(ctx, segment, L.animate, pass.still, true);
+                if (!pass.still || segment.empty) continue;
+                STILL[L.animate]?.(ctx, segment, STILL_PHASE);
+                if (marked()) drawMarkers(ctx, segment, STILL_PHASE);
+            }
+            if (!pass.still) moveShown(ctx);
+        } catch (error) {
+            guard.fail(LINKS, error);
+            if (guard.off(LINKS)) canvas.setDirty(true, true);
+        } finally {
+            stopSprites();
+            ctx.restore();
+        }
+    }
+    if (pass.runs) {
+        ctx.save();
+        drawFlows(ctx, shown);
+        ctx.restore();
+    }
+    overShown(canvas, ctx, true);
 }
 
 /** The link setup(): wraps drawConnections and renderLink, and puts the motion layer in place. */
 export function installLinks(): void {
     const proto = LGraphCanvas.prototype;
     const drawConnections = proto.drawConnections;
-    const renderLink = proto.renderLink;
+    original = proto.renderLink;
     // Both frontends' own renderLink hands each segment to linkRenderer.renderLinkDirect (FE157 LGraphCanvas.ts L6537,
     // FE1395 L6083). LinkFX wraps renderLink in its init(), before any setup(), and marks that it booted.
-    foreign = !String(renderLink).includes('renderLinkDirect') || Boolean((globalThis as { __LINKFX_V2_BOOTED__?: unknown }).__LINKFX_V2_BOOTED__);
+    foreign = !String(original).includes('renderLinkDirect') || Boolean((globalThis as { __LINKFX_V2_BOOTED__?: unknown }).__LINKFX_V2_BOOTED__);
     warned = told = false;
     glows.bases = 0;
 
@@ -379,25 +626,43 @@ export function installLinks(): void {
     proto.renderLink = function (this: Canvas, ...args: RenderLink) {
         const [ctx, a, b, link, skipBorder, flow, color, startDir, endDir, extras] = args;
         pass.calls++;
-        // Native draws the calls outside our pass or on another context, KJNodes' virtual links (no link),
-        // the flash of a triggered link (skip_border and flow) and floating links (disabled).
-        if (pass.on && ctx === pass.ctx && link && !(skipBorder && flow) && !extras?.disabled) {
-            const segment = record(this, link, a, b, color, startDir, endDir, extras);
+        // Native draws the calls outside our pass or on another context, KJNodes' virtual links (no link) and the
+        // flash of a triggered link (skip_border and flow).
+        if (ctx !== pass.ctx || !link || (skipBorder && flow)) return original.apply(this, args);
+        // Native draws floating links (disabled) too, which selection focus and runs never hold.
+        const disabled = Boolean(extras?.disabled);
+        const focused = pass.focus !== '' && !disabled && focuses(link, extras?.reroute);
+        const step = pass.runs && !disabled ? stepInto(link) : undefined;
+        if (pass.focus === 'dim' && !focused && !step) return dim(this, args);
+        if (pass.focus === 'hide' && !focused && !step) return hide(this, args);
+        // Animate only these leaves the rest to native.
+        if (pass.on && !disabled && (focused || step || pass.focus !== 'animate')) {
+            const segment = record(this, link, a, b, color, startDir, endDir, extras, focused, step);
             // A segment we failed to draw is left to native.
             if (place(this, ctx, segment)) {
                 args[0] = dummy();
-                renderLink.apply(this, args);
+                original.apply(this, args);
                 if (segment.custom) hit(extras?.reroute ?? link, segment.path);
                 return;
             }
+        } else {
+            // Native draws it, with the run's visuals over it.
+            if (step) record(this, link, a, b, color, startDir, endDir, extras, focused, step);
+            if (focused && pass.tinted) return tint(this, args);
         }
-        return renderLink.apply(this, args);
+        return original.apply(this, args);
     };
 
-    // Over the background and under the nodes, unless the graph puts links over the nodes (links_ontop).
+    // Over the background and under the nodes, unless the graph puts links over the nodes (links_ontop), with the run's
+    // visuals over them. A focus built again, or a run's visuals gone, since the background was drawn draws it again;
+    // focused links come over the nodes.
     layers.links = (canvas, ctx, over) => {
-        if (over !== Boolean(canvas.graph?.config.links_ontop)) return;
+        const ontop = Boolean(canvas.graph?.config.links_ontop);
+        if (!over && (syncFocus(canvas) || (pass.runs && !flowsShown()))) canvas.setDirty(true, true);
+        if (over && !ontop) raise(canvas, ctx);
+        if (over !== ontop) return;
         live.links = motion(canvas, ctx);
-        if (live.links) wake();
+        live.flows = flows(canvas, ctx);
+        if (live.links || live.flows) wake();
     };
 }

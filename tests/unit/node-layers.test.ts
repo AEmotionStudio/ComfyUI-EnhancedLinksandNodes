@@ -532,13 +532,14 @@ describe('the node menu', () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER] });
         const [node] = canvas.graph._nodes;
         const items = menu(node);
-        expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true]]);
+        // Go to connected node comes third (tests/unit/navigation.test.ts).
+        expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
         expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Flower of Life', null, 'Particles only']);
-        expect(labels(items[1])).toEqual(['✓ Use global', 'Fireworks', 'Off']);
+        expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
-        node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'off' };
+        node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
         expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
-        expect(labels(menu(node)[1])).toEqual(['Use global', 'Fireworks', '✓ Off']);
+        expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
     it('write a pick to the node as one change the history can undo, and Use global takes it back out', async () => {
@@ -546,8 +547,8 @@ describe('the node menu', () => {
         const [node] = canvas.graph._nodes;
         pick(node, 'Node FX', 'Neon Nexus');
         pick(node, 'Node FX', 'Particles only');
-        pick(node, 'Completion FX', 'Fireworks');
-        expect(node.properties).toEqual({ enhanced_fx_style: 2, enhanced_fx_particles_only: true, enhanced_fx_completion: 'fireworks' });
+        pick(node, 'Completion FX', 'Primary (anchor here)');
+        expect(node.properties).toEqual({ enhanced_fx_style: 2, enhanced_fx_particles_only: true, enhanced_fx_completion: 'primary' });
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(3).fill(['emitBeforeChange', 'emitAfterChange']).flat());
         pick(node, 'Node FX', 'Use global (Off)');
         pick(node, 'Completion FX', 'Use global');
@@ -572,8 +573,8 @@ describe('the node menu', () => {
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
         expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
-        completion.submenu!.options.find((option) => option?.content === 'Fireworks')!.callback!();
-        expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['fireworks', undefined]);
+        completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
+        expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
         expect(menu(other)[0].content).toBe('Node FX');
     });
 
@@ -594,7 +595,7 @@ describe('the node menu', () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER, { pos: [700, 300] }, { pos: [300, 700] }] });
         const [odd, kept, bare] = canvas.graph._nodes;
         odd.properties = { enhanced_fx_style: 7, enhanced_fx_particles_only: 'yes', enhanced_fx_completion: 'loud' };
-        kept.properties = { enhanced_fx_style: 4, enhanced_fx_completion: 'fireworks', other: 1 };
+        kept.properties = { enhanced_fx_style: 4, enhanced_fx_completion: 'primary', other: 1 };
         const before = JSON.stringify([odd.properties, kept.properties]);
         const from = canvas.front.paints.length;
         const { calls } = frame(canvas);

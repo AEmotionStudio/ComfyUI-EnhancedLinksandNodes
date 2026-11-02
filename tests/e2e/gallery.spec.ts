@@ -497,16 +497,20 @@ async function shootRow(page: Page, row: Row, settings: Record<string, unknown>,
 
 /**
  * A run of this page's finishing, as each version heard of it: v1 from the global 'status' event, the queue going busy
- * then empty; v3 from the events ComfyUI sends the client that queued the run, which reached every node and succeeded.
+ * then empty; v3 from the events ComfyUI sends the client that queued the run, which ran every node and succeeded.
  */
 function finishRun(page: Page): Promise<void> {
     return page.evaluate(() => {
         const { api, graph } = window.app;
         api.dispatchCustomEvent('status', { exec_info: { queue_remaining: 1 } });
         api.dispatchCustomEvent('execution_start', { prompt_id: 'sheet', timestamp: 0 });
-        for (const node of graph.nodes) api.dispatchCustomEvent('executing', String(node.id));
-        api.dispatchCustomEvent('executing', null);
+        for (const node of graph.nodes) {
+            const id = String(node.id);
+            api.dispatchCustomEvent('progress_state', { prompt_id: 'sheet', nodes: { [id]: { value: 0, max: 1, state: 'running', node_id: id, display_node_id: id, prompt_id: 'sheet' } } });
+            api.dispatchCustomEvent('executing', id);
+        }
         api.dispatchCustomEvent('execution_success', { prompt_id: 'sheet', timestamp: 0 });
+        api.dispatchCustomEvent('executing', null);
         api.dispatchCustomEvent('status', { exec_info: { queue_remaining: 0 } });
     });
 }

@@ -11,7 +11,8 @@
  * fresh install just notes that it was told. About shows the picker again, to
  * choose another look. Where the toasts take no action and the panel is
  * closed, the undo of a pick, and of any change the panel offers to undo,
- * shows in a bar where the card shows.
+ * shows in a bar where the card shows. Chips, one at a time, say where a jump
+ * went at the foot of the canvas.
  *
  * @module sidebar/picker
  */
@@ -30,6 +31,8 @@ const NEWS = '3.0.0';
 /** How long the page keeps still before the picker shows, and how often it looks again while it is busy. */
 const IDLE_MS = 1500;
 const NEWS_MS = 10_000;
+/** How long a chip shows. */
+export const CHIP_MS = 6000;
 
 const byId = (id: string) => LOOKS.find((look) => look.id === id)!;
 const SUBTLE = byId('subtle');
@@ -39,8 +42,10 @@ let card: HTMLElement | undefined;
 let asking = false;
 /** Where the focus was before the card took it. */
 let before: Element | null = null;
-/** The undo bar while it shows. */
+/** The undo bar while it shows, and the chip. */
 let offer: HTMLElement | undefined;
+let pill: HTMLElement | undefined;
+let pillTimer = 0;
 
 /** The canvas's part of the page, beside the sidebar and above the bottom panel, in 1.39.5 and 1.57.1. */
 const host = (): Element => document.querySelector('.graph-canvas-panel')!;
@@ -165,6 +170,25 @@ export function undoBar(title: string, undo: () => void): void {
     const timer = setTimeout(() => bar.remove(), UNDO_MS);
     offer = bar;
     host().append(bar);
+}
+
+/**
+ * A chip at the foot of the canvas, in the middle, between ComfyUI's own controls, for `ms`: `text`, then a button
+ * that closes it and runs `action`. It takes the place of the last; without either, the last just goes.
+ */
+export function chip(text?: string, action?: [label: string, run: () => void], ms = CHIP_MS): void {
+    pill?.remove();
+    clearTimeout(pillTimer);
+    if (!text && !action) return;
+    const el = h('div', { class: 'eln eln-chipbar', role: 'status' });
+    if (text) el.append(h('span', {}, text));
+    if (action) el.append(button(action[0], () => {
+        el.remove();
+        action[1]();
+    }));
+    pill = el;
+    pillTimer = window.setTimeout(() => el.remove(), ms);
+    host().append(el);
 }
 
 /** What is new in 3.0, told once to an upgrader who customised; a fresh install just notes it was told. */

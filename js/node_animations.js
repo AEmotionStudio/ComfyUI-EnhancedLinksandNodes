@@ -1,6 +1,5 @@
 import { app } from "/scripts/app.js";
-import { api } from "/scripts/api.js";
-import { N, H as translucent, I as revision, S as SELECTION_FX, J as nodeMenu, K as nodeSettings, d as install, e as installPanel, M as layers, O as live, P as startSprites, Q as drawBursts, R as guard, U as particlesOnly$1, V as drawNodeFx, W as clock, X as OVER, Y as dummy, D as fireworks, Z as holdsStill, _ as reach, $ as UNDER, a0 as wake, a1 as ownStyle, a2 as STILL_NODE, a3 as nodePalette, a4 as OWN_COMPLETION, a5 as stopSprites } from "./chunks/menus-BcXUDhho.js";
+import { z as N, W as translucent, X as revision, S as SELECTION_FX, Y as nodeMenu, Z as nodeSettings, b as install, d as installPanel, e as installRuns, _ as layers, $ as live, a0 as startSprites, a1 as drawBursts, a2 as guard, a3 as FIREWORKS, a4 as particlesOnly$1, a5 as drawNodeFx, a6 as clock, a7 as OVER, a8 as dummy, a9 as holdsStill, aa as reach, ab as overlaps, ac as UNDER, ad as wake, ae as ownStyle, af as during, ag as CALM_ALPHA, ah as STILL_NODE, ai as nodePalette, aj as stopSprites } from "./chunks/menus-CKk-joPo.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -142,7 +141,6 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
 const EFFECT = "Node effect";
 const PARTICLES = "Node particles";
 const TITLES = "Animated titles";
-const FIREWORKS = "Fireworks";
 const [ROUND, CIRCLE, CARD] = [2, 3, 4];
 const [NEVER, BYPASS] = [2, 4];
 const NO_TITLE = 1;
@@ -160,6 +158,7 @@ function modeAlpha(canvas, node) {
   if (node.flags.ghost) return 0.3;
   return node.mode === BYPASS ? 0.2 : node.mode === NEVER ? 0.4 : canvas.editor_alpha;
 }
+const fxAlpha = (canvas, node) => modeAlpha(canvas, node) * (during(N.pauseDuringRender) === "calm" ? CALM_ALPHA : 1);
 const ROUND_CORNERS = [0];
 const CARD_CORNERS = [0, 0, 0, 0];
 function body(canvas, ctx, node) {
@@ -197,10 +196,9 @@ function halo(canvas, ctx, node, style, scale) {
   ctx.shadowBlur = 10 * N.glow;
   ctx.shadowOffsetX = 2 * canvas.ds.scale - shift;
   ctx.shadowOffsetY = 2 * canvas.ds.scale;
-  ctx.globalAlpha = modeAlpha(canvas, node);
+  ctx.globalAlpha = fxAlpha(canvas, node);
   ctx.fill();
 }
-const overlaps = (box, area, margin) => box[0] - margin <= area[0] + area[2] && box[0] + box[2] + margin >= area[0] && box[1] - margin <= area[1] + area[3] && box[1] + box[3] + margin >= area[1];
 function under(canvas, ctx) {
   const { graph } = canvas;
   if (!graph || LiteGraph.vueNodesMode) return;
@@ -230,7 +228,7 @@ function under(canvas, ctx) {
         ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
         body(canvas, ctx, node);
         ctx.clip("evenodd");
-        drawNodeFx(ctx, style, node, node.size[0], node.size[1], clock, partOf(canvas, node, UNDER), modeAlpha(canvas, node), only);
+        drawNodeFx(ctx, style, node, node.size[0], node.size[1], clock, partOf(canvas, node, UNDER), fxAlpha(canvas, node), only);
       }
     } catch (error) {
       guard.fail(keyOf(style), error);
@@ -256,20 +254,13 @@ function styledTitle(canvas, ctx, node) {
 }
 let shaping;
 let titled;
-const reached = /* @__PURE__ */ new Set();
-let ranOn;
-function celebrates(node) {
-  const own = node.properties[OWN_COMPLETION];
-  if (own === "fireworks") return true;
-  if (own === "off") return false;
-  return N.endAnimationEnabled && reached.has(String(node.id)) && Boolean(node.constructor.nodeData?.output_node);
-}
 const ext = {
   name: "enhanced.node.animations",
   settings: nodeSettings,
   async setup() {
     install();
     installPanel("nodes");
+    installRuns("nodes");
     layers.nodes = under;
     layers.bursts = (canvas, ctx) => {
       if (!live.bursts) return;
@@ -303,7 +294,7 @@ const ext = {
           ctx.beginPath();
           body(this, ctx, node);
           ctx.clip();
-          drawNodeFx(ctx, style, node, size[0], size[1], clock, partOf(this, node, OVER), modeAlpha(this, node), only);
+          drawNodeFx(ctx, style, node, size[0], size[1], clock, partOf(this, node, OVER), fxAlpha(this, node), only);
         } catch (error) {
           guard.fail(keyOf(style), error);
         } finally {
@@ -319,20 +310,6 @@ const ext = {
       args[0] = dummy();
       return drawTitleText.apply(this, args);
     };
-    api.addEventListener("execution_start", () => {
-      reached.clear();
-      ranOn = app.canvas?.graph;
-    });
-    api.addEventListener("executing", ({ detail }) => {
-      if (detail != null) reached.add(String(detail));
-    });
-    api.addEventListener("execution_cached", ({ detail }) => {
-      for (const id of detail.nodes) reached.add(String(id));
-    });
-    api.addEventListener("execution_success", ({ detail }) => {
-      const graph = app.canvas?.graph;
-      if (N.enabled && graph && graph === ranOn && !guard.off(FIREWORKS)) fireworks(graph.nodes.filter(celebrates), detail.prompt_id);
-    });
     console.log("[EnhancedNodes] Extension registered with full animation pipeline.");
   },
   getNodeMenuItems: nodeMenu,

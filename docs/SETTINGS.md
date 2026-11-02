@@ -120,18 +120,44 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Title orbit radius | `📦 Enhanced Nodes.Text.Rotation.Radius` | slider | 0 to 50, step 1 | `0` | Circles the title around its position. |
 | Title rotation | `📦 Enhanced Nodes.Text.Rotation.Angle` | slider | -180 to 180, step 5 | `0` |  |
 
-## Runs · During a run
+## Focus & Flow · Selection focus
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Pause link animation during runs | `🔗 Enhanced Links.Pause.During.Render` | boolean | `true`, `false` | `true` | Links hold a still frame while the queue is running. |
-| Pause node effects during runs | `📦 Enhanced Nodes.Pause.During.Render` | boolean | `true`, `false` | `true` | Node effects and their particles hold still while the queue is running. |
+| Selection focus | `🔗 Enhanced Links.Focus.Enabled` | boolean | `true`, `false` | `true` | Make the selection's connections stand out. |
+| Selection focus mode | `🔗 Enhanced Links.Focus.Mode` | combo | `highlight` Highlight, `animate` Animate only these, `dim` Dim others, `hide` Hide others | `highlight` Highlight |  |
+| Focused link color | `🔗 Enhanced Links.Focus.Color` | combo | `native` White (ComfyUI), `accent` Theme accent, `type` Link type color | `native` White (ComfyUI) |  |
+| Focus reach | `🔗 Enhanced Links.Focus.Depth` | combo | `direct` Direct links, `upstream` Everything feeding in, `downstream` Everything it feeds, `chain` Whole chain | `direct` Direct links |  |
+| Bring focused links to front | `🔗 Enhanced Links.Focus.OnTop` | boolean | `true`, `false` | `true` | Draws them above nodes. |
+| Focus on hover | `🔗 Enhanced Links.Focus.Hover` | boolean | `true`, `false` | `false` | Hover a node to focus it without selecting. |
+| Dimmed link opacity | `🔗 Enhanced Links.Focus.Dim` | slider | 5 to 60, step 5 | `20` |  |
 
-## Runs · Completion
+## Focus & Flow · Navigation
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Fireworks when a run finishes | `📦 Enhanced Nodes.End Animation.Enabled` | boolean | `true`, `false` | `true` | Above your run's output nodes. Completion FX in the node menu sets them for one node. |
+| Double-click a slot to jump | `🔗 Enhanced Links.Navigate.DoubleClick` | boolean | `true`, `false` | `true` | Fly to the other end; repeat to cycle. |
+| Follow execution | `🔗 Enhanced Links.Navigate.Follow` | boolean | `true`, `false` | `false` | Pan to each node as your run reaches it. |
+
+## Focus & Flow · During a run
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| During a run | `🔗 Enhanced Links.Pause.Mode` | combo | `pause` Freeze effects, `calm` Calm, `spotlight` Spotlight, `ignore` Keep animating | `spotlight` Spotlight | Reacts to your own runs only. |
+| Apply run behavior to links | `🔗 Enhanced Links.Pause.During.Render` | boolean | `true`, `false` | `true` | Off = links ignore runs. |
+| Apply run behavior to nodes | `📦 Enhanced Nodes.Pause.During.Render` | boolean | `true`, `false` | `true` |  |
+| Data river | `🔗 Enhanced Links.Flow.River` | boolean | `true`, `false` | `true` | Light flowing into the running node. |
+| Executed-path trail | `🔗 Enhanced Links.Flow.Trail` | boolean | `true`, `false` | `true` | The run's path keeps a fading glow. |
+| Trail fade time | `🔗 Enhanced Links.Flow.Trail.Fade` | slider | 2 to 30, step 1 | `8` |  |
+| Progress ring | `📦 Enhanced Nodes.Run.Ring` | boolean | `true`, `false` | `true` | Ring fills with the node's progress. |
+| Error pulse | `📦 Enhanced Nodes.Run.Error` | boolean | `true`, `false` | `true` | Failed node pulses red. |
+
+## Focus & Flow · Completion
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Fireworks when a run finishes | `📦 Enhanced Nodes.End Animation.Enabled` | boolean | `true`, `false` | `true` | Plays when your run succeeds. |
+| Completion anchor | `📦 Enhanced Nodes.Completion.Anchor` | combo | `outputs` Output nodes, `primary` Primary nodes, `viewport` Center of screen | `outputs` Output nodes | Mark primary nodes in the node menu. |
 
 ## Performance · Budget
 

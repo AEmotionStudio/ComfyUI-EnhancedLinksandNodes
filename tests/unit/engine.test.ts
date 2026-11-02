@@ -12,7 +12,7 @@ import { clock, guard, install, live } from '@/core/engine';
 import { preview } from '@/core/settings';
 import { MOVING } from '@/links/animations';
 import { app, fake } from '../helpers/fake-app';
-import { frames, page, queue, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
+import { frames, page, send, start, type FakeCanvas, type GraphSpec } from '../helpers/fake-litegraph';
 
 const TURN = (2 * Math.PI) / 15;
 const PHI2 = ((1 + Math.sqrt(5)) / 2) ** 2;
@@ -112,7 +112,8 @@ describe('clock', () => {
         }
         expect(turning[0]).toBeCloseTo(1 - 2 / 18, 9);
         expect(turning[8]).toBeCloseTo(0, 9);
-        expect(turning.slice(17)).toEqual(Array(7).fill(-1));
+        // Turned all the way, to within the frames' timing.
+        expect(turning.slice(17).map((dir) => Math.round(dir * 1e9) / 1e9)).toEqual(Array(7).fill(-1));
         // Flowing backwards now, at the full rate.
         const flow = clock.linkFlow;
         frames(60);
@@ -143,7 +144,8 @@ describe('clock', () => {
         }
         expect(turning[0]).toBeCloseTo(1 - 2 / 18, 9);
         expect(turning[8]).toBeCloseTo(0, 9);
-        expect(turning.slice(17)).toEqual(Array(7).fill(-1));
+        // Turned all the way, to within the frames' timing.
+        expect(turning.slice(17).map((dir) => Math.round(dir * 1e9) / 1e9)).toEqual(Array(7).fill(-1));
         const before = { ...clock };
         frames(60);
         expect(clock.nodePhase - before.nodePhase).toBeCloseTo(-TURN, 9);
@@ -242,7 +244,7 @@ describe('ticker', () => {
     // Animated titles move with the node effect's phase, so they stop with it.
     for (const [why, settings, still] of [
         ['in Static mode', { ...NODES_ON, ...TITLES, '🔗 Enhanced Links.Static.Mode': true, '📦 Enhanced Nodes.Static.Mode': true, '📦 Enhanced Nodes.Particle.Show': false }, () => {}],
-        ['while a run pauses links and nodes', { ...TITLES, '📦 Enhanced Nodes.Animate': 1 }, () => queue(1)],
+        ["while this client's run holds links and nodes still", { ...TITLES, '📦 Enhanced Nodes.Animate': 1 }, () => send('execution_start', { prompt_id: 'held', timestamp: 0 })],
         ['with reduced motion', { ...NODES_ON, ...TITLES }, () => {
             fake.reducedMotion.matches = true;
             fake.reducedMotion.dispatchEvent(new Event('change'));
@@ -318,7 +320,7 @@ describe('ticker', () => {
         preview('📦 Enhanced Nodes.Animate', 2);
         frames(5);
         expect(page.waiting).toHaveLength(1);
-        expect(live).toEqual({ links: 1, nodes: 2, particles: 2, bursts: 0 });
+        expect(live).toEqual({ links: 1, nodes: 2, particles: 2, bursts: 0, marks: 0, flows: 0, rings: 0 });
     });
 });
 

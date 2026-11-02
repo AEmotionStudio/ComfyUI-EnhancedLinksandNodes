@@ -122,6 +122,34 @@ const MOTION_OPTIONS = [
   { value: "reduce", text: "Reduce" },
   { value: "full", text: "Full" }
 ];
+const FOCUS_MODE_OPTIONS = [
+  { value: "highlight", text: "Highlight" },
+  { value: "animate", text: "Animate only these" },
+  { value: "dim", text: "Dim others" },
+  { value: "hide", text: "Hide others" }
+];
+const FOCUS_COLOR_OPTIONS = [
+  { value: "native", text: "White (ComfyUI)" },
+  { value: "accent", text: "Theme accent" },
+  { value: "type", text: "Link type color" }
+];
+const FOCUS_DEPTH_OPTIONS = [
+  { value: "direct", text: "Direct links" },
+  { value: "upstream", text: "Everything feeding in" },
+  { value: "downstream", text: "Everything it feeds" },
+  { value: "chain", text: "Whole chain" }
+];
+const PAUSE_MODE_OPTIONS = [
+  { value: "pause", text: "Freeze effects" },
+  { value: "calm", text: "Calm" },
+  { value: "spotlight", text: "Spotlight" },
+  { value: "ignore", text: "Keep animating" }
+];
+const COMPLETION_ANCHOR_OPTIONS = [
+  { value: "outputs", text: "Output nodes" },
+  { value: "primary", text: "Primary nodes" },
+  { value: "viewport", text: "Center of screen" }
+];
 const COEXIST_OPTIONS = [
   { value: "auto", text: "Step aside if one is found" },
   { value: "ours", text: "Keep Enhanced link effects" },
@@ -135,6 +163,8 @@ const shadows = () => linksOn() && L.animate === CLASSIC$2 && L.linkShadowEnable
 const effects$1 = () => N.enabled && N.animate !== 0;
 const nodesDraw = () => N.enabled && (N.animate !== 0 || N.particleShow || N.textAnimationEnabled);
 const particles = () => N.enabled && N.particleShow;
+const focusOn = () => L.focusEnabled;
+const runsChange = () => L.pauseMode !== "ignore";
 const titles = () => N.enabled && N.textAnimationEnabled;
 const customNodes = () => N.colorMode === "custom" ? void 0 : { reason: "Used when Node effect colors is Custom.", id: "📦 Enhanced Nodes.Color.Mode", value: "custom" };
 const LINKS$1 = "🔗 Enhanced Links.";
@@ -208,9 +238,25 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Text.Position.Y", key: "textPositionY", name: "Title offset Y", type: "slider", min: -50, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
   { id: "📦 Enhanced Nodes.Text.Rotation.Radius", key: "textRotationRadius", name: "Title orbit radius", type: "slider", min: 0, max: 50, step: 1, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles, tooltip: "Circles the title around its position." },
   { id: "📦 Enhanced Nodes.Text.Rotation.Angle", key: "textRotationAngle", name: "Title rotation", type: "slider", min: -180, max: 180, step: 5, default: 0, group: "Nodes · Titles", advanced: true, showIf: titles },
-  { id: "🔗 Enhanced Links.Pause.During.Render", key: "pauseDuringRender", name: "Pause link animation during runs", type: "boolean", default: true, group: "Runs · During a run", advanced: true, showIf: linksOn, tooltip: "Links hold a still frame while the queue is running." },
-  { id: "📦 Enhanced Nodes.Pause.During.Render", key: "pauseDuringRender", name: "Pause node effects during runs", type: "boolean", default: true, group: "Runs · During a run", advanced: true, showIf: nodesDraw, tooltip: "Node effects and their particles hold still while the queue is running." },
-  { id: "📦 Enhanced Nodes.End Animation.Enabled", key: "endAnimationEnabled", name: "Fireworks when a run finishes", type: "boolean", default: true, group: "Runs · Completion", showIf: () => N.enabled, tooltip: "Above your run's output nodes. Completion FX in the node menu sets them for one node." },
+  { id: "🔗 Enhanced Links.Focus.Enabled", key: "focusEnabled", name: "Selection focus", type: "boolean", default: true, group: "Focus & Flow · Selection focus", look: false, tooltip: "Make the selection's connections stand out." },
+  { id: "🔗 Enhanced Links.Focus.Mode", key: "focusMode", name: "Selection focus mode", type: "combo", options: FOCUS_MODE_OPTIONS, default: "highlight", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
+  { id: "🔗 Enhanced Links.Focus.Color", key: "focusColor", name: "Focused link color", type: "combo", options: FOCUS_COLOR_OPTIONS, default: "native", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
+  { id: "🔗 Enhanced Links.Focus.Depth", key: "focusDepth", name: "Focus reach", type: "combo", options: FOCUS_DEPTH_OPTIONS, default: "direct", group: "Focus & Flow · Selection focus", look: false, showIf: focusOn },
+  { id: "🔗 Enhanced Links.Focus.OnTop", key: "focusOnTop", name: "Bring focused links to front", type: "boolean", default: true, group: "Focus & Flow · Selection focus", look: false, showIf: focusOn, tooltip: "Draws them above nodes." },
+  { id: "🔗 Enhanced Links.Focus.Hover", key: "focusHover", name: "Focus on hover", type: "boolean", default: false, group: "Focus & Flow · Selection focus", look: false, showIf: focusOn, tooltip: "Hover a node to focus it without selecting." },
+  { id: "🔗 Enhanced Links.Focus.Dim", key: "focusDim", name: "Dimmed link opacity", type: "slider", min: 5, max: 60, step: 5, default: 20, group: "Focus & Flow · Selection focus", advanced: true, look: false, showIf: () => focusOn() && L.focusMode === "dim" },
+  { id: "🔗 Enhanced Links.Navigate.DoubleClick", key: "navigateDoubleClick", name: "Double-click a slot to jump", type: "boolean", default: true, group: "Focus & Flow · Navigation", look: false, tooltip: "Fly to the other end; repeat to cycle." },
+  { id: "🔗 Enhanced Links.Navigate.Follow", key: "navigateFollow", name: "Follow execution", type: "boolean", default: false, group: "Focus & Flow · Navigation", look: false, tooltip: "Pan to each node as your run reaches it." },
+  { id: "🔗 Enhanced Links.Pause.Mode", key: "pauseMode", name: "During a run", type: "combo", options: PAUSE_MODE_OPTIONS, default: "spotlight", group: "Focus & Flow · During a run", tooltip: "Reacts to your own runs only." },
+  { id: "🔗 Enhanced Links.Pause.During.Render", key: "pauseDuringRender", name: "Apply run behavior to links", type: "boolean", default: true, group: "Focus & Flow · During a run", advanced: true, showIf: runsChange, tooltip: "Off = links ignore runs." },
+  { id: "📦 Enhanced Nodes.Pause.During.Render", key: "pauseDuringRender", name: "Apply run behavior to nodes", type: "boolean", default: true, group: "Focus & Flow · During a run", advanced: true, showIf: runsChange },
+  { id: "🔗 Enhanced Links.Flow.River", key: "flowRiver", name: "Data river", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => L.enabled, tooltip: "Light flowing into the running node." },
+  { id: "🔗 Enhanced Links.Flow.Trail", key: "flowTrail", name: "Executed-path trail", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => L.enabled, tooltip: "The run's path keeps a fading glow." },
+  { id: "🔗 Enhanced Links.Flow.Trail.Fade", key: "flowTrailFade", name: "Trail fade time", type: "slider", min: 2, max: 30, step: 1, default: 8, group: "Focus & Flow · During a run", advanced: true, look: false, showIf: () => L.enabled && L.flowTrail },
+  { id: "📦 Enhanced Nodes.Run.Ring", key: "runRing", name: "Progress ring", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Ring fills with the node's progress." },
+  { id: "📦 Enhanced Nodes.Run.Error", key: "runError", name: "Error pulse", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Failed node pulses red." },
+  { id: "📦 Enhanced Nodes.End Animation.Enabled", key: "endAnimationEnabled", name: "Fireworks when a run finishes", type: "boolean", default: true, group: "Focus & Flow · Completion", showIf: () => N.enabled, tooltip: "Plays when your run succeeds." },
+  { id: "📦 Enhanced Nodes.Completion.Anchor", key: "completionAnchor", name: "Completion anchor", type: "combo", options: COMPLETION_ANCHOR_OPTIONS, default: "outputs", group: "Focus & Flow · Completion", look: false, showIf: () => N.enabled && N.endAnimationEnabled, tooltip: "Mark primary nodes in the node menu." },
   { id: "🔗 Enhanced Links.Perf.MaxFps", key: "perfMaxFps", name: "Effect frame-rate cap", type: "combo", options: MAX_FPS_OPTIONS, default: 60, group: "Performance · Budget", look: false, tooltip: "The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows." },
   { id: "🔗 Enhanced Links.Motion", key: "motion", name: "Motion", type: "combo", options: MOTION_OPTIONS, default: "system", group: "Performance · Accessibility", look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },
   { id: "🔗 Enhanced Links.Coexist", key: "coexist", name: "Other link extensions", type: "combo", options: COEXIST_OPTIONS, default: "auto", group: "Performance · Compatibility", advanced: true, look: false, tooltip: "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working." },
@@ -258,10 +304,10 @@ const L = snapshot(LINKS$1);
 const N = snapshot(NODES);
 let revision = 0;
 const snapshotOf = (id) => id.startsWith(LINKS$1) ? L : N;
-const shown$2 = (id) => snapshotOf(id)[setting(id).key];
+const shown$3 = (id) => snapshotOf(id)[setting(id).key];
 function checked(id) {
   app.extensionManager.setting.get(id);
-  return shown$2(id);
+  return shown$3(id);
 }
 const listeners = /* @__PURE__ */ new Set();
 function watch(listener) {
@@ -287,7 +333,7 @@ function present(s, value) {
 const stored = /* @__PURE__ */ new Map();
 let migrated;
 let writing;
-const own = /* @__PURE__ */ new Set();
+const own$1 = /* @__PURE__ */ new Set();
 function params(prefix) {
   return SETTINGS.flatMap((s, i) => s.id.startsWith(prefix) ? [{
     // The package types id as keyof Settings, the core ids only; the settings store takes any string.
@@ -307,8 +353,8 @@ function params(prefix) {
     onChange: (value, old) => {
       const chosen = old !== void 0 && writing !== s.id;
       if (old === void 0 && s.type !== "hidden") {
-        if (migrated === s.id && value !== (V2_DEFAULTS[s.id] ?? s.default)) own.add(s.id);
-        else own.delete(s.id);
+        if (migrated === s.id && value !== (V2_DEFAULTS[s.id] ?? s.default)) own$1.add(s.id);
+        else own$1.delete(s.id);
         if (s.id in V2_DEFAULTS && value === V2_DEFAULTS[s.id]) overlaid.add(s.id);
         else overlaid.delete(s.id);
       } else if (chosen) overlaid.delete(s.id);
@@ -321,7 +367,7 @@ function params(prefix) {
 }
 const linkSettings = params(LINKS$1);
 const nodeSettings = params(NODES);
-const customised = () => own.size > 0;
+const customised = () => own$1.size > 0;
 const unsaved = /* @__PURE__ */ new Map();
 let saving = Promise.resolve();
 function saved(id) {
@@ -400,11 +446,21 @@ const QUANTUM_SWEEPS = 5;
 const JITTER_MS = 1;
 const GUARD_MS = 1e4;
 const FAILURES = 5;
-const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0 };
+const CALM = 0.25;
+const CALM_ALPHA = 0.5;
+const CALM_FPS = 20;
+const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0 };
 const STILL_PHASE = 9 * Math.PI / 4;
 const env = { running: false, reducedMotion: false };
-const live = { links: 0, nodes: 0, particles: 0, bursts: 0 };
+const during = (applies) => env.running && applies ? L.pauseMode : "ignore";
+function heldByRun(applies) {
+  const mode = during(applies);
+  return mode === "pause" || mode === "spotlight";
+}
+const calm$1 = () => during(L.pauseDuringRender) === "calm" || during(N.pauseDuringRender) === "calm";
+const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0 };
 const layers = {};
+const overlaps = (box2, area, margin) => box2[0] - margin <= area[0] + area[2] && box2[0] + box2[2] + margin >= area[0] && box2[1] - margin <= area[1] + area[3] && box2[1] + box2[3] + margin >= area[1];
 function offscreen(width, height) {
   return typeof OffscreenCanvas === "function" ? new OffscreenCanvas(width, height) : Object.assign(document.createElement("canvas"), { width, height });
 }
@@ -417,26 +473,30 @@ let frame$2 = 0;
 let last$1 = 0;
 let due = 0;
 function want() {
-  return !document.hidden && live.links + live.nodes + live.particles + live.bursts > 0;
+  return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings > 0;
 }
 const toward = (dir, to, dt) => dir + Math.max(-2 * dt / TURNAROUND, Math.min(2 * dt / TURNAROUND, to - dir));
-function advance(k2, dt, moving) {
-  if (moving.links) {
+function advance(k2, dt, moving2) {
+  if (moving2.links) {
     const speed = L.animationSpeed;
+    const linkDt = during(L.pauseDuringRender) === "calm" ? dt * CALM : dt;
     k2.linkDir = toward(k2.linkDir, L.direction, dt);
-    k2.linkPhase -= PHI2 * speed * k2.linkDir * dt;
-    k2.linkFlow += 2 * speed * speed * k2.linkDir * dt;
-    k2.quantumPhase -= Math.min(PHI2 * speed, 2 * Math.PI * MAX_FLASH_HZ / QUANTUM_SWEEPS) * k2.linkDir * dt;
+    k2.linkPhase -= PHI2 * speed * k2.linkDir * linkDt;
+    k2.linkFlow += 2 * speed * speed * k2.linkDir * linkDt;
+    k2.quantumPhase -= Math.min(PHI2 * speed, 2 * Math.PI * MAX_FLASH_HZ / QUANTUM_SWEEPS) * k2.linkDir * linkDt;
   } else {
     k2.linkDir = L.direction;
   }
-  k2.nodeDir = moving.nodes || moving.particles ? toward(k2.nodeDir, N.direction, dt) : N.direction;
-  if (moving.nodes) k2.nodePhase += TURN * N.animationSpeed * k2.nodeDir * dt;
-  if (moving.particles) {
-    k2.particleTime += N.particleSpeed * k2.nodeDir * dt;
-    k2.nodeTime += dt;
+  const nodeDt = during(N.pauseDuringRender) === "calm" ? dt * CALM : dt;
+  k2.nodeDir = moving2.nodes || moving2.particles ? toward(k2.nodeDir, N.direction, dt) : N.direction;
+  if (moving2.nodes) k2.nodePhase += TURN * N.animationSpeed * k2.nodeDir * nodeDt;
+  if (moving2.particles) {
+    k2.particleTime += N.particleSpeed * k2.nodeDir * nodeDt;
+    k2.nodeTime += nodeDt;
   }
-  if (moving.bursts) k2.burstTime += dt;
+  if (moving2.bursts) k2.burstTime += dt;
+  if (moving2.marks) k2.markTime += dt;
+  if (moving2.flows || moving2.rings) k2.runTime += dt;
 }
 function tick$1(now) {
   frame$2 = 0;
@@ -451,7 +511,8 @@ function tick$1(now) {
   } else if (now >= due - JITTER_MS) {
     advance(clock, Math.min((now - last$1) / 1e3, 0.1), live);
     last$1 = now;
-    const interval = L.perfMaxFps ? 1e3 / L.perfMaxFps : 0;
+    const fps = calm$1() ? Math.min(L.perfMaxFps || CALM_FPS, CALM_FPS) : L.perfMaxFps;
+    const interval = fps ? 1e3 / fps : 0;
     due = due + interval > now ? due + interval : now + interval;
     heal(app.canvas);
     app.canvas.setDirty(true, false);
@@ -483,6 +544,8 @@ const hooks = {
     ctx: 0,
     draw(canvas, ctx) {
       layers.links?.(canvas, ctx, true);
+      layers.runs?.(canvas, ctx);
+      layers.marks?.(canvas, ctx);
       layers.bursts?.(canvas, ctx);
     },
     installed: void 0,
@@ -521,14 +584,14 @@ function heal(canvas) {
   }
 }
 let chained;
-let listening = false;
+let listening$1 = false;
 function install() {
   if (chained !== app.canvas) {
     chained = app.canvas;
     for (const name of HOOKS) chain(app.canvas, name);
   }
-  if (listening) return;
-  listening = true;
+  if (listening$1) return;
+  listening$1 = true;
   document.addEventListener("visibilitychange", () => {
     last$1 = 0;
     wake();
@@ -545,12 +608,6 @@ function install() {
   new MutationObserver(motion2).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   watch((id) => {
     if (id === "🔗 Enhanced Links.Motion") motion2();
-  });
-  api.addEventListener("status", ({ detail }) => {
-    const running2 = detail?.exec_info?.queue_remaining > 0;
-    if (running2 === env.running) return;
-    env.running = running2;
-    need();
   });
 }
 const failures = /* @__PURE__ */ new Map();
@@ -669,7 +726,7 @@ function filter([r, g, b, alpha], scheme) {
       return [r, g, b, alpha];
   }
 }
-const tint = (colour2) => show(filter(parse(colour2), L.colorScheme));
+const tint$2 = (colour2) => show(filter(parse(colour2), L.colorScheme));
 const palettes = /* @__PURE__ */ new Map();
 let palettesSince = -1;
 function palette(colour2) {
@@ -683,13 +740,43 @@ function palette(colour2) {
     const rgba = parse(colour2);
     if (rgba) {
       const own2 = show(filter(rgba, L.colorScheme));
-      const [primary, secondary, accent] = L.colorMode === "custom" ? [tint(L.colorPrimary), tint(L.colorSecondary), tint(L.colorAccent)] : [own2, own2, own2];
-      const marker = L.markerColorMode === "custom" ? tint(L.markerColor) : L.markerColorMode === "inherit" ? primary : own2;
-      p = { native: show(rgba), primary, secondary, accent, marker };
+      const [primary, secondary, accent2] = L.colorMode === "custom" ? [tint$2(L.colorPrimary), tint$2(L.colorSecondary), tint$2(L.colorAccent)] : [own2, own2, own2];
+      const marker = L.markerColorMode === "custom" ? tint$2(L.markerColor) : L.markerColorMode === "inherit" ? primary : own2;
+      p = { native: show(rgba), primary, secondary, accent: accent2, marker };
     } else p = null;
     palettes.set(colour2, p);
   }
   return p ?? void 0;
+}
+const solids = /* @__PURE__ */ new Map();
+const lifted = /* @__PURE__ */ new Map();
+let solidsSince = -1;
+function solidCaches() {
+  if (solidsSince === revision) return;
+  solids.clear();
+  lifted.clear();
+  solidsSince = revision;
+}
+function solid$1(colour2) {
+  solidCaches();
+  let p = solids.get(colour2);
+  if (!p) solids.set(colour2, p = { native: colour2, primary: colour2, secondary: colour2, accent: colour2, marker: colour2 });
+  return p;
+}
+const lift = (v) => Math.round(v + (255 - v) * 0.2);
+function lighter(colour2) {
+  solidCaches();
+  let light2 = lifted.get(colour2);
+  if (light2 === void 0) {
+    const rgba = parse(colour2);
+    light2 = rgba ? show([lift(rgba[0]), lift(rgba[1]), lift(rgba[2]), rgba[3]]) : colour2;
+    lifted.set(colour2, light2);
+  }
+  return light2;
+}
+function accent() {
+  const rgba = parse(getComputedStyle(document.body).getPropertyValue("--primary-background"));
+  return rgba ? show(rgba) : "#0b8ce9";
 }
 const hues = [];
 let huesSince = -1;
@@ -718,16 +805,16 @@ function nodePalette(style) {
   let p = nodePalettes[style];
   if (!p) {
     const custom = N.colorMode === "custom";
-    const [primary, secondary, accent] = (custom ? [N.colorPrimary, N.colorSecondary, N.colorAccent] : STYLE_COLOURS[style]).map(nodeTint);
+    const [primary, secondary, accent2] = (custom ? [N.colorPrimary, N.colorSecondary, N.colorAccent] : STYLE_COLOURS[style]).map(nodeTint);
     const [r, g, b] = parse(custom ? N.colorParticle : primary);
     const [h2, s, l] = toHsl(r, g, b);
     p = nodePalettes[style] = {
       primary,
       secondary,
-      accent,
+      accent: accent2,
       particle: custom ? nodeTint(N.colorParticle) : primary,
       complement: `hsl(${(h2 + 180) % 360}, ${s}%, ${l}%)`,
-      title: custom ? nodeTint(N.textColor) : accent
+      title: custom ? nodeTint(N.textColor) : accent2
     };
   }
   return p;
@@ -833,7 +920,7 @@ function opacity(colour2) {
   if (alpha === void 0) alphas.set(colour2, alpha = Number(colour2.slice(colour2.lastIndexOf(",") + 1, -1)));
   return alpha;
 }
-const step = (size) => Math.round(Math.log2(Math.max(size, LEAST)) * STEPS);
+const step$1 = (size) => Math.round(Math.log2(Math.max(size, LEAST)) * STEPS);
 function cast(shape, size, angle, width, colour2, blur, half) {
   const image = offscreen(2 * half, 2 * half);
   const ctx = image.getContext("2d");
@@ -849,20 +936,20 @@ function cast(shape, size, angle, width, colour2, blur, half) {
   return { image, size, half, used: pass$1 };
 }
 function evict() {
-  const all = [];
+  const all2 = [];
   for (const byColour of sprites.values()) {
-    for (const byKey of byColour.values()) for (const [key, sprite2] of byKey) all.push([byKey, key, sprite2]);
+    for (const byKey of byColour.values()) for (const [key, sprite2] of byKey) all2.push([byKey, key, sprite2]);
   }
-  all.sort((x, y) => x[2].used - y[2].used);
-  for (const [byKey, key, sprite2] of all) {
+  all2.sort((x, y) => x[2].used - y[2].used);
+  for (const [byKey, key, sprite2] of all2) {
     if (pixels <= BUDGET * 0.75) return;
     byKey.delete(key);
     pixels -= 4 * sprite2.half * sprite2.half;
   }
 }
 function sprite(shape, size, angle, width, colour2, blur) {
-  const s = step(size);
-  const w = width && step(width);
+  const s = step$1(size);
+  const w = width && step$1(width);
   const [cs, cw] = [2 ** (s / STEPS), width && 2 ** (w / STEPS)];
   const half = Math.ceil((shape.reach ?? 1) * cs + cw / 2 + 1.5 * blur) + 1;
   if (2 * half > WIDEST) return void 0;
@@ -935,7 +1022,7 @@ function disc(ctx, x, y, r, colour2, alpha, soft) {
   }
   const d = r * scale;
   if (d < LEAST) return;
-  const s = step(d);
+  const s = step$1(d);
   let byKey = discs.get(colour2);
   if (!byKey) discs.set(colour2, byKey = /* @__PURE__ */ new Map());
   const key = (s + 16) * 2 + Number(soft);
@@ -953,6 +1040,7 @@ function disc(ctx, x, y, r, colour2, alpha, soft) {
   ctx.drawImage(found.image, x - h2, y - h2, 2 * h2, 2 * h2);
   ctx.globalAlpha = before2;
 }
+const FIREWORKS = "Fireworks";
 const BURSTS = [
   { x: 0.05, y: -0.2, delay: 0, colour: "#FF3366", size: 3.2 },
   { x: 0.03, y: -0.15, delay: 0.1, colour: "#33EEFF", size: 2.9 },
@@ -970,7 +1058,7 @@ function hash(text2) {
   for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
   return h2;
 }
-function add$1(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail = 0, seq = 0) {
+function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail = 0, seq = 0) {
   const i = pool$1.count++;
   pool$1.kind[i] = kind;
   pool$1.owner[i] = owner;
@@ -981,31 +1069,35 @@ function add$1(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail =
   pool$1.trail[i] = trail;
   pool$1.seq[i] = seq;
 }
-function fireworks(nodes, run) {
+function fireworks(nodes, run2) {
   if (pool$1.count && progress() < 1 || !nodes.length) return;
   pool$1.count = bursts.length = 0;
   clock.burstTime = 0;
-  const { secondary, accent } = nodePalette(N.animate);
+  const { secondary, accent: accent2 } = nodePalette(N.animate);
   for (const node2 of nodes) {
     if (pool$1.count + SHOW > CAP) break;
-    const random = rng(hash(run) ^ hash(String(node2.id)));
+    const random = rng(hash(run2) ^ hash(String(node2.id)));
     for (const { x, y, delay, size, colour: colour2 } of BURSTS) {
-      const owner = bursts.push({ node: node2, x, y, delay, size, colours: [colour2, secondary, accent, "#FFFFFF"] }) - 1;
+      const owner = bursts.push({ node: node2, x, y, delay, size: node2.small ? size / 2 : size, colours: [colour2, secondary, accent2, "#FFFFFF"] }) - 1;
       if (env.reducedMotion) {
-        add$1(GLOW, owner);
+        add$2(GLOW, owner);
         break;
       }
-      add$1(CORE, owner);
+      add$2(CORE, owner);
       for (let i = 0; i < SPARKS; i++) {
         const speed = 0.3 + random() * 0.7;
         const shade = Math.floor(random() * 4);
-        add$1(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
+        add$2(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
       }
-      for (let j = 0; j < SPARKLES; j++) add$1(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
+      for (let j = 0; j < SPARKLES; j++) add$2(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
     }
   }
   live.bursts = pool$1.count;
   wake();
+}
+function endBursts() {
+  pool$1.count = bursts.length = 0;
+  live.bursts = 0;
 }
 function drawBursts(canvas, ctx) {
   const phase = progress();
@@ -1051,8 +1143,8 @@ function drawBursts(canvas, ctx) {
           const size = Math.max(1, 3 * (1 - t) * pool$1.size[i]) * unit;
           disc(ctx, x + Math.cos(angle) * speed * t, y + dy2, size * 1.2, colour2, alpha, true);
           for (let j = 1; j <= pool$1.trail[i]; j++) {
-            const back = Math.max(0, t - 0.02 * j);
-            disc(ctx, x + Math.cos(angle) * speed * back, y + Math.sin(angle) * speed * back + gravity * back * back, size * (1 - j * 0.2), colour2, alpha * (0.7 - j * 0.2), false);
+            const back2 = Math.max(0, t - 0.02 * j);
+            disc(ctx, x + Math.cos(angle) * speed * back2, y + Math.sin(angle) * speed * back2 + gravity * back2 * back2, size * (1 - j * 0.2), colour2, alpha * (0.7 - j * 0.2), false);
           }
           break;
         }
@@ -1078,7 +1170,353 @@ function drawBursts(canvas, ctx) {
     ctx.restore();
   }
 }
+const RUNS = "Run visuals";
+const RIVER_DELAY = 0.15;
+const RIVER_IN = 0.15;
+const RIVER_OUT = 0.6;
+const RIVER_WIDTH = 1.4;
+const SPACING = 60;
+const RIVER_SPEED = 400;
+const TRAIL = 0.35;
+const TRAIL_WIDTH = 3;
+const RING_WIDTH = 3;
+const RING_OUT = 9;
+const COMET = 0.2;
+const COMET_HZ = 0.5;
+const PULSE_HZ = 1;
+const PULSES = 3;
+const SHAKE_PX = 3;
+const SHAKE_S = 0.3;
+const RED = "#ff3b30";
+const ANCHORS = 3;
+const BATCH_MS = 1500;
+const SHOWS_MS = 3e3;
+const [BOX, CIRCLE] = [1, 3];
+const OWN_COMPLETION = "enhanced_fx_completion";
+const run = { prompt: "", workflow: void 0, end: -Infinity };
+const steps = /* @__PURE__ */ new Map();
+const cached = /* @__PURE__ */ new Set();
+let tint$1 = "";
+const held$1 = /* @__PURE__ */ new Map();
+let changes = 0;
+let celebrating = false;
+let listening = false;
+const shown$2 = [];
+const into = /* @__PURE__ */ new Map();
+const taken = { graph: void 0, version: -1, changes: -1 };
+function path(id) {
+  const nodes = [];
+  let graph = app.rootGraph;
+  for (const part2 of id.split(":")) {
+    const node2 = graph?.getNodeById(part2);
+    if (!node2) return [];
+    nodes.push(node2);
+    graph = node2.subgraph;
+  }
+  return nodes;
+}
+const standIn = (graph, id) => path(id).find((node2) => node2.graph === graph);
+const here$4 = () => app.extensionManager.workflow.activeWorkflow === run.workflow;
+function syncRuns(canvas) {
+  const { graph } = canvas;
+  if (graph === taken.graph && graph?._version === taken.version && changes === taken.changes) return;
+  Object.assign(taken, { graph, version: graph?._version ?? -1, changes });
+  shown$2.length = 0;
+  into.clear();
+  if (!graph || !steps.size || !here$4()) return;
+  for (const [id, step2] of steps) {
+    const node2 = standIn(graph, id);
+    if (!node2) continue;
+    const seen2 = into.get(Number(node2.id));
+    if (!seen2) {
+      const entry2 = { node: node2, step: step2 };
+      shown$2.push(entry2);
+      into.set(Number(node2.id), entry2);
+      continue;
+    }
+    const { start, end: end2, progress: progress2, failed } = seen2.step;
+    seen2.step = { start: Math.min(start, step2.start), end: Math.max(end2, step2.end), progress: step2.end === Infinity ? step2.progress : progress2, failed: failed || step2.failed };
+  }
+}
+const stepInto = (link2) => into.get(Number(link2.target_id))?.step;
+const flowsShown = () => (L.flowRiver || L.flowTrail) && shown$2.length > 0 && !guard.off(RUNS) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT);
+function riverAlpha(step2, t, still) {
+  if (still) return step2.end === Infinity ? 1 : 0;
+  return Math.max(0, Math.min(1, (Math.min(t, step2.end) - step2.start - RIVER_DELAY) / RIVER_IN, 1 - (t - step2.end) / RIVER_OUT));
+}
+const trailLeft = (step2, t) => step2.end > t ? 0 : Math.max(0, Math.min(1, 1 - (t - run.end) / L.flowTrailFade));
+const point = new Float64Array(4);
+function drawFlows(ctx, segments) {
+  const t = clock.runTime;
+  const still = during(L.pauseDuringRender) === "pause";
+  const flowing2 = !still && !env.reducedMotion;
+  let moving2 = 0;
+  ctx.lineCap = "round";
+  startSprites(ctx);
+  try {
+    for (const s of segments) {
+      const step2 = s.flow;
+      if (!step2 || s.empty) continue;
+      const left = L.flowTrail ? trailLeft(step2, t) : 0;
+      if (left > 0) {
+        ctx.globalAlpha = step2.failed ? left : left * TRAIL;
+        ctx.strokeStyle = step2.failed ? RED : tint$1;
+        ctx.lineWidth = L.thickness * (step2.failed ? RIVER_WIDTH : TRAIL_WIDTH);
+        ctx.beginPath();
+        s.path.trace(ctx);
+        ctx.stroke();
+        if (run.end !== Infinity) moving2++;
+      }
+      if (!L.flowRiver || step2.failed) continue;
+      const alpha = riverAlpha(step2, t, still);
+      if (!still && t < step2.end + RIVER_OUT && (flowing2 || alpha < 1)) moving2++;
+      if (alpha <= 0) continue;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = lighter(s.colour);
+      ctx.lineWidth = L.thickness * RIVER_WIDTH;
+      ctx.beginPath();
+      s.path.trace(ctx);
+      ctx.stroke();
+      const shift = flowing2 ? t * RIVER_SPEED % SPACING : 0;
+      for (let d = s.u0 + ((shift - s.u0) % SPACING + SPACING) % SPACING; d < s.u0 + s.len; d += SPACING) {
+        s.path.at((d - s.u0) / s.len, point);
+        disc(ctx, point[0], point[1], L.thickness, "#ffffff", 1, true);
+      }
+    }
+  } catch (error) {
+    guard.fail(RUNS, error);
+  } finally {
+    stopSprites();
+  }
+  return moving2;
+}
+const round = { length: 0, top: 0 };
+const dash$1 = [0, 0];
+function trace(ctx, node2, out) {
+  const box2 = node2.boundingRect;
+  const shape = node2.renderingShape;
+  ctx.beginPath();
+  if (shape === CIRCLE && !node2.flags.collapsed) {
+    const r2 = node2.size[0] / 2 + out;
+    ctx.arc(node2.pos[0] + node2.size[0] / 2, node2.pos[1] + node2.size[1] / 2, r2, -Math.PI / 2, 1.5 * Math.PI);
+    round.length = 2 * Math.PI * r2;
+    round.top = 0;
+    return;
+  }
+  const w = box2[2] + 2 * out;
+  const h2 = box2[3] + 2 * out;
+  const r = node2.flags.collapsed ? h2 / 2 : shape === BOX ? 0 : LiteGraph.ROUND_RADIUS + out;
+  ctx.roundRect(box2[0] - out, box2[1] - out, w, h2, r);
+  round.length = 2 * (w + h2) - 8 * r + 2 * Math.PI * r;
+  round.top = w / 2 - r;
+}
+function stretch(ctx, from, length) {
+  dash$1[0] = length;
+  dash$1[1] = round.length - length;
+  ctx.setLineDash(dash$1);
+  ctx.lineDashOffset = round.length - round.top - from;
+  ctx.stroke();
+}
+function ring(ctx, node2, step2, t, still) {
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = tint$1;
+  ctx.lineWidth = RING_WIDTH;
+  trace(ctx, node2, RING_OUT + RING_WIDTH / 2);
+  if (!Number.isNaN(step2.progress)) {
+    stretch(ctx, 0, step2.progress * round.length);
+    return false;
+  }
+  if (still) {
+    ctx.globalAlpha = 0.6;
+    ctx.stroke();
+    return false;
+  }
+  const piece = COMET * round.length / 4;
+  const head = t * COMET_HZ % 1 * round.length;
+  for (let i = 0; i < 4; i++) {
+    ctx.globalAlpha = (i + 1) / 4;
+    stretch(ctx, head - (4 - i) * piece, piece);
+  }
+  return true;
+}
+function failure(ctx, node2, step2, t) {
+  const age = t - step2.end;
+  const steady = env.reducedMotion || age >= PULSES / PULSE_HZ;
+  ctx.globalAlpha = steady ? 1 : 0.6 + 0.4 * Math.cos(2 * Math.PI * PULSE_HZ * age);
+  if (!env.reducedMotion && age < SHAKE_S) ctx.translate(SHAKE_PX * Math.sin(age / SHAKE_S * 6 * Math.PI) * (1 - age / SHAKE_S), 0);
+  ctx.strokeStyle = RED;
+  ctx.lineWidth = RING_WIDTH;
+  trace(ctx, node2, RING_OUT + RING_WIDTH / 2);
+  ctx.stroke();
+  return !steady;
+}
+function drawSteps(canvas, ctx) {
+  syncRuns(canvas);
+  live.rings = 0;
+  if (!N.enabled || LiteGraph.vueNodesMode || !shown$2.length || guard.off(RUNS)) return;
+  const t = clock.runTime;
+  const still = env.reducedMotion || during(N.pauseDuringRender) === "pause";
+  const area = canvas.visible_area;
+  for (const { node: node2, step: step2 } of shown$2) {
+    if (!overlaps(node2.boundingRect, area, RING_OUT + RING_WIDTH)) continue;
+    ctx.save();
+    try {
+      const moves2 = step2.end === Infinity ? N.runRing && ring(ctx, node2, step2, t, still) : step2.failed && N.runError && failure(ctx, node2, step2, t);
+      if (moves2) live.rings++;
+    } catch (error) {
+      guard.fail(RUNS, error);
+    } finally {
+      ctx.restore();
+    }
+  }
+  if (live.rings) wake();
+}
+let celebrated = -Infinity;
+function anchors(canvas, graph) {
+  const area = canvas.visible_area;
+  const [x, y] = [area[0] + area[2] / 2, area[1] + area[3] / 2];
+  const middle = { id: "view", pos: [x, y], graph };
+  if (N.completionAnchor === "viewport") return [middle];
+  if (!here$4()) return [];
+  const choice2 = (node2) => node2.properties[OWN_COMPLETION];
+  const reached = /* @__PURE__ */ new Set();
+  let elsewhere = false;
+  for (const id of [...steps.keys(), ...cached]) {
+    const nodes = path(id);
+    const node2 = nodes.at(-1);
+    if (!node2 || choice2(node2) === "exclude" || !node2.constructor.nodeData?.output_node) continue;
+    const stand = nodes.find((n) => n.graph === graph);
+    if (stand) reached.add(stand);
+    else elsewhere = true;
+  }
+  const distance = ({ boundingRect: box2 }) => Math.hypot(box2[0] + box2[2] / 2 - x, box2[1] + box2[3] / 2 - y);
+  const near = (a, b) => distance(a) - distance(b);
+  const primary = graph.nodes.filter((node2) => choice2(node2) === "primary").sort(near);
+  const outputs = [...reached].filter((node2) => choice2(node2) !== "primary" && choice2(node2) !== "exclude").sort(near);
+  const list = (N.completionAnchor === "primary" && primary.length ? primary : [...primary, ...outputs]).slice(0, ANCHORS);
+  const shows2 = list.filter((node2) => overlaps(node2.boundingRect, area, 0));
+  if (shows2.length < list.length || elsewhere && !list.length) shows2.push({ ...middle, small: true });
+  return shows2;
+}
+function celebrate(prompt) {
+  const { canvas } = app;
+  const now = performance.now();
+  if (!celebrating || !N.enabled || !N.endAnimationEnabled || guard.off(FIREWORKS) || !canvas.graph || now - celebrated < SHOWS_MS) return;
+  const shows2 = anchors(canvas, canvas.graph);
+  if (!shows2.length) return;
+  celebrated = now;
+  fireworks(shows2, prompt);
+}
+function running$1() {
+  let id;
+  for (const [key, step2] of steps) if (step2.end === Infinity) id = key;
+  return id;
+}
+function shownAs(id) {
+  const { graph } = app.canvas;
+  if (!graph || !here$4()) return void 0;
+  const nodes = path(id);
+  const node2 = nodes.find((n) => n.graph === graph);
+  return node2 && [node2, node2 !== nodes.at(-1)];
+}
+function errorNodes() {
+  const { canvas, extensionManager: manager } = app;
+  const ids2 = "lastNodeErrors" in manager ? [...Object.keys(manager.lastNodeErrors ?? {}), ...manager.lastExecutionError?.node_id != null ? [String(manager.lastExecutionError.node_id)] : []] : [...steps].flatMap(([id, step2]) => step2.failed ? [id] : []);
+  const graph = canvas.graph;
+  return graph && here$4() ? [...new Set(ids2.flatMap((id) => standIn(graph, id) ?? []))] : [];
+}
+function changed$2(moved2) {
+  changes++;
+  app.canvas.setDirty(true, moved2);
+}
+function finish() {
+  for (const step2 of steps.values()) if (step2.end === Infinity) step2.end = clock.runTime;
+  run.end = clock.runTime;
+  env.running = false;
+  changed$2(true);
+}
+const signature = (node2) => JSON.stringify([node2.mode, node2.widgets?.map((widget) => widget.value), node2.inputs.map((_, i) => node2.getInputLink(i)?.id)]);
+function installRuns(part2) {
+  if (part2 === "nodes") {
+    layers.runs = drawSteps;
+    celebrating = true;
+  }
+  if (listening) return;
+  listening = true;
+  const ours = (detail) => env.running && detail.prompt_id === run.prompt;
+  api.addEventListener("execution_start", ({ detail }) => {
+    if (performance.now() - celebrated < BATCH_MS) endBursts();
+    Object.assign(run, { prompt: detail.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
+    steps.clear();
+    cached.clear();
+    held$1.clear();
+    tint$1 = accent();
+    env.running = true;
+    changed$2(true);
+  });
+  api.addEventListener("execution_cached", ({ detail }) => {
+    if (ours(detail)) for (const id of detail.nodes) cached.add(String(id));
+  });
+  api.addEventListener("progress_state", ({ detail }) => {
+    if (!ours(detail)) return;
+    let moved2 = false;
+    for (const { state: state2, value, max, node_id, display_node_id } of Object.values(detail.nodes)) {
+      const id = String(display_node_id ?? node_id);
+      let step2 = steps.get(id);
+      if (state2 === "running") {
+        if (!step2) {
+          steps.set(id, step2 = { start: clock.runTime, end: Infinity, progress: NaN, failed: false });
+          moved2 = true;
+        } else if (step2.end !== Infinity) {
+          step2.end = Infinity;
+          moved2 = true;
+        }
+        step2.progress = max > 1 || value > 0 ? value / max : NaN;
+      } else if (state2 === "finished" && step2?.end === Infinity) {
+        step2.end = clock.runTime;
+        moved2 = true;
+      }
+    }
+    changed$2(moved2);
+  });
+  api.addEventListener("execution_success", ({ detail }) => {
+    if (!ours(detail)) return;
+    finish();
+    celebrate(detail.prompt_id);
+  });
+  api.addEventListener("execution_error", ({ detail }) => {
+    if (!ours(detail)) return;
+    const id = detail.node_id == null ? void 0 : String(detail.node_id);
+    if (id !== void 0) {
+      const step2 = steps.get(id) ?? { start: clock.runTime, end: Infinity, progress: NaN, failed: false };
+      step2.failed = true;
+      steps.set(id, step2);
+    }
+    finish();
+    const node2 = id === void 0 ? void 0 : path(id).at(-1);
+    if (node2) held$1.set(id, signature(node2));
+  });
+  api.addEventListener("execution_interrupted", ({ detail }) => {
+    if (ours(detail)) finish();
+  });
+  api.addEventListener("reconnected", () => {
+    if (env.running) finish();
+  });
+  api.addEventListener("graphChanged", () => {
+    let edited = false;
+    for (const [id, before2] of held$1) {
+      const node2 = path(id).at(-1);
+      if (node2 && signature(node2) === before2) continue;
+      held$1.delete(id);
+      const step2 = steps.get(id);
+      if (step2) step2.failed = false;
+      edited = true;
+    }
+    if (edited) changed$2(true);
+  });
+}
 const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
+const moving = { alpha: 1 };
 function wrap(x) {
   const r = x % 1;
   return r < 0 ? r + 1 : r;
@@ -1134,7 +1572,7 @@ const RUNG = {
 const moved = (turn, T, cp) => turn(T * Math.PI * SACRED.TRINITY - cp) * 10 * Math.sin(T * Math.PI - cp) * 0.5;
 function sacredFlow$1(ctx, s, k2) {
   const { thickness, glowIntensity } = L;
-  const { primary, accent } = s.pal;
+  const { primary, accent: accent2 } = s.pal;
   const cp = k2.linkFlow * 0.25;
   const m = vertices(s, Math.max(12, Math.round(s.chain / 8)));
   ctx.beginPath();
@@ -1152,7 +1590,7 @@ function sacredFlow$1(ctx, s, k2) {
   ctx.lineJoin = "round";
   ctx.shadowColor = primary;
   ctx.shadowBlur = glowIntensity;
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = moving.alpha;
   ctx.stroke();
   const count2 = Math.max(1, Math.floor(SACRED.TRINITY * L.quality * L.particleDensity));
   for (let i = 0; i < count2; i++) {
@@ -1163,8 +1601,8 @@ function sacredFlow$1(ctx, s, k2) {
     const x = here$3[0] + moved(Math.sin, T, cp);
     const y = here$3[1] + moved(Math.cos, T, cp);
     DOT.path(ctx, x, y, thickness * 0.75, 0);
-    ctx.globalAlpha = 0.4 + Math.sin(k2.linkPhase + T * Math.PI * 2) * 0.2;
-    shine(ctx, DOT, x, y, thickness * 0.75, 0, accent, accent, glowIntensity);
+    ctx.globalAlpha = (0.4 + Math.sin(k2.linkPhase + T * Math.PI * 2) * 0.2) * moving.alpha;
+    shine(ctx, DOT, x, y, thickness * 0.75, 0, accent2, accent2, glowIntensity);
   }
 }
 function crystalStream$1(ctx, s, k2) {
@@ -1178,7 +1616,7 @@ function crystalStream$1(ctx, s, k2) {
     if (!s.within(u)) continue;
     s.path.at(u, here$3);
     ctx.lineWidth = thickness * 0.8;
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = moving.alpha;
     createCrystal(ctx, here$3[0], here$3[1], 5 * thickness * (1 + Math.sin(cp + T * Math.PI)), T * Math.PI * 2 + cp, primary, secondary, L.glowIntensity);
   }
 }
@@ -1202,7 +1640,7 @@ function quantumField$1(ctx, s, k2) {
     ctx.lineWidth = L.thickness * 0.5;
     ctx.shadowColor = color;
     ctx.shadowBlur = L.glowIntensity;
-    ctx.globalAlpha = 0.3;
+    ctx.globalAlpha = 0.3 * moving.alpha;
     ctx.stroke();
   }
 }
@@ -1225,7 +1663,7 @@ function cosmicWeave$1(ctx, s, k2) {
     ctx.lineWidth = L.thickness * 0.7;
     ctx.shadowColor = colors[strand];
     ctx.shadowBlur = L.glowIntensity;
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.5 * moving.alpha;
     ctx.stroke();
   }
 }
@@ -1241,12 +1679,12 @@ function energyPulse$1(ctx, s, k2) {
     const trip = L.direction > 0 ? T : 1 - T;
     const r = L.thickness * 2 * (1 - trip);
     DOT.path(ctx, here$3[0], here$3[1], r, 0);
-    ctx.globalAlpha = 0.5 * (1 - trip);
+    ctx.globalAlpha = 0.5 * (1 - trip) * moving.alpha;
     shine(ctx, DOT, here$3[0], here$3[1], r, 0, secondary, secondary, L.glowIntensity * 2);
   }
 }
 function dnaHelix$1(ctx, s, k2) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const { thickness, glowIntensity } = L;
   const radius = 10;
   const rotations = 4;
@@ -1268,7 +1706,7 @@ function dnaHelix$1(ctx, s, k2) {
     ctx.lineWidth = thickness;
     ctx.shadowColor = color;
     ctx.shadowBlur = glowIntensity;
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = moving.alpha;
     ctx.stroke();
   }
   const bonds = rotations * 4;
@@ -1278,9 +1716,9 @@ function dnaHelix$1(ctx, s, k2) {
     if (!s.within(u)) continue;
     s.path.at(u, here$3);
     ctx.lineWidth = thickness;
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.6 * moving.alpha;
     RUNG.path(ctx, here$3[0], here$3[1], radius, angle(T));
-    shine(ctx, RUNG, here$3[0], here$3[1], radius, angle(T), accent, accent, glowIntensity * 0.5);
+    shine(ctx, RUNG, here$3[0], here$3[1], radius, angle(T), accent2, accent2, glowIntensity * 0.5);
   }
 }
 function linkGradient(ctx, s, dir) {
@@ -1298,7 +1736,7 @@ const LAVA = [
   { ripple: 20 * 0.7, rate: 1.2, swell: 0.6 }
 ];
 function lavaFlow$1(ctx, s, k2) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const { thickness, glowIntensity } = L;
   const cp = k2.linkFlow;
   const tube = thickness * 7;
@@ -1319,15 +1757,15 @@ function lavaFlow$1(ctx, s, k2) {
     ctx.shadowBlur = glowIntensity * 1.5;
     if (layer === LAVA[0]) {
       ctx.strokeStyle = secondary;
-      ctx.globalAlpha = 0.3;
+      ctx.globalAlpha = 0.3 * moving.alpha;
       ctx.lineWidth = tube;
     } else {
       const gradient = linkGradient(ctx, s, L.direction);
       gradient.addColorStop(0, primary);
       gradient.addColorStop(0.4 + Math.sin(k2.linkPhase) * 0.1, secondary);
-      gradient.addColorStop(1, accent);
+      gradient.addColorStop(1, accent2);
       ctx.strokeStyle = gradient;
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = moving.alpha;
       ctx.lineWidth = thickness * 5;
     }
     ctx.stroke();
@@ -1344,12 +1782,12 @@ function lavaFlow$1(ctx, s, k2) {
     const y = here$3[1] + here$3[3] * along + here$3[2] * across;
     const r = thickness * (0.5 + Math.sin(cp + i) * 0.2);
     DOT.path(ctx, x, y, r, 0);
-    ctx.globalAlpha = 0.6 + Math.sin(cp + i) * 0.4;
-    shine(ctx, DOT, x, y, r, 0, accent, secondary, glowIntensity * 1.5);
+    ctx.globalAlpha = (0.6 + Math.sin(cp + i) * 0.4) * moving.alpha;
+    shine(ctx, DOT, x, y, r, 0, accent2, secondary, glowIntensity * 1.5);
   }
 }
 function stellarPlasma$1(ctx, s, k2) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const { thickness, glowIntensity } = L;
   const f = k2.linkFlow;
   const segments = Math.floor(s.chain / 20) * L.quality * L.particleDensity || 1;
@@ -1363,7 +1801,7 @@ function stellarPlasma$1(ctx, s, k2) {
       const y2 = here$3[1] + Math.sin(t * Math.PI * 4 + f) * 15;
       const color = first2(t) ? primary : secondary;
       DOT.path(ctx, here$3[0], y2, size, 0);
-      ctx.globalAlpha = 0.7 - Math.abs(t - 0.5) * 0.3;
+      ctx.globalAlpha = (0.7 - Math.abs(t - 0.5) * 0.3) * moving.alpha;
       shine(ctx, DOT, here$3[0], y2, size, 0, color, color, glowIntensity);
     }
     if (i % 3) continue;
@@ -1373,8 +1811,8 @@ function stellarPlasma$1(ctx, s, k2) {
     s.path.at(u, here$3);
     const y = here$3[1] + Math.sin(spark * Math.PI * 4 + f) * 15;
     DOT.path(ctx, here$3[0], y, size * 0.5, 0);
-    ctx.globalAlpha = 0.6 - Math.abs(spark - 0.5) * 0.4;
-    shine(ctx, DOT, here$3[0], y, size * 0.5, 0, accent, accent, glowIntensity * 0.5);
+    ctx.globalAlpha = (0.6 - Math.abs(spark - 0.5) * 0.4) * moving.alpha;
+    shine(ctx, DOT, here$3[0], y, size * 0.5, 0, accent2, accent2, glowIntensity * 0.5);
   }
 }
 const STROKES = /* @__PURE__ */ new Set([1, 3, 4, 6, 7]);
@@ -1388,14 +1826,111 @@ const MOVING = {
   7: lavaFlow$1,
   8: stellarPlasma$1
 };
+const MOST = 2e3;
+const HOVER_MS = 150;
+const LEAVE_MS = 100;
+const focus = { links: /* @__PURE__ */ new Set(), reroutes: /* @__PURE__ */ new Set() };
+const focuses = (link2, reroute) => reroute ? focus.reroutes.has(reroute.id) : focus.links.has(link2.id);
+const focusing = () => focus.links.size > 0;
+const built = { graph: void 0, version: 0, reroutes: 0, revision: 0, hovered: void 0, background: "", items: [] };
+let themeAccent = "";
+let resting;
+let under;
+let adding = 0;
+let dropping = 0;
+function settle$1(node2) {
+  resting = node2;
+  app.canvas.setDirty(true, true);
+}
+function hover$1(canvas) {
+  const over = L.focusEnabled && L.focusHover && !canvas.isDragging && !canvas.dragging_canvas && !canvas.linkConnector.isConnecting ? canvas.node_over : void 0;
+  if (over === under) return;
+  under = over;
+  clearTimeout(adding);
+  clearTimeout(dropping);
+  if (resting && over !== resting) dropping = window.setTimeout(settle$1, LEAVE_MS, void 0);
+  if (over && over !== resting) adding = window.setTimeout(settle$1, HOVER_MS, over);
+}
+function changed$1(canvas, graph) {
+  const items = canvas.selectedItems;
+  if (built.graph !== graph || built.version !== graph._version || built.reroutes !== graph.reroutes.size || built.revision !== revision || built.hovered !== resting || built.background !== canvas.clear_background_color || built.items.length !== items.size) return true;
+  let i = 0;
+  for (const item of items) if (built.items[i++] !== item) return true;
+  return false;
+}
+const seeds = [];
+const stack = [];
+const visited = /* @__PURE__ */ new Set();
+function add$1(graph, link2) {
+  if (focus.links.size >= MOST) return false;
+  focus.links.add(link2.id);
+  for (let r = graph.getReroute(link2.parentId); r && !focus.reroutes.has(r.id); r = graph.getReroute(r.parentId)) focus.reroutes.add(r.id);
+  return true;
+}
+function through(graph, link2, up, far) {
+  if (!link2) return true;
+  if (!add$1(graph, link2)) return false;
+  const next = graph.getNodeById(up ? link2.origin_id : link2.target_id);
+  if (next && (far || next.type === "Reroute")) stack.push(next);
+  return true;
+}
+function spread(graph, up, far) {
+  stack.length = 0;
+  stack.push(...seeds);
+  visited.clear();
+  for (let node2 = stack.pop(); node2; node2 = stack.pop()) {
+    if (visited.has(node2)) continue;
+    visited.add(node2);
+    if (up) {
+      for (let i = 0; i < node2.inputs.length; i++) if (!through(graph, node2.getInputLink(i), true, far)) return;
+    } else {
+      for (const output of node2.outputs) for (const id of output.links ?? []) if (!through(graph, graph.getLink(id), false, far)) return;
+    }
+  }
+}
+function build(canvas, graph) {
+  focus.links.clear();
+  focus.reroutes.clear();
+  Object.assign(built, { graph, version: graph._version, reroutes: graph.reroutes.size, revision, hovered: resting, background: canvas.clear_background_color });
+  built.items.length = seeds.length = 0;
+  for (const item of canvas.selectedItems) {
+    built.items.push(item);
+    if (item instanceof LGraphNode) seeds.push(item);
+    else if (item instanceof LGraphGroup) {
+      for (const child of item.children) if (child instanceof LGraphNode) seeds.push(child);
+    }
+  }
+  if (resting?.graph === graph) seeds.push(resting);
+  if (L.focusColor === "accent") themeAccent = accent();
+  const { focusDepth: depth2 } = L;
+  spread(graph, true, depth2 === "upstream" || depth2 === "chain");
+  spread(graph, false, depth2 === "downstream" || depth2 === "chain");
+}
+function syncFocus(canvas) {
+  hover$1(canvas);
+  const { graph } = canvas;
+  if (!L.focusEnabled || !graph) {
+    if (!built.graph) return false;
+    focus.links.clear();
+    focus.reroutes.clear();
+    built.graph = void 0;
+    return true;
+  }
+  if (!changed$1(canvas, graph)) return false;
+  build(canvas, graph);
+  return true;
+}
+function focusPalette(colour2) {
+  return L.focusColor === "type" ? solid$1(lighter(colour2)) : L.focusColor === "accent" ? solid$1(themeAccent) : HIGHLIGHT;
+}
 const UP = 1;
 const DOWN = 2;
-const LEFT$1 = 3;
-const RIGHT$1 = 4;
+const LEFT$2 = 3;
+const RIGHT$2 = 4;
 const STRAIGHT_LINK = 0;
 const LINEAR_LINK = 1;
 const CHORDS = 40;
-const STUB = 10;
+const STUB$1 = 10;
 const CORNER = 8;
 const WAVE = 10;
 const WAVELENGTH = 60;
@@ -1403,9 +1938,13 @@ const COIL = 6;
 const PITCH = 12;
 const TAPER = 15;
 const MOST_POINTS = 2049;
-const dx = (dir) => dir === LEFT$1 ? -1 : dir === RIGHT$1 ? 1 : 0;
+const dx = (dir) => dir === LEFT$2 ? -1 : dir === RIGHT$2 ? 1 : 0;
 const dy = (dir) => dir === UP ? -1 : dir === DOWN ? 1 : 0;
 const smooth = (x) => x >= 1 ? 1 : x <= 0 ? 0 : x * x * (3 - 2 * x);
+function stub(path2, point2, dir, length) {
+  path2.moveTo(point2[0], point2[1]);
+  path2.lineTo(point2[0] + dx(dir) * length, point2[1] + dy(dir) * length);
+}
 let samples = new Float64Array(64);
 const here$2 = new Float64Array(4);
 class LinkPath {
@@ -1438,8 +1977,8 @@ class LinkPath {
     const bx = this.b[0] = b[0];
     const by = this.b[1] = b[1];
     this.looped = 0;
-    const sd = startDir || RIGHT$1;
-    const ed = endDir || LEFT$1;
+    const sd = startDir || RIGHT$2;
+    const ed = endDir || LEFT$2;
     this.spline = mode !== LINEAR_LINK && mode !== STRAIGHT_LINK;
     if (this.spline) {
       const d = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) * 0.25;
@@ -1478,9 +2017,9 @@ class LinkPath {
   step(endDir) {
     const [ax, ay] = this.a;
     const [bx, by] = this.b;
-    const ed = endDir || LEFT$1;
-    const ex = bx + dx(ed) * STUB;
-    const ey = by + dy(ed) * STUB;
+    const ed = endDir || LEFT$2;
+    const ex = bx + dx(ed) * STUB$1;
+    const ey = by + dy(ed) * STUB$1;
     const rise = Math.abs(ey - ay) * 0.5;
     this.spline = false;
     this.n = 0;
@@ -1582,11 +2121,11 @@ class LinkPath {
     out[3] = ty / norm;
   }
   /** Adds the path, or a coil's loops, to a context's current path or to a Path2D. */
-  trace(path) {
+  trace(path2) {
     const [p, n] = this.looped ? [this.loops, this.looped] : [this.p, this.n];
-    path.moveTo(p[0], p[1]);
-    if (this.spline && !this.looped) path.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
-    else for (let i = 1; i < n; i++) path.lineTo(p[2 * i], p[2 * i + 1]);
+    path2.moveTo(p[0], p[1]);
+    if (this.spline && !this.looped) path2.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
+    else for (let i = 1; i < n; i++) path2.lineTo(p[2 * i], p[2 * i + 1]);
   }
   /** Strokes the path the way v1's renderers stroked theirs: 0.8 × `thickness` wide. */
   draw(ctx, color, thickness) {
@@ -1598,9 +2137,9 @@ class LinkPath {
   }
   /** The path as native keeps it for hit testing. */
   hit() {
-    const path = new Path2D();
-    this.trace(path);
-    return path;
+    const path2 = new Path2D();
+    this.trace(path2);
+    return path2;
   }
   /** Makes room for `count` points. */
   points(count2) {
@@ -1633,9 +2172,9 @@ class LinkPath {
     }
     for (let i = 0; i <= 4; i++) {
       const angle = i * Math.PI / 8;
-      const back = r * (1 - Math.sin(angle));
+      const back2 = r * (1 - Math.sin(angle));
       const on = r * (1 - Math.cos(angle));
-      this.add(x - ux * back + vx * on, y - uy * back + vy * on);
+      this.add(x - ux * back2 + vx * on, y - uy * back2 + vy * on);
     }
   }
   /** The spline's polynomial, its length along CHORDS chords and its box; the centre where native puts it (pathRenderer.ts L654-682). */
@@ -1725,7 +2264,7 @@ function elements(s, count2, last2, each) {
 }
 function sacredFlow(ctx, s, phase) {
   const { thickness, glowIntensity } = L;
-  const { primary, accent } = s.pal;
+  const { primary, accent: accent2 } = s.pal;
   const hidden = s.linkStyle === "hidden";
   elements(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality)), true, (T) => {
     ctx.beginPath();
@@ -1736,8 +2275,8 @@ function sacredFlow(ctx, s, phase) {
       0,
       Math.PI * 2
     );
-    ctx.fillStyle = accent;
-    ctx.shadowColor = hidden ? accent : primary;
+    ctx.fillStyle = accent2;
+    ctx.shadowColor = hidden ? accent2 : primary;
     ctx.shadowBlur = hidden ? glowIntensity * 0.7 : glowIntensity;
     ctx.globalAlpha = 0.4 + Math.sin(phase + T * Math.PI * 2) * 0.2;
     ctx.fill();
@@ -1813,7 +2352,7 @@ function energyPulse(ctx, s, phase) {
   });
 }
 function dnaHelix(ctx, s, phase) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const { thickness, glowIntensity } = L;
   const radius = 10;
   const rotations = 4;
@@ -1840,8 +2379,8 @@ function dnaHelix(ctx, s, phase) {
   }
   elements(s, rotations * 4, true, (T) => {
     const angle = T * Math.PI * rotations * 2 + phase;
-    ctx.strokeStyle = accent;
-    ctx.shadowColor = accent;
+    ctx.strokeStyle = accent2;
+    ctx.shadowColor = accent2;
     ctx.shadowBlur = glowIntensity * 0.5;
     ctx.lineWidth = thickness * 0.8;
     ctx.globalAlpha = 0.8;
@@ -1852,7 +2391,7 @@ function dnaHelix(ctx, s, phase) {
   });
 }
 function lavaFlow(ctx, s, phase) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const m = vertices(s, Math.max(1, Math.floor(SACRED.TRINITY * L.quality * 12)));
   ctx.beginPath();
   for (let j = 0; j < m; j++) {
@@ -1867,7 +2406,7 @@ function lavaFlow(ctx, s, phase) {
   const gradient = linkGradient(ctx, s, 1);
   gradient.addColorStop(0, primary);
   gradient.addColorStop(0.4 + Math.sin(phase) * 0.1, secondary);
-  gradient.addColorStop(1, accent);
+  gradient.addColorStop(1, accent2);
   ctx.globalAlpha = 1;
   ctx.strokeStyle = gradient;
   ctx.lineWidth = L.thickness * 5;
@@ -1877,7 +2416,7 @@ function lavaFlow(ctx, s, phase) {
   ctx.stroke();
 }
 function stellarPlasma(ctx, s, phase) {
-  const { primary, secondary, accent } = s.pal;
+  const { primary, secondary, accent: accent2 } = s.pal;
   const { thickness, glowIntensity, quality } = L;
   const segments = Math.max(5, Math.floor(Math.min(Math.floor(s.chain / 30), 20) * quality * 0.5));
   elements(s, segments, true, (T, i) => {
@@ -1894,8 +2433,8 @@ function stellarPlasma(ctx, s, phase) {
     if (i % 3 !== 0 || quality <= 1) return;
     ctx.beginPath();
     ctx.arc(here$1[0], here$1[1] + wave * 1.2, size * 0.4, 0, Math.PI * 2);
-    ctx.fillStyle = accent;
-    ctx.shadowColor = accent;
+    ctx.fillStyle = accent2;
+    ctx.shadowColor = accent2;
     ctx.shadowBlur = glowIntensity * 0.5;
     ctx.globalAlpha = 0.4;
     ctx.fill();
@@ -1946,19 +2485,19 @@ function dashes(ctx, s, color, thickness, on, off, march) {
   ctx.lineDashOffset = 0;
 }
 function every(s, gap, each) {
-  const { path } = s;
-  for (let d = Math.ceil(s.u0 / gap) * gap - s.u0; d < path.length; d += gap) {
-    path.find(d, here);
+  const { path: path2 } = s;
+  for (let d = Math.ceil(s.u0 / gap) * gap - s.u0; d < path2.length; d += gap) {
+    path2.find(d, here);
     each();
   }
 }
 function beside(ctx, s, step2, across) {
-  const { path } = s;
-  const count2 = Math.max(2, Math.ceil(path.length / step2) + 1);
+  const { path: path2 } = s;
+  const count2 = Math.max(2, Math.ceil(path2.length / step2) + 1);
   ctx.beginPath();
   for (let i = 0; i < count2; i++) {
-    const d = path.length * i / (count2 - 1);
-    path.find(d, here);
+    const d = path2.length * i / (count2 - 1);
+    path2.find(d, here);
     const off = across(s.u0 + d);
     const x = here[0] - here[3] * off;
     const y = here[1] + here[2] * off;
@@ -1967,7 +2506,7 @@ function beside(ctx, s, step2, across) {
   }
 }
 function drawBody(ctx, s, color, thickness) {
-  const { path } = s;
+  const { path: path2 } = s;
   const alpha = ctx.globalAlpha;
   switch (s.linkStyle) {
     case "dotted":
@@ -1999,13 +2538,13 @@ function drawBody(ctx, s, color, thickness) {
       return;
     }
     case "glowpath": {
-      path.draw(ctx, color, thickness);
+      path2.draw(ctx, color, thickness);
       const glow2 = ctx.createLinearGradient(s.start[0], s.start[1], s.end[0], s.end[1]);
       glow2.addColorStop(0, "rgba(255, 255, 255, 0.5)");
       glow2.addColorStop(0.5, "rgba(255, 255, 255, 0.2)");
       glow2.addColorStop(1, "rgba(255, 255, 255, 0.5)");
       ctx.beginPath();
-      path.trace(ctx);
+      path2.trace(ctx);
       ctx.strokeStyle = glow2;
       ctx.lineWidth = thickness * 2;
       ctx.globalAlpha = alpha * 0.5;
@@ -2042,7 +2581,7 @@ function drawBody(ctx, s, color, thickness) {
       sheen.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
       sheen.addColorStop(1, color);
       ctx.beginPath();
-      path.trace(ctx);
+      path2.trace(ctx);
       ctx.strokeStyle = sheen;
       ctx.lineWidth = thickness * 1.2;
       ctx.stroke();
@@ -2057,7 +2596,7 @@ function drawBody(ctx, s, color, thickness) {
       return;
     }
     default:
-      path.draw(ctx, color, thickness);
+      path2.draw(ctx, color, thickness);
   }
 }
 const BASES = {
@@ -2076,7 +2615,7 @@ const shadowOffset = () => L.shadowStyle === "drop" ? L.shadowOffset * 3 : 0;
 function drawBase(ctx, s, animate, still, plain = false) {
   const base = BASES[animate]?.[still ? 1 : 0];
   if (!base || base === "none" || s.linkStyle === "hidden") return false;
-  const { thickness } = L;
+  const thickness = L.thickness * s.width;
   const color = s.pal.primary;
   ctx.globalAlpha = 1;
   if (base === "classic" && L.linkShadowEnabled && !plain) {
@@ -2280,7 +2819,7 @@ function drawMarkers(ctx, s, phase, flow) {
     if (L.markerEffects === "pulse") alpha = 0.5 + Math.sin(phase + T * Math.PI * 2) * 0.5;
     else if (L.markerEffects === "fade") alpha = 1 - T;
     else if (L.markerEffects === "rainbow") color = rainbow(T * 360 + phase * 50);
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = alpha * moving.alpha;
     if (L.markerShadowEnabled) mark(ctx, shape, here[0], here[1], size * 1.2, angle, SHADOW, SHADOW, shadowBlur(L.markerGlow), shadowOffset());
     mark(ctx, shape, here[0], here[1], size, angle, color, L.markerEffects === "rainbow" ? pal.primary : color, L.markerGlow);
   }
@@ -2307,16 +2846,23 @@ const LINKS = "Link animation";
 const LOD_SCALE = 0.25;
 const REACH = 120;
 const CLASSIC$1 = 9;
+const NATIVE = "spline";
 class Segment {
   path = new LinkPath();
   /** The link native drew the segment for. */
   link;
   /** Whether its path is not the one native drew for it, so the hit data must follow ours. */
   custom = false;
-  /** The colours it is drawn in. */
+  /** The colours it is drawn in, and the colour native draws its link in, but for the white of a highlighted one. */
   pal = HIGHLIGHT;
+  colour = "";
   linkStyle = "";
   isStatic = false;
+  /** Whether selection focus holds it, and how much wider than Thickness its base is drawn. */
+  focused = false;
+  width = 1;
+  /** The run's step of the node its link leads into, while the run's visuals show. */
+  flow;
   /**
    * px along the link to the segment's start, the segment's own length and the link's whole length, along the
    * segments native drew for it: the paths Link.Style takes, before a wave or a coil winds around them.
@@ -2346,18 +2892,19 @@ class Segment {
     return u >= 0 && (u < 1 || u === 1 && this.t1 === 1);
   }
   /**
-   * Lays the segment from a to b on the path Link.Style gives it, the render mode's `mode` where that keeps native's:
-   * `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave or a coil starts and ends.
+   * Lays the segment from a to b on the path `linkStyle` gives it, Link.Style's unless given, the render mode's `mode`
+   * where that keeps native's: `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave
+   * or a coil starts and ends.
    */
-  lay(a, b, startDir, endDir, mode, u0 = 0, fromSlot = true, toSlot = true, startControl, endControl) {
-    const style = LINK_STYLES[L.linkStyle];
+  lay(a, b, startDir, endDir, mode, u0 = 0, fromSlot = true, toSlot = true, startControl, endControl, linkStyle = L.linkStyle) {
+    const style = LINK_STYLES[linkStyle];
     this.u0 = u0;
     this.path.set(a, b, startDir, endDir, style.mode ?? mode, startControl, endControl);
     if (style.shape === "step") this.path.step(endDir);
     this.len = this.path.length;
     if (style.shape === "wave" || style.shape === "coil") this.path.bend(style.shape === "coil", u0, fromSlot, toSlot);
     this.custom = Boolean(style.shape) || (style.mode ?? mode) !== mode;
-    this.linkStyle = L.linkStyle;
+    this.linkStyle = linkStyle;
   }
 }
 const pool = [];
@@ -2366,7 +2913,21 @@ let first = 0;
 let open = false;
 const ends = /* @__PURE__ */ new Map();
 const shown$1 = [];
-const pass = { ctx: void 0, on: false, still: false, plain: false, calls: 0, bases: 0, highlighted: {} };
+const raised = [];
+const flowing = [];
+const pass = {
+  ctx: void 0,
+  on: false,
+  still: false,
+  plain: false,
+  calls: 0,
+  bases: 0,
+  highlighted: {},
+  focus: "",
+  tinted: false,
+  runs: false
+};
+let original;
 const BUSY = 12;
 const SETTLE_MS = 150;
 const glows = { bases: 0, due: false, scale: 0, x: 0, y: 0, timer: 0 };
@@ -2392,6 +2953,12 @@ function defers() {
   return true;
 }
 const LINK_COLOR$1 = "#9A9";
+const STUB = 8;
+const [LEFT$1, RIGHT$1] = [3, 4];
+let unhit;
+const unseen = [];
+const nothing = () => {
+};
 function enableAntiAliasing(ctx) {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
@@ -2402,19 +2969,31 @@ function enableAntiAliasing(ctx) {
 function moves() {
   return L.animate !== CLASSIC$1 || L.markerEnabled && L.markerShape !== "none" || Boolean(LINK_STYLES[L.linkStyle].moving);
 }
+function focusIn() {
+  const mode = L.focusEnabled ? L.focusMode : "";
+  if (!focusing()) return pass.on && mode === "animate" ? mode : "";
+  if (deferring()) return mode === "dim" || mode === "hide" ? mode : "";
+  return !pass.on && mode === "animate" ? "highlight" : mode;
+}
 function begin(canvas, ctx) {
   count = 0;
   open = false;
   ends.clear();
+  raised.length = flowing.length = 0;
   pass.ctx = ctx;
   pass.calls = pass.bases = 0;
   pass.on = L.enabled && L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
-  pass.still = L.staticMode || L.pauseDuringRender && env.running || env.reducedMotion || !moves();
+  pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves();
   pass.highlighted = canvas.highlighted_links;
+  syncRuns(canvas);
+  pass.runs = L.enabled && flowsShown() && !defers() && canvas.ds.scale >= LOD_SCALE;
+  syncFocus(canvas);
+  pass.focus = focusIn();
+  pass.tinted = (pass.focus === "highlight" || pass.focus === "dim" || pass.focus === "hide") && !deferring();
   const { scale: scale2, offset } = canvas.ds;
-  const moving = scale2 !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
+  const moving2 = scale2 !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
   [glows.scale, glows.x, glows.y] = [scale2, offset[0], offset[1]];
-  pass.plain = pass.on && !glows.due && glows.bases > BUSY && moving;
+  pass.plain = pass.on && !glows.due && glows.bases > BUSY && moving2;
   glows.due = false;
   if (pass.plain) {
     clearTimeout(glows.timer);
@@ -2429,6 +3008,16 @@ function end(canvas) {
     live.links = count;
     wake();
   }
+  if (flowing.length) {
+    live.flows = flowing.length;
+    wake();
+  }
+  for (const reroute of unseen) {
+    delete reroute.draw;
+    delete reroute.drawSlots;
+    canvas._visibleReroutes.delete(reroute);
+  }
+  unseen.length = 0;
   if (pass.calls || warned) return;
   for (const segment2 of canvas.renderedPaths) {
     if (segment2._dragging) continue;
@@ -2448,22 +3037,41 @@ function close$1() {
   }
   open = false;
 }
-function record(canvas, link2, a, b, color, startDir, endDir, extras) {
+const own = (canvas, link2, color) => palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link2.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR$1);
+function record(canvas, link2, a, b, color, startDir, endDir, extras, focused, flow) {
   if (open && pool[count - 1].link !== link2) close$1();
   if (!open) first = count;
   const segment2 = pool[count++] ??= new Segment();
   const reroute = extras?.reroute;
   const from = canvas.graph?.getReroute((reroute ?? link2).parentId);
   segment2.link = link2;
-  segment2.lay(a, b, startDir, endDir, canvas.links_render_mode, from && ends.get(from) || 0, !from, !reroute, extras?.startControl, extras?.endControl);
+  segment2.lay(
+    a,
+    b,
+    startDir,
+    endDir,
+    canvas.links_render_mode,
+    from && ends.get(from) || 0,
+    !from,
+    !reroute,
+    extras?.startControl,
+    extras?.endControl,
+    pass.on ? L.linkStyle : NATIVE
+  );
   if (reroute) ends.set(reroute, segment2.u0 + segment2.len);
   open = Boolean(reroute);
   if (!open) close$1();
-  segment2.pal = pass.highlighted[link2.id] ? HIGHLIGHT : palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link2.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR$1);
+  const colours = own(canvas, link2, color);
+  segment2.pal = focused && pass.tinted ? focusPalette(colours.native) : pass.highlighted[link2.id] ? HIGHLIGHT : colours;
+  segment2.colour = colours.native;
+  segment2.focused = focused;
+  segment2.width = focused && pass.focus === "highlight" ? 1.5 : 1;
   segment2.isStatic = pass.still;
+  segment2.flow = flow;
+  if (flow) flowing.push(segment2);
   return segment2;
 }
-const marked = () => L.animate === CLASSIC$1 || L.markerAll;
+const marked$1 = () => L.animate === CLASSIC$1 || L.markerAll;
 function place(canvas, ctx, segment2) {
   if (!pass.still && LINK_STYLES[segment2.linkStyle].moving) return true;
   const whole = pass.still && !open;
@@ -2474,7 +3082,7 @@ function place(canvas, ctx, segment2) {
     for (let i = first; whole && i < count; i++) {
       if (pool[i].empty) continue;
       STILL[L.animate]?.(ctx, pool[i], STILL_PHASE);
-      if (marked()) drawMarkers(ctx, pool[i], STILL_PHASE);
+      if (marked$1()) drawMarkers(ctx, pool[i], STILL_PHASE);
     }
   } catch (error) {
     guard.fail(LINKS, error);
@@ -2489,33 +3097,57 @@ function place(canvas, ctx, segment2) {
   }
   return true;
 }
-function hit(owner, path) {
-  owner.path = path.hit();
-  owner._pos[0] = path.cx;
-  owner._pos[1] = path.cy;
-  owner._centreAngle = path.angle;
+function hit(owner, path2) {
+  owner.path = path2.hit();
+  owner._pos[0] = path2.cx;
+  owner._pos[1] = path2.cy;
+  owner._centreAngle = path2.angle;
 }
-function motion(canvas, ctx) {
-  if (pass.still) return 0;
+const all = () => true;
+const isFocused = (segment2) => segment2.focused;
+const isFlowing = (segment2) => segment2.flow !== void 0;
+function cull(canvas, keep2) {
   const area = canvas.visible_area;
   let n = 0;
   for (let i = 0; i < count; i++) {
     const { box: box2 } = pool[i].path;
-    if (box2[2] + REACH >= area[0] && box2[0] - REACH <= area[0] + area[2] && box2[3] + REACH >= area[1] && box2[1] - REACH <= area[1] + area[3]) shown$1[n++] = pool[i];
+    if (keep2(pool[i]) && box2[2] + REACH >= area[0] && box2[0] - REACH <= area[0] + area[2] && box2[3] + REACH >= area[1] && box2[1] - REACH <= area[1] + area[3]) shown$1[n++] = pool[i];
   }
   shown$1.length = n;
+  return n;
+}
+function moveShown(ctx) {
+  const draw = MOVING[L.animate];
+  moving.alpha = during(L.pauseDuringRender) === "calm" ? CALM_ALPHA : 1;
+  try {
+    for (const segment2 of shown$1) {
+      if (segment2.empty) continue;
+      draw?.(ctx, segment2, clock);
+      if (marked$1()) drawMarkers(ctx, segment2, clock.linkPhase, clock.linkFlow);
+    }
+  } finally {
+    moving.alpha = 1;
+  }
+}
+function overShown(canvas, ctx, focused) {
+  ctx.globalAlpha = canvas.editor_alpha;
+  for (const segment2 of shown$1) centreMarker(canvas, ctx, segment2);
+  for (const reroute of canvas._visibleReroutes) {
+    if (focused && !focus.reroutes.has(reroute.id)) continue;
+    reroute.draw(ctx, canvas._pattern);
+    if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
+  }
+}
+function motion(canvas, ctx) {
+  if (pass.still) return 0;
+  const n = cull(canvas, all);
   if (!n) return 0;
   ctx.save();
   try {
     enableAntiAliasing(ctx);
     if (!STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
     if (LINK_STYLES[L.linkStyle].moving) for (const segment2 of shown$1) drawBase(ctx, segment2, L.animate, false);
-    const draw = MOVING[L.animate];
-    for (const segment2 of shown$1) {
-      if (segment2.empty) continue;
-      draw?.(ctx, segment2, clock);
-      if (marked()) drawMarkers(ctx, segment2, clock.linkPhase, clock.linkFlow);
-    }
+    moveShown(ctx);
   } catch (error) {
     guard.fail(LINKS, error);
     if (guard.off(LINKS)) canvas.setDirty(true, true);
@@ -2523,19 +3155,112 @@ function motion(canvas, ctx) {
     stopSprites();
     ctx.restore();
   }
-  ctx.globalAlpha = canvas.editor_alpha;
-  for (const segment2 of shown$1) centreMarker(canvas, ctx, segment2);
-  for (const reroute of canvas._visibleReroutes) {
-    reroute.draw(ctx, canvas._pattern);
-    if (!canvas.pointer.isDown) reroute.drawSlots(ctx);
-  }
+  overShown(canvas, ctx, false);
   return n;
+}
+function flows(canvas, ctx) {
+  if (!flowing.length || !cull(canvas, isFlowing)) return 0;
+  ctx.save();
+  let n = 0;
+  try {
+    n = drawFlows(ctx, shown$1);
+  } finally {
+    ctx.restore();
+  }
+  overShown(canvas, ctx, false);
+  return n;
+}
+function widened(canvas, args) {
+  const width = canvas.connections_width;
+  const lit = canvas.highlighted_links;
+  const { id } = args[3];
+  const highlighted = lit[id];
+  if (pass.focus === "highlight") canvas.connections_width = width * 1.5;
+  delete lit[id];
+  try {
+    original.apply(canvas, args);
+  } finally {
+    canvas.connections_width = width;
+    if (highlighted) lit[id] = highlighted;
+  }
+}
+function tint(canvas, args) {
+  args[6] = focusPalette(own(canvas, args[3], args[6]).native).native;
+  raised.push(args);
+  widened(canvas, args);
+}
+function dim(canvas, args) {
+  const ctx = args[0];
+  const alpha = ctx.globalAlpha;
+  ctx.globalAlpha = alpha * L.focusDim / 100;
+  try {
+    original.apply(canvas, args);
+  } finally {
+    ctx.globalAlpha = alpha;
+  }
+}
+function hide(canvas, args) {
+  const [ctx, a, b, link2, , , color, startDir, endDir, extras] = args;
+  args[0] = dummy();
+  original.apply(canvas, args);
+  const owner = extras?.reroute ?? link2;
+  owner.path = unhit ??= new Path2D();
+  owner._pos[0] = owner._pos[1] = NaN;
+  if (extras?.reroute) {
+    extras.reroute.draw = extras.reroute.drawSlots = nothing;
+    unseen.push(extras.reroute);
+  }
+  const fromSlot = !canvas.graph?.getReroute(owner.parentId);
+  if (!fromSlot && extras?.reroute) return;
+  const reach2 = LiteGraph.NODE_SLOT_HEIGHT * 0.5 + STUB;
+  ctx.save();
+  ctx.beginPath();
+  if (fromSlot) stub(ctx, a, startDir || RIGHT$1, reach2);
+  if (!extras?.reroute) stub(ctx, b, endDir || LEFT$1, reach2);
+  ctx.strokeStyle = own(canvas, link2, color).native;
+  ctx.lineWidth = canvas.connections_width;
+  ctx.stroke();
+  ctx.restore();
+}
+function raise(canvas, ctx) {
+  if (!L.focusOnTop || !pass.focus || LiteGraph.vueNodesMode) return;
+  if (!cull(canvas, isFocused) && !raised.length) return;
+  for (const args of raised) {
+    args[0] = ctx;
+    widened(canvas, args);
+  }
+  if (pass.on) {
+    ctx.save();
+    try {
+      enableAntiAliasing(ctx);
+      if (!pass.still && !STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
+      for (const segment2 of shown$1) {
+        drawBase(ctx, segment2, L.animate, pass.still, true);
+        if (!pass.still || segment2.empty) continue;
+        STILL[L.animate]?.(ctx, segment2, STILL_PHASE);
+        if (marked$1()) drawMarkers(ctx, segment2, STILL_PHASE);
+      }
+      if (!pass.still) moveShown(ctx);
+    } catch (error) {
+      guard.fail(LINKS, error);
+      if (guard.off(LINKS)) canvas.setDirty(true, true);
+    } finally {
+      stopSprites();
+      ctx.restore();
+    }
+  }
+  if (pass.runs) {
+    ctx.save();
+    drawFlows(ctx, shown$1);
+    ctx.restore();
+  }
+  overShown(canvas, ctx, true);
 }
 function installLinks() {
   const proto = LGraphCanvas.prototype;
   const drawConnections = proto.drawConnections;
-  const renderLink = proto.renderLink;
-  foreign = !String(renderLink).includes("renderLinkDirect") || Boolean(globalThis.__LINKFX_V2_BOOTED__);
+  original = proto.renderLink;
+  foreign = !String(original).includes("renderLinkDirect") || Boolean(globalThis.__LINKFX_V2_BOOTED__);
   warned = told = false;
   glows.bases = 0;
   proto.drawConnections = function(...args) {
@@ -2549,21 +3274,34 @@ function installLinks() {
   proto.renderLink = function(...args) {
     const [ctx, a, b, link2, skipBorder, flow, color, startDir, endDir, extras] = args;
     pass.calls++;
-    if (pass.on && ctx === pass.ctx && link2 && !(skipBorder && flow) && !extras?.disabled) {
-      const segment2 = record(this, link2, a, b, color, startDir, endDir, extras);
+    if (ctx !== pass.ctx || !link2 || skipBorder && flow) return original.apply(this, args);
+    const disabled = Boolean(extras?.disabled);
+    const focused = pass.focus !== "" && !disabled && focuses(link2, extras?.reroute);
+    const step2 = pass.runs && !disabled ? stepInto(link2) : void 0;
+    if (pass.focus === "dim" && !focused && !step2) return dim(this, args);
+    if (pass.focus === "hide" && !focused && !step2) return hide(this, args);
+    if (pass.on && !disabled && (focused || step2 || pass.focus !== "animate")) {
+      const segment2 = record(this, link2, a, b, color, startDir, endDir, extras, focused, step2);
       if (place(this, ctx, segment2)) {
         args[0] = dummy();
-        renderLink.apply(this, args);
+        original.apply(this, args);
         if (segment2.custom) hit(extras?.reroute ?? link2, segment2.path);
         return;
       }
+    } else {
+      if (step2) record(this, link2, a, b, color, startDir, endDir, extras, focused, step2);
+      if (focused && pass.tinted) return tint(this, args);
     }
-    return renderLink.apply(this, args);
+    return original.apply(this, args);
   };
   layers.links = (canvas, ctx, over) => {
-    if (over !== Boolean(canvas.graph?.config.links_ontop)) return;
+    const ontop = Boolean(canvas.graph?.config.links_ontop);
+    if (!over && (syncFocus(canvas) || pass.runs && !flowsShown())) canvas.setDirty(true, true);
+    if (over && !ontop) raise(canvas, ctx);
+    if (over !== ontop) return;
     live.links = motion(canvas, ctx);
-    if (live.links) wake();
+    live.flows = flows(canvas, ctx);
+    if (live.links || live.flows) wake();
   };
 }
 const lookable = (s) => s.type !== "hidden" && s.look !== false;
@@ -2572,8 +3310,15 @@ const LOOKS = [
   {
     id: "off",
     name: "Off",
-    description: "Native links and nodes with no fireworks, but for nodes given effects of their own in the node menu.",
-    values: { "🔗 Enhanced Links.Animate": 0, "📦 Enhanced Nodes.End Animation.Enabled": false }
+    description: "Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or fireworks.",
+    values: {
+      "🔗 Enhanced Links.Animate": 0,
+      "🔗 Enhanced Links.Flow.River": false,
+      "🔗 Enhanced Links.Flow.Trail": false,
+      "📦 Enhanced Nodes.Run.Ring": false,
+      "📦 Enhanced Nodes.Run.Error": false,
+      "📦 Enhanced Nodes.End Animation.Enabled": false
+    }
   },
   {
     id: "subtle",
@@ -2584,8 +3329,8 @@ const LOOKS = [
   {
     id: "showcase",
     name: "Showcase",
-    description: "Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow.",
-    // TODO(M9a, M9c, M9e): additive glow, rope physics at 0.6 and hands & eyes. TODO(M7): calm runs. TODO(M9b): a burst per node.
+    description: "Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play.",
+    // TODO(M9a, M9c, M9e): additive glow, rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
     values: {
       "🔗 Enhanced Links.Animate": 4,
       "🔗 Enhanced Links.Quality": 2,
@@ -2596,19 +3341,21 @@ const LOOKS = [
       "📦 Enhanced Nodes.Glow": 1,
       "📦 Enhanced Nodes.Particle.Show": true,
       "📦 Enhanced Nodes.Particle.Glow": 1,
-      "📦 Enhanced Nodes.Particle.Color.Mode": "aurora"
+      "📦 Enhanced Nodes.Particle.Color.Mode": "aurora",
+      "🔗 Enhanced Links.Pause.Mode": "calm"
     }
   },
   {
     id: "performance",
     name: "Performance",
-    description: "Still Classic Flow links with less glow and no shadows, plain nodes, and no fireworks.",
-    // TODO(M7): no executed-path trail.
+    description: "Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no fireworks.",
     values: {
       "🔗 Enhanced Links.Static.Mode": true,
       "🔗 Enhanced Links.Glow.Intensity": 6,
       "🔗 Enhanced Links.Link.Shadow.Enabled": false,
       "🔗 Enhanced Links.Marker.Shadow.Enabled": false,
+      "🔗 Enhanced Links.Pause.Mode": "pause",
+      "🔗 Enhanced Links.Flow.Trail": false,
       "📦 Enhanced Nodes.End Animation.Enabled": false
     }
   },
@@ -2616,8 +3363,7 @@ const LOOKS = [
     // v1's defaults (old_link_animations.js:19-45, old_node_animations.js:146-178); its links are v3's.
     id: "classic-v1",
     name: "Classic v1",
-    description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and no fireworks.",
-    // TODO(M7): no river, trail, progress ring or error pulse.
+    description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or fireworks.",
     values: {
       "📦 Enhanced Nodes.Animate": 2,
       "📦 Enhanced Nodes.Quality": 1,
@@ -2626,6 +3372,11 @@ const LOOKS = [
       "📦 Enhanced Nodes.Particle.Show": true,
       "📦 Enhanced Nodes.Particle.Density": 0.5,
       "📦 Enhanced Nodes.Particle.Glow": 1,
+      "🔗 Enhanced Links.Pause.Mode": "pause",
+      "🔗 Enhanced Links.Flow.River": false,
+      "🔗 Enhanced Links.Flow.Trail": false,
+      "📦 Enhanced Nodes.Run.Ring": false,
+      "📦 Enhanced Nodes.Run.Error": false,
       "📦 Enhanced Nodes.End Animation.Enabled": false
     }
   },
@@ -2694,7 +3445,6 @@ const LOOKS = [
     id: "presenter",
     name: "Presenter",
     description: "Thicker, high-contrast Classic Flow links with larger markers, for streams and screenshots.",
-    // TODO(M7): a spotlight on the running node.
     values: {
       "🔗 Enhanced Links.Thickness": 5,
       "🔗 Enhanced Links.Color.Scheme": "contrast",
@@ -2728,9 +3478,9 @@ function previewLook(look) {
 function applyLook(look) {
   return commitAll({ ...valuesOf(look), [LOOK]: look.id });
 }
-const changed = (look) => Object.entries(valuesOf(look)).some(([id, value]) => shown$2(id) !== value);
+const changed = (look) => Object.entries(valuesOf(look)).some(([id, value]) => shown$3(id) !== value);
 function keepShown() {
-  commitAll({ ...Object.fromEntries(Object.keys(DEFAULTS).map((id) => [id, shown$2(id)])), [LOOK]: "custom" });
+  commitAll({ ...Object.fromEntries(Object.keys(DEFAULTS).map((id) => [id, shown$3(id)])), [LOOK]: "custom" });
 }
 function currentLook() {
   const id = L.look || "subtle";
@@ -2792,7 +3542,7 @@ async function add(name, values) {
   return look;
 }
 function saveLook(name) {
-  return add(name, Object.fromEntries(Object.entries(DEFAULTS).flatMap(([id, value]) => shown$2(id) === value ? [] : [[id, shown$2(id)]])));
+  return add(name, Object.fromEntries(Object.entries(DEFAULTS).flatMap(([id, value]) => shown$3(id) === value ? [] : [[id, shown$3(id)]])));
 }
 async function renameLook(id, name) {
   const looks = await userLooks();
@@ -2845,7 +3595,7 @@ function mix(seed) {
   const links = pick2(optionsOf(LINK_ANIMATE).filter((o) => o.value !== 0));
   const nodes = pick2(optionsOf(NODE_ANIMATE));
   const hue = random() * 360;
-  const [primary, secondary, accent] = [0, 40, 180].map((turn) => hex(fromHsl((hue + turn) % 360, 90, seed & 1 ? 40 : 60)));
+  const [primary, secondary, accent2] = [0, 40, 180].map((turn) => hex(fromHsl((hue + turn) % 360, 90, seed & 1 ? 40 : 60)));
   const values = {
     [LINK_ANIMATE]: links.value,
     "🔗 Enhanced Links.Animation.Speed": between(0.6, 1.4, 0.05),
@@ -2855,14 +3605,14 @@ function mix(seed) {
     "🔗 Enhanced Links.Color.Mode": "custom",
     "🔗 Enhanced Links.Color.Primary": primary,
     "🔗 Enhanced Links.Color.Secondary": secondary,
-    "🔗 Enhanced Links.Color.Accent": accent,
+    "🔗 Enhanced Links.Color.Accent": accent2,
     [NODE_ANIMATE]: nodes.value,
     "📦 Enhanced Nodes.Animation.Speed": between(0.6, 1.4, 0.1),
     "📦 Enhanced Nodes.Quality": pick2([1, 2]),
     "📦 Enhanced Nodes.Color.Mode": "custom",
     "📦 Enhanced Nodes.Color.Primary": primary,
     "📦 Enhanced Nodes.Color.Secondary": secondary,
-    "📦 Enhanced Nodes.Color.Accent": accent,
+    "📦 Enhanced Nodes.Color.Accent": accent2,
     "📦 Enhanced Nodes.Particle.Show": random() < 0.5,
     "📦 Enhanced Nodes.Particle.Density": pick2([0.5, 1, 2])
   };
@@ -2880,7 +3630,7 @@ function surprise() {
   }
 }
 const STILL_NODE = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
-const holdsStill = () => N.staticMode || N.pauseDuringRender && env.running || env.reducedMotion;
+const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion;
 const UNDER = 1;
 const OVER = 2;
 let part$1;
@@ -2922,11 +3672,11 @@ function pale(colour2, alpha) {
   }
   return `${start}${alpha})`;
 }
-function outline(ctx, x, y, w, h2, selected, colour2) {
+function outline(ctx, x, y, w, h2, selected2, colour2) {
   save(ctx);
   const blur = 15 * N.animationGlow;
   ctx.shadowColor = colour2(N.colorHover, 0.5);
-  ctx.shadowBlur = selected ? blur * 1.5 : blur;
+  ctx.shadowBlur = selected2 ? blur * 1.5 : blur;
   ctx.strokeStyle = colour2(N.colorHover, 0.7);
   ctx.lineWidth = 2;
   ctx.globalAlpha = fade;
@@ -2935,7 +3685,7 @@ function outline(ctx, x, y, w, h2, selected, colour2) {
 }
 function gentlePulse(ctx, node2, w, h2, k2, pal, only) {
   const { quality, animationGlow: glow2, animationSize: size, particleSpeed: speed, particleIntensity: motion2 } = N;
-  const { primary, secondary, accent } = pal;
+  const { primary, secondary, accent: accent2 } = pal;
   const phase = k2.nodePhase;
   const time = held ? phase : TURN * k2.particleTime;
   const radius = Math.max(w, h2) * (0.5 + quality * 0.1) * size;
@@ -2956,7 +3706,7 @@ function gentlePulse(ctx, node2, w, h2, k2, pal, only) {
       gradient.addColorStop(0, pale("#ffffff", Math.min(alpha + 0.15, 1)));
       gradient.addColorStop(0.3, pale(primary, alpha));
       gradient.addColorStop(0.7, pale(secondary, alpha * 0.6));
-      gradient.addColorStop(1, pale(accent, 0));
+      gradient.addColorStop(1, pale(accent2, 0));
       ctx.beginPath();
       ctx.arc(0, 0, inner, 0, Math.PI * 2);
       ctx.fillStyle = gradient;
@@ -2967,8 +3717,8 @@ function gentlePulse(ctx, node2, w, h2, k2, pal, only) {
       const alpha = 0.1 * glow2 * (0.5 + breathe * 0.5);
       const gradient = ctx.createRadialGradient(0, 0, radius * 0.6 * pulse, 0, 0, outer);
       gradient.addColorStop(0, pale(secondary, alpha));
-      gradient.addColorStop(0.6, pale(accent, alpha * 0.5));
-      gradient.addColorStop(1, pale(accent, 0));
+      gradient.addColorStop(0.6, pale(accent2, alpha * 0.5));
+      gradient.addColorStop(1, pale(accent2, 0));
       ctx.beginPath();
       ctx.arc(0, 0, outer, 0, Math.PI * 2);
       ctx.fillStyle = gradient;
@@ -3039,7 +3789,7 @@ function roundedRect(ctx, x, y, w, h2, r) {
   ctx.closePath();
 }
 function neonNexus(ctx, node2, w, h2, k2, pal, only) {
-  const { primary, secondary, accent } = pal;
+  const { primary, secondary, accent: accent2 } = pal;
   const { animationGlow: glow2, animationSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
   const intensity = N.intensity * 1.5;
   const phase = k2.nodePhase;
@@ -3064,7 +3814,7 @@ function neonNexus(ctx, node2, w, h2, k2, pal, only) {
     for (let i = 0; i < 4; i++) {
       save(ctx);
       ctx.lineWidth = line * (1 + i * 0.3);
-      const colour2 = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent : "rgba(255, 255, 255, 0.4)";
+      const colour2 = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent2 : "rgba(255, 255, 255, 0.4)";
       ctx.strokeStyle = colour2;
       ctx.shadowColor = colour2;
       ctx.shadowBlur = (i + 1) * 12 * intensity * glow2;
@@ -3166,7 +3916,7 @@ function neonNexus(ctx, node2, w, h2, k2, pal, only) {
   }
 }
 function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
-  const { primary, secondary, accent } = pal;
+  const { primary, secondary, accent: accent2 } = pal;
   const { animationGlow: glow2, particleGlow: dotGlow, particleIntensity: motion2 } = N;
   const cx = w / 2;
   const cy = h2 / 2;
@@ -3187,7 +3937,7 @@ function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
       const alpha = Math.max(0, 1 - at);
       gradient.addColorStop(0, translucent(secondary, alpha * 0.8));
       gradient.addColorStop(0.5, translucent(primary, alpha));
-      gradient.addColorStop(1, translucent(accent, alpha * 0.8));
+      gradient.addColorStop(1, translucent(accent2, alpha * 0.8));
       ctx.strokeStyle = gradient;
       ctx.lineWidth = line;
       ctx.shadowColor = translucent(secondary, 0.5);
@@ -3201,9 +3951,9 @@ function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
     const time = k2.nodeTime;
     for (let i = 0; i < count2; i++) {
       const angle = i / count2 * Math.PI * 2 + k2.particleTime;
-      const spread = Math.max(0.1, 0.8 + Math.sin(time * 0.5 + i) * 0.2 * motion2);
-      const x = Math.cos(angle) * corona * spread + cx;
-      const y = Math.sin(angle) * corona * spread + cy;
+      const spread2 = Math.max(0.1, 0.8 + Math.sin(time * 0.5 + i) * 0.2 * motion2);
+      const x = Math.cos(angle) * corona * spread2 + cx;
+      const y = Math.sin(angle) * corona * spread2 + cy;
       const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion2);
       const trail = Math.max(1, s * 2);
       if (!circle(x, y, trail + 1.5 * 15 * dotGlow)) continue;
@@ -3229,7 +3979,7 @@ function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
 const xs = new Float64Array(127);
 const ys = new Float64Array(127);
 function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
-  const { primary, secondary, accent } = pal;
+  const { primary, secondary, accent: accent2 } = pal;
   const { quality, particleGlow: dotGlow, particleIntensity: motion2, particleSpeed: speed } = N;
   const intensity = N.intensity * 1.5;
   const cx = w / 2;
@@ -3276,7 +4026,7 @@ function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
         if (circle(xs[j], ys[j], radius * pulse + reach2)) {
           ctx.beginPath();
           ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = index % 2 === 0 ? secondary : accent;
+          ctx.strokeStyle = index % 2 === 0 ? secondary : accent2;
           ctx.globalAlpha = (1 - layer / (layers2 + 1)) * fade;
           ctx.stroke();
         }
@@ -3406,10 +4156,10 @@ const RIGHT = 4;
 const LEFT = 3;
 const CLASSIC = 9;
 const LINK_COLOR = "#9A9";
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0 };
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0 };
 const k = { ...clock };
 const segment = new Segment();
-const linksStill = () => L.staticMode || L.pauseDuringRender && env.running || env.reducedMotion;
+const linksStill = () => L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion;
 function link(ctx, animate, a, b, k2) {
   segment.pal = palette(LGraphCanvas.link_type_colors.IMAGE) ?? palette(app.canvas.default_link_color) ?? palette(LINK_COLOR);
   ctx.save();
@@ -3432,7 +4182,7 @@ const part = { sides: UNDER | OVER, x0: 0, y0: 0, x1: 0, y1: 0, round: 0 };
 const node = { id: 0, title: "", size: [0, 0], selected: false };
 function box(ctx, style, x, y, w, h2, k2) {
   const title = LiteGraph.NODE_TITLE_HEIGHT;
-  const round = LiteGraph.ROUND_RADIUS;
+  const round2 = LiteGraph.ROUND_RADIUS;
   ctx.save();
   ctx.translate(x, y);
   if (style && N.glowShow) {
@@ -3441,19 +4191,19 @@ function box(ctx, style, x, y, w, h2, k2) {
     ctx.shadowOffsetX = ctx.shadowOffsetY = 2;
   }
   ctx.beginPath();
-  ctx.roundRect(0, -title, w, h2 + title, round);
+  ctx.roundRect(0, -title, w, h2 + title, round2);
   ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
   ctx.fill();
   ctx.shadowColor = "transparent";
   ctx.beginPath();
-  ctx.roundRect(0, -title, w, title, [round, round, 0, 0]);
+  ctx.roundRect(0, -title, w, title, [round2, round2, 0, 0]);
   ctx.fillStyle = LiteGraph.NODE_DEFAULT_COLOR;
   ctx.fill();
   const only = !style || !N.animationsEnabled;
   if (N.particleShow || !only) {
     node.size[0] = w;
     node.size[1] = h2;
-    Object.assign(part, { x0: 0, y0: -title, x1: w, y1: h2, round });
+    Object.assign(part, { x0: 0, y0: -title, x1: w, y1: h2, round: round2 });
     drawNodeFx(ctx, style, node, w, h2, k2, part, 1, only);
   }
   ctx.restore();
@@ -3601,7 +4351,7 @@ const GALLERIES = {
 };
 function toggle(s, id) {
   const el = h("button", { type: "button", role: "switch", id, class: "eln-switch" });
-  el.addEventListener("click", () => commit(s.id, !shown$2(s.id)));
+  el.addEventListener("click", () => commit(s.id, !shown$3(s.id)));
   return { el, update: (value) => el.setAttribute("aria-checked", String(value)) };
 }
 function slider(s, id) {
@@ -3613,7 +4363,7 @@ function slider(s, id) {
   });
   range.addEventListener("change", () => commit(s.id, Number(range.value)));
   number.addEventListener("change", () => {
-    if (number.value === "") number.value = String(shown$2(s.id));
+    if (number.value === "") number.value = String(shown$3(s.id));
     else commit(s.id, Number(number.value));
   });
   return {
@@ -3663,7 +4413,7 @@ function colour(s, id) {
   well.addEventListener("change", () => commit(s.id, well.value));
   hex2.addEventListener("change", () => {
     if (HEX$1.test(hex2.value)) commit(s.id, hex2.value);
-    else hex2.value = String(shown$2(s.id));
+    else hex2.value = String(shown$3(s.id));
   });
   return {
     el: h("div", { class: "eln-colour" }, well, hex2),
@@ -3708,7 +4458,7 @@ function row(s, found = false) {
     setting: s,
     el,
     update() {
-      const value = shown$2(s.id);
+      const value = shown$3(s.id);
       control.update(value);
       const changed2 = value !== s.default;
       el.classList.toggle("eln-row--modified", changed2);
@@ -3857,19 +4607,13 @@ const css = `/*
     box-shadow: inset 0 0 0 1px var(--eln-accent-strong);
 }
 
-/* Quick bar */
+/* Quick bar: the chips, then the Look, which takes the rest of the chips' last line where it has room. */
 .eln-quick {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.375rem;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--eln-stroke);
-}
-
-.eln-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
 }
 
 .eln-chip {
@@ -3920,8 +4664,10 @@ const css = `/*
 .eln-look {
     position: relative;
     display: flex;
+    flex: 1 1 9rem;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
 }
 
 .eln-look-label {
@@ -4638,7 +5384,8 @@ a.eln-button {
  * in the corner.
  */
 .eln.eln-picker,
-.eln.eln-picker-undo {
+.eln.eln-picker-undo,
+.eln.eln-chipbar {
     position: absolute;
     inset-inline-start: 8rem;
     bottom: 1rem;
@@ -4709,6 +5456,25 @@ a.eln-button {
     padding: 0.5rem 0.5rem 0.5rem 1rem;
 }
 
+/* A chip, at the foot of the canvas in the middle, where neither version puts controls of its own. */
+.eln.eln-chipbar {
+    inset-inline: auto;
+    left: 50%;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: calc(100% - 2rem);
+    padding: 0.375rem;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.eln-chipbar > span {
+    overflow: hidden;
+    padding-inline: 0.5rem;
+    text-overflow: ellipsis;
+}
+
 /* Less motion, as Motion says, or as the system or ComfyUI's Disable animations asks unless Motion is Full. */
 .eln--still *,
 .eln--still *::after,
@@ -4733,6 +5499,7 @@ const TITLE = "Enhanced Links & Nodes";
 const LINKS_ON = "🔗 Enhanced Links.Enabled";
 const NODES_ON = "📦 Enhanced Nodes.Enabled";
 const FROZEN = ["🔗 Enhanced Links.Static.Mode", "📦 Enhanced Nodes.Static.Mode"];
+const FOCUS_ON = "🔗 Enhanced Links.Focus.Enabled";
 const PANEL_STATE = "🔗 Enhanced Links.Panel.State";
 const COEXIST = "🔗 Enhanced Links.Coexist";
 const UNDO_MS = 8e3;
@@ -4742,7 +5509,8 @@ const TABS = [
   { id: "looks", name: "Looks" },
   { id: "links", name: "Links", part: "Links" },
   { id: "nodes", name: "Nodes", part: "Nodes" },
-  { id: "runs", name: "Runs", part: "Runs" },
+  // Saved as runs before selection focus joined it.
+  { id: "runs", name: "Focus & Flow", part: "Focus & Flow" },
   { id: "perf", name: "Perf", part: "Performance" },
   { id: "about", name: "About" }
 ];
@@ -4871,9 +5639,9 @@ function go(id, clicked = true) {
     remember();
   }
   tabs.forEach((tab, i) => {
-    const selected = TABS[i].id === id;
-    tab.setAttribute("aria-selected", String(selected));
-    tab.tabIndex = selected ? 0 : -1;
+    const selected2 = TABS[i].id === id;
+    tab.setAttribute("aria-selected", String(selected2));
+    tab.tabIndex = selected2 ? 0 : -1;
   });
   body.setAttribute("aria-labelledby", `eln-tab-${id}`);
   fill();
@@ -4914,13 +5682,13 @@ function keep() {
 function offerUndo(title, undo, look = false) {
   const { toast } = app.extensionManager;
   const earlier = look && Date.now() < applied.until ? applied : void 0;
-  const all = () => {
+  const all2 = () => {
     undo();
     earlier?.undo();
   };
-  const run = () => {
+  const run2 = () => {
     applied.until = 0;
-    all();
+    all2();
   };
   if ("success" in toast) {
     const id = toast.success(title, {
@@ -4930,26 +5698,26 @@ function offerUndo(title, undo, look = false) {
         label: "Undo",
         onClick() {
           toast.dismiss(id);
-          run();
+          run2();
         }
       }
     });
-    if (look) applied = { undo: all, toast: id, until: Date.now() + UNDO_MS };
+    if (look) applied = { undo: all2, toast: id, until: Date.now() + UNDO_MS };
     return;
   }
   if (panelShown()) {
     undoText.textContent = title;
     undoButton.onclick = () => {
       panelUndo.hidden = true;
-      run();
+      run2();
     };
     panelUndo.hidden = false;
     clearTimeout(undoTimer);
     undoTimer = window.setTimeout(() => panelUndo.hidden = true, UNDO_MS);
   } else {
-    undoBar(title, run);
+    undoBar(title, run2);
   }
-  if (look) applied = { undo: all, until: Date.now() + UNDO_MS };
+  if (look) applied = { undo: all2, until: Date.now() + UNDO_MS };
 }
 function apply(look) {
   offerUndo(`${look.name} applied`, applyLook(look), true);
@@ -4965,26 +5733,28 @@ function resetEverything() {
 }
 const keyText = (combo) => [combo.ctrl && "Ctrl", combo.alt && "Alt", combo.shift && "Shift", combo.key.length === 1 ? combo.key.toUpperCase() : combo.key].filter(Boolean).join("+");
 const commandKeys = () => new Map(app.extensionManager.command.commands.flatMap((c) => c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : []));
-const MAC_ONLY = /* @__PURE__ */ new Set(["Alt+¬", "Alt+˚"]);
+const MAC_ONLY = /* @__PURE__ */ new Set(["Alt+¬", "Alt+˚", "Alt+∆"]);
 function keyName(id) {
   const key = commandKeys().get(id);
   return key && !MAC_ONLY.has(key) ? key : void 0;
 }
 const toggleLinks = () => commit(LINKS_ON, !L.enabled);
 const toggleNodes = () => commit(NODES_ON, !N.enabled);
+const toggleFocus = () => commit(FOCUS_ON, !L.focusEnabled);
 function toggleStatic() {
   const on = !(L.staticMode && N.staticMode);
   for (const id of FROZEN) commit(id, on);
 }
 function quickBar() {
-  const chip = (label, click) => {
+  const chip2 = (label, click) => {
     const button2 = h("button", { type: "button", class: "eln-chip" }, label);
     button2.addEventListener("click", click);
     return button2;
   };
-  const links = chip("Link FX", toggleLinks);
-  const nodes = chip("Node FX", toggleNodes);
-  const frozen = chip("Static", toggleStatic);
+  const links = chip2("Link FX", toggleLinks);
+  const nodes = chip2("Node FX", toggleNodes);
+  const frozen = chip2("Static", toggleStatic);
+  const focus2 = chip2("Focus", toggleFocus);
   const name = h("span", { class: "eln-look-name" });
   const dot = h("span", { class: "eln-dot", title: "Changed since the look was applied" }, h("span", { class: "eln-sr" }, "Changed since the look was applied"));
   const choose = h(
@@ -5040,14 +5810,18 @@ function quickBar() {
     links.setAttribute("aria-pressed", String(L.enabled));
     nodes.setAttribute("aria-pressed", String(N.enabled));
     frozen.setAttribute("aria-pressed", L.staticMode === N.staticMode ? String(L.staticMode) : "mixed");
+    focus2.setAttribute("aria-pressed", String(L.focusEnabled));
     const look = currentLook();
     name.textContent = look?.name ?? "Custom";
     dot.hidden = !look || !changed(look);
   };
   return h(
     "div",
-    { class: "eln-quick" },
-    h("div", { class: "eln-chips", role: "group", "aria-label": "Quick switches" }, links, nodes, frozen),
+    { class: "eln-quick", role: "group", "aria-label": "Quick bar" },
+    links,
+    nodes,
+    frozen,
+    focus2,
     h("div", { class: "eln-look" }, h("span", { id: "eln-look-label", class: "eln-look-label" }, "Look"), choose)
   );
 }
@@ -5087,9 +5861,9 @@ function section(group, settings, open2) {
   region.append(...own2.map((r) => r.el), more);
   const el = h("section", { class: "eln-section" }, h("div", { class: "eln-section-head" }, h("h3", {}, toggle2), count2, reset2), region);
   parts.push(() => {
-    const changes = settings.filter((s) => shown$2(s.id) !== s.default).length;
-    count2.textContent = changes ? `${changes} changed` : "";
-    count2.hidden = reset2.hidden = !changes;
+    const changes2 = settings.filter((s) => shown$3(s.id) !== s.default).length;
+    count2.textContent = changes2 ? `${changes2} changed` : "";
+    count2.hidden = reset2.hidden = !changes2;
     let held2 = 0;
     for (const r of own2) {
       if (r.el.hidden || !("advanced" in r.setting) || state.advanced || revealed.has(group)) continue;
@@ -5123,14 +5897,14 @@ function results(query) {
   return found;
 }
 function noticesOf(tab) {
-  const all = tab === "looks";
+  const all2 = tab === "looks";
   const list = [];
-  if ((all || tab === "links") && !running.links) list.push({ text: DISABLED.links });
-  if ((all || tab === "nodes") && !running.nodes) list.push({ text: DISABLED.nodes });
-  if ((all || tab === "nodes") && LiteGraph.vueNodesMode) {
+  if ((all2 || tab === "links") && !running.links) list.push({ text: DISABLED.links });
+  if ((all2 || tab === "nodes") && !running.nodes) list.push({ text: DISABLED.nodes });
+  if ((all2 || tab === "nodes") && LiteGraph.vueNodesMode) {
     list.push({ text: "Nodes 2.0 is on, and node effects show on classic nodes only for now.", action: ["Use classic nodes", () => void Promise.resolve(app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)).then(refresh)] });
   }
-  if ((all || tab === "links") && deferring()) list.push({ text: L.coexist === "defer" ? "Link effects are set to always step aside for other link extensions." : "Another extension draws links, so link effects step aside for it.", action: ["Keep Enhanced link effects", () => commit(COEXIST, "ours")] });
+  if ((all2 || tab === "links") && deferring()) list.push({ text: L.coexist === "defer" ? "Link effects are set to always step aside for other link extensions." : "Another extension draws links, so link effects step aside for it.", action: ["Keep Enhanced link effects", () => commit(COEXIST, "ours")] });
   for (const key of tab === "perf" ? [] : guard.tripped()) {
     list.push({ text: `${key} kept failing, so it was turned off.`, action: ["Retry", () => {
       guard.retry();
@@ -5270,6 +6044,7 @@ const NEWS$1 = [
   "This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.",
   "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.",
   "Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.",
+  "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
   "Much lighter than 2.x on big graphs."
 ];
 const PLACES = [
@@ -5285,7 +6060,8 @@ const BADGES = [
 ];
 const COMMANDS = [
   [TOGGLE, "Toggle Enhanced Links & Nodes Sidebar", "Opens and closes this panel."],
-  [TOGGLE_ALL, "Toggle all effects", "Turns every effect off, or back on."]
+  [TOGGLE_ALL, "Toggle all effects", "Turns every effect off, or back on."],
+  ["EnhancedLinksNodes.GoToRunning", "Go to running node (or next error)", "Goes to the node your run is running, or once it failed, to the next error."]
 ];
 const KEYS = [
   ["← → Home End", "Move between the tabs."],
@@ -5368,7 +6144,7 @@ function aboutTab() {
 }
 function diagnostics() {
   const look = currentLook();
-  const changes = VISIBLE.filter((s) => shown$2(s.id) !== s.default).map((s) => `  ${s.id}: ${JSON.stringify(shown$2(s.id))}`);
+  const changes2 = VISIBLE.filter((s) => shown$3(s.id) !== s.default).map((s) => `  ${s.id}: ${JSON.stringify(shown$3(s.id))}`);
   return [
     `${TITLE} ${"2.0.1"}, ComfyUI frontend ${window.__COMFYUI_FRONTEND_VERSION__}`,
     `Browser: ${navigator.userAgent}; language ${navigator.language}`,
@@ -5380,20 +6156,23 @@ function diagnostics() {
     `Coexist: ${L.coexist}${deferring() ? ", stepping aside for another extension" : ""}`,
     `Reduced motion: ${env.reducedMotion ? "yes" : "no"}`,
     `Turned off after failing: ${guard.tripped().join(", ") || "nothing"}`,
-    `Settings changed from the defaults:${changes.length ? "" : " none"}`,
-    ...changes
+    `Settings changed from the defaults:${changes2.length ? "" : " none"}`,
+    ...changes2
   ].join("\n");
 }
 const SEEN = "🔗 Enhanced Links.WhatsNew.Seen";
 const NEWS = "3.0.0";
 const IDLE_MS = 1500;
 const NEWS_MS = 1e4;
+const CHIP_MS = 6e3;
 const byId = (id) => LOOKS.find((look) => look.id === id);
 const SUBTLE = byId("subtle");
 let card;
 let asking = false;
 let before = null;
 let offer;
+let pill;
+let pillTimer = 0;
 const host = () => document.querySelector(".graph-canvas-panel");
 function installPicker() {
   if (L.look !== "") return;
@@ -5502,6 +6281,20 @@ function undoBar(title, undo) {
   offer = bar;
   host().append(bar);
 }
+function chip(text2, action, ms = CHIP_MS) {
+  pill?.remove();
+  clearTimeout(pillTimer);
+  if (!text2 && !action) return;
+  const el = h("div", { class: "eln eln-chipbar", role: "status" });
+  if (text2) el.append(h("span", {}, text2));
+  if (action) el.append(button(action[0], () => {
+    el.remove();
+    action[1]();
+  }));
+  pill = el;
+  pillTimer = window.setTimeout(() => el.remove(), ms);
+  host().append(el);
+}
 function whatsNew() {
   if (L.whatsNewSeen === NEWS) return;
   commit(SEEN, NEWS);
@@ -5527,7 +6320,6 @@ function whatsNew() {
 }
 const OWN_STYLE = "enhanced_fx_style";
 const OWN_ONLY = "enhanced_fx_particles_only";
-const OWN_COMPLETION = "enhanced_fx_completion";
 const SELECTION_FX = "EnhancedLinksNodes.SelectionNodeFX";
 const STYLES = new Set(NODE_ANIMATION_OPTIONS.map((option) => option.value));
 function ownStyle(node2) {
@@ -5546,6 +6338,10 @@ function pick(nodes, choices) {
   app.canvas.setDirty(true, false);
 }
 const selectedNodes = () => [...app.canvas.selectedItems].filter((item) => item instanceof LGraphNode);
+function selected() {
+  const nodes = selectedNodes();
+  return nodes.length === 1 ? nodes[0] : void 0;
+}
 function effects() {
   const global = N.animate ? NODE_ANIMATION_OPTIONS.find((option) => option.value === N.animate).text : "Off";
   return [
@@ -5563,6 +6359,7 @@ function particlesOnly(node2) {
 }
 const entry = (content, ticked, callback) => ({ content: ticked ? `✓ ${content}` : content, callback });
 function nodeMenu(node2) {
+  const connected = connections(node2).slice(0, LISTED);
   const selection = selectedNodes();
   const nodes = node2.selected && selection.length > 1 ? selection : [node2];
   const only = nodes.every(particlesOnly);
@@ -5584,74 +6381,279 @@ function nodeMenu(node2) {
       has_submenu: true,
       submenu: {
         options: [
-          entry("Use global", completion !== "fireworks" && completion !== "off", () => pick([node2], { [OWN_COMPLETION]: void 0 })),
-          entry("Fireworks", completion === "fireworks", () => pick([node2], { [OWN_COMPLETION]: "fireworks" })),
-          entry("Off", completion === "off", () => pick([node2], { [OWN_COMPLETION]: "off" }))
+          entry("Use global", completion !== "primary" && completion !== "exclude", () => pick([node2], { [OWN_COMPLETION]: void 0 })),
+          entry("Primary (anchor here)", completion === "primary", () => pick([node2], { [OWN_COMPLETION]: "primary" })),
+          entry("Exclude", completion === "exclude", () => pick([node2], { [OWN_COMPLETION]: "exclude" }))
         ]
+      }
+    },
+    {
+      content: "Go to connected node",
+      has_submenu: true,
+      submenu: {
+        options: connected.length ? connected.map((c) => ({ content: `${c.up ? "←" : "→"} ${c.slot} · ${c.node.title} #${c.node.id}`, callback: () => jump(c.node, node2) })) : [{ content: "No connections", disabled: true }]
       }
     }
   ];
 }
+const HOPS = 100;
+const LISTED = 15;
+const HISTORY = 20;
+const JUMP_MS = 350;
+const SMALL = 40;
+const PULSE_S = 1.2;
+const STEADY_S = 1.5;
+const MARK_OUT = 6;
+function sourceOf(graph, link2) {
+  for (let hops = 0; link2 && hops < HOPS; hops++) {
+    const node2 = graph.getNodeById(link2.origin_id);
+    if (node2?.type !== "Reroute") return node2 ?? void 0;
+    link2 = node2.getInputLink(0);
+  }
+}
+function targetsOf(graph, ids2, into2 = [], hops = 0) {
+  for (const id of ids2 ?? []) {
+    const link2 = graph.getLink(id);
+    const node2 = link2 && graph.getNodeById(link2.target_id);
+    if (node2?.type !== "Reroute") {
+      if (node2) into2.push(node2);
+    } else if (hops < HOPS) targetsOf(graph, node2.outputs[0].links, into2, hops + 1);
+  }
+  return into2;
+}
+const slotName = (slot) => slot.label || slot.localized_name || slot.name;
+function connections(node2) {
+  const graph = app.canvas.graph;
+  const list = [];
+  node2.inputs.forEach((input, i) => {
+    const source = sourceOf(graph, node2.getInputLink(i));
+    if (source) list.push({ up: true, slot: slotName(input), node: source });
+  });
+  for (const output of node2.outputs) {
+    for (const target of targetsOf(graph, output.links)) list.push({ up: false, slot: slotName(output), node: target });
+  }
+  return list;
+}
+const back = [];
+function backTo() {
+  const { graph } = app.canvas;
+  while (back.length && (back.at(-1).graph !== graph || graph.getNodeById(back.at(-1).node.id) !== back.at(-1).node)) back.pop();
+  return back.at(-1)?.node;
+}
+let marked;
+let markColour = "";
+function drawMark(canvas, ctx) {
+  if (!marked) return;
+  const steady = env.reducedMotion;
+  const t = clock.markTime / (steady ? STEADY_S : PULSE_S);
+  if (t >= 1) {
+    marked = void 0;
+    live.marks = 0;
+    return;
+  }
+  if (marked.graph !== canvas.graph) return;
+  ctx.save();
+  ctx.globalAlpha = steady ? 1 : 0.5 - 0.5 * Math.cos(4 * Math.PI * t);
+  ctx.strokeStyle = markColour;
+  ctx.lineWidth = 3 / canvas.ds.scale;
+  trace(ctx, marked, MARK_OUT);
+  ctx.stroke();
+  ctx.restore();
+}
+function pan(node2, fit) {
+  const { canvas } = app;
+  const bounds = node2.boundingRect;
+  canvas.ds.animateToBounds(bounds, () => canvas.setDirty(true, true), { duration: env.reducedMotion ? 1 : JUMP_MS, zoom: fit && bounds[3] * canvas.ds.scale < SMALL ? 0.75 : 0 });
+}
+function jump(node2, from, text2, colour2 = accent()) {
+  const { canvas } = app;
+  if (from && back.at(-1)?.node !== from) {
+    back.push({ node: from, graph: canvas.graph });
+    if (back.length > HISTORY) back.shift();
+  }
+  pan(node2, true);
+  canvas.selectItems([node2]);
+  layers.marks = drawMark;
+  marked = node2;
+  markColour = colour2;
+  clock.markTime = 0;
+  live.marks = 1;
+  wake();
+  const previous = backTo();
+  chip(text2, previous && [`↩ Back to ${previous.title}`, goBack]);
+}
+function goBack() {
+  const node2 = backTo();
+  if (!node2) return false;
+  back.pop();
+  jump(node2);
+  return true;
+}
+let stepped = { from: void 0, way: "", index: 0, of: 0, to: void 0, at: 0 };
+const again = (way) => stepped.way === way && stepped.of > 1 && performance.now() - stepped.at < CHIP_MS;
+function step(from, way, nodes, next) {
+  const index = next ? (stepped.index + 1) % nodes.length : 0;
+  stepped = { from, way, index, of: nodes.length, to: nodes[index], at: performance.now() };
+  jump(nodes[index], from, nodes.length > 1 ? `${index + 1}/${nodes.length} · ${nodes[index].title}` : void 0);
+}
+function goAlong(up) {
+  const node2 = selected();
+  if (!node2) return "Select one node first";
+  const way = up ? "up" : "down";
+  const next = again(way) && stepped.to === node2;
+  const from = next ? stepped.from : node2;
+  const nodes = connections(from).filter((c) => c.up === up).map((c) => c.node);
+  if (!nodes.length) return up ? `Nothing feeds ${from.title}` : `${from.title} feeds nothing`;
+  step(from, way, nodes, next);
+}
+const navigating = () => L.navigateDoubleClick && !LiteGraph.vueNodesMode;
+function navigateOnDoubleClick(nodeType) {
+  const { onInputDblClick, onOutputDblClick } = nodeType.prototype;
+  nodeType.prototype.onInputDblClick = function(slot, e) {
+    const link2 = this.getInputLink(slot);
+    onInputDblClick?.call(this, slot, e);
+    if (!link2 || this.getInputLink(slot)?.id !== link2.id || !navigating()) return;
+    const source = sourceOf(app.canvas.graph, link2);
+    if (source) jump(source, this);
+  };
+  if (onOutputDblClick) return;
+  nodeType.prototype.onOutputDblClick = function(slot) {
+    if (!navigating()) return;
+    const nodes = targetsOf(app.canvas.graph, this.outputs[slot].links);
+    const way = `out ${slot}`;
+    if (nodes.length) step(this, way, nodes, again(way) && stepped.from === this);
+  };
+}
+const FOLLOW_MS = 1500;
+const PAUSE_MS = 1e4;
+const REPAUSE_MS = 1e3;
+let lastError;
+function nextError() {
+  const nodes = errorNodes();
+  if (!nodes.length) return "No errors";
+  const at = (nodes.indexOf(lastError) + 1) % nodes.length;
+  const node2 = lastError = nodes[at];
+  jump(node2, selected(), nodes.length > 1 ? `${at + 1}/${nodes.length} · ${node2.title}` : void 0, RED);
+}
+function goToRunning() {
+  if (!env.running) return errorNodes().length ? nextError() : "Nothing is running";
+  const id = running$1();
+  if (!id) return "Nothing is running";
+  const shown2 = shownAs(id);
+  if (!shown2) return "Running in another graph";
+  const [node2, inside] = shown2;
+  jump(node2, selected());
+  return inside ? `Running inside ${node2.title}` : void 0;
+}
+let followed = -Infinity;
+let pausedUntil = 0;
+let watched;
+function follow(id) {
+  const now = performance.now();
+  if (!L.navigateFollow || now < pausedUntil || now - followed < FOLLOW_MS) return;
+  const node2 = shownAs(id)?.[0];
+  if (!node2 || overlaps(node2.boundingRect, app.canvas.visible_area, 0)) return;
+  followed = now;
+  pan(node2, false);
+}
+function resume() {
+  pausedUntil = 0;
+  followed = -Infinity;
+  const id = running$1();
+  if (id) follow(id);
+}
+function interrupted(event) {
+  if (!L.navigateFollow || !env.running || event.type === "pointermove" && !event.buttons) return;
+  const now = performance.now();
+  if (now < pausedUntil - PAUSE_MS + REPAUSE_MS) return;
+  pausedUntil = now + PAUSE_MS;
+  chip("Following paused", ["Resume", resume], PAUSE_MS);
+}
+function installFollow() {
+  if (watched === app.canvas) return;
+  if (!watched) {
+    api.addEventListener("executing", ({ detail }) => {
+      if (detail != null && env.running) follow(String(detail));
+    });
+  }
+  watched = app.canvas;
+  app.canvas.canvas.addEventListener("wheel", interrupted, { passive: true });
+  app.canvas.canvas.addEventListener("pointermove", interrupted, { passive: true });
+}
 export {
-  UNDER as $,
-  effects as A,
+  live as $,
+  toggleStatic as A,
   BADGES as B,
-  pick as C,
-  fireworks as D,
-  resetEverything as E,
+  toggleFocus as C,
+  DISABLED as D,
+  FOCUS_ON as E,
   FROZEN as F,
-  DISABLED as G,
-  translucent as H,
-  revision as I,
-  nodeMenu as J,
-  nodeSettings as K,
-  L,
-  layers as M,
-  N,
-  live as O,
-  startSprites as P,
-  drawBursts as Q,
-  guard as R,
+  commit as G,
+  showPicker as H,
+  surpriseMe as I,
+  goBack as J,
+  selectedNodes as K,
+  LINKS_ON as L,
+  effects as M,
+  NODES_ON as N,
+  pick as O,
+  fireworks as P,
+  resetEverything as Q,
+  goToRunning as R,
   SELECTION_FX as S,
   TITLE as T,
-  particlesOnly as U,
-  drawNodeFx as V,
-  clock as W,
-  OVER as X,
-  dummy as Y,
-  holdsStill as Z,
-  reach as _,
-  currentLook as a,
-  wake as a0,
-  ownStyle as a1,
-  STILL_NODE as a2,
-  nodePalette as a3,
-  OWN_COMPLETION as a4,
-  stopSprites as a5,
-  TOGGLE_ALL as b,
+  nextError as U,
+  goAlong as V,
+  translucent as W,
+  revision as X,
+  nodeMenu as Y,
+  nodeSettings as Z,
+  layers as _,
+  TOGGLE_ALL as a,
+  startSprites as a0,
+  drawBursts as a1,
+  guard as a2,
+  FIREWORKS as a3,
+  particlesOnly as a4,
+  drawNodeFx as a5,
+  clock as a6,
+  OVER as a7,
+  dummy as a8,
+  holdsStill as a9,
+  reach as aa,
+  overlaps as ab,
+  UNDER as ac,
+  wake as ad,
+  ownStyle as ae,
+  during as af,
+  CALM_ALPHA as ag,
+  STILL_NODE as ah,
+  nodePalette as ai,
+  stopSprites as aj,
+  install as b,
   checked as c,
-  install as d,
-  installPanel as e,
-  installLinks as f,
-  commandKeys as g,
-  TOGGLE as h,
+  installPanel as d,
+  installRuns as e,
+  installFollow as f,
+  installLinks as g,
+  errorNodes as h,
   installStyle as i,
-  keyText as j,
+  currentLook as j,
   keyName as k,
   linkSettings as l,
-  NODES_ON as m,
-  toggleStatic as n,
-  showPanel as o,
+  commandKeys as m,
+  navigateOnDoubleClick as n,
+  TOGGLE as o,
   panelShown as p,
-  showPicker as q,
+  keyText as q,
   running as r,
-  surpriseMe as s,
-  toggleNodes as t,
-  LINKS_ON as u,
-  toggleLinks as v,
-  setting as w,
-  shown$2 as x,
-  commit as y,
-  selectedNodes as z
+  env as s,
+  setting as t,
+  shown$3 as u,
+  showPanel as v,
+  toggleLinks as w,
+  L as x,
+  toggleNodes as y,
+  N as z
 };
-//# sourceMappingURL=menus-BcXUDhho.js.map
+//# sourceMappingURL=menus-CKk-joPo.js.map

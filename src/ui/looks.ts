@@ -36,8 +36,15 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'off',
         name: 'Off',
-        description: 'Native links and nodes with no fireworks, but for nodes given effects of their own in the node menu.',
-        values: { '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.End Animation.Enabled': false },
+        description: 'Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or fireworks.',
+        values: {
+            '🔗 Enhanced Links.Animate': 0,
+            '🔗 Enhanced Links.Flow.River': false,
+            '🔗 Enhanced Links.Flow.Trail': false,
+            '📦 Enhanced Nodes.Run.Ring': false,
+            '📦 Enhanced Nodes.Run.Error': false,
+            '📦 Enhanced Nodes.End Animation.Enabled': false,
+        },
     },
     {
         id: 'subtle',
@@ -48,8 +55,8 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow.',
-        // TODO(M9a, M9c, M9e): additive glow, rope physics at 0.6 and hands & eyes. TODO(M7): calm runs. TODO(M9b): a burst per node.
+        description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play.',
+        // TODO(M9a, M9c, M9e): additive glow, rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Quality': 2,
@@ -61,18 +68,20 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Particle.Show': true,
             '📦 Enhanced Nodes.Particle.Glow': 1,
             '📦 Enhanced Nodes.Particle.Color.Mode': 'aurora',
+            '🔗 Enhanced Links.Pause.Mode': 'calm',
         },
     },
     {
         id: 'performance',
         name: 'Performance',
-        description: 'Still Classic Flow links with less glow and no shadows, plain nodes, and no fireworks.',
-        // TODO(M7): no executed-path trail.
+        description: 'Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no fireworks.',
         values: {
             '🔗 Enhanced Links.Static.Mode': true,
             '🔗 Enhanced Links.Glow.Intensity': 6,
             '🔗 Enhanced Links.Link.Shadow.Enabled': false,
             '🔗 Enhanced Links.Marker.Shadow.Enabled': false,
+            '🔗 Enhanced Links.Pause.Mode': 'pause',
+            '🔗 Enhanced Links.Flow.Trail': false,
             '📦 Enhanced Nodes.End Animation.Enabled': false,
         },
     },
@@ -80,8 +89,7 @@ export const LOOKS: readonly Look[] = [
         // v1's defaults (old_link_animations.js:19-45, old_node_animations.js:146-178); its links are v3's.
         id: 'classic-v1',
         name: 'Classic v1',
-        description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and no fireworks.",
-        // TODO(M7): no river, trail, progress ring or error pulse.
+        description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or fireworks.",
         values: {
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Quality': 1,
@@ -90,6 +98,11 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Particle.Show': true,
             '📦 Enhanced Nodes.Particle.Density': 0.5,
             '📦 Enhanced Nodes.Particle.Glow': 1,
+            '🔗 Enhanced Links.Pause.Mode': 'pause',
+            '🔗 Enhanced Links.Flow.River': false,
+            '🔗 Enhanced Links.Flow.Trail': false,
+            '📦 Enhanced Nodes.Run.Ring': false,
+            '📦 Enhanced Nodes.Run.Error': false,
             '📦 Enhanced Nodes.End Animation.Enabled': false,
         },
     },
@@ -158,7 +171,6 @@ export const LOOKS: readonly Look[] = [
         id: 'presenter',
         name: 'Presenter',
         description: 'Thicker, high-contrast Classic Flow links with larger markers, for streams and screenshots.',
-        // TODO(M7): a spotlight on the running node.
         values: {
             '🔗 Enhanced Links.Thickness': 5,
             '🔗 Enhanced Links.Color.Scheme': 'contrast',

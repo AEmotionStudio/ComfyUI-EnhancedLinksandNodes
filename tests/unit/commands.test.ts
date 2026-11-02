@@ -15,7 +15,7 @@ import { live } from '@/core/engine';
 import { fireworks } from '@/fx/bursts';
 import { DISABLED, running } from '@/sidebar/sidebar';
 import { app, fake } from '../helpers/fake-app';
-import { frames, start, type FakeCanvas, type FakeNode } from '../helpers/fake-litegraph';
+import { frames, progress, send, start, type FakeCanvas, type FakeNode } from '../helpers/fake-litegraph';
 
 vi.mock('@/fx/bursts', async (importOriginal) => {
     const bursts = await importOriginal<typeof import('@/fx/bursts')>();
@@ -29,6 +29,9 @@ const NODES_ON = '📦 Enhanced Nodes.Enabled';
 const LINKS_STATIC = '🔗 Enhanced Links.Static.Mode';
 const NODES_STATIC = '📦 Enhanced Nodes.Static.Mode';
 const THICKNESS = '🔗 Enhanced Links.Thickness';
+const FOCUS_ON = '🔗 Enhanced Links.Focus.Enabled';
+const FOCUS_MODE = '🔗 Enhanced Links.Focus.Mode';
+const FOLLOW = '🔗 Enhanced Links.Navigate.Follow';
 
 const extension = (name: string) => fake.extensions.find((e) => e.name === name) as unknown as ComfyExtension;
 const links = () => extension('enhanced.link.animations');
@@ -74,10 +77,18 @@ describe('the commands', () => {
             ['ToggleLinks', 'Toggle link effects', 'Link effects', 'view-controls', 'pi pi-link'],
             ['ToggleNodes', 'Toggle node effects', 'Node effects', 'view-controls', 'pi pi-objects-column'],
             ['ToggleStatic', 'Freeze / unfreeze animation', 'Freeze animation', 'view-controls', 'pi pi-pause'],
+            ['ToggleFocus', 'Toggle selection focus', 'Selection focus', 'view-controls', 'pi pi-bullseye'],
+            ['NextFocusMode', 'Next selection focus mode', undefined, 'view-controls', 'pi pi-filter'],
             ['NextLinkStyle', 'Next link animation', undefined, 'view-controls', 'pi pi-forward'],
             ['NextNodeStyle', 'Next node effect', undefined, 'view-controls', 'pi pi-forward'],
             ['ChooseLook', 'Choose a look…', 'Choose look…', 'view-controls', 'pi pi-palette'],
             ['SurpriseMe', 'Surprise me (random look)', 'Surprise me', undefined, 'pi pi-star'],
+            ['GoToRunning', 'Go to running node (or next error)', 'Go to running node', 'essentials', 'pi pi-directions'],
+            ['NextError', 'Go to next error', 'Next error', 'essentials', 'pi pi-exclamation-triangle'],
+            ['ToggleFollow', 'Toggle follow execution', 'Follow execution', 'view-controls', 'pi pi-eye'],
+            ['GoUpstream', 'Go to input node', undefined, 'view-controls', 'pi pi-arrow-left'],
+            ['GoDownstream', 'Go to output node', undefined, 'view-controls', 'pi pi-arrow-right'],
+            ['GoBack', 'Go back', undefined, 'view-controls', 'pi pi-undo'],
             ['SelectionNodeFX', 'Cycle node effect for selection', undefined, undefined, 'pi pi-sparkles'],
             ['PreviewCompletion', 'Preview completion effect', undefined, undefined, 'pi pi-play'],
             ['ResetAll', 'Reset all Enhanced Links & Nodes settings…', undefined, undefined, 'pi pi-refresh'],
@@ -162,6 +173,98 @@ describe('the commands', () => {
         expect([L.animate, said()]).toEqual([0, 'Link animation: None']);
         await run('NextLinkStyle');
         expect(L.animate).toBe(9);
+    });
+
+    it('ToggleFocus turns selection focus over, named with its mode, and checked while on; NextFocusMode steps the mode, turning focus on', async () => {
+        await start();
+        const focus = command('ToggleFocus');
+        expect(focus.active!()).toBe(true);
+        await run('ToggleFocus');
+        await settle();
+        expect([L.focusEnabled, focus.active!(), posted(), said()]).toEqual([false, false, [FOCUS_ON], 'Selection focus off']);
+        await run('NextFocusMode');
+        await settle();
+        expect([L.focusEnabled, L.focusMode, posted(), said()]).toEqual([true, 'animate', [FOCUS_ON, FOCUS_ON, FOCUS_MODE], 'Selection focus mode: Animate only these']);
+        for (const mode of ['dim', 'hide', 'highlight']) {
+            await run('NextFocusMode');
+            expect(L.focusMode).toBe(mode);
+        }
+        await run('ToggleFocus');
+        await run('ToggleFocus');
+        expect(said()).toBe('Selection focus: Highlight');
+    });
+
+    it('GoUpstream and GoDownstream go from the node selected, and say why when they cannot; GoBack goes back, or says there is nowhere to go', async () => {
+        const canvas = await start({}, { nodes: [{ pos: [100, 100], title: 'Seed' }, { pos: [600, 100], title: 'KSampler' }], links: [{ from: 0, to: 1 }] });
+        frames(1);
+        await run('GoUpstream');
+        expect(said()).toBe('Select one node first');
+        select(canvas, [canvas.graph._nodes[1]]);
+        await run('GoUpstream');
+        expect([...canvas.selectedItems]).toEqual([canvas.graph._nodes[0]]);
+        await run('GoUpstream');
+        expect(said()).toBe('Nothing feeds Seed');
+        await run('GoDownstream');
+        expect([...canvas.selectedItems]).toEqual([canvas.graph._nodes[1]]);
+        await run('GoBack');
+        await run('GoBack');
+        await run('GoBack');
+        expect([[...canvas.selectedItems], said()]).toEqual([[canvas.graph._nodes[1]], 'Nothing to go back to']);
+    });
+
+    it('GoToRunning goes to the node this client’s run runs, or to the one holding the subgraph it runs in, saying so; once the run failed, NextError and it cycle its errors with a red pulse', async () => {
+        const canvas = await start({}, {
+            nodes: [{ pos: [100, 100], title: 'Load' }, { pos: [600, 100], title: 'Group', subgraph: { nodes: [{ pos: [100, 100], title: 'Inner' }] } }, { pos: [1100, 100], title: 'Save' }],
+        });
+        const [load, group, save] = canvas.graph._nodes;
+        frames(1);
+        await run('GoToRunning');
+        expect(said()).toBe('Nothing is running');
+        await run('NextError');
+        expect(said()).toBe('No errors');
+        send('execution_start', { prompt_id: 'go', timestamp: 0 });
+        progress('go', { 1: 'running' });
+        await run('GoToRunning');
+        expect([[...canvas.selectedItems], canvas.animations.at(-1)?.bounds]).toEqual([[load], [...load.boundingRect]]);
+        progress('go', { 1: 'finished', '2:1': 'running' });
+        fake.toasts = [];
+        await run('GoToRunning');
+        expect([[...canvas.selectedItems], said()]).toEqual([[group], 'Running inside Group']);
+        expect(document.querySelector('.eln-chipbar')?.textContent).toBe('↩ Back to Load');
+        // Failed: Alt+J goes to the error, marked in red.
+        send('execution_error', { prompt_id: 'go', node_id: '2:1', node_type: 'ELNInt', executed: [], exception_message: '', exception_type: '', traceback: [], timestamp: 0 });
+        canvas.selectItems([save]);
+        await run('GoToRunning');
+        frames(3);
+        const marks = canvas.front.paints.filter((p) => p.op === 'stroke' && p.style === '#ff3b30' && p.box?.[0] === group.boundingRect[0] - 6);
+        expect([[...canvas.selectedItems], marks.length > 0]).toEqual([[group], true]);
+        expect(enhancedFx(canvas)[1][5].content).toBe('Next error (1)');
+        // 1.57.1 keeps this client's errors on the workspace store, the prompt's own too.
+        Object.assign(app.extensionManager, { lastNodeErrors: { 3: { errors: [] } }, lastExecutionError: { node_id: '1' } });
+        try {
+            await run('NextError');
+            expect([[...canvas.selectedItems], document.querySelector('.eln-chipbar')?.textContent]).toEqual([[save], '1/2 · Save↩ Back to Group']);
+            await run('NextError');
+            expect([...canvas.selectedItems]).toEqual([load]);
+            expect(enhancedFx(canvas)[1][5].content).toBe('Next error (2)');
+        } finally {
+            delete (app.extensionManager as { lastNodeErrors?: unknown }).lastNodeErrors;
+            delete (app.extensionManager as { lastExecutionError?: unknown }).lastExecutionError;
+        }
+        document.querySelector('.eln-chipbar')?.remove();
+    });
+
+    it('ToggleFollow turns Navigate.Follow over, checked while on, and the canvas menu shows it', async () => {
+        const canvas = await start();
+        const follow = command('ToggleFollow');
+        expect(follow.active!()).toBe(false);
+        await run('ToggleFollow');
+        await settle();
+        expect([L.navigateFollow, follow.active!(), posted(), said()]).toEqual([true, true, [FOLLOW], 'Follow execution on']);
+        expect(enhancedFx(canvas)[1][4].content).toBe('☑ Follow execution');
+        enhancedFx(canvas)[1][4].callback!.call(undefined as never);
+        await settle();
+        expect([L.navigateFollow, said()]).toEqual([false, 'Follow execution off']);
     });
 
     it('ShowPanel opens the panel unless it shows, and is checked while it shows; ChooseLook shows the look picker', async () => {
@@ -290,14 +393,16 @@ describe('the commands', () => {
 });
 
 describe('the keys', () => {
-    it('bind Alt+L to the panel’s toggle and Alt+K to ToggleAll, with the characters macOS’s Option types too', async () => {
+    it('bind Alt+L to the panel’s toggle, Alt+K to ToggleAll and Alt+J to GoToRunning, with the characters macOS’s Option types too', async () => {
         await start();
-        const ours = fake.keybindings.filter((k) => k.commandId === TOGGLE || k.commandId === `${ID}ToggleAll`);
+        const ours = fake.keybindings.filter((k) => k.commandId === TOGGLE || k.commandId.startsWith(ID));
         expect(ours).toEqual([
             { commandId: TOGGLE, combo: { key: 'l', alt: true } },
             { commandId: TOGGLE, combo: { key: '¬', alt: true } },
             { commandId: `${ID}ToggleAll`, combo: { key: 'k', alt: true } },
             { commandId: `${ID}ToggleAll`, combo: { key: '˚', alt: true } },
+            { commandId: `${ID}GoToRunning`, combo: { key: 'j', alt: true } },
+            { commandId: `${ID}GoToRunning`, combo: { key: '∆', alt: true } },
         ]);
     });
 
@@ -308,7 +413,7 @@ describe('the keys', () => {
         fake.keybindings = [{ commandId: 'Other.Command', combo: { key: 'K', alt: true } }];
         fake.registeredCommands = new Map([['Other.Command', { id: 'Other.Command', function: () => {} }]]);
         try {
-            expect(links().keybindings!.map((k) => [k.commandId, k.combo.key])).toEqual([[TOGGLE, 'l'], [TOGGLE, '¬'], [`${ID}ToggleAll`, '˚']]);
+            expect(links().keybindings!.map((k) => [k.commandId, k.combo.key])).toEqual([[TOGGLE, 'l'], [TOGGLE, '¬'], [`${ID}ToggleAll`, '˚'], [`${ID}GoToRunning`, 'j'], [`${ID}GoToRunning`, '∆']]);
         } finally {
             [fake.keybindings, fake.registeredCommands] = [kept, commands];
         }
@@ -322,20 +427,22 @@ describe('the keys', () => {
             tab.render(slot);
             const keys = [...slot.querySelectorAll('.eln-keys > dt')].map((dt) => [dt.textContent, dt.nextElementSibling!.textContent]);
             tab.destroy!();
-            return keys.slice(0, 2);
+            return keys.slice(0, 3);
         };
-        expect(about()).toEqual([['Alt+L', 'Opens and closes this panel.'], ['Alt+K', 'Turns every effect off, or back on.']]);
+        const RUNNING = 'Goes to the node your run is running, or once it failed, to the next error.';
+        expect(about()).toEqual([['Alt+L', 'Opens and closes this panel.'], ['Alt+K', 'Turns every effect off, or back on.'], ['Alt+J', RUNNING]]);
         await run('ChooseLook');
         expect(document.querySelector('.eln-picker-foot .eln-hint')!.textContent).toBe('Change it any time in the FX panel (Alt+L).');
         buttonOf(document.querySelector('.eln-picker')!, 'Done')!.click();
 
         // Left with the keys macOS's Option types alone, which other keyboards cannot, they name none.
         const kept = fake.keybindings;
-        fake.keybindings = kept.filter((k) => k.combo.key === '¬' || k.combo.key === '˚');
+        fake.keybindings = kept.filter((k) => k.combo.key === '¬' || k.combo.key === '˚' || k.combo.key === '∆');
         try {
             expect(about()).toEqual([
                 ['Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel. Give it a key in Settings › Keybinding.'],
                 ['Toggle all effects', 'Turns every effect off, or back on. Give it a key in Settings › Keybinding.'],
+                ['Go to running node (or next error)', `${RUNNING} Give it a key in Settings › Keybinding.`],
             ]);
             await run('ChooseLook');
             expect(document.querySelector('.eln-picker-foot .eln-hint')!.textContent).toBe('Change it any time in the FX panel.');
@@ -347,23 +454,24 @@ describe('the keys', () => {
 });
 
 describe('the menus and buttons', () => {
-    it('View ▸ Enhanced Links & Nodes lists the extension’s own commands in two groups', async () => {
+    it('View ▸ Enhanced Links & Nodes lists the extension’s own commands in three groups', async () => {
         await start();
         const groups = links().menuCommands!;
         expect(groups).toEqual([
             { path: ['View', 'Enhanced Links & Nodes'], commands: [`${ID}ShowPanel`, `${ID}ChooseLook`, `${ID}SurpriseMe`] },
             { path: ['View', 'Enhanced Links & Nodes'], commands: [`${ID}ToggleAll`, `${ID}ToggleLinks`, `${ID}ToggleNodes`, `${ID}ToggleStatic`] },
+            { path: ['View', 'Enhanced Links & Nodes'], commands: [`${ID}ToggleFocus`, `${ID}ToggleFollow`, `${ID}GoToRunning`, `${ID}NextError`] },
         ]);
         // The menu leaves out ids that are not the extension's (FE157 stores/menuItemStore.ts L94-110).
         const own = new Set(links().commands!.map((c) => c.id));
         expect(groups.flatMap((g) => g.commands).every((id) => own.has(id))).toBe(true);
     });
 
-    it('the canvas menu’s Enhanced FX shows the switches’ state in their text and the look by name, one submenu level, and runs the commands', async () => {
-        const canvas = await start({ [LOOK]: 'showcase' });
+    it('the canvas menu’s Enhanced FX shows the switches’ state in their text, selection focus with its mode and the look by name, one submenu level, and runs the commands', async () => {
+        const canvas = await start({ [LOOK]: 'showcase', [FOCUS_MODE]: 'dim' });
         const [item, options] = enhancedFx(canvas);
         expect([item.content, item.has_submenu]).toEqual(['Enhanced FX', true]);
-        expect(options.map((o) => o.content)).toEqual(['☑ Link effects', '☑ Node effects', '☐ Freeze animation', 'Look: Showcase…', 'Surprise me', 'Open panel']);
+        expect(options.map((o) => o.content)).toEqual(['☑ Link effects', '☑ Node effects', '☐ Freeze animation', '☑ Selection focus: Dim others', '☐ Follow execution', 'Go to running node', 'Look: Showcase…', 'Surprise me', 'Open panel']);
         expect(options.every((o) => !o.has_submenu && !o.submenu)).toBe(true);
         const click = (content: string) => enhancedFx(canvas)[1].find((o) => o.content === content)!.callback!.call(undefined as never);
         click('☑ Link effects');
@@ -371,14 +479,17 @@ describe('the menus and buttons', () => {
         await settle();
         expect(enhancedFx(canvas)[1].slice(0, 3).map((o) => o.content)).toEqual(['☐ Link effects', '☑ Node effects', '☑ Freeze animation']);
         expect([said(), posted()]).toEqual(['Animation frozen', [LINKS_ON, LINKS_STATIC, NODES_STATIC]]);
+        click('☑ Selection focus: Dim others');
+        await settle();
+        expect([enhancedFx(canvas)[1][3].content, said()]).toEqual(['☐ Selection focus: Dim others', 'Selection focus off']);
         click('Open panel');
         click('Look: Showcase…');
-        expect(fake.commands).toEqual([`${ID}ToggleLinks`, `${ID}ToggleStatic`, `${ID}ShowPanel`, TOGGLE, `${ID}ChooseLook`]);
+        expect(fake.commands).toEqual([`${ID}ToggleLinks`, `${ID}ToggleStatic`, `${ID}ToggleFocus`, `${ID}ShowPanel`, TOGGLE, `${ID}ChooseLook`]);
         expect(document.querySelector('.eln-picker')).not.toBeNull();
         buttonOf(document.querySelector('.eln-picker')!, 'Done')!.click();
 
         await start({ [LOOK]: 'custom' });
-        expect(enhancedFx(canvas)[1][3].content).toBe('Look: Custom…');
+        expect(enhancedFx(canvas)[1][6].content).toBe('Look: Custom…');
     });
 
     it('the action bar’s button toggles every effect, named with Alt+K; the About page shows the project at its version, the studio’s Discord and Ko-fi', async () => {

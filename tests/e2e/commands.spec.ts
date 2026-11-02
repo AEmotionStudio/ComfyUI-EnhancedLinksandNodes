@@ -14,6 +14,9 @@ const STATIC = ['🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.M
 const ANIMATE = ['🔗 Enhanced Links.Animate', '📦 Enhanced Nodes.Animate'];
 const THICKNESS = '🔗 Enhanced Links.Thickness';
 const LOOK = '🔗 Enhanced Links.Look';
+const FOCUS_ON = '🔗 Enhanced Links.Focus.Enabled';
+const FOCUS_MODE = '🔗 Enhanced Links.Focus.Mode';
+const FOLLOW = '🔗 Enhanced Links.Navigate.Follow';
 const SWITCHES = [LINKS_ON, NODES_ON];
 
 /** Three nodes in a row, the last an output node. */
@@ -71,16 +74,16 @@ function bodyOf(page: Page, id: number): Promise<[number, number]> {
 const properties = (page: Page, ids: number[]) =>
     page.evaluate((ids) => ids.map((id) => Object.fromEntries(Object.entries(window.app.canvas.graph.getNodeById(id).properties).filter(([key]) => key.startsWith('enhanced_fx')))), ids);
 
-test('registers Alt+L and Alt+K as the page loads without an error toast, a disabled extension too', async ({ page, profile, log }) => {
+test('registers Alt+L, Alt+K and Alt+J as the page loads without an error toast, a disabled extension too', async ({ page, profile, log }) => {
     await openApp(page);
     await page.waitForTimeout(1500);
     const keys = await page.evaluate(() =>
-        ['Workspace.ToggleSidebarTab.enhanced-links-nodes', 'EnhancedLinksNodes.ToggleAll'].map((id) => {
+        ['Workspace.ToggleSidebarTab.enhanced-links-nodes', 'EnhancedLinksNodes.ToggleAll', 'EnhancedLinksNodes.GoToRunning'].map((id) => {
             const combo = window.app.extensionManager.command.commands.find((c: { id: string }) => c.id === id)?.keybinding?.combo;
             return combo && `${combo.alt ? 'Alt+' : ''}${combo.key}`;
         }));
     // A disabled extension's keys and commands register, but no panel, so no toggle command for it.
-    expect(keys).toEqual([profile === 'native' ? undefined : 'Alt+l', 'Alt+k']);
+    expect(keys).toEqual([profile === 'native' ? undefined : 'Alt+l', 'Alt+k', 'Alt+j']);
     await expect(toasts(page)).toHaveCount(0);
     expect(log.counts.filter((m) => m.text.includes('already exists'))).toEqual([]);
 });
@@ -117,6 +120,15 @@ test.describe('with the extensions', () => {
         await step('ToggleNodes', [NODES_ON], [true]);
         await step('ToggleStatic', STATIC, [true, true]);
         await step('ToggleStatic', STATIC, [false, false]);
+        await step('ToggleFocus', [FOCUS_ON], [false]);
+        await expect(toasts(page).filter({ hasText: 'Selection focus off' })).toBeVisible();
+        await step('ToggleFocus', [FOCUS_ON], [true]);
+        await step('NextFocusMode', [FOCUS_MODE], ['animate']);
+        await expect(toasts(page).filter({ hasText: 'Selection focus mode: Animate only these' })).toBeVisible();
+        for (const mode of ['dim', 'hide', 'highlight']) await step('NextFocusMode', [FOCUS_MODE], [mode]);
+        await step('ToggleFollow', [FOLLOW], [true]);
+        await expect(toasts(page).filter({ hasText: 'Follow execution on' })).toBeVisible();
+        await step('ToggleFollow', [FOLLOW], [false]);
         await step('NextLinkStyle', [ANIMATE[0]], [9]);
         await expect(toasts(page).filter({ hasText: 'Link animation: Classic Flow' })).toBeVisible();
         await step('NextNodeStyle', [ANIMATE[1]], [1]);
@@ -169,29 +181,33 @@ test.describe('with the extensions', () => {
         await expect(panel).toBeHidden();
     });
 
-    test('View ▸ Enhanced Links & Nodes lists the commands in two groups, checked as they are on', async ({ page }, testInfo) => {
+    test('View ▸ Enhanced Links & Nodes lists the commands in three groups, checked as they are on', async ({ page }, testInfo) => {
         // Commands with a check are menuitemcheckboxes on 1.57.
         const item = (name: string) => page.getByRole('menuitem', { name, exact: true }).or(page.getByRole('menuitemcheckbox', { name, exact: true }));
         // Checked as aria-checked on 1.57, with a check icon that shows on 1.39.5.
         const checked = (name: string) => item(name).evaluate((el) => el.getAttribute('aria-checked') === 'true' || !!el.querySelector('.pi-check:not(.invisible)'));
-        const NAMES = ['Panel', 'Choose look…', 'Surprise me', 'All effects', 'Link effects', 'Node effects', 'Freeze animation'];
+        const NAMES = ['Panel', 'Choose look…', 'Surprise me', 'All effects', 'Link effects', 'Node effects', 'Freeze animation', 'Selection focus', 'Follow execution', 'Go to running node', 'Next error'];
         await page.getByTestId('comfy-menu-button').or(page.locator('.comfy-menu-button-wrapper')).click();
         await item('View').hover();
         await item('Enhanced Links & Nodes').hover();
         await expect(item('Freeze animation')).toBeVisible();
         const group = page.getByRole('menu').filter({ has: item('Freeze animation') }).last();
         await expect(group.locator('[role=menuitem], [role=menuitemcheckbox]')).toHaveText(NAMES.map((name) => new RegExp(`^\\s*${name}`)));
-        await expect(group.getByRole('separator')).toHaveCount(1);
-        expect(await Promise.all(NAMES.map(checked))).toEqual([false, false, false, true, true, true, false]);
+        await expect(group.getByRole('separator')).toHaveCount(2);
+        expect(await Promise.all(NAMES.map(checked))).toEqual([false, false, false, true, true, true, false, true, false, false, false]);
         await shoot(page, testInfo, 'view-menu', [group, item('Enhanced Links & Nodes')]);
         // The menu stays open, and its checks follow each click, as ComfyUI's own do.
         await item('Link effects').click();
         await expect.poll(() => settingValues(page, [LINKS_ON])).toEqual([false]);
-        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, true, false, true, false]);
+        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, true, false, true, false, true, false, false, false]);
         await item('All effects').click();
-        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, false]);
+        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, false, true, false, false, false]);
         await item('Freeze animation').click();
-        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, true]);
+        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, true, true, false, false, false]);
+        await item('Selection focus').click();
+        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, true, false, false, false, false]);
+        await item('Follow execution').click();
+        await expect.poll(() => Promise.all(NAMES.map(checked))).toEqual([false, false, false, false, false, false, true, false, true, false, false]);
         await item('Panel').click();
         await expect(page.locator('.eln')).toBeVisible();
     });
@@ -202,7 +218,7 @@ test.describe('with the extensions', () => {
         const menu = page.locator('.litecontextmenu');
         await menu.getByText('Enhanced FX', { exact: true }).click();
         const submenu = menu.filter({ hasText: 'Open panel' });
-        await expect(submenu.locator('.litemenu-entry')).toHaveText(['☑ Link effects', '☑ Node effects', '☐ Freeze animation', 'Look: Subtle…', 'Surprise me', 'Open panel']);
+        await expect(submenu.locator('.litemenu-entry')).toHaveText(['☑ Link effects', '☑ Node effects', '☐ Freeze animation', '☑ Selection focus: Highlight', '☐ Follow execution', 'Go to running node', 'Look: Subtle…', 'Surprise me', 'Open panel']);
         await shoot(page, testInfo, 'canvas-menu', [menu.first(), submenu]);
         await submenu.getByText('☐ Freeze animation').click();
         await expect.poll(() => settingValues(page, STATIC)).toEqual([true, true]);

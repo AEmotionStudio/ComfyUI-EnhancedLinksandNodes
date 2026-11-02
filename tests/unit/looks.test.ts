@@ -74,10 +74,11 @@ describe('curated looks', () => {
         await settle();
     });
 
-    it('Off leaves links and nodes native', async () => {
+    it('Off leaves links, nodes and runs native', async () => {
         resetFakeApp();
         applyLook(look('off'));
         expect([L.animate, N.animate, N.particleShow, N.textAnimationEnabled, N.endAnimationEnabled]).toEqual([0, 0, false, false, false]);
+        expect([L.flowRiver, L.flowTrail, N.runRing, N.runError]).toEqual([false, false, false, false]);
         await settle();
     });
 });
@@ -100,6 +101,7 @@ describe('applying a look', () => {
             ['📦 Enhanced Nodes.Particle.Show', true],
             ['📦 Enhanced Nodes.Particle.Glow', 1],
             ['📦 Enhanced Nodes.Particle.Color.Mode', 'aurora'],
+            ['🔗 Enhanced Links.Pause.Mode', 'calm'],
             [LOOK, 'showcase'],
         ]);
         expect(currentLook()?.id).toBe('showcase');
@@ -109,7 +111,7 @@ describe('applying a look', () => {
         await settle();
         expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Glow.Intensity',
             '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
-            '📦 Enhanced Nodes.Particle.Color.Mode', LOOK]);
+            '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', LOOK]);
         expect(showing()).toEqual(before);
     });
 
@@ -183,7 +185,9 @@ describe("the first-run picker's choices", () => {
         again();
         expect(showing()).toEqual(before);
         await settle();
-        expect(Object.fromEntries(fake.settings)).toEqual({ ...V2_CHANGED, '🔗 Enhanced Links.Static.Mode': false, '🔗 Enhanced Links.Glow.Intensity': 10, [LOOK]: '' });
+        expect(Object.fromEntries(fake.settings)).toEqual({
+            ...V2_CHANGED, '🔗 Enhanced Links.Static.Mode': false, '🔗 Enhanced Links.Glow.Intensity': 10, '🔗 Enhanced Links.Pause.Mode': 'spotlight', '🔗 Enhanced Links.Flow.Trail': true, [LOOK]: '',
+        });
     });
 });
 

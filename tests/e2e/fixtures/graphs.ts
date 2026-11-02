@@ -50,6 +50,38 @@ export const rerouted: GraphSpec = {
     links: { float: { from: 'source', to: 'target', reroute: [640, 460] } },
 };
 
+/** For selection focus: the rerouted link, into a node that feeds a third, and a pair apart, whose link focus leaves out. */
+export const focus: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNFloat', pos: [300, 300] },
+        target: { type: 'ELNFloat', pos: [800, 300] },
+        next: { type: 'ELNFloat', pos: [1200, 300] },
+        other: { type: 'ELNInt', pos: [300, 650] },
+        otherTarget: { type: 'ELNInt', pos: [800, 650] },
+    },
+    links: {
+        float: { from: 'source', to: 'target', reroute: [640, 460] },
+        next: { from: 'target', to: 'next' },
+        int: { from: 'other', to: 'otherTarget' },
+    },
+};
+
+/** For going along the links: an IMAGE node feeding two, whose IMAGE inputs take no widget, and an INT pair, whose input does. */
+export const fanOut: GraphSpec = {
+    nodes: {
+        source: { type: 'ELNImage', pos: [300, 300] },
+        first: { type: 'ELNImage', pos: [750, 200] },
+        second: { type: 'ELNImage', pos: [750, 450] },
+        int: { type: 'ELNInt', pos: [300, 650] },
+        intTarget: { type: 'ELNInt', pos: [750, 650] },
+    },
+    links: {
+        first: { from: 'source', to: 'first' },
+        second: { from: 'source', to: 'second' },
+        int: { from: 'int', to: 'intTarget' },
+    },
+};
+
 export const floating: GraphSpec = {
     nodes: {
         source: { type: 'ELNInt', pos: [300, 300] },
@@ -164,4 +196,26 @@ export const nodeScene: GraphSpec = {
         latent: { type: 'ELNLatent', pos: [640, 300] },
         sleep: { type: 'ELNSleep', pos: [380, 540] },
     },
+};
+
+/** For runs: three Sleep nodes, output nodes each, chained so they run in turn, `seconds` each; the last at `x`. */
+export const sleepChain = (seconds = 1, x = 1000): GraphSpec => ({
+    nodes: {
+        first: { type: 'ELNSleep', pos: [200, 300], widgets: [seconds] },
+        second: { type: 'ELNSleep', pos: [600, 300], widgets: [seconds] },
+        third: { type: 'ELNSleep', pos: [x, 300], widgets: [seconds] },
+    },
+    links: {
+        first: { from: 'first', to: 'second', input: 'value' },
+        second: { from: 'second', to: 'third', input: 'value' },
+    },
+});
+
+/** For a run that fails: a short Sleep node into one that raises. */
+export const failing: GraphSpec = {
+    nodes: {
+        sleep: { type: 'ELNSleep', pos: [300, 300], widgets: [0.5] },
+        fail: { type: 'ELNFail', pos: [800, 300] },
+    },
+    links: { fail: { from: 'sleep', to: 'fail', input: 'value' } },
 };

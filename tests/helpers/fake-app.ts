@@ -6,7 +6,8 @@
  * 1.39.5 and 1.57.1) where M2 relies on it; tests can also fill the stored
  * values directly. Commands and keys behave like its commandStore and
  * keybindingStore: an extension's keys and commands go in as it registers, and
- * each command hands out its first key.
+ * each command hands out its first key. The workflow store holds one workflow
+ * open, which tests may swap for another.
  *
  * @module tests/helpers/fake-app
  */
@@ -42,6 +43,7 @@ interface Extension {
     commands?: Command[];
     keybindings?: Keybinding[];
     setup?: (app: unknown) => unknown;
+    beforeRegisterNodeDef?: (nodeType: unknown, nodeData: unknown, app: unknown) => unknown;
     nodeCreated?: (node: unknown, app: unknown) => unknown;
     loadedGraphNode?: (node: unknown, app: unknown) => unknown;
 }
@@ -164,6 +166,7 @@ export const app = {
             fake.registeredCommands.set(`Workspace.ToggleSidebarTab.${tab.id}`, { id: `Workspace.ToggleSidebarTab.${tab.id}`, function: () => {} });
         },
         getSidebarTabs: () => fake.tabs,
+        workflow: { activeWorkflow: {} as unknown },
         toast: { add: (message: unknown) => void fake.toasts.push(message) },
         dialog: {
             confirm: async (options: unknown) => {
@@ -187,6 +190,8 @@ export const app = {
         canvas,
         setDirtyCanvas: () => {},
     },
+    /** The workflow's own graph, which every subgraph is in (FE157 scripts/app.ts L391-396). */
+    rootGraph: undefined as unknown,
     // extensionService.registerExtension registers an extension's keys, commands and settings whether or not it is
     // disabled (FE157 services/extensionService.ts L39-53).
     registerExtension: (extension: Extension) => {

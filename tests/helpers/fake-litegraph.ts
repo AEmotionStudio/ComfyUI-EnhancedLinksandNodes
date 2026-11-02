@@ -59,8 +59,12 @@ Object.assign(globalThis, {
 });
 
 export interface GraphSpec {
-    /** A ghost node is one being placed (1.57); shape is a RenderShape, ROUND unless given; an output node's class is one (nodeData.output_node). */
-    nodes: { pos: Point; size?: Point; title?: string; collapsed?: boolean; ghost?: boolean; mode?: number; shape?: number; output?: boolean }[];
+    /**
+     * A ghost node is one being placed (1.57); shape is a RenderShape, ROUND unless given; an output node's class is one
+     * (nodeData.output_node); type is the node type, 'Reroute' for the frontend's legacy Reroute node; a node with a
+     * subgraph holds that graph (SubgraphNode.subgraph, FE157 subgraph/SubgraphNode.ts).
+     */
+    nodes: { pos: Point; size?: Point; title?: string; collapsed?: boolean; ghost?: boolean; mode?: number; shape?: number; output?: boolean; type?: string; subgraph?: GraphSpec }[];
     /**
      * `from` and `to` index `nodes`; each link takes the next input of its target. Reroutes are positions from
      * the output on; a floating link is what is left of one whose input was disconnected: the output and its reroutes.
@@ -152,6 +156,7 @@ function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: num
 }
 
 export class FakeNode {
+    type: string;
     title: string;
     pos: Point;
     size: Point;
@@ -161,12 +166,13 @@ export class FakeNode {
     title_mode = TitleMode.NORMAL_TITLE;
     title_buttons: TitleButton[] = [];
     properties: Record<string, unknown> = {};
-    /** The graph that holds it (FE157 LGraphNode.ts L345), set when it is added. */
+    /** The graph that holds it (FE157 LGraphNode.ts L345), set when it is added, and the subgraph it holds, if any. */
     graph: unknown = null;
+    subgraph?: Graph;
     selected = false;
     mouseOver = false;
-    inputs: { link: number | null; dir?: number }[] = [];
-    outputs: { links: number[]; dir?: number }[] = [{ links: [] }];
+    inputs: { name: string; link: number | null; dir?: number }[] = [];
+    outputs: { name: string; links: number[]; dir?: number }[] = [{ name: 'out', links: [] }];
     /** FE157 LGraphNode.ts L1156-1159, FE1395 L788-791: the selection outline (and an error one, never shown here). */
     strokeStyles: Record<string, (this: FakeNode) => StrokeStyle | undefined> = {
         selected() {
@@ -174,11 +180,15 @@ export class FakeNode {
         },
     };
     onDrawTitleText?: (...args: unknown[]) => void;
+    /** FE157 LGraphNode.ts L1026-1032, FE1395 likewise: what a double-click on a slot calls, on the node type's prototype. */
+    declare onInputDblClick?: (slot: number, e: unknown) => void;
+    declare onOutputDblClick?: (slot: number, e: unknown) => void;
     /** Where the node and its title bar are, and that with room for its shadow; updateArea() sets both each frame. */
     readonly boundingRect: number[] = [0, 0, 0, 0];
     readonly renderArea: number[] = [0, 0, 0, 0];
 
     constructor(readonly id: number, spec: GraphSpec['nodes'][number]) {
+        this.type = spec.type ?? 'ELNInt';
         this.title = spec.title ?? `Node ${id}`;
         this.pos = spec.pos;
         this.size = spec.size ?? [220, 120];
@@ -231,6 +241,11 @@ export class FakeNode {
         return this.getConnectionPos(true, slot);
     }
 
+    /** LGraphNode.getInputLink (FE157 LGraphNode.ts L1586-1593, FE1395 L1187-1194). */
+    getInputLink(slot: number): Link | null {
+        return (this.graph as Graph).getLink(this.inputs[slot]?.link) ?? null;
+    }
+
     getOutputPos(slot: number): Point {
         return this.getConnectionPos(false, slot);
     }
@@ -269,6 +284,12 @@ function strokeShape(ctx: CanvasRenderingContext2D, [x, y, w, h]: number[], { pa
     ctx.globalAlpha = 1;
 }
 
+/** LGraphGroup (FE157 LGraphGroup.ts): what it holds, as recomputeInsideNodes found it when it was selected. */
+export class FakeGroup {
+    selected = false;
+    readonly children = new Set<unknown>();
+}
+
 class Graph {
     _nodes: FakeNode[] = [];
     _nodes_by_id: Record<number, FakeNode> = {};
@@ -277,6 +298,8 @@ class Graph {
     floatingLinks = new Map<number, Link>();
     reroutes = new Map<number, Reroute>();
     config = { links_ontop: false };
+    /** Counts the graph's changes (FE157 LGraph.ts L1289-1293, FE1395 LGraph.ts L173); tests count up what they change. */
+    _version = 0;
 
     get nodes(): FakeNode[] {
         return this._nodes;
@@ -287,6 +310,29 @@ class Graph {
         return id == null ? undefined : this.reroutes.get(id);
     }
 
+    getLink(id: number | null | undefined): Link | undefined {
+        return id == null ? undefined : this.links[id];
+    }
+
+    /** A subgraph's input and output (ids -10 and -20) are no nodes; an execution id names a node by its id as text. */
+    getNodeById(id: number | string | null | undefined): FakeNode | null {
+        return (id != null && this._nodes_by_id[id as number]) || null;
+    }
+
+    /**
+     * Links the output of `from`, or the subgraph's input (SUBGRAPH_INPUT_ID, FE157 constants.ts) where it is undefined,
+     * to the next input of `to`, as LGraphNode.connect does, which counts up the graph's version.
+     */
+    connect(from: FakeNode | undefined, to: FakeNode, type = 'INT'): Link {
+        const id = Math.max(0, ...Object.keys(this.links).map(Number), ...this.floatingLinks.keys()) + 1;
+        const link: Link = { id, origin_id: from?.id ?? -10, origin_slot: 0, target_id: to.id, target_slot: to.inputs.length, type, reroutes: [], _pos: [0, 0] };
+        this.links[id] = link;
+        from?.outputs[0].links.push(id);
+        to.inputs.push({ name: `in ${to.inputs.length}`, link: id });
+        this._version++;
+        return link;
+    }
+
     constructor(spec: GraphSpec, Node: typeof FakeNode) {
         const Output = class extends Node {
             static nodeData = { output_node: true };
@@ -294,6 +340,7 @@ class Graph {
         spec.nodes.forEach((n, i) => {
             const node = new (n.output ? Output : Node)(i + 1, n);
             node.graph = this;
+            if (n.subgraph) node.subgraph = new Graph(n.subgraph, Node);
             this._nodes.push(node);
             this._nodes_by_id[node.id] = node;
         });
@@ -322,7 +369,7 @@ class Graph {
                 return;
             }
             this.links[link.id] = link;
-            target.inputs.push({ link: link.id });
+            target.inputs.push({ name: `in ${target.inputs.length}`, link: link.id });
             origin.outputs[0].links.push(link.id);
         });
     }
@@ -384,11 +431,26 @@ export class FakeCanvas {
             ctx.scale(this.scale, this.scale);
             ctx.translate(this.offset[0], this.offset[1]);
         },
+        // FE157 DragAndScale.ts L237-311, FE1395 L215-285, which throw on a duration that is not above 0.
+        animateToBounds: (bounds: ArrayLike<number>, _setDirty: () => void, { duration = 350, zoom = 0.75 }: { duration?: number; zoom?: number } = {}) => {
+            if (!(duration > 0)) throw new RangeError('Duration must be greater than 0');
+            this.animations.push({ bounds: [...Array.from(bounds)], duration, zoom });
+        },
     };
     visible_area = new Float32Array(4);
     visible_nodes: FakeNode[] = [];
     /** What is selected: nodes, groups and reroutes (FE157 L895-897, FE1395 L652). */
     selectedItems = new Set<unknown>();
+    /** FE157 L1288, FE1395 L624: what native strokes links at. */
+    connections_width = 3;
+    /** The node under the pointer (FE157 L915, FE1395 L664), whether the view is being dragged (FE157 L1007, FE1395 L432), and the link drag (LinkConnector.isConnecting, FE157 L132-134, FE1395 L124). */
+    node_over?: FakeNode;
+    dragging_canvas = false;
+    linkConnector = { isConnecting: false };
+    /** What a palette sets the canvas background to (FE157 services/colorPaletteService.ts L157). */
+    clear_background_color = '#222';
+    /** Each DragAndScale.animateToBounds call: the bounds, and the duration and zoom it was given. */
+    animations: { bounds: number[]; duration?: number; zoom?: number }[] = [];
     renderedPaths = new Set<Link | Reroute>();
     /** FE157 L1050, L1152, FE1395 L733, L813: tests spy on its renderLinkDirect to see what native drew. */
     readonly linkRenderer = { renderLinkDirect };
@@ -401,7 +463,8 @@ export class FakeCanvas {
     node_title_color = '#999';
     front = new CanvasRecorder();
     back = new CanvasRecorder();
-    canvas = this.front.ctx.canvas;
+    /** The canvas element, which the pointer and the wheel are on. */
+    canvas = Object.assign(new EventTarget(), { width: this.front.ctx.canvas.width, height: this.front.ctx.canvas.height });
     ctx = this.front.ctx;
     bgctx = this.back.ctx;
     /** Each native step a frame took, in order, with the hooks it called. */
@@ -420,6 +483,13 @@ export class FakeCanvas {
 
     emitAfterChange(): void {
         this.calls.push('emitAfterChange');
+    }
+
+    /** FE157 L4747-4762, FE1395 L4420-4428: selects only `items`. */
+    selectItems(items: (FakeNode | FakeGroup)[]): void {
+        for (const item of this.selectedItems) (item as FakeNode).selected = false;
+        this.selectedItems = new Set(items);
+        for (const item of items) item.selected = true;
     }
 
     /** FE157 L2364-2367, FE1395 L2032-2035. */
@@ -497,8 +567,9 @@ export class FakeCanvas {
         for (const node of (graph === nodesGraph && nodesInFrameOrder) || graph._nodes) {
             node.inputs.forEach((input, slot) => {
                 const link = input.link === null ? undefined : graph.links[input.link];
-                if (!link) return;
-                const origin = graph._nodes_by_id[link.origin_id];
+                // A subgraph input's links are drawn from its slots (FE157 L6138-6174), which this graph has none of.
+                const origin = link && graph._nodes_by_id[link.origin_id];
+                if (!link || !origin) return;
                 this.renderSegments(ctx, link, origin.getOutputPos(link.origin_slot), node.getInputPos(slot), reroutes, origin.outputs[link.origin_slot].dir, input.dir);
             });
         }
@@ -637,9 +708,23 @@ export function frames(count: number, hz = 60): void {
     }
 }
 
-/** Reports the queue as running or idle the way ComfyUI does, with a global 'status' event. */
+/** Hands the page an event of ComfyUI's api, as its websocket does (FE157 scripts/api.ts L1069-1112). */
+export const send = (type: string, detail: unknown) => api.dispatchEvent(new CustomEvent(type, { detail }));
+
+/** Reports the queue the way ComfyUI does to every client, with the global 'status' event. */
 export function queue(remaining: number): void {
-    api.dispatchEvent(new CustomEvent('status', { detail: { exec_info: { queue_remaining: remaining } } }));
+    send('status', { exec_info: { queue_remaining: remaining } });
+}
+
+/** A run's progress_state (comfy_execution/progress.py WebUIProgressHandler): every node of it not still to come, by execution id, in the state `nodes` gives. */
+export function progress(prompt: string, nodes: Record<string, 'running' | 'finished' | [value: number, max: number]>): void {
+    send('progress_state', {
+        prompt_id: prompt,
+        nodes: Object.fromEntries(Object.entries(nodes).map(([id, state]) => [id, {
+            value: typeof state === 'string' ? Number(state === 'finished') : state[0], max: typeof state === 'string' ? 1 : state[1],
+            state: typeof state === 'string' ? state : 'running', node_id: id, display_node_id: id, prompt_id: prompt,
+        }])),
+    });
 }
 
 /**
@@ -647,19 +732,24 @@ export function queue(remaining: number): void {
  * from the cache, runs the nodes `ran` in turn (the frontend's api.ts hands 'executing' on as the node's id), and succeeds.
  */
 export function run(prompt: string, ran: number[], cached: number[] = []): void {
-    const send = (type: string, detail: unknown) => api.dispatchEvent(new CustomEvent(type, { detail }));
+    const nodes: Parameters<typeof progress>[1] = {};
     send('execution_start', { prompt_id: prompt, timestamp: 0 });
     send('execution_cached', { nodes: cached.map(String), prompt_id: prompt, timestamp: 0 });
-    for (const id of ran) send('executing', String(id));
-    send('executing', null);
+    for (const id of cached) progress(prompt, Object.assign(nodes, { [id]: 'finished' }));
+    for (const id of ran) {
+        progress(prompt, Object.assign(nodes, { [id]: 'running' }));
+        send('executing', String(id));
+        progress(prompt, Object.assign(nodes, { [id]: 'finished' }));
+    }
     send('execution_success', { prompt_id: prompt, timestamp: 0 });
+    send('executing', null);
 }
 
 /**
  * A fresh page with exactly `settings` stored, and Look 'custom' unless they hold one: new LiteGraph globals, a canvas
  * over `spec` as app.canvas, then both extensions' setup(), as ComfyUI runs
- * them, and the graph loaded as a workflow. The page shows the canvas, motion is not reduced, the queue is idle and
- * no fireworks play.
+ * them, and the graph loaded as a workflow. The page shows the canvas, motion is not reduced, no run of the last
+ * test's goes on and no fireworks play.
  */
 export async function start(settings: Record<string, unknown> = {}, spec: GraphSpec = { nodes: [] }): Promise<FakeCanvas> {
     // A ticker left running by the last test sees a hidden tab and stops.
@@ -670,24 +760,30 @@ export async function start(settings: Record<string, unknown> = {}, spec: GraphS
         fake.reducedMotion.matches = false;
         fake.reducedMotion.dispatchEvent(new Event('change'));
     }
-    queue(0);
+    // A run the last test left going ends, as its listeners, which an earlier setup() added, hear.
+    send('execution_start', { prompt_id: 'reset', timestamp: 0 });
+    send('execution_interrupted', { prompt_id: 'reset', node_id: '', node_type: '', executed: [], timestamp: 0 });
     // The first-run picker answered, so stored values draw as they are; the first-run overlay's tests store Look ''.
     resetFakeApp({ [LOOK]: 'custom', ...settings });
-    // Nor fireworks: past the end of any show, which fireworks() and the next pass then clear.
+    // Nor fireworks: past the end of any show, which fireworks() and the next pass then clear, and far enough on that
+    // the next can start at once.
     clock.burstTime += 3600;
+    page.now += 5000;
     live.bursts = 0;
 
     const LGraphCanvas = class extends FakeCanvas {
         static link_type_colors: Record<string, string> = { '-1': '#A86', number: '#AAA', node: '#DCA' };
     };
     const LGraphNode = class extends FakeNode {};
-    Object.assign(globalThis, { LiteGraph: { NODE_TITLE_HEIGHT, NODE_TITLE_TEXT_Y, NODE_FONT, ROUND_RADIUS, vueNodesMode: false }, LGraphCanvas, LGraphNode });
-    const canvas = new LGraphCanvas(new Graph(spec, LGraphNode));
-    Object.assign(app, { canvas });
+    Object.assign(globalThis, { LiteGraph: { NODE_TITLE_HEIGHT, NODE_TITLE_TEXT_Y, NODE_SLOT_HEIGHT, NODE_FONT, ROUND_RADIUS, vueNodesMode: false }, LGraphCanvas, LGraphNode, LGraphGroup: FakeGroup });
 
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await import('@/extensions/link-animations');
     await import('@/extensions/node-animations');
+    // The node types register before setup() (FE157 services/litegraphService.ts L644-650), here the one the graph's nodes take.
+    for (const extension of fake.extensions) await extension.beforeRegisterNodeDef?.(LGraphNode, {}, app);
+    const canvas = new LGraphCanvas(new Graph(spec, LGraphNode));
+    Object.assign(app, { canvas, rootGraph: canvas.graph });
     for (const name of ['enhanced.link.animations', 'enhanced.node.animations']) {
         await fake.extensions.find((e) => e.name === name)?.setup?.(app);
     }

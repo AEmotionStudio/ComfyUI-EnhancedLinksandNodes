@@ -1,18 +1,18 @@
 /**
  * The panel, ComfyUI's sidebar tab for Enhanced Links & Nodes: a quick bar with
- * the master switches, Static and the look; tabs for the looks and for each
- * part of the settings, which the schema lays out; a search over all of them;
- * and notices for what keeps effects from showing. It shows what the canvas
- * shows and keeps in step with the settings dialog through watch(). A change
- * of many settings at once, a look or a section's reset, offers its undo: a
- * toast with an Undo button where the frontend has one (1.57+), else a bar at
- * the foot of the panel, or where the picker shows while the panel is closed;
- * looks applied one after another share one offer, which goes back to before
- * the first. The rail icon's badge says when effects are off or frozen. About
- * tells what the extension is and what is new, the keys bound now, copies
- * diagnostics, shows the first-run look picker again and resets everything.
- * The commands share the quick bar's switches, Surprise me and Reset
- * everything. The panel draws nothing while it is closed.
+ * the master switches, Static, Focus and the look; tabs for the looks and for
+ * each part of the settings, which the schema lays out; a search over all of
+ * them; and notices for what keeps effects from showing. It shows what the
+ * canvas shows and keeps in step with the settings dialog through watch(). A
+ * change of many settings at once, a look or a section's reset, offers its
+ * undo: a toast with an Undo button where the frontend has one (1.57+), else a
+ * bar at the foot of the panel, or where the picker shows while the panel is
+ * closed; looks applied one after another share one offer, which goes back to
+ * before the first. The rail icon's badge says when effects are off or frozen.
+ * About tells what the extension is and what is new, the keys bound now, copies
+ * diagnostics, shows the first-run look picker again and resets everything. The
+ * commands share the quick bar's switches, Surprise me and Reset everything.
+ * The panel draws nothing while it is closed.
  *
  * @module sidebar/sidebar
  */
@@ -39,6 +39,7 @@ export const TITLE = 'Enhanced Links & Nodes';
 export const LINKS_ON = '🔗 Enhanced Links.Enabled';
 export const NODES_ON = '📦 Enhanced Nodes.Enabled';
 export const FROZEN = ['🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode'];
+export const FOCUS_ON = '🔗 Enhanced Links.Focus.Enabled';
 const PANEL_STATE = '🔗 Enhanced Links.Panel.State';
 const COEXIST = '🔗 Enhanced Links.Coexist';
 /** How long an undo is offered. */
@@ -53,7 +54,8 @@ const TABS: { id: string; name: string; part?: string }[] = [
     { id: 'looks', name: 'Looks' },
     { id: 'links', name: 'Links', part: 'Links' },
     { id: 'nodes', name: 'Nodes', part: 'Nodes' },
-    { id: 'runs', name: 'Runs', part: 'Runs' },
+    // Saved as runs before selection focus joined it.
+    { id: 'runs', name: 'Focus & Flow', part: 'Focus & Flow' },
     { id: 'perf', name: 'Perf', part: 'Performance' },
     { id: 'about', name: 'About' },
 ];
@@ -353,8 +355,8 @@ export const keyText = (combo: Combo): string =>
 export const commandKeys = (): Map<string, string> =>
     new Map((app.extensionManager.command.commands as { id: string; keybinding?: { combo: Combo } | null }[]).flatMap((c) => (c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : [])));
 
-/** The keys bound for macOS, whose Option types these for L and K: other keyboards cannot type them. */
-const MAC_ONLY = new Set(['Alt+¬', 'Alt+˚']);
+/** The keys bound for macOS, whose Option types these for L, K and J: other keyboards cannot type them. */
+const MAC_ONLY = new Set(['Alt+¬', 'Alt+˚', 'Alt+∆']);
 
 /** The key a command has now, as the texts name it: its first, unless only macOS types that one. */
 export function keyName(id: string): string | undefined {
@@ -369,6 +371,7 @@ export function keyName(id: string): string | undefined {
 /** The quick bar's switches, which the commands share. */
 export const toggleLinks = (): void => commit(LINKS_ON, !L.enabled);
 export const toggleNodes = (): void => commit(NODES_ON, !N.enabled);
+export const toggleFocus = (): void => commit(FOCUS_ON, !L.focusEnabled);
 
 /** Static: freezes links and nodes, or with both frozen frees both. */
 export function toggleStatic(): void {
@@ -385,6 +388,7 @@ function quickBar(): HTMLElement {
     const links = chip('Link FX', toggleLinks);
     const nodes = chip('Node FX', toggleNodes);
     const frozen = chip('Static', toggleStatic);
+    const focus = chip('Focus', toggleFocus);
 
     // A menu button rather than a list box, whose arrow keys would apply every look they pass.
     const name = h('span', { class: 'eln-look-name' });
@@ -437,13 +441,13 @@ function quickBar(): HTMLElement {
         links.setAttribute('aria-pressed', String(L.enabled));
         nodes.setAttribute('aria-pressed', String(N.enabled));
         frozen.setAttribute('aria-pressed', L.staticMode === N.staticMode ? String(L.staticMode) : 'mixed');
+        focus.setAttribute('aria-pressed', String(L.focusEnabled));
         // Look names none for the user's settings, or a look of theirs not read yet.
         const look = currentLook();
         name.textContent = look?.name ?? 'Custom';
         dot.hidden = !look || !changed(look);
     };
-    return h('div', { class: 'eln-quick' },
-        h('div', { class: 'eln-chips', role: 'group', 'aria-label': 'Quick switches' }, links, nodes, frozen),
+    return h('div', { class: 'eln-quick', role: 'group', 'aria-label': 'Quick bar' }, links, nodes, frozen, focus,
         h('div', { class: 'eln-look' }, h('span', { id: 'eln-look-label', class: 'eln-look-label' }, 'Look'), choose));
 }
 
@@ -692,6 +696,7 @@ const NEWS = [
     'This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.',
     'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.',
     'Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.',
+    "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
     'Much lighter than 2.x on big graphs.',
 ];
 
@@ -714,6 +719,7 @@ export const BADGES = [
 const COMMANDS = [
     [TOGGLE, 'Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel.'],
     [TOGGLE_ALL, 'Toggle all effects', 'Turns every effect off, or back on.'],
+    ['EnhancedLinksNodes.GoToRunning', 'Go to running node (or next error)', 'Goes to the node your run is running, or once it failed, to the next error.'],
 ];
 const KEYS = [
     ['← → Home End', 'Move between the tabs.'],

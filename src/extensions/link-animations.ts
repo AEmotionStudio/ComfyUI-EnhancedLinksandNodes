@@ -4,11 +4,13 @@
  *
  * Registers the link settings, and the quick toggles of both extensions, here
  * so that menus list them in one order: the EnhancedLinksNodes.* commands,
- * Alt+L for the panel and Alt+K for every effect, View ▸ Enhanced Links &
- * Nodes, a button on the action bar, Enhanced FX in the canvas menu, and the
- * About page's badges. A command says what it did in a short toast. setup()
- * starts the engine, the link pipeline (links/pipeline.ts) on ComfyUI's own link
- * pass, and the panel.
+ * Alt+L for the panel, Alt+K for every effect and Alt+J for the running node
+ * or the next error, View ▸ Enhanced Links & Nodes, a button on the action
+ * bar, Enhanced FX in the canvas menu, and the About page's badges. A command
+ * says what it did in a short toast. setup() starts the engine, the link
+ * pipeline (links/pipeline.ts) on ComfyUI's own link pass, the run visuals
+ * (fx/execution.ts) and the panel; each node type learns Navigate.DoubleClick
+ * as it registers (ui/menus.ts).
  *
  * @module extensions/link-animations
  */
@@ -16,13 +18,15 @@
 import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, checked, commit, linkSettings, setting, shown, type Setting } from '@/core/settings';
-import { install } from '@/core/engine';
+import { env, install } from '@/core/engine';
 import { fireworks, type Anchor } from '@/fx/bursts';
+import { errorNodes, installRuns } from '@/fx/execution';
 import { installLinks } from '@/links/pipeline';
 import { showPicker } from '@/sidebar/picker';
 import {
     BADGES,
     DISABLED,
+    FOCUS_ON,
     FROZEN,
     LINKS_ON,
     NODES_ON,
@@ -39,12 +43,13 @@ import {
     running,
     showPanel,
     surpriseMe,
+    toggleFocus,
     toggleLinks,
     toggleNodes,
     toggleStatic,
 } from '@/sidebar/sidebar';
 import { currentLook } from '@/ui/looks';
-import { SELECTION_FX, effects, pick, selectedNodes } from '@/ui/menus';
+import { SELECTION_FX, effects, goAlong, goBack, goToRunning, installFollow, navigateOnDoubleClick, nextError, pick, selectedNodes } from '@/ui/menus';
 
 type Command = NonNullable<ComfyExtension['commands']>[number];
 
@@ -72,13 +77,34 @@ const needs = (work: () => void, part?: keyof typeof running) => () => {
     else say(part ? DISABLED[part] : `${TITLE} is disabled in Settings › Extensions.`, HINT_MS);
 };
 
+const FOCUS_MODE = '🔗 Enhanced Links.Focus.Mode';
+const FOLLOW = '🔗 Enhanced Links.Navigate.Follow';
+
+/** A choice setting's options, and the index of the one it shows. */
+function choices(id: string): [Extract<Setting, { type: 'combo' }>, number] {
+    const s = setting(id) as Extract<Setting, { type: 'combo' }>;
+    return [s, s.options.findIndex((o) => o.value === shown(id))];
+}
+
 /** Steps a choice setting to its next option, from the last back to the first, and says which. */
 function next(id: string): void {
-    const { name, options } = setting(id) as Extract<Setting, { type: 'combo' }>;
-    const option = options[(options.findIndex((o) => o.value === shown(id)) + 1) % options.length];
+    const [{ name, options }, at] = choices(id);
+    const option = options[(at + 1) % options.length];
     commit(id, option.value);
     say(`${name}: ${option.text}`);
 }
+
+/** The mode selection focus shows, by name. */
+function focusMode(): string {
+    const [{ options }, at] = choices(FOCUS_MODE);
+    return options[at].text;
+}
+
+/** Runs a command's work and says what it has to say, if anything: GoUpstream and GoDownstream say why they cannot go, GoToRunning where it went. */
+const saying = (work: () => string | undefined) => () => {
+    const text = work();
+    if (text) say(text);
+};
 
 /** Turns every effect off if any is on, else all on. */
 function toggleAll(): void {
@@ -154,6 +180,30 @@ const frozen = {
         say(L.staticMode ? 'Animation frozen' : 'Animation unfrozen');
     }),
 } satisfies Command;
+const focus = {
+    id: `${ID}ToggleFocus`, label: 'Toggle selection focus', menubarLabel: 'Selection focus', category: 'view-controls', icon: 'pi pi-bullseye',
+    active: () => checked(FOCUS_ON),
+    function: needs(() => {
+        toggleFocus();
+        say(L.focusEnabled ? `Selection focus: ${focusMode()}` : 'Selection focus off');
+    }, 'links'),
+} satisfies Command;
+const toRunning = {
+    id: `${ID}GoToRunning`, label: 'Go to running node (or next error)', menubarLabel: 'Go to running node', category: 'essentials', icon: 'pi pi-directions',
+    function: needs(saying(goToRunning)),
+} satisfies Command;
+const toError = {
+    id: `${ID}NextError`, label: 'Go to next error', menubarLabel: 'Next error', category: 'essentials', icon: 'pi pi-exclamation-triangle',
+    function: needs(saying(nextError)),
+} satisfies Command;
+const follow = {
+    id: `${ID}ToggleFollow`, label: 'Toggle follow execution', menubarLabel: 'Follow execution', category: 'view-controls', icon: 'pi pi-eye',
+    active: () => checked(FOLLOW),
+    function: needs(() => {
+        commit(FOLLOW, !L.navigateFollow);
+        say(L.navigateFollow ? 'Follow execution on' : 'Follow execution off');
+    }, 'links'),
+} satisfies Command;
 const look = {
     id: `${ID}ChooseLook`, label: 'Choose a look…', menubarLabel: 'Choose look…', category: 'view-controls', icon: 'pi pi-palette',
     function: needs(showPicker),
@@ -164,7 +214,15 @@ const surprise = {
 } satisfies Command;
 
 const commands: Command[] = [
-    panel, all, links, nodes, frozen,
+    panel, all, links, nodes, frozen, focus,
+    {
+        id: `${ID}NextFocusMode`, label: 'Next selection focus mode', category: 'view-controls', icon: 'pi pi-filter',
+        // Turned on too, so the mode it names shows.
+        function: needs(() => {
+            if (!L.focusEnabled) toggleFocus();
+            next(FOCUS_MODE);
+        }, 'links'),
+    },
     {
         id: `${ID}NextLinkStyle`, label: 'Next link animation', category: 'view-controls', icon: 'pi pi-forward',
         function: needs(() => next('🔗 Enhanced Links.Animate'), 'links'),
@@ -173,18 +231,28 @@ const commands: Command[] = [
         id: `${ID}NextNodeStyle`, label: 'Next node effect', category: 'view-controls', icon: 'pi pi-forward',
         function: needs(() => next('📦 Enhanced Nodes.Animate'), 'nodes'),
     },
-    look, surprise,
+    look, surprise, toRunning, toError, follow,
+    { id: `${ID}GoUpstream`, label: 'Go to input node', category: 'view-controls', icon: 'pi pi-arrow-left', function: needs(saying(() => goAlong(true))) },
+    { id: `${ID}GoDownstream`, label: 'Go to output node', category: 'view-controls', icon: 'pi pi-arrow-right', function: needs(saying(() => goAlong(false))) },
+    {
+        id: `${ID}GoBack`, label: 'Go back', category: 'view-controls', icon: 'pi pi-undo',
+        function: needs(() => {
+            if (!goBack()) say('Nothing to go back to');
+        }),
+    },
     { id: SELECTION_FX, label: 'Cycle node effect for selection', icon: 'pi pi-sparkles', mutatesGraph: true, function: needs(stepSelection, 'nodes') },
     { id: `${ID}PreviewCompletion`, label: 'Preview completion effect', icon: 'pi pi-play', function: needs(preview, 'nodes') },
     { id: `${ID}ResetAll`, label: `Reset all ${TITLE} settings…`, icon: 'pi pi-refresh', function: needs(() => void resetAll()) },
 ];
 
-/** Alt+L opens and closes the panel and Alt+K toggles every effect, with the characters macOS's Option types for them too. */
+/** Alt+L opens and closes the panel, Alt+K toggles every effect and Alt+J goes to the running node, with the characters macOS's Option types for them too. */
 const KEYS = [
     { commandId: TOGGLE, combo: { key: 'l', alt: true } },
     { commandId: TOGGLE, combo: { key: '¬', alt: true } },
     { commandId: TOGGLE_ALL, combo: { key: 'k', alt: true } },
     { commandId: TOGGLE_ALL, combo: { key: '˚', alt: true } },
+    { commandId: toRunning.id, combo: { key: 'j', alt: true } },
+    { commandId: toRunning.id, combo: { key: '∆', alt: true } },
 ];
 
 /** Runs a command as ComfyUI does, which toasts what it throws. */
@@ -203,10 +271,11 @@ const ext: ComfyExtension = {
         return KEYS.filter(({ combo }) => !taken.has(keyText(combo)));
     },
 
-    // Two groups, which the menu parts with a separator (FE157 stores/menuItemStore.ts L61-65); checks come from active().
+    // Three groups, which the menu parts with separators (FE157 stores/menuItemStore.ts L61-65); checks come from active().
     menuCommands: [
         { path: ['View', TITLE], commands: [panel.id, look.id, surprise.id] },
         { path: ['View', TITLE], commands: [all.id, links.id, nodes.id, frozen.id] },
+        { path: ['View', TITLE], commands: [focus.id, follow.id, toRunning.id, toError.id] },
     ],
 
     // Drawn as it was given, so its icon stays as it is; the tooltip is read whenever the bar draws.
@@ -221,23 +290,34 @@ const ext: ComfyExtension = {
 
     aboutPageBadges: BADGES,
 
-    // One item with one submenu level. The switches show their state in their text: the canvas menu has no checks.
-    getCanvasMenuItems: () => [{
-        content: 'Enhanced FX',
-        has_submenu: true,
-        submenu: {
-            options: [
-                ...[links, nodes, frozen].map((c) => ({ content: `${c.active() ? '☑' : '☐'} ${c.menubarLabel}`, callback: run(c) })),
-                { content: `Look: ${currentLook()?.name ?? 'Custom'}…`, callback: run(look) },
-                { content: surprise.menubarLabel, callback: run(surprise) },
-                { content: 'Open panel', callback: run(panel) },
-            ],
-        },
-    }],
+    // One item with one submenu level. The switches show their state in their text: the canvas menu has no checks. Once a
+    // run is over, Go to running node goes to its errors.
+    getCanvasMenuItems: () => {
+        const errors = env.running ? 0 : errorNodes().length;
+        return [{
+            content: 'Enhanced FX',
+            has_submenu: true,
+            submenu: {
+                options: [
+                    ...[links, nodes, frozen].map((c) => ({ content: `${c.active() ? '☑' : '☐'} ${c.menubarLabel}`, callback: run(c) })),
+                    { content: `${focus.active() ? '☑' : '☐'} ${focus.menubarLabel}: ${focusMode()}`, callback: run(focus) },
+                    { content: `${follow.active() ? '☑' : '☐'} ${follow.menubarLabel}`, callback: run(follow) },
+                    errors ? { content: `${toError.menubarLabel} (${errors})`, callback: run(toError) } : { content: toRunning.menubarLabel, callback: run(toRunning) },
+                    { content: `Look: ${currentLook()?.name ?? 'Custom'}…`, callback: run(look) },
+                    { content: surprise.menubarLabel, callback: run(surprise) },
+                    { content: 'Open panel', callback: run(panel) },
+                ],
+            },
+        }];
+    },
+
+    beforeRegisterNodeDef: navigateOnDoubleClick,
 
     async setup() {
         install();
         installPanel('links');
+        installRuns('links');
+        installFollow();
         installLinks();
 
         console.log('[EnhancedLinks] Extension registered with full batched rendering pipeline.');

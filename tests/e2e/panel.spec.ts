@@ -106,7 +106,7 @@ for (const palette of ['dark', 'light']) {
             };
             await measure('Looks');
             await panel.getByRole('button', { name: 'Advanced settings' }).click();
-            for (const name of ['Links', 'Nodes', 'Runs', 'Perf']) {
+            for (const name of ['Links', 'Nodes', 'Focus & Flow', 'Perf']) {
                 await panel.getByRole('tab', { name, exact: true }).click();
                 // A section none of whose settings applies hides.
                 const closed = panel.locator('.eln-section-toggle[aria-expanded=false]').filter({ visible: true });
@@ -182,14 +182,14 @@ test('a look applied from the panel saves only what differs, and its undo puts e
     await expect(panel.locator('[data-look=showcase]')).toHaveAttribute('aria-checked', 'true');
     await expect.poll(() => settingValues(page, [ANIMATE, '📦 Enhanced Nodes.Animate', '🔗 Enhanced Links.Glow.Intensity', LOOK])).toEqual([4, 2, 14, 'showcase']);
     await expect(panel.locator('#eln-look .eln-look-name')).toHaveText('Showcase');
-    await expect.poll(() => posts.filter(ours).length).toBe(11);
+    await expect.poll(() => posts.filter(ours).length).toBe(12);
     expect(posts).not.toEqual(expect.arrayContaining([LINKS_ON]));
 
     // A toast's Undo on 1.57+, the panel's own on 1.39.5.
     await page.getByTestId('toast').or(panel.locator('.eln-undo')).getByRole('button', { name: 'Undo', exact: true }).click();
     await expect.poll(() => settingValues(page, [ANIMATE, '📦 Enhanced Nodes.Animate', '🔗 Enhanced Links.Glow.Intensity', LOOK])).toEqual(before);
     await expect(panel.locator('[data-look=subtle]')).toHaveAttribute('aria-checked', 'true');
-    await expect.poll(() => posts.filter(ours).length).toBe(22);
+    await expect.poll(() => posts.filter(ours).length).toBe(24);
 });
 
 test('the quick bar’s Look menu moves with the arrow keys and saves nothing until Enter picks a look; looks picked one after another undo together', async ({ page }) => {

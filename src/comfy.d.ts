@@ -12,6 +12,7 @@ declare module "/scripts/api.js" {
 declare global {
     const LGraphCanvas: typeof import('@comfyorg/comfyui-frontend-types').LGraphCanvas;
     const LGraphNode: typeof import('@comfyorg/comfyui-frontend-types').LGraphNode;
+    const LGraphGroup: typeof import('@comfyorg/comfyui-frontend-types').LGraphGroup;
     const LiteGraph: import('@comfyorg/comfyui-frontend-types').LiteGraphGlobal;
 }
 

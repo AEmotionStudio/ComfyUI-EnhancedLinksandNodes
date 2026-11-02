@@ -11,8 +11,10 @@
     "Nodes · Color": "Nodes · Color",
     "Nodes · Particles": "Nodes · Particles",
     "Nodes · Titles": "Nodes · Titles",
-    "Runs · During a run": "Runs · During a run",
-    "Runs · Completion": "Runs · Completion",
+    "Focus & Flow · Selection focus": "Focus & Flow · Selection focus",
+    "Focus & Flow · Navigation": "Focus & Flow · Navigation",
+    "Focus & Flow · During a run": "Focus & Flow · During a run",
+    "Focus & Flow · Completion": "Focus & Flow · Completion",
     "Performance · Budget": "Performance · Budget",
     "Performance · Accessibility": "Performance · Accessibility",
     "Performance · Compatibility": "Performance · Compatibility"
@@ -25,6 +27,9 @@
     "☐ Node effects": "☐ Node effects",
     "☐ Freeze animation": "☐ Freeze animation",
     "☑ Freeze animation": "☑ Freeze animation",
+    "☐ Follow execution": "☐ Follow execution",
+    "☑ Follow execution": "☑ Follow execution",
+    "Go to running node": "Go to running node",
     "Surprise me": "Surprise me",
     "Open panel": "Open panel"
   }

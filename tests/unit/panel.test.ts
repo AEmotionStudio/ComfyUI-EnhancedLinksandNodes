@@ -100,6 +100,19 @@ describe('the panel', () => {
         close(slot);
     });
 
+    it('the quick bar’s Focus chip turns selection focus over; Focus & Flow, which a panel saved on its Runs tab opens on, lays out its four sections', async () => {
+        const slot = await open('runs');
+        const focus = buttonOf(slot, 'Focus')!;
+        expect(focus.getAttribute('aria-pressed')).toBe('true');
+        focus.click();
+        expect([L.focusEnabled, focus.getAttribute('aria-pressed')]).toEqual([false, 'false']);
+        expect(slot.querySelector('[role=tab][aria-selected=true]')!.textContent).toBe('Focus & Flow');
+        expect([...slot.querySelectorAll('.eln-section-toggle')].map((t) => t.textContent)).toEqual(['Selection focus', 'Navigation', 'During a run', 'Completion']);
+        await settle();
+        expect(fake.posts).toEqual([['🔗 Enhanced Links.Focus.Enabled', false]]);
+        close(slot);
+    });
+
     it("the quick bar's Look menu moves with the arrows and applies only the look picked; looks applied one after another undo together", async () => {
         const slot = await open('about', { '🔗 Enhanced Links.Thickness': 6, '📦 Enhanced Nodes.Animate': 3 });
         const choose = slot.querySelector<HTMLElement>('#eln-look')!;

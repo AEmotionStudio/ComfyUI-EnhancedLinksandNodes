@@ -14,7 +14,7 @@
  * around the body goes under every node, and what falls on it over its fill.
  * Each element is drawn in the parts it reaches, so most are drawn once; both
  * sides at once draw every element, in v1's order. While still (Static mode, a
- * paused run, reduced motion) an effect takes v1's still pose.
+ * run that holds them, reduced motion) an effect takes v1's still pose.
  *
  * Where v3 draws differently from v1 on purpose: Gentle Pulse's fireflies
  * flicker by a hash of the time instead of Math.random(), so both parts draw a
@@ -26,7 +26,7 @@
  */
 
 import { N, revision } from '@/core/settings';
-import { TURN, env } from '@/core/engine';
+import { TURN, env, heldByRun } from '@/core/engine';
 import { nodePalette, particleColour, translucent, type NodePalette } from '@/core/colors';
 import { noise } from '@/fx/particles';
 import type { ComfyNode } from '@/core/types';
@@ -41,8 +41,8 @@ interface NodeMoment {
 /** v1's pose for still effects and titles: State.staticPhase (old_node_animations.js:56), at time 0, where v1's first still frame was. */
 export const STILL_NODE: NodeMoment = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
 
-/** Whether node effects hold still: in Static mode, while a run pauses them, and with reduced motion. */
-export const holdsStill = () => N.staticMode || (N.pauseDuringRender && env.running) || env.reducedMotion;
+/** Whether node effects hold still: in Static mode, while this client's run holds them (Pause.Mode), and with reduced motion. */
+export const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion;
 
 /** The sides of a node's edge: around its body, drawn under every node, and on it, drawn over its fill. */
 export const UNDER = 1;

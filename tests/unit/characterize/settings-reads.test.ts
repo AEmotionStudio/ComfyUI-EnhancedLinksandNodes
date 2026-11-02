@@ -93,7 +93,7 @@ describe('settings reads', () => {
         canvas.ctx = canvas.bgctx = nothing();
         expect(reads(() => frames(120))).toBe(0);
         // All of it on screen and moving: each segment, each node's effect and title, and its particles.
-        expect(live).toEqual({ links: 500, nodes: 400, particles: 200, bursts: 0 });
+        expect(live).toEqual({ links: 500, nodes: 400, particles: 200, bursts: 0, marks: 0, flows: 0, rings: 0 });
         expect(fake.legacyCalls).toBe(0);
     }, 30_000);
 

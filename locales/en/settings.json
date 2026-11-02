@@ -373,17 +373,103 @@
   "📦 Enhanced Nodes_Text_Rotation_Angle": {
     "name": "Title rotation"
   },
+  "🔗 Enhanced Links_Focus_Enabled": {
+    "name": "Selection focus",
+    "tooltip": "Make the selection's connections stand out."
+  },
+  "🔗 Enhanced Links_Focus_Mode": {
+    "name": "Selection focus mode",
+    "options": {
+      "Highlight": "Highlight",
+      "Animate only these": "Animate only these",
+      "Dim others": "Dim others",
+      "Hide others": "Hide others"
+    }
+  },
+  "🔗 Enhanced Links_Focus_Color": {
+    "name": "Focused link color",
+    "options": {
+      "White (ComfyUI)": "White (ComfyUI)",
+      "Theme accent": "Theme accent",
+      "Link type color": "Link type color"
+    }
+  },
+  "🔗 Enhanced Links_Focus_Depth": {
+    "name": "Focus reach",
+    "options": {
+      "Direct links": "Direct links",
+      "Everything feeding in": "Everything feeding in",
+      "Everything it feeds": "Everything it feeds",
+      "Whole chain": "Whole chain"
+    }
+  },
+  "🔗 Enhanced Links_Focus_OnTop": {
+    "name": "Bring focused links to front",
+    "tooltip": "Draws them above nodes."
+  },
+  "🔗 Enhanced Links_Focus_Hover": {
+    "name": "Focus on hover",
+    "tooltip": "Hover a node to focus it without selecting."
+  },
+  "🔗 Enhanced Links_Focus_Dim": {
+    "name": "Dimmed link opacity"
+  },
+  "🔗 Enhanced Links_Navigate_DoubleClick": {
+    "name": "Double-click a slot to jump",
+    "tooltip": "Fly to the other end; repeat to cycle."
+  },
+  "🔗 Enhanced Links_Navigate_Follow": {
+    "name": "Follow execution",
+    "tooltip": "Pan to each node as your run reaches it."
+  },
+  "🔗 Enhanced Links_Pause_Mode": {
+    "name": "During a run",
+    "tooltip": "Reacts to your own runs only.",
+    "options": {
+      "Freeze effects": "Freeze effects",
+      "Calm": "Calm",
+      "Spotlight": "Spotlight",
+      "Keep animating": "Keep animating"
+    }
+  },
   "🔗 Enhanced Links_Pause_During_Render": {
-    "name": "Pause link animation during runs",
-    "tooltip": "Links hold a still frame while the queue is running."
+    "name": "Apply run behavior to links",
+    "tooltip": "Off = links ignore runs."
   },
   "📦 Enhanced Nodes_Pause_During_Render": {
-    "name": "Pause node effects during runs",
-    "tooltip": "Node effects and their particles hold still while the queue is running."
+    "name": "Apply run behavior to nodes"
+  },
+  "🔗 Enhanced Links_Flow_River": {
+    "name": "Data river",
+    "tooltip": "Light flowing into the running node."
+  },
+  "🔗 Enhanced Links_Flow_Trail": {
+    "name": "Executed-path trail",
+    "tooltip": "The run's path keeps a fading glow."
+  },
+  "🔗 Enhanced Links_Flow_Trail_Fade": {
+    "name": "Trail fade time"
+  },
+  "📦 Enhanced Nodes_Run_Ring": {
+    "name": "Progress ring",
+    "tooltip": "Ring fills with the node's progress."
+  },
+  "📦 Enhanced Nodes_Run_Error": {
+    "name": "Error pulse",
+    "tooltip": "Failed node pulses red."
   },
   "📦 Enhanced Nodes_End Animation_Enabled": {
     "name": "Fireworks when a run finishes",
-    "tooltip": "Above your run's output nodes. Completion FX in the node menu sets them for one node."
+    "tooltip": "Plays when your run succeeds."
+  },
+  "📦 Enhanced Nodes_Completion_Anchor": {
+    "name": "Completion anchor",
+    "tooltip": "Mark primary nodes in the node menu.",
+    "options": {
+      "Output nodes": "Output nodes",
+      "Primary nodes": "Primary nodes",
+      "Center of screen": "Center of screen"
+    }
   },
   "🔗 Enhanced Links_Perf_MaxFps": {
     "name": "Effect frame-rate cap",

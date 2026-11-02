@@ -206,6 +206,39 @@ const MOTION_OPTIONS = [
     { value: 'full', text: 'Full' },
 ] as const;
 
+const FOCUS_MODE_OPTIONS = [
+    { value: 'highlight', text: 'Highlight' },
+    { value: 'animate', text: 'Animate only these' },
+    { value: 'dim', text: 'Dim others' },
+    { value: 'hide', text: 'Hide others' },
+] as const;
+
+const FOCUS_COLOR_OPTIONS = [
+    { value: 'native', text: 'White (ComfyUI)' },
+    { value: 'accent', text: 'Theme accent' },
+    { value: 'type', text: 'Link type color' },
+] as const;
+
+const FOCUS_DEPTH_OPTIONS = [
+    { value: 'direct', text: 'Direct links' },
+    { value: 'upstream', text: 'Everything feeding in' },
+    { value: 'downstream', text: 'Everything it feeds' },
+    { value: 'chain', text: 'Whole chain' },
+] as const;
+
+const PAUSE_MODE_OPTIONS = [
+    { value: 'pause', text: 'Freeze effects' },
+    { value: 'calm', text: 'Calm' },
+    { value: 'spotlight', text: 'Spotlight' },
+    { value: 'ignore', text: 'Keep animating' },
+] as const;
+
+const COMPLETION_ANCHOR_OPTIONS = [
+    { value: 'outputs', text: 'Output nodes' },
+    { value: 'primary', text: 'Primary nodes' },
+    { value: 'viewport', text: 'Center of screen' },
+] as const;
+
 const COEXIST_OPTIONS = [
     { value: 'auto', text: 'Step aside if one is found' },
     { value: 'ours', text: 'Keep Enhanced link effects' },
@@ -230,6 +263,9 @@ const effects = (): boolean => N.enabled && N.animate !== 0;
 /** Whether the nodes draw anything that takes the node colours: an effect, particles or styled titles. */
 const nodesDraw = (): boolean => N.enabled && (N.animate !== 0 || N.particleShow || N.textAnimationEnabled);
 const particles = (): boolean => N.enabled && N.particleShow;
+const focusOn = (): boolean => L.focusEnabled;
+/** Whether a run changes anything: Pause.Mode is not Keep animating. */
+const runsChange = (): boolean => L.pauseMode !== 'ignore';
 const titles = (): boolean => N.enabled && N.textAnimationEnabled;
 
 /** The fix for a node colour that only Custom colours use. */
@@ -323,9 +359,27 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Text.Rotation.Radius', key: 'textRotationRadius', name: 'Title orbit radius', type: 'slider', min: 0, max: 50, step: 1, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles, tooltip: 'Circles the title around its position.' },
     { id: '📦 Enhanced Nodes.Text.Rotation.Angle', key: 'textRotationAngle', name: 'Title rotation', type: 'slider', min: -180, max: 180, step: 5, default: 0, group: 'Nodes · Titles', advanced: true, showIf: titles },
 
-    { id: '🔗 Enhanced Links.Pause.During.Render', key: 'pauseDuringRender', name: 'Pause link animation during runs', type: 'boolean', default: true, group: 'Runs · During a run', advanced: true, showIf: linksOn, tooltip: 'Links hold a still frame while the queue is running.' },
-    { id: '📦 Enhanced Nodes.Pause.During.Render', key: 'pauseDuringRender', name: 'Pause node effects during runs', type: 'boolean', default: true, group: 'Runs · During a run', advanced: true, showIf: nodesDraw, tooltip: 'Node effects and their particles hold still while the queue is running.' },
-    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Fireworks when a run finishes', type: 'boolean', default: true, group: 'Runs · Completion', showIf: (): boolean => N.enabled, tooltip: "Above your run's output nodes. Completion FX in the node menu sets them for one node." },
+    { id: '🔗 Enhanced Links.Focus.Enabled', key: 'focusEnabled', name: 'Selection focus', type: 'boolean', default: true, group: 'Focus & Flow · Selection focus', look: false, tooltip: "Make the selection's connections stand out." },
+    { id: '🔗 Enhanced Links.Focus.Mode', key: 'focusMode', name: 'Selection focus mode', type: 'combo', options: FOCUS_MODE_OPTIONS, default: 'highlight', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
+    { id: '🔗 Enhanced Links.Focus.Color', key: 'focusColor', name: 'Focused link color', type: 'combo', options: FOCUS_COLOR_OPTIONS, default: 'native', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
+    { id: '🔗 Enhanced Links.Focus.Depth', key: 'focusDepth', name: 'Focus reach', type: 'combo', options: FOCUS_DEPTH_OPTIONS, default: 'direct', group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn },
+    { id: '🔗 Enhanced Links.Focus.OnTop', key: 'focusOnTop', name: 'Bring focused links to front', type: 'boolean', default: true, group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn, tooltip: 'Draws them above nodes.' },
+    { id: '🔗 Enhanced Links.Focus.Hover', key: 'focusHover', name: 'Focus on hover', type: 'boolean', default: false, group: 'Focus & Flow · Selection focus', look: false, showIf: focusOn, tooltip: 'Hover a node to focus it without selecting.' },
+    { id: '🔗 Enhanced Links.Focus.Dim', key: 'focusDim', name: 'Dimmed link opacity', type: 'slider', min: 5, max: 60, step: 5, default: 20, group: 'Focus & Flow · Selection focus', advanced: true, look: false, showIf: (): boolean => focusOn() && L.focusMode === 'dim' },
+
+    { id: '🔗 Enhanced Links.Navigate.DoubleClick', key: 'navigateDoubleClick', name: 'Double-click a slot to jump', type: 'boolean', default: true, group: 'Focus & Flow · Navigation', look: false, tooltip: 'Fly to the other end; repeat to cycle.' },
+    { id: '🔗 Enhanced Links.Navigate.Follow', key: 'navigateFollow', name: 'Follow execution', type: 'boolean', default: false, group: 'Focus & Flow · Navigation', look: false, tooltip: 'Pan to each node as your run reaches it.' },
+
+    { id: '🔗 Enhanced Links.Pause.Mode', key: 'pauseMode', name: 'During a run', type: 'combo', options: PAUSE_MODE_OPTIONS, default: 'spotlight', group: 'Focus & Flow · During a run', tooltip: 'Reacts to your own runs only.' },
+    { id: '🔗 Enhanced Links.Pause.During.Render', key: 'pauseDuringRender', name: 'Apply run behavior to links', type: 'boolean', default: true, group: 'Focus & Flow · During a run', advanced: true, showIf: runsChange, tooltip: 'Off = links ignore runs.' },
+    { id: '📦 Enhanced Nodes.Pause.During.Render', key: 'pauseDuringRender', name: 'Apply run behavior to nodes', type: 'boolean', default: true, group: 'Focus & Flow · During a run', advanced: true, showIf: runsChange },
+    { id: '🔗 Enhanced Links.Flow.River', key: 'flowRiver', name: 'Data river', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => L.enabled, tooltip: 'Light flowing into the running node.' },
+    { id: '🔗 Enhanced Links.Flow.Trail', key: 'flowTrail', name: 'Executed-path trail', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => L.enabled, tooltip: "The run's path keeps a fading glow." },
+    { id: '🔗 Enhanced Links.Flow.Trail.Fade', key: 'flowTrailFade', name: 'Trail fade time', type: 'slider', min: 2, max: 30, step: 1, default: 8, group: 'Focus & Flow · During a run', advanced: true, look: false, showIf: (): boolean => L.enabled && L.flowTrail },
+    { id: '📦 Enhanced Nodes.Run.Ring', key: 'runRing', name: 'Progress ring', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: "Ring fills with the node's progress." },
+    { id: '📦 Enhanced Nodes.Run.Error', key: 'runError', name: 'Error pulse', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: 'Failed node pulses red.' },
+    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Fireworks when a run finishes', type: 'boolean', default: true, group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled, tooltip: 'Plays when your run succeeds.' },
+    { id: '📦 Enhanced Nodes.Completion.Anchor', key: 'completionAnchor', name: 'Completion anchor', type: 'combo', options: COMPLETION_ANCHOR_OPTIONS, default: 'outputs', group: 'Focus & Flow · Completion', look: false, showIf: (): boolean => N.enabled && N.endAnimationEnabled, tooltip: 'Mark primary nodes in the node menu.' },
 
     { id: '🔗 Enhanced Links.Perf.MaxFps', key: 'perfMaxFps', name: 'Effect frame-rate cap', type: 'combo', options: MAX_FPS_OPTIONS, default: 60, group: 'Performance · Budget', look: false, tooltip: 'The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows.' },
     { id: '🔗 Enhanced Links.Motion', key: 'motion', name: 'Motion', type: 'combo', options: MOTION_OPTIONS, default: 'system', group: 'Performance · Accessibility', look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },

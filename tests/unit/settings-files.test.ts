@@ -45,10 +45,10 @@ const commands = json(Object.fromEntries(links.commands!.map((c) => [key(c.id), 
 /**
  * The canvas menu's Enhanced FX and its items, as they read with the switches on and off, which ComfyUI looks up in
  * main.json's contextMenu by their whole text (FE157 composables/useContextMenuTranslation.ts L85-90): but the look's,
- * whose text names the look.
+ * whose text names the look, selection focus's, which names its mode, and Next error's, which counts the errors.
  */
 function canvasMenu(): string[] {
-    const SWITCHES = ['🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled', '🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode'];
+    const SWITCHES = ['🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled', '🔗 Enhanced Links.Static.Mode', '📦 Enhanced Nodes.Static.Mode', '🔗 Enhanced Links.Navigate.Follow'];
     const read = (on: boolean) => {
         SWITCHES.forEach((id, i) => preview(id, i < 2 ? on : !on));
         const [item] = links.getCanvasMenuItems!(app.canvas as never) as IContextMenuValue[];
@@ -56,7 +56,7 @@ function canvasMenu(): string[] {
     };
     // Off, then on as they start, so they end as they were.
     const [off, on] = [read(false), read(true)];
-    return [...new Set(on.flatMap((label, i) => [label, off[i]]))].filter((label) => !label.startsWith('Look: '));
+    return [...new Set(on.flatMap((label, i) => [label, off[i]]))].filter((label) => !label.startsWith('Look: ') && !label.includes('Selection focus: '));
 }
 
 /** settingsCategories.<label>, which the dialog's navigation and group headings look up at the top of main.json, and contextMenu.<text>. */
