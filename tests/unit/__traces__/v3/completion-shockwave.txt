@@ -1,0 +1,85 @@
+# Shockwave over a node, then the middle
+# t=0.1s
+save()
+save()
+beginPath()
+roundRect(555.57, 345.93, 328.86, 178.13, 10.96)
+globalAlpha = 0.257
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.735
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# t=0.4s
+save()
+save()
+beginPath()
+roundRect(489.45, 310.12, 461.11, 249.77, 15.37)
+globalAlpha = 0.064
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.184
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+beginPath()
+arc(800, 450, 53.35, 0, 6.28)
+globalAlpha = 0.287
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.819
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# t=0.65s
+save()
+save()
+beginPath()
+roundRect(480.04, 305.02, 479.91, 259.95, 16)
+globalAlpha = 0.002
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.005
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+beginPath()
+arc(800, 450, 136.35, 0, 6.28)
+globalAlpha = 0.105
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.3
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# t=0.9s
+save()
+save()
+beginPath()
+arc(800, 450, 159, 0, 6.28)
+globalAlpha = 0.013
+strokeStyle = #0088ff
+lineWidth = 12
+stroke()
+globalAlpha = 0.036
+strokeStyle = #44aaff
+lineWidth = 3
+stroke()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0

@@ -1,0 +1,2260 @@
+# Confetti over a node
+# t=0.3s
+save()
+save()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(690.11, 304.15)
+lineTo(682.88, 309.03)
+lineTo(684.73, 311.79)
+lineTo(691.97, 306.91)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(810.9, 273.76)
+lineTo(816.83, 270.1)
+lineTo(815.31, 267.63)
+lineTo(809.37, 271.3)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(742.57, 230.51)
+lineTo(736.23, 236.1)
+lineTo(738.31, 238.45)
+lineTo(744.65, 232.86)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(785.17, 306.42)
+lineTo(788.45, 301.25)
+lineTo(790.16, 302.33)
+lineTo(786.88, 307.51)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(793.11, 350.82)
+lineTo(789.54, 354.63)
+lineTo(789.86, 354.93)
+lineTo(793.43, 351.12)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(853.78, 218.58)
+lineTo(849.39, 224.96)
+lineTo(846.48, 222.96)
+lineTo(850.87, 216.58)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(665.29, 311.9)
+lineTo(660.64, 308.47)
+lineTo(661.45, 307.38)
+lineTo(666.1, 310.81)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(620.99, 361.35)
+lineTo(625.57, 357.32)
+lineTo(623.99, 355.52)
+lineTo(619.41, 359.54)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(802.68, 244.34)
+lineTo(798.8, 250.07)
+lineTo(800.75, 251.4)
+lineTo(804.64, 245.66)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(789.2, 208.65)
+lineTo(795.74, 214.71)
+lineTo(797.77, 212.52)
+lineTo(791.23, 206.46)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(831.85, 359)
+lineTo(830.65, 350.18)
+lineTo(831.77, 350.03)
+lineTo(832.97, 358.85)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(837.23, 335.68)
+lineTo(830.26, 330.85)
+lineTo(832.56, 327.53)
+lineTo(839.53, 332.35)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(720.23, 224.73)
+lineTo(713.2, 229.23)
+lineTo(714.35, 231.03)
+lineTo(721.38, 226.52)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(790.79, 268.21)
+lineTo(794.86, 275.59)
+lineTo(797.38, 274.19)
+lineTo(793.31, 266.82)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(684.84, 246.38)
+lineTo(686.36, 239.02)
+lineTo(687.5, 239.26)
+lineTo(685.97, 246.62)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(667.76, 282.17)
+lineTo(661.96, 276.93)
+lineTo(664.52, 274.09)
+lineTo(670.33, 279.33)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(613.19, 209.86)
+lineTo(619.24, 205.77)
+lineTo(621.29, 208.79)
+lineTo(615.24, 212.89)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(684.32, 278.03)
+lineTo(681.59, 283.8)
+lineTo(683.84, 284.86)
+lineTo(686.57, 279.09)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(777.16, 287.8)
+lineTo(773.44, 282.68)
+lineTo(773.67, 282.51)
+lineTo(777.39, 287.63)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(695.65, 313.52)
+lineTo(688.07, 317.35)
+lineTo(689.48, 320.14)
+lineTo(697.06, 316.32)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(610.95, 229.97)
+lineTo(614.3, 222.54)
+lineTo(615.45, 223.06)
+lineTo(612.1, 230.49)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(721.17, 326.45)
+lineTo(716.66, 329.52)
+lineTo(717.36, 330.56)
+lineTo(721.87, 327.49)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(679.76, 285.39)
+lineTo(679.15, 279.81)
+lineTo(679.73, 279.75)
+lineTo(680.34, 285.33)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(843.99, 339.59)
+lineTo(837.2, 342.17)
+lineTo(838.45, 345.45)
+lineTo(845.24, 342.86)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(820.59, 283.75)
+lineTo(828.62, 280.83)
+lineTo(829.26, 282.6)
+lineTo(821.23, 285.51)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(716.13, 179.98)
+lineTo(710.54, 186.78)
+lineTo(713.94, 189.57)
+lineTo(719.53, 182.77)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(707.71, 382.25)
+lineTo(706.07, 375.53)
+lineTo(708.03, 375.06)
+lineTo(709.66, 381.77)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(662.7, 352.16)
+lineTo(667.6, 348.76)
+lineTo(668.77, 350.44)
+lineTo(663.87, 353.85)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(729.1, 202.65)
+lineTo(725.81, 198.76)
+lineTo(727.76, 197.11)
+lineTo(731.04, 201.01)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(619.82, 277.88)
+lineTo(624.62, 275.18)
+lineTo(623.54, 273.26)
+lineTo(618.74, 275.96)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(657.76, 200.16)
+lineTo(657.08, 207.47)
+lineTo(656.5, 207.42)
+lineTo(657.18, 200.11)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(699.98, 214.31)
+lineTo(700.76, 206.59)
+lineTo(701.98, 206.72)
+lineTo(701.2, 214.43)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(676.21, 313.26)
+lineTo(670.35, 312.07)
+lineTo(670.78, 309.96)
+lineTo(676.64, 311.15)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(799.36, 203.04)
+lineTo(794.48, 207.63)
+lineTo(796.25, 209.5)
+lineTo(801.12, 204.92)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(814.08, 243.26)
+lineTo(818.25, 246.68)
+lineTo(816.95, 248.26)
+lineTo(812.78, 244.84)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(835.15, 254.27)
+lineTo(829.56, 257.74)
+lineTo(829.12, 257.04)
+lineTo(834.71, 253.56)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(772.9, 265.13)
+lineTo(777.76, 261.46)
+lineTo(779.56, 263.85)
+lineTo(774.7, 267.52)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(587.97, 282.57)
+lineTo(594.7, 285.18)
+lineTo(595.3, 283.65)
+lineTo(588.56, 281.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(680.85, 226.09)
+lineTo(683.44, 233.88)
+lineTo(683.5, 233.86)
+lineTo(680.91, 226.07)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(584.98, 276.66)
+lineTo(582.56, 269.44)
+lineTo(586.17, 268.22)
+lineTo(588.59, 275.45)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(829.52, 294.68)
+lineTo(822.58, 293.18)
+lineTo(822.05, 295.62)
+lineTo(828.99, 297.12)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(662.78, 282.59)
+lineTo(657.42, 285.2)
+lineTo(657.48, 285.33)
+lineTo(662.85, 282.72)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(840.67, 259.61)
+lineTo(838.73, 267.67)
+lineTo(837.86, 267.46)
+lineTo(839.8, 259.4)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(676.93, 267.63)
+lineTo(671.56, 271.64)
+lineTo(672.43, 272.81)
+lineTo(677.8, 268.8)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(815.12, 364.73)
+lineTo(810.4, 357.18)
+lineTo(809.99, 357.44)
+lineTo(814.71, 364.99)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(839.57, 281.87)
+lineTo(840.5, 276.55)
+lineTo(842.49, 276.89)
+lineTo(841.56, 282.22)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(655.94, 273.47)
+lineTo(662.2, 267.58)
+lineTo(659.46, 264.67)
+lineTo(653.2, 270.56)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(607.08, 249.98)
+lineTo(599.27, 246.79)
+lineTo(600.01, 245)
+lineTo(607.82, 248.19)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(766.08, 313.65)
+lineTo(763.77, 318.45)
+lineTo(764.26, 318.68)
+lineTo(766.56, 313.88)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(650.87, 251.06)
+lineTo(651.41, 244.59)
+lineTo(648.24, 244.33)
+lineTo(647.7, 250.79)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(610.86, 289.2)
+lineTo(608.23, 284.41)
+lineTo(606.24, 285.5)
+lineTo(608.87, 290.29)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(689.04, 341.58)
+lineTo(685.56, 336.43)
+lineTo(683.05, 338.12)
+lineTo(686.53, 343.27)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(672.84, 199.79)
+lineTo(666.5, 202.43)
+lineTo(665.53, 200.09)
+lineTo(671.87, 197.45)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(710.58, 214.92)
+lineTo(714.15, 222.36)
+lineTo(711.65, 223.56)
+lineTo(708.08, 216.12)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(823.6, 305.76)
+lineTo(827.48, 312.71)
+lineTo(827.57, 312.66)
+lineTo(823.7, 305.7)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(640.08, 298.54)
+lineTo(631.76, 301.04)
+lineTo(631.16, 299.04)
+lineTo(639.48, 296.54)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(701.69, 312.57)
+lineTo(699.83, 319.39)
+lineTo(696.42, 318.46)
+lineTo(698.28, 311.64)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(772.55, 346.37)
+lineTo(766.5, 345.38)
+lineTo(766.34, 346.33)
+lineTo(772.4, 347.32)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(797.59, 347.33)
+lineTo(803.59, 350.96)
+lineTo(801.82, 353.87)
+lineTo(795.83, 350.24)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(616.75, 264.71)
+lineTo(611.01, 269.29)
+lineTo(611.48, 269.88)
+lineTo(617.22, 265.3)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(695.04, 230.36)
+lineTo(688.15, 233.01)
+lineTo(688.12, 232.91)
+lineTo(695, 230.26)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(610.25, 203.82)
+lineTo(610.66, 198.08)
+lineTo(607.9, 197.88)
+lineTo(607.48, 203.62)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(719.1, 299.51)
+lineTo(719.26, 292.1)
+lineTo(722.14, 292.16)
+lineTo(721.98, 299.57)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(731.19, 231.63)
+lineTo(733.43, 225.06)
+lineTo(731.47, 224.39)
+lineTo(729.23, 230.96)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(629.27, 314.85)
+lineTo(621.8, 310.2)
+lineTo(622.8, 308.59)
+lineTo(630.28, 313.23)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(841.81, 250.68)
+lineTo(833.11, 249.83)
+lineTo(832.69, 254.17)
+lineTo(841.38, 255.02)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(754.57, 357.59)
+lineTo(752.82, 349.99)
+lineTo(756.3, 349.19)
+lineTo(758.05, 356.78)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(773.37, 284.49)
+lineTo(779.85, 281.52)
+lineTo(778.73, 279.07)
+lineTo(772.25, 282.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(625.85, 285.19)
+lineTo(621, 282.54)
+lineTo(621.96, 280.78)
+lineTo(626.81, 283.43)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(801.98, 268.28)
+lineTo(801.15, 263.07)
+lineTo(798.71, 263.46)
+lineTo(799.54, 268.67)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(613.69, 214.68)
+lineTo(620.24, 214.07)
+lineTo(620.13, 212.88)
+lineTo(613.58, 213.49)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(833, 191.78)
+lineTo(838.58, 197.07)
+lineTo(838.88, 196.75)
+lineTo(833.31, 191.46)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(817.78, 336.7)
+lineTo(812.07, 337.49)
+lineTo(812.09, 337.65)
+lineTo(817.8, 336.85)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(718.43, 274.99)
+lineTo(711.38, 274.17)
+lineTo(711.14, 276.24)
+lineTo(718.19, 277.07)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(801.16, 321.25)
+lineTo(796.34, 326.91)
+lineTo(799.15, 329.32)
+lineTo(803.98, 323.66)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(624.8, 185.25)
+lineTo(627.16, 190.43)
+lineTo(624.57, 191.61)
+lineTo(622.21, 186.43)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(589.21, 320.16)
+lineTo(592.88, 312.72)
+lineTo(592.93, 312.75)
+lineTo(589.26, 320.18)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(610.18, 283.4)
+lineTo(616.35, 286.96)
+lineTo(614.98, 289.32)
+lineTo(608.82, 285.75)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(808.43, 241.42)
+lineTo(803.27, 245.45)
+lineTo(801.89, 243.69)
+lineTo(807.05, 239.66)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(825.57, 275.41)
+lineTo(819.3, 271.86)
+lineTo(817.64, 274.8)
+lineTo(823.9, 278.35)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(791.28, 190.64)
+lineTo(798.05, 194.93)
+lineTo(796.25, 197.77)
+lineTo(789.47, 193.49)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(704.26, 219.9)
+lineTo(710.42, 221.12)
+lineTo(710.4, 221.22)
+lineTo(704.24, 220.01)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(662.39, 301.22)
+lineTo(658.47, 295.01)
+lineTo(659.63, 294.28)
+lineTo(663.55, 300.49)
+closePath()
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# t=1s
+save()
+save()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(680.55, 425.44)
+lineTo(686.47, 431.85)
+lineTo(683.96, 434.17)
+lineTo(678.04, 427.76)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(812.78, 379.49)
+lineTo(819.74, 378.99)
+lineTo(819.57, 376.61)
+lineTo(812.61, 377.1)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(757.81, 353.74)
+lineTo(750.59, 349.33)
+lineTo(752.51, 346.2)
+lineTo(759.72, 350.6)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(792.35, 418.34)
+lineTo(792.88, 412.23)
+lineTo(791.32, 412.1)
+lineTo(790.79, 418.2)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(794.38, 471.37)
+lineTo(793.41, 466.24)
+lineTo(791.3, 466.64)
+lineTo(792.27, 471.77)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(837.84, 343.5)
+lineTo(830.23, 342.06)
+lineTo(830.45, 340.88)
+lineTo(838.06, 342.32)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(644.67, 427.6)
+lineTo(644.03, 421.86)
+lineTo(645.86, 421.66)
+lineTo(646.5, 427.4)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(618.93, 487.14)
+lineTo(625, 487.74)
+lineTo(624.96, 488.07)
+lineTo(618.9, 487.47)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(803.98, 368)
+lineTo(802.88, 361.16)
+lineTo(804.06, 360.98)
+lineTo(805.15, 367.81)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(783.44, 323.63)
+lineTo(792.28, 322.5)
+lineTo(792.84, 326.82)
+lineTo(783.99, 327.95)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(849.51, 474.94)
+lineTo(847.38, 466.3)
+lineTo(847.37, 466.3)
+lineTo(849.5, 474.94)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(857.29, 445.89)
+lineTo(854.22, 437.99)
+lineTo(852, 438.86)
+lineTo(855.07, 446.76)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(731.55, 345.79)
+lineTo(725.49, 351.52)
+lineTo(722.75, 348.63)
+lineTo(728.82, 342.9)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(800.12, 379.35)
+lineTo(804.34, 372.06)
+lineTo(807.42, 373.84)
+lineTo(803.2, 381.13)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(670, 353.65)
+lineTo(676.22, 357.88)
+lineTo(678.18, 355)
+lineTo(671.96, 350.77)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(639.35, 408.34)
+lineTo(645.46, 403.45)
+lineTo(643.02, 400.4)
+lineTo(636.91, 405.28)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(609.48, 331.19)
+lineTo(614.58, 325.97)
+lineTo(613.82, 325.22)
+lineTo(608.72, 330.45)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(680.01, 398.5)
+lineTo(675.82, 393.68)
+lineTo(677.74, 392.01)
+lineTo(681.93, 396.83)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(754.58, 406.97)
+lineTo(753.14, 400.81)
+lineTo(751.36, 401.23)
+lineTo(752.8, 407.39)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(715.12, 430.46)
+lineTo(706.82, 428.64)
+lineTo(707.64, 424.88)
+lineTo(715.94, 426.69)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(604.04, 348.06)
+lineTo(607.43, 340.65)
+lineTo(604.73, 339.42)
+lineTo(601.34, 346.82)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(726.92, 451.24)
+lineTo(723.49, 447)
+lineTo(722.5, 447.8)
+lineTo(725.93, 452.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(671, 400.25)
+lineTo(665.74, 402.22)
+lineTo(664.9, 399.96)
+lineTo(670.16, 398)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(839.17, 456.74)
+lineTo(832.07, 455.18)
+lineTo(832.45, 453.47)
+lineTo(839.55, 455.02)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(814.24, 397.12)
+lineTo(819.9, 390.72)
+lineTo(822.26, 392.81)
+lineTo(816.6, 399.21)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(729.93, 296.31)
+lineTo(724.73, 289.21)
+lineTo(728.23, 286.64)
+lineTo(733.43, 293.75)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(713.68, 505.29)
+lineTo(719.13, 509.53)
+lineTo(719.95, 508.48)
+lineTo(714.49, 504.24)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(684.17, 471.82)
+lineTo(682.37, 477.51)
+lineTo(684.67, 478.24)
+lineTo(686.47, 472.55)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(713.35, 314.04)
+lineTo(717.61, 311.24)
+lineTo(718.04, 311.89)
+lineTo(713.77, 314.69)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(613.12, 391.36)
+lineTo(612.39, 396.82)
+lineTo(609.84, 396.47)
+lineTo(610.56, 391.02)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(689.33, 313.44)
+lineTo(683.27, 309.3)
+lineTo(681.49, 311.9)
+lineTo(687.55, 316.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(705.13, 325.09)
+lineTo(701.51, 318.24)
+lineTo(701.67, 318.15)
+lineTo(705.29, 325.01)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(659.89, 435.91)
+lineTo(653.92, 436.24)
+lineTo(654, 437.68)
+lineTo(659.97, 437.35)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(816.59, 312.22)
+lineTo(810.73, 309)
+lineTo(811.6, 307.42)
+lineTo(817.46, 310.64)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(806.37, 354.65)
+lineTo(804.97, 359.86)
+lineTo(807.5, 360.54)
+lineTo(808.9, 355.32)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(832.62, 368.71)
+lineTo(826.66, 371.51)
+lineTo(825.37, 368.77)
+lineTo(831.32, 365.97)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(790.94, 382.56)
+lineTo(788.93, 376.8)
+lineTo(790.38, 376.3)
+lineTo(792.39, 382.05)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(612.76, 405.39)
+lineTo(606.41, 408.82)
+lineTo(606.05, 408.16)
+lineTo(612.4, 404.73)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(681.76, 352.1)
+lineTo(684.97, 344.54)
+lineTo(681.3, 342.98)
+lineTo(678.09, 350.54)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(599.82, 386.3)
+lineTo(604.15, 380.03)
+lineTo(601.46, 378.17)
+lineTo(597.12, 384.43)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(835.29, 405.96)
+lineTo(831.03, 411.64)
+lineTo(831.77, 412.19)
+lineTo(836.02, 406.51)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(656.18, 398.79)
+lineTo(652.71, 393.93)
+lineTo(655.14, 392.2)
+lineTo(658.61, 397.06)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(817.42, 386.5)
+lineTo(811.22, 392)
+lineTo(813.95, 395.08)
+lineTo(820.15, 389.58)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(680.09, 383.87)
+lineTo(677.98, 377.52)
+lineTo(676.89, 377.88)
+lineTo(679, 384.23)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(801.48, 478.25)
+lineTo(794.48, 483.75)
+lineTo(793.21, 482.14)
+lineTo(800.22, 476.64)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(864.11, 397.14)
+lineTo(858.94, 395.55)
+lineTo(858.41, 397.26)
+lineTo(863.58, 398.86)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(665.51, 375.86)
+lineTo(666.95, 367.38)
+lineTo(670.94, 368.06)
+lineTo(669.5, 376.53)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(625.18, 348.24)
+lineTo(616.74, 348.09)
+lineTo(616.68, 352.04)
+lineTo(625.11, 352.19)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(779.89, 443.68)
+lineTo(774.6, 443.08)
+lineTo(774.89, 440.48)
+lineTo(780.18, 441.08)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(656.91, 352.94)
+lineTo(655.07, 346.71)
+lineTo(653.92, 347.05)
+lineTo(655.76, 353.28)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(629.05, 405.11)
+lineTo(633.23, 408.62)
+lineTo(632.35, 409.67)
+lineTo(628.17, 406.15)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(702.36, 464.7)
+lineTo(696.25, 465.84)
+lineTo(695.69, 462.82)
+lineTo(701.8, 461.68)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(650.24, 315.49)
+lineTo(648.31, 322.08)
+lineTo(651.43, 323)
+lineTo(653.37, 316.41)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(729.46, 343.01)
+lineTo(737, 346.38)
+lineTo(738.68, 342.62)
+lineTo(731.14, 339.25)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(799.76, 431.27)
+lineTo(807.72, 431.19)
+lineTo(807.69, 427.96)
+lineTo(799.73, 428.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(626.32, 426.43)
+lineTo(619.26, 421.36)
+lineTo(616.75, 424.86)
+lineTo(623.81, 429.93)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(681.72, 425.33)
+lineTo(679.15, 431.91)
+lineTo(682.35, 433.16)
+lineTo(684.92, 426.57)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(794.86, 471.82)
+lineTo(798.31, 466.75)
+lineTo(799.04, 467.25)
+lineTo(795.59, 472.32)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(791.07, 469.24)
+lineTo(791.03, 462.23)
+lineTo(789.13, 462.24)
+lineTo(789.16, 469.25)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(595.79, 371.28)
+lineTo(597.71, 378.37)
+lineTo(594.27, 379.3)
+lineTo(592.35, 372.21)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(677.23, 354.64)
+lineTo(678.45, 347.36)
+lineTo(678.78, 347.42)
+lineTo(677.56, 354.69)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(582.36, 324.23)
+lineTo(586.19, 319.93)
+lineTo(586.5, 320.2)
+lineTo(582.67, 324.5)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(709.22, 425.6)
+lineTo(705.48, 419.2)
+lineTo(702.4, 421)
+lineTo(706.14, 427.4)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(742.79, 343.77)
+lineTo(746.8, 349.44)
+lineTo(745.39, 350.44)
+lineTo(741.38, 344.78)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(613.86, 427.09)
+lineTo(605.53, 429.95)
+lineTo(605.1, 428.7)
+lineTo(613.43, 425.84)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(857.86, 370.38)
+lineTo(853.88, 378.16)
+lineTo(850.38, 376.36)
+lineTo(854.36, 368.59)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(744.17, 470.08)
+lineTo(736.42, 469.22)
+lineTo(736.31, 470.25)
+lineTo(744.05, 471.11)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(786.67, 398.53)
+lineTo(789.53, 391.99)
+lineTo(792.56, 393.32)
+lineTo(789.7, 399.86)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(604.73, 389.46)
+lineTo(601.21, 385.2)
+lineTo(601.79, 384.71)
+lineTo(605.31, 388.98)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(809.5, 394.62)
+lineTo(811.5, 389.74)
+lineTo(813.84, 390.7)
+lineTo(811.84, 395.57)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(611.33, 325.65)
+lineTo(616.85, 329.21)
+lineTo(615.77, 330.89)
+lineTo(610.24, 327.33)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(843.11, 306.33)
+lineTo(838.32, 312.33)
+lineTo(840.62, 314.17)
+lineTo(845.42, 308.17)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(807.76, 450.16)
+lineTo(807.77, 455.92)
+lineTo(807.77, 455.92)
+lineTo(807.77, 450.16)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(694.12, 390.12)
+lineTo(700.93, 388.13)
+lineTo(701.85, 391.28)
+lineTo(695.04, 393.27)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(809.25, 435.37)
+lineTo(816.18, 432.68)
+lineTo(817.2, 435.29)
+lineTo(810.26, 437.98)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(612.88, 296.12)
+lineTo(612.49, 301.79)
+lineTo(611.03, 301.69)
+lineTo(611.42, 296.02)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #88ccff
+beginPath()
+moveTo(598.77, 441.6)
+lineTo(602.06, 433.99)
+lineTo(605.8, 435.61)
+lineTo(602.51, 443.22)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(614.5, 406.06)
+lineTo(613.82, 398.97)
+lineTo(610.28, 399.31)
+lineTo(610.96, 406.4)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(784.97, 356.39)
+lineTo(790.21, 360.32)
+lineTo(789.14, 361.73)
+lineTo(783.91, 357.81)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(819.18, 388.85)
+lineTo(814.91, 394.63)
+lineTo(814.71, 394.49)
+lineTo(818.99, 388.7)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #44aaff
+beginPath()
+moveTo(808.86, 308.83)
+lineTo(814.1, 314.9)
+lineTo(817.05, 312.35)
+lineTo(811.81, 306.28)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(715.63, 336.56)
+lineTo(711.77, 341.51)
+lineTo(709.81, 339.98)
+lineTo(713.67, 335.04)
+closePath()
+fill()
+globalAlpha = 1
+fillStyle = #0088ff
+beginPath()
+moveTo(634.4, 420.92)
+lineTo(641.73, 421.26)
+lineTo(641.63, 423.37)
+lineTo(634.3, 423.02)
+closePath()
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# t=1.8s
+save()
+save()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(667.84, 590.66)
+lineTo(671.46, 582.71)
+lineTo(675.04, 584.34)
+lineTo(671.42, 592.28)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(815.25, 532.37)
+lineTo(821.44, 535.59)
+lineTo(821.52, 535.44)
+lineTo(815.32, 532.22)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(752.6, 511.36)
+lineTo(756.13, 503.68)
+lineTo(753.23, 502.35)
+lineTo(749.71, 510.04)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(772.99, 574.74)
+lineTo(770.26, 569.25)
+lineTo(772.18, 568.3)
+lineTo(774.9, 573.79)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(796.87, 623.25)
+lineTo(800.65, 626.86)
+lineTo(798.9, 628.7)
+lineTo(795.12, 625.09)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(852.35, 503.62)
+lineTo(851.86, 495.89)
+lineTo(849.36, 496.05)
+lineTo(849.84, 503.78)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(661.14, 584.47)
+lineTo(665.42, 580.58)
+lineTo(663.47, 578.44)
+lineTo(659.2, 582.33)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(634.31, 642.87)
+lineTo(637.43, 648.11)
+lineTo(634.94, 649.59)
+lineTo(631.82, 644.36)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(792.6, 518.93)
+lineTo(796.35, 524.75)
+lineTo(797.34, 524.12)
+lineTo(793.59, 518.3)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(803.52, 486.99)
+lineTo(807.36, 478.94)
+lineTo(803.34, 477.02)
+lineTo(799.5, 485.08)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(831.71, 631.87)
+lineTo(828.54, 623.55)
+lineTo(829.21, 623.3)
+lineTo(832.37, 631.62)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(838.11, 603.32)
+lineTo(840.7, 595.25)
+lineTo(836.8, 594.01)
+lineTo(834.22, 602.08)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(724.12, 500.93)
+lineTo(719.41, 507.83)
+lineTo(720.02, 508.24)
+lineTo(724.73, 501.35)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(788.37, 529.38)
+lineTo(780.37, 532.03)
+lineTo(781.36, 535.03)
+lineTo(789.36, 532.38)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(678.09, 511.37)
+lineTo(670.91, 513.59)
+lineTo(669.81, 510.05)
+lineTo(676.99, 507.83)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(655.68, 558.43)
+lineTo(657.72, 565.98)
+lineTo(654.61, 566.82)
+lineTo(652.57, 559.27)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(596.91, 489.27)
+lineTo(600.68, 483.02)
+lineTo(598.63, 481.78)
+lineTo(594.86, 488.04)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(660.1, 551.77)
+lineTo(666.49, 551.65)
+lineTo(666.49, 552.09)
+lineTo(660.11, 552.22)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(766.87, 564.26)
+lineTo(768.29, 558.1)
+lineTo(770.44, 558.59)
+lineTo(769.02, 564.76)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(700.05, 587.25)
+lineTo(695.43, 580.12)
+lineTo(694.57, 580.68)
+lineTo(699.19, 587.81)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(619.27, 503.84)
+lineTo(622.71, 496.46)
+lineTo(625.69, 497.85)
+lineTo(622.25, 505.23)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(727.93, 607.48)
+lineTo(732.58, 604.63)
+lineTo(733.88, 606.74)
+lineTo(729.23, 609.59)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(681.68, 556.41)
+lineTo(685.96, 560.05)
+lineTo(687.61, 558.1)
+lineTo(683.33, 554.47)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(832.9, 615.04)
+lineTo(828.25, 609.46)
+lineTo(829.75, 608.21)
+lineTo(834.4, 613.79)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(838.86, 555.92)
+lineTo(840.16, 547.48)
+lineTo(836.1, 546.85)
+lineTo(834.8, 555.29)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(710.89, 449.96)
+lineTo(719.63, 448.9)
+lineTo(719.1, 444.54)
+lineTo(710.36, 445.6)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(721.69, 665.56)
+lineTo(715.18, 663.23)
+lineTo(714.47, 665.23)
+lineTo(720.97, 667.55)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(684.75, 635.94)
+lineTo(684.78, 629.98)
+lineTo(686.71, 629.99)
+lineTo(686.68, 635.95)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(728.4, 467.12)
+lineTo(729.51, 472.1)
+lineTo(730.05, 471.98)
+lineTo(728.94, 467)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(618.7, 553.3)
+lineTo(616.18, 548.41)
+lineTo(614.96, 549.04)
+lineTo(617.48, 553.93)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(670.3, 468.22)
+lineTo(677.54, 467)
+lineTo(677.91, 469.22)
+lineTo(670.68, 470.45)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(705.98, 478.11)
+lineTo(698.89, 474.99)
+lineTo(697.65, 477.8)
+lineTo(704.74, 480.93)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(673.57, 592.65)
+lineTo(667.95, 594.68)
+lineTo(668.86, 597.19)
+lineTo(674.48, 595.16)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(795.76, 468.69)
+lineTo(798.17, 462.44)
+lineTo(796.23, 461.7)
+lineTo(793.83, 467.94)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(826.43, 515.01)
+lineTo(821.03, 515.01)
+lineTo(821.03, 513.02)
+lineTo(826.43, 513.02)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(824.76, 524.51)
+lineTo(818.49, 526.49)
+lineTo(818.38, 526.14)
+lineTo(824.65, 524.16)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(783.3, 535.65)
+lineTo(777.33, 536.89)
+lineTo(777.32, 536.84)
+lineTo(783.29, 535.6)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(592.25, 568.13)
+lineTo(595.93, 561.92)
+lineTo(594.84, 561.27)
+lineTo(591.16, 567.49)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(681, 502.72)
+lineTo(675.25, 508.58)
+lineTo(673.31, 506.67)
+lineTo(679.06, 500.81)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(578.59, 538.02)
+lineTo(586.18, 538.75)
+lineTo(586.17, 538.78)
+lineTo(578.59, 538.05)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(824.64, 562.05)
+lineTo(829, 567.65)
+lineTo(826.65, 569.49)
+lineTo(822.28, 563.88)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(671.01, 552.82)
+lineTo(675.98, 549.51)
+lineTo(676.94, 550.95)
+lineTo(671.97, 554.26)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(824.62, 547.77)
+lineTo(816.33, 548.02)
+lineTo(816.41, 550.57)
+lineTo(824.69, 550.33)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(666.79, 534.66)
+lineTo(673.25, 536.45)
+lineTo(672.36, 539.65)
+lineTo(665.91, 537.85)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(809, 636)
+lineTo(816.55, 640.72)
+lineTo(817.57, 639.08)
+lineTo(810.03, 634.36)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(844.53, 551.46)
+lineTo(843.34, 556.73)
+lineTo(845.98, 557.32)
+lineTo(847.16, 552.05)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(654.74, 529.98)
+lineTo(650.08, 522.76)
+lineTo(647.36, 524.52)
+lineTo(652.03, 531.73)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(607.63, 504.9)
+lineTo(599.88, 508.23)
+lineTo(598.88, 505.9)
+lineTo(606.63, 502.57)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(759.38, 603)
+lineTo(759.15, 597.68)
+lineTo(761.1, 597.59)
+lineTo(761.34, 602.91)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(663.76, 507.99)
+lineTo(659.52, 503.07)
+lineTo(660.26, 502.44)
+lineTo(664.5, 507.35)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(620.72, 566.23)
+lineTo(616.64, 562.59)
+lineTo(615.86, 563.48)
+lineTo(619.94, 567.11)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(679.2, 618.53)
+lineTo(678.83, 624.73)
+lineTo(681.91, 624.91)
+lineTo(682.28, 618.71)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(667.31, 473.12)
+lineTo(671.9, 478.23)
+lineTo(669.8, 480.12)
+lineTo(665.21, 475.01)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(722.52, 500.49)
+lineTo(730.18, 497.4)
+lineTo(731.62, 500.97)
+lineTo(723.97, 504.06)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(806.65, 590.5)
+lineTo(809.26, 582.98)
+lineTo(811.48, 583.75)
+lineTo(808.88, 591.27)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(615.09, 588.12)
+lineTo(615.93, 579.47)
+lineTo(619.72, 579.84)
+lineTo(618.88, 588.49)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(691.3, 583.28)
+lineTo(687.96, 589.51)
+lineTo(686.16, 588.54)
+lineTo(689.51, 582.31)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(779.84, 624.36)
+lineTo(781.35, 630.31)
+lineTo(780.79, 630.45)
+lineTo(779.28, 624.5)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(785.5, 619.5)
+lineTo(780.92, 624.8)
+lineTo(781.94, 625.68)
+lineTo(786.52, 620.37)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(609.12, 532.83)
+lineTo(616.47, 532.68)
+lineTo(616.4, 529.62)
+lineTo(609.06, 529.78)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(687.89, 505.93)
+lineTo(691.87, 512.14)
+lineTo(693.8, 510.9)
+lineTo(689.82, 504.69)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(598.17, 479.18)
+lineTo(603.9, 478.63)
+lineTo(604.08, 480.52)
+lineTo(598.35, 481.07)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(725.52, 584.56)
+lineTo(718.74, 581.58)
+lineTo(719.93, 578.86)
+lineTo(726.71, 581.84)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(738.84, 506.9)
+lineTo(732.26, 504.69)
+lineTo(733.16, 502.01)
+lineTo(739.74, 504.22)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(614.84, 580.09)
+lineTo(612.87, 588.67)
+lineTo(617.16, 589.65)
+lineTo(619.13, 581.07)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(847.56, 529.66)
+lineTo(854.37, 535.14)
+lineTo(856.7, 532.25)
+lineTo(849.89, 526.77)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(758.57, 623.31)
+lineTo(756.48, 630.82)
+lineTo(757.61, 631.13)
+lineTo(759.7, 623.63)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(790.72, 556.26)
+lineTo(787.82, 549.74)
+lineTo(789.44, 549.03)
+lineTo(792.34, 555.55)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(622.19, 544.9)
+lineTo(620.79, 539.55)
+lineTo(618.44, 540.16)
+lineTo(619.84, 545.51)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(818.34, 553.31)
+lineTo(822.82, 550.53)
+lineTo(821.65, 548.65)
+lineTo(817.17, 551.43)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(613.54, 482.03)
+lineTo(615.09, 488.42)
+lineTo(616.7, 488.03)
+lineTo(615.14, 481.64)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(828.15, 471.3)
+lineTo(822.8, 465.78)
+lineTo(825.56, 463.11)
+lineTo(830.91, 468.63)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(800.46, 609.47)
+lineTo(806.21, 609.07)
+lineTo(806.31, 610.49)
+lineTo(800.56, 610.89)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(718.75, 546.32)
+lineTo(711.96, 548.38)
+lineTo(712.07, 548.76)
+lineTo(718.86, 546.69)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(810.43, 591.16)
+lineTo(803.23, 593.03)
+lineTo(802.93, 591.9)
+lineTo(810.13, 590.02)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(623.44, 453.09)
+lineTo(620.06, 457.66)
+lineTo(619.48, 457.23)
+lineTo(622.86, 452.66)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #88ccff
+beginPath()
+moveTo(603.65, 600.03)
+lineTo(606.5, 592.24)
+lineTo(607.61, 592.65)
+lineTo(604.77, 600.43)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(633.76, 557.43)
+lineTo(630.08, 563.53)
+lineTo(627.44, 561.93)
+lineTo(631.12, 555.83)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(794.73, 519.44)
+lineTo(795.49, 512.94)
+lineTo(793.65, 512.73)
+lineTo(792.89, 519.22)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(828.38, 545.71)
+lineTo(834.51, 549.48)
+lineTo(833.16, 551.68)
+lineTo(827.03, 547.91)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #44aaff
+beginPath()
+moveTo(796.78, 463.16)
+lineTo(799.72, 470.62)
+lineTo(796.15, 472.03)
+lineTo(793.2, 464.57)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(699.59, 498.39)
+lineTo(698.66, 492.19)
+lineTo(696.66, 492.49)
+lineTo(697.59, 498.69)
+closePath()
+fill()
+globalAlpha = 0.4
+fillStyle = #0088ff
+beginPath()
+moveTo(646.64, 576.85)
+lineTo(640.59, 581.01)
+lineTo(642.28, 583.47)
+lineTo(648.33, 579.31)
+closePath()
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0

@@ -10,7 +10,7 @@ import { LinkPath } from '@/links/geometry';
 import { Segment } from '@/links/pipeline';
 import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
 import { drawTitle } from '@/nodes/text';
-import { drawBursts, fireworks } from '@/fx/bursts';
+import { drawBursts, play } from '@/fx/bursts';
 import { SETTINGS, preview } from '@/core/settings';
 import { clock, live } from '@/core/engine';
 import { nodePalette, palette } from '@/core/colors';
@@ -346,12 +346,14 @@ export const V1_NODE_RICH_SETTINGS: Record<string, unknown> = {
 /**
  * The values v1's node extension read with an empty settings file: the defaultValue of each addSetting
  * (old_node_animations.js:209-690), DEFAULT_SETTINGS (:146-178) for most. Its effects took energy Intensity × 1.5 and
- * their bloom from Animation.Glow (:2088-2099); Glow drove the halo and the frame of its drawNodeShape.
+ * their bloom from Animation.Glow (:2088-2099); Glow drove the halo and the frame of its drawNodeShape. Its completion
+ * effect was the fireworks.
  */
 export const V1_NODE_SETTINGS: Record<string, unknown> = {
     '📦 Enhanced Nodes.Animate': 2,
     '📦 Enhanced Nodes.Animations.Enabled': true,
     '📦 Enhanced Nodes.End Animation.Enabled': false,
+    '📦 Enhanced Nodes.Completion.Style': 'fireworks',
     '📦 Enhanced Nodes.Static.Mode': false,
     '📦 Enhanced Nodes.Direction': 1,
     '📦 Enhanced Nodes.Animation.Speed': 1,
@@ -472,11 +474,11 @@ export function v3Title(style: string): NodeDraw {
 }
 
 /** The view v1's fireworks trace drew on: a 1600 × 900 canvas at zoom 1, and a node at its origin, as v1's drawNodeShape drew them in the node's space. */
-function fireworksView(): { canvas: Parameters<typeof drawBursts>[0]; node: Parameters<typeof fireworks>[0][number] } {
+function fireworksView(): { canvas: Parameters<typeof drawBursts>[0]; node: Parameters<typeof play>[1][number] } {
     const graph = {};
     return {
         canvas: { visible_area: new Float32Array([0, 0, 1600, 900]), ds: { scale: 1 }, graph } as unknown as Parameters<typeof drawBursts>[0],
-        node: { id: 1, pos: [0, 0], graph } as unknown as Parameters<typeof fireworks>[0][number],
+        node: { id: 1, pos: [0, 0], graph } as unknown as Parameters<typeof play>[1][number],
     };
 }
 
@@ -496,7 +498,7 @@ export function traceFireworks(title: string): CanvasRecorder {
     const { canvas, node } = fireworksView();
     // Past the end of any show before.
     clock.burstTime += 1000;
-    fireworks([node], 'run');
+    play('fireworks', [node], 'run');
     const rec = traceFrames(title, FIREWORK_PHASES.map((phase) => [`completionPhase=${phase}`, (ctx) => {
         clock.burstTime = showTime(phase);
         drawBursts(canvas, ctx);

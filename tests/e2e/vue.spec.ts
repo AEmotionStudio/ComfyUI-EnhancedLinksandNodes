@@ -1,11 +1,12 @@
 // Nodes 2.0 in ComfyUI: what goes over the nodes, focused links on top, the progress ring, the error outline, the jump
-// pulse and the fireworks, lands on a canvas above the DOM nodes (1.57.1's overlayCtx, or ours on 1.39.5) that matches the
-// main canvas's rect and device pixel ratio, and on the DOM node's box; our links end at the DOM slot dots; Follow pauses
-// as the user drags a DOM node. Each DOM node carries its effect, selection, run and mode as data-eln-* attributes
-// through a select, a move, a collapse and a workflow switch, and glows by them, holding still while ComfyUI disables
-// animations, whatever Motion says; the panel says what works and disables what needs classic nodes; and turning the
-// mode on and off leaves one overlay, stylesheet and observer at most. What the overlay and the glows show is attached
-// as screenshots, on the dark and light palettes. They come with the extensions, so the -native projects skip them.
+// pulse, the completion effects and the bursts as nodes finish, lands on a canvas above the DOM nodes (1.57.1's
+// overlayCtx, or ours on 1.39.5) that matches the main canvas's rect and device pixel ratio, and on the DOM node's box;
+// our links end at the DOM slot dots; Follow pauses as the user drags a DOM node. Each DOM node carries its effect,
+// selection, run and mode as data-eln-* attributes through a select, a move, a collapse and a workflow switch, and glows
+// by them, holding still while ComfyUI disables animations, whatever Motion says; the panel says what works and disables
+// what needs classic nodes; and turning the mode on and off leaves one overlay, stylesheet and observer at most. What the
+// overlay and the glows show is attached as screenshots, on the dark and light palettes. They come with the extensions,
+// so the -native projects skip them.
 import type { Page, TestInfo } from '@playwright/test';
 import * as graphs from './fixtures/graphs';
 import { buildGraph, expect, openApp, redraw, setSetting, slotPoint, test, vueSlotCentres, type GraphSpec, type Point } from './helpers';
@@ -141,7 +142,7 @@ for (const palette of PALETTES) {
 
 for (const palette of PALETTES) {
     test.describe(`a run on the ${palette} palette`, () => {
-        test.use({ settings: { 'Comfy.VueNodes.Enabled': true, 'Comfy.ColorPalette': palette } });
+        test.use({ settings: { 'Comfy.VueNodes.Enabled': true, 'Comfy.ColorPalette': palette, '📦 Enhanced Nodes.Completion.Style': 'fireworks' } });
 
         test('a run rings the running DOM node on the overlay, on its box, and the fireworks go off over the DOM nodes', async ({ page }, testInfo) => {
             const graph = await buildGraph(page, graphs.sleepChain(1.5));
@@ -180,6 +181,36 @@ for (const palette of PALETTES) {
         });
     });
 }
+
+test.describe('completion effects', () => {
+    test.use({ settings: { 'Comfy.VueNodes.Enabled': true, '📦 Enhanced Nodes.Run.Ring': false, '📦 Enhanced Nodes.Completion.Style': 'confetti', '📦 Enhanced Nodes.Completion.PerNode': true } });
+
+    test('a burst pops from each DOM node as it finishes, and confetti falls over them when the run is done, on the overlay', async ({ page }, testInfo) => {
+        const graph = await buildGraph(page, graphs.sleepChain(0.5));
+        await expect(page.locator('.lg-node[data-node-id]')).toHaveCount(3);
+        await redraw(page);
+        // How many pixels of the overlay round the first node's top-right corner are drawn on.
+        const corner = await page.evaluate((id) => {
+            const [x, y, w] = window.app.canvas.graph.getNodeById(id).boundingRect;
+            return [x + w, y] as Point;
+        }, graph.nodes.first);
+        const around = () => page.evaluate(([x, y]) => {
+            const el = (window.app.canvas.overlayCanvas ?? document.querySelector('canvas.eln-overlay')) as HTMLCanvasElement;
+            const [cx, cy] = window.app.canvas.ds.convertOffsetToCanvas([x, y]);
+            const ratio = el.width / el.clientWidth;
+            const data = el.getContext('2d')!.getImageData(Math.floor((cx - 50) * ratio), Math.floor((cy - 50) * ratio), Math.ceil(100 * ratio), Math.ceil(100 * ratio)).data;
+            let drawn = 0;
+            for (let i = 3; i < data.length; i += 4) if (data[i]) drawn++;
+            return drawn;
+        }, corner);
+        expect(await around()).toBe(0);
+        await queue(page);
+        await expect.poll(around, { timeout: 20_000, intervals: [30] }).toBeGreaterThan(10);
+        await shoot(page, testInfo, 'vue-node-burst');
+        await expect.poll(() => drawnOver(page, graph.nodes.third), { timeout: 20_000, intervals: [50] }).toBeGreaterThan(50);
+        await shoot(page, testInfo, 'vue-confetti');
+    });
+});
 
 test('our links end at the DOM slot dots', async ({ page }) => {
     const graph = await buildGraph(page, graphs.pair);

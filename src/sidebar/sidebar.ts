@@ -566,7 +566,7 @@ function noticesOf(tab: string): Notice[] {
     if ((all || tab === 'nodes') && !running.nodes) list.push({ text: DISABLED.nodes });
     if ((all || tab === 'nodes') && LiteGraph.vueNodesMode) {
         list.push({
-            text: 'Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.',
+            text: 'Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and completion effects work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.',
             action: ['Use classic nodes', () => void app.extensionManager.setting.set('Comfy.VueNodes.Enabled', false)],
         });
     }
@@ -713,7 +713,7 @@ const NEWS = [
     "Effects draw on ComfyUI's own links and nodes, so links stay clickable, and reroutes, subgraphs and every link render mode work.",
     "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
     'This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.',
-    'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.',
+    'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.',
     'Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.',
     "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
     'Much lighter than 2.x on big graphs.',

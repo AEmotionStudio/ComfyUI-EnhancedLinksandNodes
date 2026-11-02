@@ -3,7 +3,7 @@
  * ComfyUI Enhanced Node Animations Extension
  *
  * Registers the node settings, and draws the node effects (nodes/effects.ts),
- * v1's halo, the styled titles (nodes/text.ts), the fireworks (fx/bursts.ts)
+ * v1's halo, the styled titles (nodes/text.ts), the completion effects (fx/bursts.ts)
  * and this client's run's rings and error outlines (fx/execution.ts) on
  * LiteGraph's own node pass. The halo, and what an effect
  * draws around a node over it, go under every node, in onRender before the link
@@ -14,7 +14,7 @@
  * every node with Node effects off, get none; a Calm run halves them. In Nodes
  * 2.0, whose DOM nodes these hooks never reach, nodes/vue.ts's stylesheet draws
  * the halo and the effects, and the under-layer their particles. The node menu's Node FX and
- * Completion FX set a node's own effect and where the fireworks go, which it keeps in its properties (ui/menus.ts);
+ * Completion FX set a node's own effect and where the completion effect plays, which it keeps in its properties (ui/menus.ts);
  * while node effects are on, the selection toolbox has a button that steps the selected nodes through the effects.
  *
  * @module extensions/node-animations
@@ -28,7 +28,7 @@ import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
 import { drawTitle, titleOf } from '@/nodes/text';
 import { vueNodes } from '@/nodes/vue';
-import { FIREWORKS, drawBursts } from '@/fx/bursts';
+import { COMPLETION, drawBursts } from '@/fx/bursts';
 import { installRuns } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { installPanel } from '@/sidebar/sidebar';
@@ -229,7 +229,7 @@ const ext: ComfyExtension = {
             try {
                 drawBursts(canvas, ctx);
             } catch (error) {
-                guard.fail(FIREWORKS, error);
+                guard.fail(COMPLETION, error);
             } finally {
                 stopSprites();
             }

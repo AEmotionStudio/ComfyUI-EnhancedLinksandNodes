@@ -15,6 +15,7 @@
 import { api } from '/scripts/api.js';
 import { L, LOOK, SETTINGS, commitAll, drawWith, normalize, preview, restore, setting, shown, type Setting, type Values } from '@/core/settings';
 import { fromHsl } from '@/core/colors';
+import { STYLES } from '@/fx/bursts';
 import { rng } from '@/fx/particles';
 
 export interface Look {
@@ -36,7 +37,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'off',
         name: 'Off',
-        description: 'Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or fireworks.',
+        description: 'Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or completion effect.',
         values: {
             '🔗 Enhanced Links.Animate': 0,
             '🔗 Enhanced Links.Flow.River': false,
@@ -49,14 +50,14 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'subtle',
         name: 'Subtle',
-        description: "Classic Flow links with gliding arrows and v1's dark halo, plain nodes, and fireworks over your outputs when a run finishes.",
+        description: "Classic Flow links with gliding arrows and v1's dark halo, plain nodes, and a shockwave over your outputs when a run finishes.",
         values: {},
     },
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play.',
-        // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
+        description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
+        // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes.
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Quality': 2,
@@ -70,12 +71,14 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Particle.Glow': 1,
             '📦 Enhanced Nodes.Particle.Color.Mode': 'aurora',
             '🔗 Enhanced Links.Pause.Mode': 'calm',
+            '📦 Enhanced Nodes.Completion.Style': 'fireworks',
+            '📦 Enhanced Nodes.Completion.PerNode': true,
         },
     },
     {
         id: 'performance',
         name: 'Performance',
-        description: 'Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no fireworks.',
+        description: 'Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no completion effect.',
         values: {
             '🔗 Enhanced Links.Static.Mode': true,
             '🔗 Enhanced Links.Glow.Intensity': 6,
@@ -90,7 +93,7 @@ export const LOOKS: readonly Look[] = [
         // v1's defaults (old_link_animations.js:19-45, old_node_animations.js:146-178); its links are v3's.
         id: 'classic-v1',
         name: 'Classic v1',
-        description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or fireworks.",
+        description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or completion effect.",
         values: {
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Quality': 1,
@@ -105,13 +108,13 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Run.Ring': false,
             '📦 Enhanced Nodes.Run.Error': false,
             '📦 Enhanced Nodes.End Animation.Enabled': false,
+            '📦 Enhanced Nodes.Completion.Style': 'fireworks',
         },
     },
     {
         id: 'neon-night',
         name: 'Neon Night',
-        description: 'Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles.',
-        // TODO(M9b): confetti.
+        description: 'Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.',
         values: {
             '🔗 Enhanced Links.Animate': 5,
             '🔗 Enhanced Links.Quality': 2,
@@ -128,12 +131,13 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Color.Accent': '#7c4dff',
             '📦 Enhanced Nodes.Particle.Show': true,
             '📦 Enhanced Nodes.Particle.Color.Mode': 'energy',
+            '📦 Enhanced Nodes.Completion.Style': 'confetti',
         },
     },
     {
         id: 'lava-lamp',
         name: 'Lava Lamp',
-        description: 'Lava Flow links and Cosmic Ripple nodes in molten reds and ambers, with color-cycling particles.',
+        description: 'Lava Flow links and Cosmic Ripple nodes in molten reds and ambers, with color-cycling particles and fireworks when a run finishes.',
         values: {
             '🔗 Enhanced Links.Animate': 7,
             '🔗 Enhanced Links.Quality': 2,
@@ -149,13 +153,14 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Color.Accent': '#ff006e',
             '📦 Enhanced Nodes.Particle.Show': true,
             '📦 Enhanced Nodes.Particle.Color.Mode': 'energy',
+            '📦 Enhanced Nodes.Completion.Style': 'fireworks',
         },
     },
     {
         id: 'sacred-geometry',
         name: 'Sacred Geometry',
-        description: 'Sacred Flow links and Flower of Life nodes in gold.',
-        // TODO(M9d): Merkaba Beads links. TODO(M9b): a path trace when a run finishes.
+        description: 'Sacred Flow links and Flower of Life nodes in gold, and a path trace when a run finishes.',
+        // TODO(M9d): Merkaba Beads links.
         values: {
             '🔗 Enhanced Links.Animate': 1,
             '🔗 Enhanced Links.Color.Mode': 'custom',
@@ -167,6 +172,7 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Color.Primary': '#ffcc00',
             '📦 Enhanced Nodes.Color.Secondary': '#ff8800',
             '📦 Enhanced Nodes.Color.Accent': '#fff3b0',
+            '📦 Enhanced Nodes.Completion.Style': 'trace',
         },
     },
     {
@@ -183,8 +189,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'blueprint',
         name: 'Blueprint',
-        description: 'Muted right-angle links with small square markers and no shadows, and plain nodes.',
-        // TODO(M9b): a path trace when a run finishes.
+        description: 'Muted right-angle links with small square markers and no shadows, plain nodes, and a path trace when a run finishes.',
         values: {
             '🔗 Enhanced Links.Link.Style': 'linear',
             '🔗 Enhanced Links.Color.Scheme': 'muted',
@@ -193,6 +198,7 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Marker.Size': 2,
             '🔗 Enhanced Links.Link.Shadow.Enabled': false,
             '🔗 Enhanced Links.Marker.Shadow.Enabled': false,
+            '📦 Enhanced Nodes.Completion.Style': 'trace',
         },
     },
 ];
@@ -375,7 +381,8 @@ export const light = () => !document.documentElement.classList.contains('dark-th
 /**
  * The mix `seed` alone decides: a link animation and a node effect (or none), in custom colours at hues h, h + 40° and
  * h + 180°, lighter for a dark palette and darker for a light one as the seed's lowest bit says, at speeds from 0.6 to
- * 1.4, a glow from 6 to 16, and quality and density up to Balanced and Dense; half of them with node particles.
+ * 1.4, a glow from 6 to 16, and quality and density up to Balanced and Dense; half of them with node particles; and a
+ * completion style other than Surprise.
  */
 function mix(seed: number): Look {
     const random = rng(seed);
@@ -385,7 +392,6 @@ function mix(seed: number): Look {
     const nodes = pick(optionsOf(NODE_ANIMATE));
     const hue = random() * 360;
     const [primary, secondary, accent] = [0, 40, 180].map((turn) => hex(fromHsl((hue + turn) % 360, 90, seed & 1 ? 40 : 60)));
-    // TODO(M9b): a completion style.
     const values = {
         [LINK_ANIMATE]: links.value,
         '🔗 Enhanced Links.Animation.Speed': between(0.6, 1.4, 0.05),
@@ -405,6 +411,7 @@ function mix(seed: number): Look {
         '📦 Enhanced Nodes.Color.Accent': accent,
         '📦 Enhanced Nodes.Particle.Show': random() < 0.5,
         '📦 Enhanced Nodes.Particle.Density': pick([0.5, 1, 2]),
+        '📦 Enhanced Nodes.Completion.Style': pick(STYLES),
     };
     const description = `${links.text} links and ${nodes.value ? `${nodes.text} nodes` : 'plain nodes'} in colors of their own.`;
     return { id: `${SURPRISE}${seed}`, name: 'Surprise', description, values };

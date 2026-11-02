@@ -62,7 +62,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Node effects | `📦 Enhanced Nodes.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is. |
+| Node effects | `📦 Enhanced Nodes.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is. |
 | Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Flower of Life | `0` None | Effect drawn on and around every node. Node FX in the node menu picks one for a node. |
 | Show base effect | `📦 Enhanced Nodes.Animations.Enabled` | boolean | `true`, `false` | `true` | Off draws only the effect's own particles. |
 | Node effect speed | `📦 Enhanced Nodes.Animation.Speed` | slider | 0.1 to 3, step 0.1 | `1` |  |
@@ -157,8 +157,10 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
-| Fireworks when a run finishes | `📦 Enhanced Nodes.End Animation.Enabled` | boolean | `true`, `false` | `true` | Plays when your run succeeds. |
+| Effect when a run finishes | `📦 Enhanced Nodes.End Animation.Enabled` | boolean | `true`, `false` | `true` | Plays the Completion style when your run succeeds. |
+| Completion style | `📦 Enhanced Nodes.Completion.Style` | combo | `fireworks` Fireworks, `confetti` Confetti, `shockwave` Shockwave, `trace` Path trace, `random` Surprise | `shockwave` Shockwave | Path trace runs a comet along the links your run took; Surprise plays another style each time. |
 | Completion anchor | `📦 Enhanced Nodes.Completion.Anchor` | combo | `outputs` Output nodes, `primary` Primary nodes, `viewport` Center of screen | `outputs` Output nodes | Mark primary nodes in the node menu. |
+| Burst when each node finishes | `📦 Enhanced Nodes.Completion.PerNode` | boolean | `true`, `false` | `false` | Sparks pop from the corner of each node on screen as your run finishes it. |
 
 ## Performance · Budget
 

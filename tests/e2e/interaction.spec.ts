@@ -404,7 +404,7 @@ test.describe('node menus', () => {
 });
 
 test.describe('fireworks', () => {
-    test.use({ settings: { '🔗 Enhanced Links.Animate': 0 } });
+    test.use({ settings: { '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Completion.Style': 'fireworks' } });
 
     test('light up over the output node after a run, then the canvas goes quiet', async ({ page, profile }) => {
         test.skip(!enabled(profile), "the fireworks are the extension's");

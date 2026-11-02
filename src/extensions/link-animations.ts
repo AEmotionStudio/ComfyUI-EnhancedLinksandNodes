@@ -19,8 +19,8 @@ import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, checked, commit, linkSettings, setting, shown, type Setting } from '@/core/settings';
 import { env, install } from '@/core/engine';
-import { fireworks, type Anchor } from '@/fx/bursts';
-import { errorNodes, installRuns } from '@/fx/execution';
+import type { Anchor } from '@/fx/bursts';
+import { complete, errorNodes, installRuns } from '@/fx/execution';
 import { installLinks } from '@/links/pipeline';
 import { showPicker } from '@/sidebar/picker';
 import {
@@ -125,14 +125,14 @@ function stepSelection(): void {
     say(`${nodes.length} ${nodes.length === 1 ? 'node' : 'nodes'}: ${effect.name}`);
 }
 
-/** Plays the fireworks now: over the selected nodes, else the output nodes in view, else in the middle of the view. */
+/** Plays the completion effect now: over the selected nodes, else the output nodes in view, else in the middle of the view. */
 function preview(): void {
     const { canvas } = app;
     const area = canvas.visible_area;
     const nodes = selectedNodes();
     const outputs = canvas.visible_nodes.filter((node) => (node.constructor as typeof LGraphNode).nodeData?.output_node);
     const middle: Anchor = { id: 'view', pos: [area[0] + area[2] / 2, area[1] + area[3] / 2], graph: canvas.graph };
-    fireworks(nodes.length ? nodes : outputs.length ? outputs : [middle], `preview ${Date.now()}`);
+    complete(nodes.length ? nodes : outputs.length ? outputs : [middle], `preview ${Date.now()}`);
 }
 
 async function resetAll(): Promise<void> {

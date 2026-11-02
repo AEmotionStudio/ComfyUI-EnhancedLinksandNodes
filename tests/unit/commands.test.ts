@@ -12,14 +12,14 @@ import type { ComfyExtension, IContextMenuValue } from '@comfyorg/comfyui-fronte
 import { describe, it, expect, vi } from 'vitest';
 import { L, LOOK, N, preview, restore } from '@/core/settings';
 import { live } from '@/core/engine';
-import { fireworks } from '@/fx/bursts';
+import { play } from '@/fx/bursts';
 import { DISABLED, running } from '@/sidebar/sidebar';
 import { app, fake } from '../helpers/fake-app';
 import { frames, progress, send, start, type FakeCanvas, type FakeNode } from '../helpers/fake-litegraph';
 
 vi.mock('@/fx/bursts', async (importOriginal) => {
     const bursts = await importOriginal<typeof import('@/fx/bursts')>();
-    return { ...bursts, fireworks: vi.fn(bursts.fireworks) };
+    return { ...bursts, play: vi.fn(bursts.play) };
 });
 
 const ID = 'EnhancedLinksNodes.';
@@ -343,8 +343,8 @@ describe('the commands', () => {
         expect([said(), first.properties]).toEqual(['1 node: Off', { enhanced_fx_style: 0 }]);
     });
 
-    it('PreviewCompletion plays the fireworks over the selected nodes, else the output nodes in view, else in the middle of the view', async () => {
-        const shown = () => vi.mocked(fireworks).mock.calls.at(-1)![0];
+    it('PreviewCompletion plays the completion style over the selected nodes, else the output nodes in view, else in the middle of the view', async () => {
+        const shown = () => vi.mocked(play).mock.calls.at(-1)![1];
         const canvas = await start({}, { nodes: [{ pos: [100, 100] }, { pos: [400, 100], output: true }, { pos: [5000, 5000], output: true }] });
         const [plain, output] = canvas.graph._nodes;
         frames(1);
@@ -368,7 +368,7 @@ describe('the commands', () => {
 
     it('those of a disabled extension say so instead of acting, for long enough to read, the commands of both only with both disabled, the action bar’s button too', async () => {
         await start();
-        const shows = vi.mocked(fireworks).mock.calls.length;
+        const shows = vi.mocked(play).mock.calls.length;
         await disabled(['nodes'], async () => {
             for (const name of ['ToggleNodes', 'NextNodeStyle', 'SelectionNodeFX', 'PreviewCompletion']) {
                 await run(name);
@@ -377,7 +377,7 @@ describe('the commands', () => {
             await run('ToggleAll');
             expect([L.enabled, N.enabled]).toEqual([false, false]);
         });
-        expect([N.animate, vi.mocked(fireworks).mock.calls.length]).toEqual([0, shows]);
+        expect([N.animate, vi.mocked(play).mock.calls.length]).toEqual([0, shows]);
         await disabled(['links'], async () => {
             await run('NextLinkStyle');
             expect([said(), L.animate]).toEqual([DISABLED.links, 9]);

@@ -149,6 +149,13 @@ const PAUSE_MODE_OPTIONS = [
   { value: "spotlight", text: "Spotlight" },
   { value: "ignore", text: "Keep animating" }
 ];
+const COMPLETION_STYLE_OPTIONS = [
+  { value: "fireworks", text: "Fireworks" },
+  { value: "confetti", text: "Confetti" },
+  { value: "shockwave", text: "Shockwave" },
+  { value: "trace", text: "Path trace" },
+  { value: "random", text: "Surprise" }
+];
 const COMPLETION_ANCHOR_OPTIONS = [
   { value: "outputs", text: "Output nodes" },
   { value: "primary", text: "Primary nodes" },
@@ -206,7 +213,7 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Shadow.Style", key: "shadowStyle", name: "Shadow style", type: "combo", options: SHADOW_STYLE_OPTIONS, default: "halo", group: "Links · Shadows", advanced: true, showIf: shadows, tooltip: "Halo is the soft dark outline v1 drew; Drop shadow is offset, as in v2." },
   { id: "🔗 Enhanced Links.Shadow.Blur", key: "shadowBlur", name: "Drop shadow blur", type: "slider", min: 0, max: 10, step: 0.5, default: 5, group: "Links · Shadows", advanced: true, showIf: () => shadows() && L.shadowStyle === "drop", tooltip: "Used by Drop shadow." },
   { id: "🔗 Enhanced Links.Shadow.Offset", key: "shadowOffset", name: "Drop shadow offset", type: "slider", min: 0, max: 10, step: 0.5, default: 3, group: "Links · Shadows", advanced: true, showIf: () => shadows() && L.shadowStyle === "drop", tooltip: "Used by Drop shadow." },
-  { id: "📦 Enhanced Nodes.Enabled", key: "enabled", name: "Node effects", type: "boolean", default: true, group: "Nodes · Effect", look: false, tooltip: "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is." },
+  { id: "📦 Enhanced Nodes.Enabled", key: "enabled", name: "Node effects", type: "boolean", default: true, group: "Nodes · Effect", look: false, tooltip: "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is." },
   { id: "📦 Enhanced Nodes.Animate", key: "animate", name: "Node effect", type: "combo", options: NODE_ANIMATION_OPTIONS, default: 0, group: "Nodes · Effect", showIf: () => N.enabled, tooltip: "Effect drawn on and around every node. Node FX in the node menu picks one for a node." },
   { id: "📦 Enhanced Nodes.Animations.Enabled", key: "animationsEnabled", name: "Show base effect", type: "boolean", default: true, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "Off draws only the effect's own particles." },
   { id: "📦 Enhanced Nodes.Animation.Speed", key: "animationSpeed", name: "Node effect speed", type: "slider", min: 0.1, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: () => effects$1() && !N.staticMode },
@@ -261,8 +268,10 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Flow.Trail.Fade", key: "flowTrailFade", name: "Trail fade time", type: "slider", min: 2, max: 30, step: 1, default: 8, group: "Focus & Flow · During a run", advanced: true, look: false, showIf: () => L.enabled && L.flowTrail },
   { id: "📦 Enhanced Nodes.Run.Ring", key: "runRing", name: "Progress ring", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Ring fills with the node's progress." },
   { id: "📦 Enhanced Nodes.Run.Error", key: "runError", name: "Error pulse", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Failed node pulses red." },
-  { id: "📦 Enhanced Nodes.End Animation.Enabled", key: "endAnimationEnabled", name: "Fireworks when a run finishes", type: "boolean", default: true, group: "Focus & Flow · Completion", showIf: () => N.enabled, tooltip: "Plays when your run succeeds." },
+  { id: "📦 Enhanced Nodes.End Animation.Enabled", key: "endAnimationEnabled", name: "Effect when a run finishes", type: "boolean", default: true, group: "Focus & Flow · Completion", showIf: () => N.enabled, tooltip: "Plays the Completion style when your run succeeds." },
+  { id: "📦 Enhanced Nodes.Completion.Style", key: "completionStyle", name: "Completion style", type: "combo", options: COMPLETION_STYLE_OPTIONS, default: "shockwave", group: "Focus & Flow · Completion", showIf: () => N.enabled && N.endAnimationEnabled, tooltip: "Path trace runs a comet along the links your run took; Surprise plays another style each time." },
   { id: "📦 Enhanced Nodes.Completion.Anchor", key: "completionAnchor", name: "Completion anchor", type: "combo", options: COMPLETION_ANCHOR_OPTIONS, default: "outputs", group: "Focus & Flow · Completion", look: false, showIf: () => N.enabled && N.endAnimationEnabled, tooltip: "Mark primary nodes in the node menu." },
+  { id: "📦 Enhanced Nodes.Completion.PerNode", key: "completionPerNode", name: "Burst when each node finishes", type: "boolean", default: false, group: "Focus & Flow · Completion", advanced: true, showIf: () => N.enabled, tooltip: "Sparks pop from the corner of each node on screen as your run finishes it." },
   { id: "🔗 Enhanced Links.Perf.MaxFps", key: "perfMaxFps", name: "Effect frame-rate cap", type: "combo", options: MAX_FPS_OPTIONS, default: 60, group: "Performance · Budget", look: false, tooltip: "The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows." },
   { id: "🔗 Enhanced Links.Perf.Adaptive", key: "perfAdaptive", name: "Adaptive quality", type: "boolean", default: true, group: "Performance · Budget", look: false, tooltip: "While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room." },
   { id: "🔗 Enhanced Links.Perf.StaticAbove", key: "perfStaticAbove", name: "Freeze above N visible links", type: "slider", min: 0, max: 5e3, step: 50, default: 400, group: "Performance · Budget", look: false, tooltip: "Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes." },
@@ -322,7 +331,7 @@ function watch(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
-function show$1(s, value) {
+function show$2(s, value) {
   const values = snapshotOf(s.id);
   const next = s.type !== "color" || HEX$1.test(String(value)) ? value : s.default;
   if (values[s.key] === next || typeof next === "object" && JSON.stringify(values[s.key]) === JSON.stringify(next)) return;
@@ -336,7 +345,7 @@ function show$1(s, value) {
 }
 const overlaid = /* @__PURE__ */ new Set();
 function present(s, value) {
-  show$1(s, L.look === "" && overlaid.has(s.id) && V2_DEFAULTS[s.id] === value ? s.default : value);
+  show$2(s, L.look === "" && overlaid.has(s.id) && V2_DEFAULTS[s.id] === value ? s.default : value);
 }
 const stored = /* @__PURE__ */ new Map();
 let migrated;
@@ -383,7 +392,7 @@ function saved(id) {
 }
 function preview(id, value) {
   const s = setting(id);
-  show$1(s, normalize(s, value));
+  show$2(s, normalize(s, value));
 }
 function restore$1(ids2) {
   for (const id of ids2) present(setting(id), saved(id));
@@ -562,10 +571,10 @@ const overlaps = (box2, area, margin) => box2[0] - margin <= area[0] + area[2] &
 function offscreen(width, height) {
   return typeof OffscreenCanvas === "function" ? new OffscreenCanvas(width, height) : Object.assign(document.createElement("canvas"), { width, height });
 }
-let sink;
+let sink$1;
 function dummy() {
-  sink ??= offscreen(1, 1).getContext("2d");
-  return sink;
+  sink$1 ??= offscreen(1, 1).getContext("2d");
+  return sink$1;
 }
 let frame$2 = 0;
 let last$1 = 0;
@@ -847,7 +856,7 @@ function parse(colour2) {
   const channel = (v, unit) => Math.round(clamp(unit ? Number(v) * 255 / 100 : Number(v), 0, 255));
   return [channel(x, xUnit), channel(y, yUnit), channel(z, zUnit), alpha];
 }
-function show([r, g, b, a]) {
+function show$1([r, g, b, a]) {
   if (a < 1) return `rgba(${r}, ${g}, ${b}, ${a})`;
   return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
 }
@@ -886,7 +895,7 @@ function filter([r, g, b, alpha], scheme) {
       return [r, g, b, alpha];
   }
 }
-const tint$2 = (colour2) => show(filter(parse(colour2), L.colorScheme));
+const tint$2 = (colour2) => show$1(filter(parse(colour2), L.colorScheme));
 const palettes = /* @__PURE__ */ new Map();
 let palettesSince = -1;
 function palette(colour2) {
@@ -899,10 +908,10 @@ function palette(colour2) {
   if (p === void 0) {
     const rgba = parse(colour2);
     if (rgba) {
-      const own2 = show(filter(rgba, L.colorScheme));
+      const own2 = show$1(filter(rgba, L.colorScheme));
       const [primary, secondary, accent2] = L.colorMode === "custom" ? [tint$2(L.colorPrimary), tint$2(L.colorSecondary), tint$2(L.colorAccent)] : [own2, own2, own2];
       const marker = L.markerColorMode === "custom" ? tint$2(L.markerColor) : L.markerColorMode === "inherit" ? primary : own2;
-      p = { native: show(rgba), primary, secondary, accent: accent2, marker };
+      p = { native: show$1(rgba), primary, secondary, accent: accent2, marker };
     } else p = null;
     palettes.set(colour2, p);
   }
@@ -910,11 +919,13 @@ function palette(colour2) {
 }
 const solids = /* @__PURE__ */ new Map();
 const lifted = /* @__PURE__ */ new Map();
+const sunk = /* @__PURE__ */ new Map();
 let solidsSince = -1;
 function solidCaches() {
   if (solidsSince === revision) return;
   solids.clear();
   lifted.clear();
+  sunk.clear();
   solidsSince = revision;
 }
 function solid$1(colour2) {
@@ -929,14 +940,25 @@ function lighter(colour2) {
   let light2 = lifted.get(colour2);
   if (light2 === void 0) {
     const rgba = parse(colour2);
-    light2 = rgba ? show([lift(rgba[0]), lift(rgba[1]), lift(rgba[2]), rgba[3]]) : colour2;
+    light2 = rgba ? show$1([lift(rgba[0]), lift(rgba[1]), lift(rgba[2]), rgba[3]]) : colour2;
     lifted.set(colour2, light2);
   }
   return light2;
 }
+const sink = (v) => Math.round(v * 0.6);
+function darker(colour2) {
+  solidCaches();
+  let deep = sunk.get(colour2);
+  if (deep === void 0) {
+    const rgba = parse(colour2);
+    deep = rgba ? show$1([sink(rgba[0]), sink(rgba[1]), sink(rgba[2]), rgba[3]]) : colour2;
+    sunk.set(colour2, deep);
+  }
+  return deep;
+}
 function accent() {
   const rgba = parse(getComputedStyle(document.body).getPropertyValue("--primary-background"));
-  return rgba ? show(rgba) : "#0b8ce9";
+  return rgba ? show$1(rgba) : "#0b8ce9";
 }
 const MID_GREY = 0.184;
 let background = "";
@@ -956,7 +978,7 @@ const hues = [];
 let huesSince = -1;
 function rainbow(hue) {
   if (huesSince !== revision) {
-    for (let h2 = 0; h2 < 360; h2++) hues[h2] = show(filter([...fromHsl(h2, 100, 50), 1], L.colorScheme));
+    for (let h2 = 0; h2 < 360; h2++) hues[h2] = show$1(filter([...fromHsl(h2, 100, 50), 1], L.colorScheme));
     huesSince = revision;
   }
   return hues[(Math.round(hue) % 360 + 360) % 360];
@@ -968,7 +990,7 @@ const STYLE_COLOURS = [
   ["#ff00ff", "#aa00ff", "#ff40ff"],
   ["#ffcc00", "#ff8800", "#ffaa00"]
 ];
-const nodeTint = (colour2) => show(filter(parse(colour2), N.colorScheme));
+const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
 let nodePalettesSince = -1;
 function nodePalette(style) {
@@ -1214,7 +1236,8 @@ function disc(ctx, x, y, r, colour2, alpha, soft) {
   ctx.drawImage(found2.image, x - h2, y - h2, 2 * h2, 2 * h2);
   ctx.globalAlpha = before2;
 }
-const FIREWORKS = "Fireworks";
+const COMPLETION = "Completion effect";
+const STYLES$1 = ["fireworks", "confetti", "shockwave", "trace"];
 const BURSTS = [
   { x: 0.05, y: -0.2, delay: 0, colour: "#FF3366", size: 3.2 },
   { x: 0.03, y: -0.15, delay: 0.1, colour: "#33EEFF", size: 2.9 },
@@ -1223,10 +1246,34 @@ const BURSTS = [
 const RATE = 0.84;
 const SPARKS = 250;
 const SPARKLES = 40;
-const [CORE$1, SPARK, SPARKLE, GLOW] = [0, 1, 2, 3];
+const [CORE$1, SPARK, SPARKLE, GLOW, PIECE, RING, COMET$1] = [0, 1, 2, 3, 4, 5, 6];
 const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
+const LASTS = { confetti: 2, shockwave: 0.7, trace: 1.5 };
+const STAGGER = 1 / MAX_FLASH_HZ;
+const MOST$1 = Math.floor(CAP / SHOW);
+const PIECES = [60, 120];
+const SPREAD = 260;
+const ABOVE = [30, 200];
+const THROW = 120;
+const GRAVITY = 600;
+const DRAG = 3;
+const SWAY = 10;
+const SWAY_HZ = 0.8;
+const SPIN = 4;
+const FLIPS = [0.4, 1.2];
+const LENGTH = [5, 9];
+const COME = 0.1;
+const GO = 0.5;
+const PARAMS = 11;
+const RING_PX = 3;
+const RING_GLOW_PX = 12;
+const POINT_RING = 160;
+const RING_CORNER = 8;
+const RING_IN = 0.06;
 const bursts = [];
-const progress = () => clock.burstTime * RATE;
+const show = { style: "fireworks", rate: RATE };
+let played;
+const progress = () => clock.burstTime * show.rate;
 function hash(text2) {
   let h2 = 2166136261;
   for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
@@ -1243,16 +1290,16 @@ function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail =
   pool$1.trail[i] = trail;
   pool$1.seq[i] = seq;
 }
+const nth = (seed, n) => noise(seed + n * 1831565813);
 function fireworks(nodes, run2) {
-  if (pool$1.count && progress() < 1 || !nodes.length) return;
-  pool$1.count = bursts.length = 0;
-  clock.burstTime = 0;
+  show.rate = RATE;
   const { secondary, accent: accent2 } = nodePalette(N.animate);
   for (const node2 of nodes) {
     if (pool$1.count + SHOW > CAP) break;
-    const random = rng(hash(run2) ^ hash(String(node2.id)));
+    const seed = hash(run2) ^ hash(String(node2.id));
+    const random = rng(seed);
     for (const { x, y, delay, size, colour: colour2 } of BURSTS) {
-      const owner = bursts.push({ node: node2, x, y, delay, size: node2.small ? size / 2 : size, colours: [colour2, secondary, accent2, "#FFFFFF"] }) - 1;
+      const owner = bursts.push({ node: node2, x, y, delay, size: node2.small ? size / 2 : size, seed, colours: [colour2, secondary, accent2, "#FFFFFF"] }) - 1;
       if (env.reducedMotion) {
         add$2(GLOW, owner);
         break;
@@ -1266,12 +1313,102 @@ function fireworks(nodes, run2) {
       for (let j = 0; j < SPARKLES; j++) add$2(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
     }
   }
+}
+function play(style, nodes, run2) {
+  if (pool$1.count && progress() < 1 || !nodes.length) return;
+  played = style;
+  pool$1.count = bursts.length = 0;
+  clock.burstTime = 0;
+  const drawn = show.style = env.reducedMotion ? "fireworks" : style;
+  if (drawn === "fireworks") fireworks(nodes, run2);
+  else {
+    const { primary, secondary, accent: accent2 } = nodePalette(N.animate);
+    const anchors2 = drawn === "trace" ? 1 : Math.min(nodes.length, MOST$1);
+    show.rate = 1 / (LASTS[drawn] + (anchors2 - 1) * STAGGER);
+    for (let k2 = 0; k2 < anchors2; k2++) {
+      const node2 = nodes[k2];
+      const seed = hash(run2) ^ hash(String(node2.id));
+      const owner = bursts.push({ node: node2, x: 0, y: 0, delay: k2 * STAGGER, size: node2.small ? 0.5 : 1, seed, colours: [primary, secondary, accent2] }) - 1;
+      if (drawn !== "confetti") add$2(drawn === "shockwave" ? RING : COMET$1, owner);
+      else {
+        const count2 = Math.round((PIECES[0] + noise(seed) * (PIECES[1] - PIECES[0])) * bursts[owner].size);
+        for (let i = 0; i < count2; i++) add$2(PIECE, owner, 0, 0, 0, 0, 0, i);
+      }
+    }
+  }
   live.bursts = pool$1.count;
   wake();
+}
+function surprise$1(run2, styles) {
+  const others = styles.filter((style) => style !== played);
+  return others[Math.floor(noise(hash(run2)) * others.length)];
+}
+function tracing() {
+  const p = progress();
+  return show.style === "trace" && pool$1.count && p < 1 ? p : -1;
 }
 function endBursts() {
   pool$1.count = bursts.length = 0;
   live.bursts = 0;
+}
+const where = new Float64Array(2);
+function anchor(node2) {
+  const box2 = node2.boundingRect;
+  where[0] = box2 ? box2[0] + box2[2] / 2 : node2.pos[0];
+  where[1] = box2 ? box2[1] : node2.pos[1];
+  return box2;
+}
+function piece(ctx, burst2, n, t, unit) {
+  const alpha = Math.min(1, t / COME, (LASTS.confetti - t) / GO);
+  if (alpha <= 0) return;
+  const { seed, size } = burst2;
+  const at = 1 + n * PARAMS;
+  anchor(burst2.node);
+  const heading = nth(seed, at + 2) * 2 * Math.PI;
+  const speed = nth(seed, at + 3) * THROW;
+  const slowed = (1 - Math.exp(-DRAG * t)) / DRAG;
+  const sway = SWAY * Math.sin(2 * Math.PI * (SWAY_HZ * t + nth(seed, at + 8)));
+  const x = where[0] + unit * ((nth(seed, at) - 0.5) * SPREAD * size + Math.cos(heading) * speed * slowed + sway);
+  const y = where[1] + unit * (Math.sin(heading) * speed * slowed + GRAVITY / DRAG * (t - slowed) - (ABOVE[0] + nth(seed, at + 1) * (ABOVE[1] - ABOVE[0])) * size);
+  const turn = nth(seed, at + 4) * 2 * Math.PI + (2 * nth(seed, at + 5) - 1) * SPIN * t;
+  const flip = Math.cos(2 * Math.PI * ((FLIPS[0] + nth(seed, at + 6) * (FLIPS[1] - FLIPS[0])) * t + nth(seed, at + 7)));
+  const half = unit * (LENGTH[0] + nth(seed, at + 9) * (LENGTH[1] - LENGTH[0])) / 2;
+  const lx = Math.cos(turn) * half;
+  const ly = Math.sin(turn) * half;
+  const wx = -ly * 0.5 * flip;
+  const wy = lx * 0.5 * flip;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = burst2.colours[Math.floor(nth(seed, at + 10) * 3)];
+  ctx.beginPath();
+  ctx.moveTo(x + lx + wx, y + ly + wy);
+  ctx.lineTo(x - lx + wx, y - ly + wy);
+  ctx.lineTo(x - lx - wx, y - ly - wy);
+  ctx.lineTo(x + lx - wx, y + ly - wy);
+  ctx.closePath();
+  ctx.fill();
+}
+function wave(ctx, burst2, t, unit) {
+  const p = t / LASTS.shockwave;
+  if (p >= 1) return;
+  const grown = 1 - (1 - p) ** 3;
+  const box2 = anchor(burst2.node);
+  ctx.beginPath();
+  if (box2) {
+    const w = box2[2] * (1 + grown);
+    const h2 = box2[3] * (1 + grown);
+    ctx.roundRect(where[0] - w / 2, where[1] + (box2[3] - h2) / 2, w, h2, RING_CORNER * (1 + grown));
+  } else {
+    ctx.arc(where[0], where[1], POINT_RING * burst2.size * unit * (0.1 + 0.9 * grown), 0, Math.PI * 2);
+  }
+  const alpha = Math.min(1, t / RING_IN) * (1 - p) ** 2;
+  ctx.globalAlpha = alpha * 0.35;
+  ctx.strokeStyle = burst2.colours[2];
+  ctx.lineWidth = RING_GLOW_PX * unit;
+  ctx.stroke();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = burst2.colours[0];
+  ctx.lineWidth = RING_PX * unit;
+  ctx.stroke();
 }
 function drawBursts(canvas, ctx) {
   const phase = progress();
@@ -1281,17 +1418,18 @@ function drawBursts(canvas, ctx) {
   const area = canvas.visible_area;
   const unit = 1 / canvas.ds.scale;
   const view = Math.min(area[2], area[3]);
+  const fireworks2 = show.style === "fireworks";
   ctx.save();
   try {
-    ctx.globalCompositeOperation = "lighter";
+    if (fireworks2) ctx.globalCompositeOperation = "lighter";
     for (let i = 0; i < pool$1.count; i++) {
-      const burst = bursts[pool$1.owner[i]];
-      const t = phase - burst.delay;
-      if (t <= 0 || burst.node.graph !== canvas.graph) continue;
-      const x = burst.node.pos[0] + area[2] * burst.x;
-      const y = burst.node.pos[1] + area[3] * burst.y;
-      const reach2 = view * 0.2 * burst.size;
-      const colour2 = burst.colours[pool$1.colour[i]];
+      const burst2 = bursts[pool$1.owner[i]];
+      const t = (fireworks2 ? phase : clock.burstTime) - burst2.delay;
+      if (t <= 0 || burst2.node.graph !== canvas.graph) continue;
+      const x = burst2.node.pos[0] + area[2] * burst2.x;
+      const y = burst2.node.pos[1] + area[3] * burst2.y;
+      const reach2 = view * 0.2 * burst2.size;
+      const colour2 = burst2.colours[pool$1.colour[i]];
       switch (pool$1.kind[i]) {
         case CORE$1: {
           const fade2 = 1 - t * 1.2;
@@ -1328,7 +1466,13 @@ function drawBursts(canvas, ctx) {
           disc(ctx, x + Math.cos(pool$1.angle[i]) * dist, y + Math.sin(pool$1.angle[i]) * dist, (1 + pool$1.size[i] * 4 * (1 - t)) * unit, colour2, 0.95 * (1 - t * 3), false);
           break;
         }
-        default: {
+        case PIECE:
+          piece(ctx, burst2, pool$1.seq[i], t, unit);
+          break;
+        case RING:
+          wave(ctx, burst2, t, unit);
+          break;
+        case GLOW: {
           const radius = reach2 * 0.4;
           const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
           gradient.addColorStop(0, translucent(colour2, 0.5 * Math.sin(Math.PI * Math.min(t, 1))));
@@ -1343,6 +1487,75 @@ function drawBursts(canvas, ctx) {
   } finally {
     ctx.restore();
   }
+}
+const POP_SPARKS = [8, 12];
+const POP_REACH = 48;
+const POP_S = 0.4;
+const POP_RING = 10;
+const POP_RING_S = 0.3;
+const POPS = 6;
+const pops = [];
+const popped = new Float64Array(POPS).fill(-Infinity);
+let oldest = 0;
+const popLasts = () => env.reducedMotion ? POP_RING_S : POP_S;
+const popKept = () => Math.max(popLasts(), 1 / MAX_FLASH_HZ);
+function pop(canvas, node2, run2) {
+  const now = performance.now();
+  if (now - popped[oldest] < 1e3 || !overlaps(node2.boundingRect, canvas.visible_area, 0) || pops.some((p) => p.node === node2 && clock.runTime - p.at < popKept())) return;
+  popped[oldest] = now;
+  oldest = (oldest + 1) % POPS;
+  pops.push({ node: node2, at: clock.runTime, seed: hash(run2) ^ hash(String(node2.id)) });
+}
+function drawPops(canvas, ctx) {
+  let n = 0;
+  for (const p of pops) if (clock.runTime - p.at < popKept()) pops[n++] = p;
+  pops.length = n;
+  if (!n) return 0;
+  const lasts = popLasts();
+  const area = canvas.visible_area;
+  const unit = 1 / canvas.ds.scale;
+  const { primary, secondary } = nodePalette(N.animate);
+  const light2 = !dark(canvas.clear_background_color);
+  const first2 = light2 ? darker(primary) : primary;
+  const second = light2 ? darker(secondary) : secondary;
+  ctx.save();
+  try {
+    for (const p of pops) {
+      const f = (clock.runTime - p.at) / lasts;
+      const box2 = p.node.boundingRect;
+      if (f >= 1 || p.node.graph !== canvas.graph || !overlaps(box2, area, POP_REACH * unit)) continue;
+      const x = box2[0] + box2[2];
+      const y = box2[1];
+      ctx.globalAlpha = 1 - f;
+      if (env.reducedMotion) {
+        ctx.strokeStyle = first2;
+        ctx.lineWidth = 2 * unit;
+        ctx.beginPath();
+        ctx.arc(x, y, POP_RING * unit, 0, Math.PI * 2);
+        ctx.stroke();
+        continue;
+      }
+      const out = POP_REACH * unit * (1 - (1 - f) ** 2);
+      const sparks = POP_SPARKS[0] + Math.floor(noise(p.seed) * (POP_SPARKS[1] - POP_SPARKS[0] + 1));
+      for (let half = 0; half < 2; half++) {
+        ctx.fillStyle = half ? second : first2;
+        ctx.beginPath();
+        for (let i = half; i < sparks; i += 2) {
+          const heading = -Math.PI + nth(p.seed, 1 + 3 * i) * 1.5 * Math.PI;
+          const reach2 = out * (0.5 + 0.5 * nth(p.seed, 2 + 3 * i));
+          const sx = x + Math.cos(heading) * reach2;
+          const sy = y + Math.sin(heading) * reach2;
+          const r = (3 + nth(p.seed, 3 + 3 * i)) * unit * (1 - 0.5 * f);
+          ctx.moveTo(sx + r, sy);
+          ctx.arc(sx, sy, r, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      }
+    }
+  } finally {
+    ctx.restore();
+  }
+  return n;
 }
 const RUNS = "Run visuals";
 const RIVER_DELAY = 0.15;
@@ -1366,6 +1579,11 @@ const ANCHORS = 3;
 const BATCH_MS = 1500;
 const SHOWS_MS = 3e3;
 const [BOX, CIRCLE] = [1, 3];
+const LEG = 0.25;
+const FADE = 0.5;
+const TAIL = 120;
+const TAIL_DISCS = 16;
+const HEAD = 6;
 const OWN_COMPLETION = "enhanced_fx_completion";
 const run = { prompt: "", workflow: void 0, end: -Infinity };
 const steps = /* @__PURE__ */ new Map();
@@ -1377,6 +1595,8 @@ let celebrating = false;
 let listening = false;
 const shown$2 = [];
 const into = /* @__PURE__ */ new Map();
+const rank = /* @__PURE__ */ new Map();
+let ranks = 0;
 const taken = { graph: void 0, version: -1, changes: -1 };
 function path(id) {
   const nodes = [];
@@ -1395,8 +1615,9 @@ function syncRuns(canvas) {
   const { graph } = canvas;
   if (graph === taken.graph && graph?._version === taken.version && changes === taken.changes) return;
   Object.assign(taken, { graph, version: graph?._version ?? -1, changes });
-  shown$2.length = 0;
+  shown$2.length = ranks = 0;
   into.clear();
+  rank.clear();
   if (!graph || !steps.size || !here$4()) return;
   for (const [id, step2] of steps) {
     const node2 = standIn(graph, id);
@@ -1411,16 +1632,37 @@ function syncRuns(canvas) {
     const { start, end: end2, progress: progress2, failed } = seen2.step;
     seen2.step = { start: Math.min(start, step2.start), end: Math.max(end2, step2.end), progress: step2.end === Infinity ? step2.progress : progress2, failed: failed || step2.failed };
   }
+  for (const { node: node2, step: step2 } of shown$2) if (node2.inputs.some((input) => input.link != null)) rank.set(step2, ranks++);
 }
 const stepInto = (link2) => into.get(Number(link2.target_id))?.step;
 const stepOf = (node2) => into.get(Number(node2.id))?.step;
-const flowsShown = () => (L.flowRiver || L.flowTrail) && shown$2.length > 0 && !guard.off(RUNS) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT);
+const flowsShown = () => shown$2.length > 0 && !guard.off(RUNS) && (tracing() >= 0 || (L.flowRiver || L.flowTrail) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT));
+const linkPass = { drawsRuns: () => false };
 function riverAlpha(step2, t, still) {
   if (still) return step2.end === Infinity ? 1 : 0;
   return Math.max(0, Math.min(1, (Math.min(t, step2.end) - step2.start - RIVER_DELAY) / RIVER_IN, 1 - (t - step2.end) / RIVER_OUT));
 }
 const trailLeft = (step2, t) => step2.end > t ? 0 : Math.max(0, Math.min(1, 1 - (t - run.end) / L.flowTrailFade));
 const point = new Float64Array(4);
+function comet(ctx, s, order, p, unit) {
+  const leg = Math.max(1 / (ranks + FADE), LEG);
+  const f = (p - (ranks > 1 ? order * (1 - leg * (1 + FADE)) / (ranks - 1) : 0)) / leg;
+  if (f <= 0 || f >= 1 + FADE) return false;
+  const tail = TAIL * unit;
+  const head = f * s.chain;
+  const fade2 = Math.min(1, (1 + FADE - f) / FADE);
+  for (let i = TAIL_DISCS - 1; i >= 0; i--) {
+    const d = head - i / TAIL_DISCS * tail;
+    if (d < s.u0 || d >= s.u0 + s.len) continue;
+    s.path.find((d - s.u0) / s.len * s.path.length, point);
+    const left = 1 - i / TAIL_DISCS;
+    disc(ctx, point[0], point[1], HEAD * unit * (0.4 + 0.6 * left), tint$1, left * fade2, true);
+    if (i) continue;
+    disc(ctx, point[0], point[1], 2 * HEAD * unit, tint$1, 0.4, true);
+    disc(ctx, point[0], point[1], 0.75 * HEAD * unit, "#ffffff", 1, false);
+  }
+  return true;
+}
 function drawFlows(ctx, segments2) {
   const t = clock.runTime;
   const still = during(L.pauseDuringRender) === "pause";
@@ -1456,6 +1698,15 @@ function drawFlows(ctx, segments2) {
       for (let d = s.u0 + ((shift - s.u0) % SPACING + SPACING) % SPACING; d < s.u0 + s.len; d += SPACING) {
         s.path.at((d - s.u0) / s.len, point);
         disc(ctx, point[0], point[1], L.thickness, "#ffffff", 1, true);
+      }
+    }
+    const p = tracing();
+    if (p >= 0) {
+      ctx.globalAlpha = 1;
+      const unit = 1 / app.canvas.ds.scale;
+      for (const s of segments2) {
+        const order = s.flow && rank.get(s.flow);
+        if (order !== void 0 && !s.empty && comet(ctx, s, order, p, unit)) moving2++;
       }
     }
   } catch (error) {
@@ -1506,11 +1757,11 @@ function ring$1(ctx, node2, step2, t, still) {
     ctx.stroke();
     return false;
   }
-  const piece = COMET * round.length / 4;
+  const piece2 = COMET * round.length / 4;
   const head = t * COMET_HZ % 1 * round.length;
   for (let i = 0; i < 4; i++) {
     ctx.globalAlpha = (i + 1) / 4;
-    stretch(ctx, head - (4 - i) * piece, piece);
+    stretch(ctx, head - (4 - i) * piece2, piece2);
   }
   return true;
 }
@@ -1544,6 +1795,11 @@ function drawSteps(canvas, ctx) {
       ctx.restore();
     }
   }
+  try {
+    live.rings += drawPops(canvas, ctx);
+  } catch (error) {
+    guard.fail(RUNS, error);
+  }
   if (live.rings) wake();
 }
 let celebrated = -Infinity;
@@ -1573,14 +1829,29 @@ function anchors(canvas, graph) {
   if (shows2.length < list.length || elsewhere && !list.length) shows2.push({ ...middle, small: true });
   return shows2;
 }
+function complete(shows2, prompt) {
+  const { canvas } = app;
+  syncRuns(canvas);
+  const styles = ranks && !guard.off(RUNS) && linkPass.drawsRuns(canvas) ? STYLES$1 : STYLES$1.filter((style2) => style2 !== "trace");
+  const chosen = N.completionStyle === "random" ? surprise$1(prompt, styles) : N.completionStyle;
+  const style = styles.includes(chosen) ? chosen : "shockwave";
+  if (style === "trace") canvas.setDirty(true, true);
+  play(style, shows2, prompt);
+}
 function celebrate(prompt) {
   const { canvas } = app;
   const now = performance.now();
-  if (!celebrating || !N.enabled || !N.endAnimationEnabled || guard.off(FIREWORKS) || !canvas.graph || now - celebrated < SHOWS_MS) return;
+  if (!celebrating || !N.enabled || !N.endAnimationEnabled || guard.off(COMPLETION) || !canvas.graph || now - celebrated < SHOWS_MS) return;
   const shows2 = anchors(canvas, canvas.graph);
   if (!shows2.length) return;
   celebrated = now;
-  fireworks(shows2, prompt);
+  complete(shows2, prompt);
+}
+function burst(id) {
+  const { canvas } = app;
+  const node2 = path(id).at(-1);
+  if (!celebrating || !N.enabled || !N.completionPerNode || guard.off(RUNS) || !node2 || node2.graph !== canvas.graph || !here$4() || during(N.pauseDuringRender) === "pause") return;
+  pop(canvas, node2, run.prompt);
 }
 function running$1() {
   let id;
@@ -1650,6 +1921,7 @@ function installRuns(part2) {
       } else if (state2 === "finished" && step2?.end === Infinity) {
         step2.end = clock.runTime;
         moved2 = true;
+        burst(id);
       }
     }
     changed$2(moved2);
@@ -2599,11 +2871,11 @@ function stellarPlasma(ctx, s, phase) {
   const { thickness, glowIntensity, quality: quality2 } = L;
   const segments2 = Math.max(5, Math.floor(Math.min(Math.floor(s.chain / 30), 20) * quality2 * 0.5));
   elements(s, segments2, true, (T, i) => {
-    const wave = Math.sin(T * Math.PI * 2 + phase * 0.5) * 8;
+    const wave2 = Math.sin(T * Math.PI * 2 + phase * 0.5) * 8;
     const size = thickness * (0.8 + Math.sin(phase + T * Math.PI) * 0.2);
     const color = T < 0.5 ? primary : secondary;
     ctx.beginPath();
-    ctx.arc(here$1[0], here$1[1] + wave, size, 0, Math.PI * 2);
+    ctx.arc(here$1[0], here$1[1] + wave2, size, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.shadowColor = color;
     ctx.shadowBlur = glowIntensity;
@@ -2611,7 +2883,7 @@ function stellarPlasma(ctx, s, phase) {
     ctx.fill();
     if (i % 3 !== 0 || quality2 <= 1) return;
     ctx.beginPath();
-    ctx.arc(here$1[0], here$1[1] + wave * 1.2, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(here$1[0], here$1[1] + wave2 * 1.2, size * 0.4, 0, Math.PI * 2);
     ctx.fillStyle = accent2;
     ctx.shadowColor = accent2;
     ctx.shadowBlur = glowIntensity * 0.5;
@@ -3272,6 +3544,7 @@ let warned = false;
 let foreign = false;
 let told = false;
 const deferring = () => L.coexist === "defer" || L.coexist === "auto" && foreign;
+const drawsRuns = (canvas) => L.enabled && !defers() && canvas.ds.scale >= LOD_SCALE;
 function defers() {
   if (!deferring()) return false;
   if (L.coexist === "auto" && !told) {
@@ -3324,7 +3597,7 @@ function begin(canvas, ctx) {
   pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves() || crowded || adaptive.level >= HELD;
   pass.highlighted = canvas.highlighted_links;
   syncRuns(canvas);
-  pass.runs = L.enabled && flowsShown() && !defers() && canvas.ds.scale >= LOD_SCALE;
+  pass.runs = flowsShown() && drawsRuns(canvas);
   const refocused = syncFocus(canvas);
   pass.focus = focusIn();
   pass.tinted = (pass.focus === "highlight" || pass.focus === "dim" || pass.focus === "hide") && !deferring();
@@ -3654,6 +3927,7 @@ function installLinks() {
   foreign = !String(original).includes("renderLinkDirect") || Boolean(globalThis.__LINKFX_V2_BOOTED__);
   warned = told = false;
   glows.bases = 0;
+  linkPass.drawsRuns = drawsRuns;
   proto.drawConnections = function(...args) {
     begin(this, args[0]);
     try {
@@ -3701,7 +3975,7 @@ const LOOKS = [
   {
     id: "off",
     name: "Off",
-    description: "Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or fireworks.",
+    description: "Native links and nodes, but for nodes given effects of their own in the node menu, with no run visuals or completion effect.",
     values: {
       "🔗 Enhanced Links.Animate": 0,
       "🔗 Enhanced Links.Flow.River": false,
@@ -3714,14 +3988,14 @@ const LOOKS = [
   {
     id: "subtle",
     name: "Subtle",
-    description: "Classic Flow links with gliding arrows and v1's dark halo, plain nodes, and fireworks over your outputs when a run finishes.",
+    description: "Classic Flow links with gliding arrows and v1's dark halo, plain nodes, and a shockwave over your outputs when a run finishes.",
     values: {}
   },
   {
     id: "showcase",
     name: "Showcase",
-    description: "Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play.",
-    // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes. TODO(M9b): a burst per node.
+    description: "Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.",
+    // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes.
     values: {
       "🔗 Enhanced Links.Animate": 4,
       "🔗 Enhanced Links.Quality": 2,
@@ -3734,13 +4008,15 @@ const LOOKS = [
       "📦 Enhanced Nodes.Particle.Show": true,
       "📦 Enhanced Nodes.Particle.Glow": 1,
       "📦 Enhanced Nodes.Particle.Color.Mode": "aurora",
-      "🔗 Enhanced Links.Pause.Mode": "calm"
+      "🔗 Enhanced Links.Pause.Mode": "calm",
+      "📦 Enhanced Nodes.Completion.Style": "fireworks",
+      "📦 Enhanced Nodes.Completion.PerNode": true
     }
   },
   {
     id: "performance",
     name: "Performance",
-    description: "Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no fireworks.",
+    description: "Still Classic Flow links with less glow and no shadows, plain nodes, runs shown still without a trail, and no completion effect.",
     values: {
       "🔗 Enhanced Links.Static.Mode": true,
       "🔗 Enhanced Links.Glow.Intensity": 6,
@@ -3755,7 +4031,7 @@ const LOOKS = [
     // v1's defaults (old_link_animations.js:19-45, old_node_animations.js:146-178); its links are v3's.
     id: "classic-v1",
     name: "Classic v1",
-    description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or fireworks.",
+    description: "v1 out of the box: Classic Flow links with their dark halo, Neon Nexus nodes with particles in v1's colors, and none of 3.0's run visuals or completion effect.",
     values: {
       "📦 Enhanced Nodes.Animate": 2,
       "📦 Enhanced Nodes.Quality": 1,
@@ -3769,14 +4045,14 @@ const LOOKS = [
       "🔗 Enhanced Links.Flow.Trail": false,
       "📦 Enhanced Nodes.Run.Ring": false,
       "📦 Enhanced Nodes.Run.Error": false,
-      "📦 Enhanced Nodes.End Animation.Enabled": false
+      "📦 Enhanced Nodes.End Animation.Enabled": false,
+      "📦 Enhanced Nodes.Completion.Style": "fireworks"
     }
   },
   {
     id: "neon-night",
     name: "Neon Night",
-    description: "Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles.",
-    // TODO(M9b): confetti.
+    description: "Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.",
     values: {
       "🔗 Enhanced Links.Animate": 5,
       "🔗 Enhanced Links.Quality": 2,
@@ -3792,13 +4068,14 @@ const LOOKS = [
       "📦 Enhanced Nodes.Color.Secondary": "#ff2bd6",
       "📦 Enhanced Nodes.Color.Accent": "#7c4dff",
       "📦 Enhanced Nodes.Particle.Show": true,
-      "📦 Enhanced Nodes.Particle.Color.Mode": "energy"
+      "📦 Enhanced Nodes.Particle.Color.Mode": "energy",
+      "📦 Enhanced Nodes.Completion.Style": "confetti"
     }
   },
   {
     id: "lava-lamp",
     name: "Lava Lamp",
-    description: "Lava Flow links and Cosmic Ripple nodes in molten reds and ambers, with color-cycling particles.",
+    description: "Lava Flow links and Cosmic Ripple nodes in molten reds and ambers, with color-cycling particles and fireworks when a run finishes.",
     values: {
       "🔗 Enhanced Links.Animate": 7,
       "🔗 Enhanced Links.Quality": 2,
@@ -3813,14 +4090,15 @@ const LOOKS = [
       "📦 Enhanced Nodes.Color.Secondary": "#ffb300",
       "📦 Enhanced Nodes.Color.Accent": "#ff006e",
       "📦 Enhanced Nodes.Particle.Show": true,
-      "📦 Enhanced Nodes.Particle.Color.Mode": "energy"
+      "📦 Enhanced Nodes.Particle.Color.Mode": "energy",
+      "📦 Enhanced Nodes.Completion.Style": "fireworks"
     }
   },
   {
     id: "sacred-geometry",
     name: "Sacred Geometry",
-    description: "Sacred Flow links and Flower of Life nodes in gold.",
-    // TODO(M9d): Merkaba Beads links. TODO(M9b): a path trace when a run finishes.
+    description: "Sacred Flow links and Flower of Life nodes in gold, and a path trace when a run finishes.",
+    // TODO(M9d): Merkaba Beads links.
     values: {
       "🔗 Enhanced Links.Animate": 1,
       "🔗 Enhanced Links.Color.Mode": "custom",
@@ -3831,7 +4109,8 @@ const LOOKS = [
       "📦 Enhanced Nodes.Color.Mode": "custom",
       "📦 Enhanced Nodes.Color.Primary": "#ffcc00",
       "📦 Enhanced Nodes.Color.Secondary": "#ff8800",
-      "📦 Enhanced Nodes.Color.Accent": "#fff3b0"
+      "📦 Enhanced Nodes.Color.Accent": "#fff3b0",
+      "📦 Enhanced Nodes.Completion.Style": "trace"
     }
   },
   {
@@ -3848,8 +4127,7 @@ const LOOKS = [
   {
     id: "blueprint",
     name: "Blueprint",
-    description: "Muted right-angle links with small square markers and no shadows, and plain nodes.",
-    // TODO(M9b): a path trace when a run finishes.
+    description: "Muted right-angle links with small square markers and no shadows, plain nodes, and a path trace when a run finishes.",
     values: {
       "🔗 Enhanced Links.Link.Style": "linear",
       "🔗 Enhanced Links.Color.Scheme": "muted",
@@ -3857,7 +4135,8 @@ const LOOKS = [
       "🔗 Enhanced Links.Marker.Shape": "square",
       "🔗 Enhanced Links.Marker.Size": 2,
       "🔗 Enhanced Links.Link.Shadow.Enabled": false,
-      "🔗 Enhanced Links.Marker.Shadow.Enabled": false
+      "🔗 Enhanced Links.Marker.Shadow.Enabled": false,
+      "📦 Enhanced Nodes.Completion.Style": "trace"
     }
   }
 ];
@@ -4007,7 +4286,8 @@ function mix(seed) {
     "📦 Enhanced Nodes.Color.Secondary": secondary,
     "📦 Enhanced Nodes.Color.Accent": accent2,
     "📦 Enhanced Nodes.Particle.Show": random() < 0.5,
-    "📦 Enhanced Nodes.Particle.Density": pick2([0.5, 1, 2])
+    "📦 Enhanced Nodes.Particle.Density": pick2([0.5, 1, 2]),
+    "📦 Enhanced Nodes.Completion.Style": pick2(STYLES$1)
   };
   const description = `${links.text} links and ${nodes.value ? `${nodes.text} nodes` : "plain nodes"} in colors of their own.`;
   return { id: `${SURPRISE}${seed}`, name: "Surprise", description, values };
@@ -6380,7 +6660,7 @@ function noticesOf(tab) {
   if ((all2 || tab === "nodes") && !running.nodes) list.push({ text: DISABLED.nodes });
   if ((all2 || tab === "nodes") && LiteGraph.vueNodesMode) {
     list.push({
-      text: "Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.",
+      text: "Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and completion effects work. The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.",
       action: ["Use classic nodes", () => void app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)]
     });
   }
@@ -6522,7 +6802,7 @@ const NEWS$1 = [
   "Effects draw on ComfyUI's own links and nodes, so links stay clickable, and reroutes, subgraphs and every link render mode work.",
   "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
   "This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.",
-  "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and fireworks over your outputs when a run finishes.",
+  "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.",
   "Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.",
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
   "Much lighter than 2.x on big graphs."
@@ -7084,7 +7364,7 @@ export {
   effects as M,
   NODES_ON as N,
   pick as O,
-  fireworks as P,
+  complete as P,
   resetEverything as Q,
   goToRunning as R,
   SELECTION_FX as S,
@@ -7111,7 +7391,7 @@ export {
   startSprites as ab,
   drawBursts as ac,
   guard as ad,
-  FIREWORKS as ae,
+  COMPLETION as ae,
   drawNodeFx as af,
   clock as ag,
   OVER as ah,
@@ -7149,4 +7429,4 @@ export {
   toggleNodes as y,
   N as z
 };
-//# sourceMappingURL=menus-1BIQTx7f.js.map
+//# sourceMappingURL=menus-Bg3Oz0LN.js.map

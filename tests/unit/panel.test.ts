@@ -98,7 +98,7 @@ describe('the panel', () => {
         canvas.setDirty(true, true);
         frames(1);
         try {
-            expect(slot.querySelector('.eln-notice')!.textContent).toBe('Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and fireworks work. ' +
+            expect(slot.querySelector('.eln-notice')!.textContent).toBe('Nodes 2.0 is on: glows, selection and run outlines, particles, selection focus, run visuals and completion effects work. ' +
                 'The patterns inside nodes, the hover outline, focus on hover, double-click jumps and animated titles need classic nodes.Use classic nodes');
             expect([need.hidden, need.textContent, titles.querySelector('[role=switch]')!.hasAttribute('inert')]).toEqual([false, 'Classic nodes only. Use classic nodes', true]);
             buttonOf(need, 'Use classic nodes')!.click();

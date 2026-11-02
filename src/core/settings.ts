@@ -242,6 +242,14 @@ const PAUSE_MODE_OPTIONS = [
     { value: 'ignore', text: 'Keep animating' },
 ] as const;
 
+const COMPLETION_STYLE_OPTIONS = [
+    { value: 'fireworks', text: 'Fireworks' },
+    { value: 'confetti', text: 'Confetti' },
+    { value: 'shockwave', text: 'Shockwave' },
+    { value: 'trace', text: 'Path trace' },
+    { value: 'random', text: 'Surprise' },
+] as const;
+
 const COMPLETION_ANCHOR_OPTIONS = [
     { value: 'outputs', text: 'Output nodes' },
     { value: 'primary', text: 'Primary nodes' },
@@ -333,7 +341,7 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Shadow.Blur', key: 'shadowBlur', name: 'Drop shadow blur', type: 'slider', min: 0, max: 10, step: 0.5, default: 5, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
     { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
 
-    { id: '📦 Enhanced Nodes.Enabled', key: 'enabled', name: 'Node effects', type: 'boolean', default: true, group: 'Nodes · Effect', look: false, tooltip: 'Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is.' },
+    { id: '📦 Enhanced Nodes.Enabled', key: 'enabled', name: 'Node effects', type: 'boolean', default: true, group: 'Nodes · Effect', look: false, tooltip: 'Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is.' },
     { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', showIf: (): boolean => N.enabled, tooltip: 'Effect drawn on and around every node. Node FX in the node menu picks one for a node.' },
     { id: '📦 Enhanced Nodes.Animations.Enabled', key: 'animationsEnabled', name: 'Show base effect', type: 'boolean', default: true, group: 'Nodes · Effect', advanced: true, showIf: effects, tooltip: "Off draws only the effect's own particles." },
     { id: '📦 Enhanced Nodes.Animation.Speed', key: 'animationSpeed', name: 'Node effect speed', type: 'slider', min: 0.1, max: 3, step: 0.1, default: 1, group: 'Nodes · Effect', advanced: true, showIf: (): boolean => effects() && !N.staticMode },
@@ -395,8 +403,10 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Flow.Trail.Fade', key: 'flowTrailFade', name: 'Trail fade time', type: 'slider', min: 2, max: 30, step: 1, default: 8, group: 'Focus & Flow · During a run', advanced: true, look: false, showIf: (): boolean => L.enabled && L.flowTrail },
     { id: '📦 Enhanced Nodes.Run.Ring', key: 'runRing', name: 'Progress ring', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: "Ring fills with the node's progress." },
     { id: '📦 Enhanced Nodes.Run.Error', key: 'runError', name: 'Error pulse', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: 'Failed node pulses red.' },
-    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Fireworks when a run finishes', type: 'boolean', default: true, group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled, tooltip: 'Plays when your run succeeds.' },
+    { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Effect when a run finishes', type: 'boolean', default: true, group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled, tooltip: 'Plays the Completion style when your run succeeds.' },
+    { id: '📦 Enhanced Nodes.Completion.Style', key: 'completionStyle', name: 'Completion style', type: 'combo', options: COMPLETION_STYLE_OPTIONS, default: 'shockwave', group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled && N.endAnimationEnabled, tooltip: 'Path trace runs a comet along the links your run took; Surprise plays another style each time.' },
     { id: '📦 Enhanced Nodes.Completion.Anchor', key: 'completionAnchor', name: 'Completion anchor', type: 'combo', options: COMPLETION_ANCHOR_OPTIONS, default: 'outputs', group: 'Focus & Flow · Completion', look: false, showIf: (): boolean => N.enabled && N.endAnimationEnabled, tooltip: 'Mark primary nodes in the node menu.' },
+    { id: '📦 Enhanced Nodes.Completion.PerNode', key: 'completionPerNode', name: 'Burst when each node finishes', type: 'boolean', default: false, group: 'Focus & Flow · Completion', advanced: true, showIf: (): boolean => N.enabled, tooltip: 'Sparks pop from the corner of each node on screen as your run finishes it.' },
 
     { id: '🔗 Enhanced Links.Perf.MaxFps', key: 'perfMaxFps', name: 'Effect frame-rate cap', type: 'combo', options: MAX_FPS_OPTIONS, default: 60, group: 'Performance · Budget', look: false, tooltip: 'The most redraws a second that moving effects ask for. Display rate asks for one with every frame the display shows.' },
     { id: '🔗 Enhanced Links.Perf.Adaptive', key: 'perfAdaptive', name: 'Adaptive quality', type: 'boolean', default: true, group: 'Performance · Budget', look: false, tooltip: 'While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room.' },
@@ -409,7 +419,7 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.WhatsNew.Seen', key: 'whatsNewSeen', name: 'Last seen version', type: 'hidden', default: '', tooltip: "The version whose What's new was last shown." },
 ] as const satisfies readonly Setting[];
 
-/** The v2.0.1 defaults v3 changed: v1's shadows, custom node colours and fireworks. */
+/** The v2.0.1 defaults v3 changed: v1's shadows, custom node colours and the completion effect. */
 const V2_DEFAULTS: Values = {
     '🔗 Enhanced Links.Link.Shadow.Enabled': false,
     '🔗 Enhanced Links.Marker.Shadow.Enabled': false,

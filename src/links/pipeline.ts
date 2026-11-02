@@ -35,7 +35,7 @@ import { app } from '/scripts/app.js';
 import { L, revision } from '@/core/settings';
 import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, wake } from '@/core/engine';
 import { HIGHLIGHT, dark, palette, type Palette } from '@/core/colors';
-import { drawFlows, flowsShown, stepInto, syncRuns, type Step } from '@/fx/execution';
+import { drawFlows, flowsShown, linkPass, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { MOVING, STROKES, moving } from './animations';
 import { focus, focusPalette, focuses, focusing, syncFocus } from './focus';
@@ -378,6 +378,9 @@ let told = false;
 /** Whether Coexist leaves the links to native and other extensions. */
 export const deferring = (): boolean => L.coexist === 'defer' || (L.coexist === 'auto' && foreign);
 
+/** With link effects on, the run's visuals go over the links, those native draws too, as with Animation None. */
+const drawsRuns = (canvas: Canvas): boolean => L.enabled && !defers() && canvas.ds.scale >= LOD_SCALE;
+
 /** deferring(), and the first time 'auto' defers, a toast that says so. */
 function defers(): boolean {
     if (!deferring()) return false;
@@ -450,8 +453,7 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves() || crowded || adaptive.level >= HELD;
     pass.highlighted = canvas.highlighted_links;
     syncRuns(canvas);
-    // With link effects on, the run's visuals go over the links, those native draws too, as with Animation None.
-    pass.runs = L.enabled && flowsShown() && !defers() && canvas.ds.scale >= LOD_SCALE;
+    pass.runs = flowsShown() && drawsRuns(canvas);
     const refocused = syncFocus(canvas);
     pass.focus = focusIn();
     pass.tinted = (pass.focus === 'highlight' || pass.focus === 'dim' || pass.focus === 'hide') && !deferring();
@@ -875,6 +877,7 @@ export function installLinks(): void {
     foreign = !String(original).includes('renderLinkDirect') || Boolean((globalThis as { __LINKFX_V2_BOOTED__?: unknown }).__LINKFX_V2_BOOTED__);
     warned = told = false;
     glows.bases = 0;
+    linkPass.drawsRuns = drawsRuns;
 
     proto.drawConnections = function (this: Canvas, ...args: Parameters<Canvas['drawConnections']>) {
         begin(this, args[0]);

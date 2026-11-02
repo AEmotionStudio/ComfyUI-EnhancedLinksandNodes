@@ -74,6 +74,26 @@ describe('curated looks', () => {
         await settle();
     });
 
+    it("play the design's completion effects: the default shockwave, fireworks and a burst per node in Showcase, Classic v1's fireworks off", () => {
+        const completion = (l: Look) => [
+            l.values['📦 Enhanced Nodes.End Animation.Enabled'] ?? true,
+            l.values['📦 Enhanced Nodes.Completion.Style'] ?? 'shockwave',
+            l.values['📦 Enhanced Nodes.Completion.PerNode'] ?? false,
+        ];
+        expect(Object.fromEntries(LOOKS.map((l) => [l.id, completion(l)]))).toEqual({
+            off: [false, 'shockwave', false],
+            subtle: [true, 'shockwave', false],
+            showcase: [true, 'fireworks', true],
+            performance: [false, 'shockwave', false],
+            'classic-v1': [false, 'fireworks', false],
+            'neon-night': [true, 'confetti', false],
+            'lava-lamp': [true, 'fireworks', false],
+            'sacred-geometry': [true, 'trace', false],
+            presenter: [true, 'shockwave', false],
+            blueprint: [true, 'trace', false],
+        });
+    });
+
     it('Off leaves links, nodes and runs native', async () => {
         resetFakeApp();
         applyLook(look('off'));
@@ -103,6 +123,8 @@ describe('applying a look', () => {
             ['📦 Enhanced Nodes.Particle.Glow', 1],
             ['📦 Enhanced Nodes.Particle.Color.Mode', 'aurora'],
             ['🔗 Enhanced Links.Pause.Mode', 'calm'],
+            ['📦 Enhanced Nodes.Completion.Style', 'fireworks'],
+            ['📦 Enhanced Nodes.Completion.PerNode', true],
             [LOOK, 'showcase'],
         ]);
         expect(currentLook()?.id).toBe('showcase');
@@ -112,7 +134,7 @@ describe('applying a look', () => {
         await settle();
         expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend',
             '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
-            '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', LOOK]);
+            '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', '📦 Enhanced Nodes.Completion.Style', '📦 Enhanced Nodes.Completion.PerNode', LOOK]);
         expect(showing()).toEqual(before);
     });
 
@@ -306,7 +328,9 @@ describe('Surprise me', () => {
             expect(values['🔗 Enhanced Links.Glow.Intensity']).toBeLessThanOrEqual(16);
             expect([1, 2]).toContain(values['🔗 Enhanced Links.Quality']);
             expect([0.5, 1, 2]).toContain(values['🔗 Enhanced Links.Particle.Density']);
+            expect(['fireworks', 'confetti', 'shockwave', 'trace']).toContain(values['📦 Enhanced Nodes.Completion.Style']);
         }
+        expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['📦 Enhanced Nodes.Completion.Style'])).size).toBe(4);
         // Darker colours for a light palette, which the seed's lowest bit marks.
         const lightness = (seed: number) => {
             const colour = String(mix(seed).values['🔗 Enhanced Links.Color.Primary']);

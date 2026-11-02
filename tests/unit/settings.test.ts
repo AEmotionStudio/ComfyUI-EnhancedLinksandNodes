@@ -140,6 +140,9 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Blend': 'normal',
     '🔗 Enhanced Links.Perf.Adaptive': true,
     '🔗 Enhanced Links.Perf.StaticAbove': 400,
+    // M9b
+    '📦 Enhanced Nodes.Completion.Style': 'shockwave',
+    '📦 Enhanced Nodes.Completion.PerNode': false,
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -152,6 +155,7 @@ const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Pause.Mode': ['pause', 'calm', 'spotlight', 'ignore'],
     '📦 Enhanced Nodes.Completion.Anchor': ['outputs', 'primary', 'viewport'],
     '🔗 Enhanced Links.Blend': ['normal', 'additive'],
+    '📦 Enhanced Nodes.Completion.Style': ['fireworks', 'confetti', 'shockwave', 'trace', 'random'],
 };
 const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
@@ -319,8 +323,8 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 52 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(52);
+    it('shows 53 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(53);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
@@ -344,7 +348,7 @@ describe('how the panel shows each setting', () => {
             'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
             'L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Navigate.DoubleClick', 'L.Navigate.Follow',
             'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Error',
-            'N.End Animation.Enabled', 'N.Completion.Anchor', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist',
+            'N.End Animation.Enabled', 'N.Completion.Style', 'N.Completion.Anchor', 'N.Completion.PerNode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist',
         ]);
         showing({
             '🔗 Enhanced Links.Animate': 6, '🔗 Enhanced Links.Static.Mode': true, '🔗 Enhanced Links.Color.Mode': 'custom',

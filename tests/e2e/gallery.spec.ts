@@ -165,6 +165,7 @@ const V1_NODES: Record<string, unknown> = {
     '📦 Enhanced Nodes.Animate': 2,
     '📦 Enhanced Nodes.Animations.Enabled': true,
     '📦 Enhanced Nodes.End Animation.Enabled': false,
+    '📦 Enhanced Nodes.Completion.Style': 'fireworks',
     '📦 Enhanced Nodes.Static.Mode': false,
     '📦 Enhanced Nodes.Direction': 1,
     '📦 Enhanced Nodes.Animation.Speed': 1,
@@ -406,7 +407,7 @@ const PREVIEWS: Row[] = [
         preview: 'preview3',
         run: true,
         settings: {
-            [ANIMATE]: 1, '🔗 Enhanced Links.Color.Mode': 'custom', '📦 Enhanced Nodes.End Animation.Enabled': true,
+            [ANIMATE]: 1, '🔗 Enhanced Links.Color.Mode': 'custom', '📦 Enhanced Nodes.End Animation.Enabled': true, '📦 Enhanced Nodes.Completion.Style': 'fireworks',
             '📦 Enhanced Nodes.Animate': 3, '📦 Enhanced Nodes.Color.Mode': 'custom', '📦 Enhanced Nodes.Color.Primary': '#00ff0d', '📦 Enhanced Nodes.Color.Secondary': '#00ff84', '📦 Enhanced Nodes.Color.Accent': '#ffd900',
             '📦 Enhanced Nodes.Color.Scheme': 'vivid', '📦 Enhanced Nodes.Particle.Show': true,
         },

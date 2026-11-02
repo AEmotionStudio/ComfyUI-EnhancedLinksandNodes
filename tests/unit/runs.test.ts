@@ -5,7 +5,7 @@
  * the river, the trail, the progress ring and the error outline at fixed times,
  * through a subgraph too, and over native's links with Animation None;
  * selection focus leaving the run's links whole; what each Pause.Mode does to
- * the effects, link and node parts apart; the fireworks' anchors; and
+ * the effects, link and node parts apart; the completion effect's anchors; and
  * Navigate.Follow. The commands that go to the run are
  * tests/unit/commands.test.ts's, and the flash test is in v1-deviations.ts.
  */
@@ -15,19 +15,19 @@ import { L, preview } from '@/core/settings';
 import { clock, env, live } from '@/core/engine';
 import { lighter } from '@/core/colors';
 import { RED } from '@/fx/execution';
-import { endBursts, fireworks, type Anchor } from '@/fx/bursts';
+import { endBursts, play, type Anchor } from '@/fx/bursts';
 import * as particles from '@/fx/particles';
 import { app, fake } from '../helpers/fake-app';
 import { frames, page, progress, queue, send, start, type FakeCanvas, type FakeNode, type GraphSpec } from '../helpers/fake-litegraph';
 
 vi.mock('@/fx/bursts', async (importOriginal) => {
     const bursts = await importOriginal<typeof import('@/fx/bursts')>();
-    return { ...bursts, fireworks: vi.fn(bursts.fireworks) };
+    return { ...bursts, play: vi.fn(bursts.play) };
 });
 
 afterEach(() => {
     vi.restoreAllMocks();
-    vi.mocked(fireworks).mockClear();
+    vi.mocked(play).mockClear();
     fake.reducedMotion.matches = false;
     fake.reducedMotion.dispatchEvent(new Event('change'));
     document.querySelector('.eln-chipbar')?.remove();
@@ -103,7 +103,7 @@ describe("this client's run", () => {
         frames(8 * 60);
         page.requests = 0;
         frames(10);
-        expect([page.requests, vi.mocked(fireworks).mock.calls.length]).toEqual([0, 0]);
+        expect([page.requests, vi.mocked(play).mock.calls.length]).toEqual([0, 0]);
     });
 
     it('draws a river into the running node: its link 1.4 × as wide in its colour lightened, from 150 ms after the node starts, with sparks flowing toward it, fading over 600 ms once it stops', async () => {
@@ -407,23 +407,23 @@ describe('Pause.Mode', () => {
     });
 });
 
-describe('the fireworks', () => {
+describe('the completion effect', () => {
     /**
-     * The anchors a run that reaches `ran` and succeeds sets the fireworks off at, by title, or the view's middle; its show
+     * The anchors a run that reaches `ran` and succeeds plays its completion effect at, by title, or the view's middle; its show
      * is ended then, and the next can start, as shows start 3 s apart.
      */
     function anchors(ran: (number | string)[], cached: (number | string)[] = []): string[] {
         frames(1);
-        vi.mocked(fireworks).mockClear();
+        vi.mocked(play).mockClear();
         const prompt = `run ${page.now}`;
         begin(prompt);
         send('execution_cached', { prompt_id: prompt, nodes: cached.map(String), timestamp: 0 });
         for (const id of ran) progress(prompt, { [id]: 'running' as const });
         succeed(prompt);
-        const shows = vi.mocked(fireworks).mock.calls.flatMap(([list]) => list as Anchor[]);
+        const shows = vi.mocked(play).mock.calls.flatMap(([, list]) => list as Anchor[]);
         endBursts();
         page.now += 4000;
-        return shows.map((a) => (a.id === 'view' ? (a.small ? 'small middle' : 'middle') : (a as FakeNode).title));
+        return shows.map((a) => (a.id === 'view' ? (a.small ? 'small middle' : 'middle') : (a as unknown as FakeNode).title));
     }
 
     /** Six output nodes round the view's middle, (800, 450), nearest first by number, and one plain node. */
@@ -480,7 +480,7 @@ describe('the fireworks', () => {
         fail('failed', '1');
         begin('stopped');
         send('execution_interrupted', { prompt_id: 'stopped', node_id: '1', node_type: 'ELNInt', executed: [], timestamp: 0 });
-        expect(fireworks).not.toHaveBeenCalled();
+        expect(play).not.toHaveBeenCalled();
         begin('first');
         progress('first', { 1: 'running' });
         succeed('first');
@@ -490,7 +490,7 @@ describe('the fireworks', () => {
         expect(live.bursts).toBe(0);
         progress('second', { 1: 'running' });
         succeed('second');
-        expect(vi.mocked(fireworks).mock.calls).toHaveLength(1);
+        expect(vi.mocked(play).mock.calls).toHaveLength(1);
         frames(160);
         expect(anchors([1])).toEqual(['one']);
     });

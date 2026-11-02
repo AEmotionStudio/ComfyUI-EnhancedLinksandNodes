@@ -1,7 +1,7 @@
 /**
  * What a node is given in its menu: its Node FX, an effect of its own or Use
  * global, Particles only, and its Completion FX, which makes it a primary node
- * the fireworks go off over or keeps them off it, kept as flat keys in its
+ * the completion effect plays over or keeps it off it, kept as flat keys in its
  * properties. Node FX sets every selected node when the node is one of them,
  * and the selection toolbox's button steps the selection through the same
  * effects. Each pick is one change the workflow's history can undo.

@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, a as TOGGLE_ALL, p as panelShown, c as checked, F as FROZEN, S as SELECTION_FX, l as linkSettings, b as install, d as installPanel, e as installRuns, f as installFollow, g as installLinks, h as errorNodes, j as currentLook, k as keyName, m as commandKeys, o as TOGGLE, q as keyText, r as running, s as env, t as setting, u as shown, D as DISABLED, v as showPanel, L as LINKS_ON, N as NODES_ON, w as toggleLinks, x as L, y as toggleNodes, z as N, A as toggleStatic, C as toggleFocus, E as FOCUS_ON, G as commit, H as showPicker, I as surpriseMe, J as goBack, K as selectedNodes, M as effects, O as pick, P as fireworks, Q as resetEverything, R as goToRunning, U as nextError, V as goAlong } from "./chunks/menus-1BIQTx7f.js";
+import { i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, a as TOGGLE_ALL, p as panelShown, c as checked, F as FROZEN, S as SELECTION_FX, l as linkSettings, b as install, d as installPanel, e as installRuns, f as installFollow, g as installLinks, h as errorNodes, j as currentLook, k as keyName, m as commandKeys, o as TOGGLE, q as keyText, r as running, s as env, t as setting, u as shown, D as DISABLED, v as showPanel, L as LINKS_ON, N as NODES_ON, w as toggleLinks, x as L, y as toggleNodes, z as N, A as toggleStatic, C as toggleFocus, E as FOCUS_ON, G as commit, H as showPicker, I as surpriseMe, J as goBack, K as selectedNodes, M as effects, O as pick, P as complete, Q as resetEverything, R as goToRunning, U as nextError, V as goAlong } from "./chunks/menus-Bg3Oz0LN.js";
 const SAY_MS = 2e3;
 const HINT_MS = 5e3;
 let said;
@@ -53,7 +53,7 @@ function preview() {
   const nodes2 = selectedNodes();
   const outputs = canvas.visible_nodes.filter((node) => node.constructor.nodeData?.output_node);
   const middle = { id: "view", pos: [area[0] + area[2] / 2, area[1] + area[3] / 2], graph: canvas.graph };
-  fireworks(nodes2.length ? nodes2 : outputs.length ? outputs : [middle], `preview ${Date.now()}`);
+  complete(nodes2.length ? nodes2 : outputs.length ? outputs : [middle], `preview ${Date.now()}`);
 }
 async function resetAll() {
   const sure = await app.extensionManager.dialog.confirm({

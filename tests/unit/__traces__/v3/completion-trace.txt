@@ -1,0 +1,201 @@
+# Path trace
+# p=0.2
+save()
+lineCap = round
+getTransform()
+imageSmoothingQuality = low
+globalAlpha = 1
+globalAlpha = 0.375
+drawImage(image(10x10), 99.87, 94.89, 10.22, 10.22)
+globalAlpha = 1
+globalAlpha = 0.438
+drawImage(image(10x10), 107.52, 95.03, 9.94, 9.94)
+globalAlpha = 1
+globalAlpha = 0.5
+drawImage(image(12x12), 114.22, 94.22, 11.55, 11.55)
+globalAlpha = 1
+globalAlpha = 0.563
+drawImage(image(12x12), 121.41, 93.91, 12.17, 12.17)
+globalAlpha = 1
+globalAlpha = 0.625
+drawImage(image(12x12), 129.13, 94.13, 11.73, 11.73)
+globalAlpha = 1
+globalAlpha = 0.688
+drawImage(image(12x12), 136.34, 93.85, 12.3, 12.3)
+globalAlpha = 1
+globalAlpha = 0.75
+drawImage(image(14x14), 143.11, 93.12, 13.76, 13.76)
+globalAlpha = 1
+globalAlpha = 0.813
+drawImage(image(14x14), 150.31, 92.81, 14.37, 14.37)
+globalAlpha = 1
+globalAlpha = 0.875
+drawImage(image(14x14), 158.13, 93.13, 13.74, 13.74)
+globalAlpha = 1
+globalAlpha = 0.938
+drawImage(image(14x14), 165.35, 92.85, 14.29, 14.29)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(16x16), 172.22, 92.22, 15.56, 15.56)
+globalAlpha = 1
+globalAlpha = 0.4
+drawImage(image(28x28), 166.38, 86.38, 27.23, 27.23)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(12x12), 173.81, 93.81, 12.38, 12.38)
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# p=0.45
+save()
+lineCap = round
+getTransform()
+imageSmoothingQuality = low
+globalAlpha = 1
+globalAlpha = 0.047
+drawImage(image(8x8), 163.45, 95.95, 8.1, 8.1)
+globalAlpha = 1
+globalAlpha = 0.094
+drawImage(image(8x8), 170.97, 95.97, 8.06, 8.06)
+globalAlpha = 1
+globalAlpha = 0.141
+drawImage(image(10x10), 177.52, 95.02, 9.97, 9.97)
+globalAlpha = 1
+globalAlpha = 0.188
+drawImage(image(10x10), 185.1, 95.09, 9.81, 9.81)
+globalAlpha = 1
+globalAlpha = 0.234
+drawImage(image(10x10), 192.7, 95.19, 9.61, 9.61)
+globalAlpha = 1
+globalAlpha = 0.281
+drawImage(image(10x10), 199.89, 94.89, 10.22, 10.22)
+globalAlpha = 1
+globalAlpha = 0.328
+drawImage(image(10x10), 207.54, 95.03, 9.94, 9.94)
+globalAlpha = 1
+globalAlpha = 0.375
+drawImage(image(12x12), 214.23, 94.22, 11.55, 11.55)
+globalAlpha = 1
+globalAlpha = 0.422
+drawImage(image(12x12), 221.42, 93.91, 12.17, 12.17)
+globalAlpha = 1
+globalAlpha = 0.469
+drawImage(image(12x12), 229.14, 94.13, 11.73, 11.73)
+globalAlpha = 1
+globalAlpha = 0.516
+drawImage(image(12x12), 236.36, 93.85, 12.3, 12.3)
+globalAlpha = 1
+globalAlpha = 0.563
+drawImage(image(14x14), 243.12, 93.12, 13.76, 13.76)
+globalAlpha = 1
+globalAlpha = 0.609
+drawImage(image(14x14), 250.33, 92.81, 14.37, 14.37)
+globalAlpha = 1
+globalAlpha = 0.438
+drawImage(image(10x10), 262.06, 215.54, 9.94, 9.94)
+globalAlpha = 1
+globalAlpha = 0.5
+drawImage(image(12x12), 268.58, 216.28, 11.55, 11.55)
+globalAlpha = 1
+globalAlpha = 0.563
+drawImage(image(12x12), 275.38, 218.36, 12.17, 12.17)
+globalAlpha = 1
+globalAlpha = 0.625
+drawImage(image(12x12), 282.46, 221.65, 11.73, 11.73)
+globalAlpha = 1
+globalAlpha = 0.688
+drawImage(image(12x12), 288.77, 224.94, 12.3, 12.3)
+globalAlpha = 1
+globalAlpha = 0.75
+drawImage(image(14x14), 294.39, 228.18, 13.76, 13.76)
+globalAlpha = 1
+globalAlpha = 0.813
+drawImage(image(14x14), 300.24, 232.16, 14.37, 14.37)
+globalAlpha = 1
+globalAlpha = 0.875
+drawImage(image(14x14), 306.52, 237.02, 13.74, 13.74)
+globalAlpha = 1
+globalAlpha = 0.938
+drawImage(image(14x14), 312.06, 241.49, 14.29, 14.29)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(16x16), 317.1, 245.77, 15.56, 15.56)
+globalAlpha = 1
+globalAlpha = 0.4
+drawImage(image(28x28), 311.26, 239.93, 27.23, 27.23)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(12x12), 318.69, 247.36, 12.38, 12.38)
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# p=0.7
+save()
+lineCap = round
+getTransform()
+imageSmoothingQuality = low
+globalAlpha = 1
+globalAlpha = 0.063
+drawImage(image(8x8), 523.33, 400.66, 8.1, 8.1)
+globalAlpha = 1
+globalAlpha = 0.125
+drawImage(image(8x8), 530.46, 403.09, 8.06, 8.06)
+globalAlpha = 1
+globalAlpha = 0.188
+drawImage(image(10x10), 536.5, 404.85, 9.97, 9.97)
+globalAlpha = 1
+globalAlpha = 0.25
+drawImage(image(10x10), 543.46, 407.89, 9.81, 9.81)
+globalAlpha = 1
+globalAlpha = 0.313
+drawImage(image(10x10), 550.36, 411.17, 9.61, 9.61)
+globalAlpha = 1
+globalAlpha = 0.375
+drawImage(image(10x10), 556.76, 414.21, 10.22, 10.22)
+globalAlpha = 1
+globalAlpha = 0.438
+drawImage(image(10x10), 563.55, 417.84, 9.94, 9.94)
+globalAlpha = 1
+globalAlpha = 0.5
+drawImage(image(12x12), 569.31, 420.64, 11.55, 11.55)
+globalAlpha = 1
+globalAlpha = 0.563
+drawImage(image(12x12), 575.53, 424.04, 12.17, 12.17)
+globalAlpha = 1
+globalAlpha = 0.625
+drawImage(image(12x12), 582.23, 428.05, 11.73, 11.73)
+globalAlpha = 1
+globalAlpha = 0.688
+drawImage(image(12x12), 588.37, 431.62, 12.3, 12.3)
+globalAlpha = 1
+globalAlpha = 0.75
+drawImage(image(14x14), 594.04, 434.8, 13.76, 13.76)
+globalAlpha = 1
+globalAlpha = 0.813
+drawImage(image(14x14), 600.11, 438.45, 14.37, 14.37)
+globalAlpha = 1
+globalAlpha = 0.875
+drawImage(image(14x14), 606.78, 442.75, 13.74, 13.74)
+globalAlpha = 1
+globalAlpha = 0.938
+drawImage(image(14x14), 612.84, 446.48, 14.29, 14.29)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(16x16), 618.54, 449.87, 15.56, 15.56)
+globalAlpha = 1
+globalAlpha = 0.4
+drawImage(image(28x28), 612.7, 444.04, 27.23, 27.23)
+globalAlpha = 1
+globalAlpha = 1
+drawImage(image(12x12), 620.13, 451.47, 12.38, 12.38)
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# p=0.95
+save()
+lineCap = round
+getTransform()
+imageSmoothingQuality = low
+globalAlpha = 1
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0

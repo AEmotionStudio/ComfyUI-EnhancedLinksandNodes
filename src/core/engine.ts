@@ -189,7 +189,8 @@ const calm = () => during(L.pauseDuringRender) === 'calm' || during(N.pauseDurin
  * once the link layer's hook runs. bursts counts the particles of the bursts
  * playing, on screen or not, so that they end, and marks the nodes marked. A
  * run's visuals that move count too: flows, the links of its river and trail,
- * and rings, its progress rings and error outlines.
+ * and rings, its progress rings, error outlines and the bursts as its nodes
+ * finish.
  */
 export const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0 };
 

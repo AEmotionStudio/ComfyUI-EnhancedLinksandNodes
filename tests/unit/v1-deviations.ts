@@ -22,7 +22,8 @@ import { drawBase, drawMarkers } from '@/links/styles';
 import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
 import { drawTitle } from '@/nodes/text';
 import { pool } from '@/fx/particles';
-import { RED } from '@/fx/execution';
+import { RED, drawFlows, stepInto } from '@/fx/execution';
+import { drawBursts, endBursts, play, type Anchor, type Style } from '@/fx/bursts';
 import { fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
 import { canonical } from '../helpers/canonical';
@@ -157,6 +158,28 @@ function luminance(colour: string): number {
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
 
+/**
+ * How many times a sampled signal swings from rising to falling or back by a tenth of its peak or more, which is what
+ * WCAG 2.3.1 counts as half a flash; smaller wobbles, such as a trace's rounding, are none.
+ */
+function swings(values: number[]): number {
+    const least = 0.1 * Math.max(...values);
+    let count = 0;
+    let way = 0;
+    let extreme = values[0];
+    for (const value of values) {
+        if ((value - extreme) * way > 0 || (!way && Math.abs(value - extreme) < least)) {
+            if (way) extreme = value;
+            continue;
+        }
+        if (Math.abs(value - extreme) < least) continue;
+        if (way) count++;
+        way = Math.sign(value - extreme);
+        extreme = value;
+    }
+    return count;
+}
+
 /** How many times a sampled signal turns from rising to falling or back, across samples that hold it level. */
 function turns(values: number[]): number {
     let count = 0;
@@ -254,7 +277,8 @@ const unseen = (line: string) => !/#[\da-f]{6}/.test(line) && [...line.matchAll(
 /** The texts a trace fills, with where. */
 const filled = (rec: CanvasRecorder) => rec.lines.filter((line) => line.startsWith('fillText('));
 
-/** A KSampler with an output node's class beside a plain node and another output node, for the fireworks. */
+/** A KSampler with an output node's class beside a plain node and another output node, for the fireworks, which play over still links. */
+const FIREWORKS = { '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Completion.Style': 'fireworks' };
 const RUN: GraphSpec = { nodes: [{ pos: [300, 400], output: true }, { pos: [900, 400], output: true }, { pos: [600, 700] }] };
 
 /** The cores of the fireworks a front pass drew, by the centre and radius their gradient was made at, on screen. */
@@ -708,7 +732,7 @@ export const DEVIATIONS: Deviation[] = [
                 frames(hz, hz);
                 moved.push(clock.linkPhase - before.linkPhase, clock.particleTime - before.particleTime);
                 // How long a show plays.
-                await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+                await start(FIREWORKS, RUN);
                 run(`rate ${hz}`, [1]);
                 let count = 0;
                 for (frames(1, hz); live.bursts; frames(1, hz)) count++;
@@ -783,7 +807,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: 'Nothing flashes more than three times a second',
-        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering.",
+        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next.",
         async proof() {
             // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the glow it breathes or where it shakes its copies.
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Animation.Speed': 3 });
@@ -799,7 +823,7 @@ export const DEVIATIONS: Deviation[] = [
                 expect(turns(seen), style).toBeGreaterThan(0);
             }
             // A run that starts half a second into a show ends it and starts none; the next show starts 3 s after the last.
-            const failing = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+            const failing = await start(FIREWORKS, RUN);
             run('first', [1]);
             frames(30);
             expect(live.bursts).toBeGreaterThan(0);
@@ -844,6 +868,93 @@ export const DEVIATIONS: Deviation[] = [
             frames(60);
             expect(clock.linkPhase - before.linkPhase).toBeCloseTo(-PHI2 * 3, 6);
             expect(clock.quantumPhase - before.quantumPhase).toBeCloseTo((-2 * Math.PI * 3) / 5, 6);
+            // The new completion styles over three nodes and a small show in the middle, at 60 Hz. Each shockwave ring lights
+            // once, a third of a second after the one before.
+            const graph = {};
+            const view = { visible_area: new Float32Array([0, 0, 1600, 900]), ds: { scale: 1 }, graph } as unknown as Parameters<typeof drawBursts>[0];
+            const anchors = [200, 700, 1200].map((x, id) => ({ id, pos: [x, 400], graph, boundingRect: [x, 370, 200, 130] }) as unknown as Anchor);
+            anchors.push({ id: 'view', pos: [800, 450], graph, small: true } as unknown as Anchor);
+            /** The frames of a show of `style` over `over`, each as `of` reads it: a value for each thing that lights, by key. */
+            const show = (style: Style, over: Anchor[], of: (rec: CanvasRecorder) => Map<string, number>) => {
+                storeSettings({});
+                endBursts();
+                play(style, over, 'flash');
+                const seen = Array.from({ length: 180 }, (_, i) => {
+                    clock.burstTime = i / 60;
+                    return of(draw((ctx) => drawBursts(view, ctx)));
+                });
+                endBursts();
+                return [...new Set(seen.flatMap((frame) => [...frame.keys()]))].map((key) => seen.map((frame) => frame.get(key) ?? 0));
+            };
+            const rings = show('shockwave', anchors, (rec) => new Map(rec.paints.filter((p) => p.op === 'stroke' && p.lineWidth === 3).map(({ box, globalAlpha }) => [`${Math.round(box![0] + box![2])}, ${Math.round(box![1] + box![3])}`, globalAlpha])));
+            expect(rings.map(swings)).toEqual([1, 1, 1, 1]);
+            const lit = rings.map((alphas) => alphas.findIndex(Boolean)).sort((a, b) => a - b);
+            for (let i = 1; i < lit.length; i++) expect(lit[i] - lit[i - 1]).toBeGreaterThanOrEqual(19);
+            // Each confetti piece: how much of its face shows, at its alpha, in each second.
+            const area = (points: number[][]) => Math.abs(points.reduce((sum, [x, y], i) => sum + x * points[(i + 1) % points.length][1] - points[(i + 1) % points.length][0] * y, 0)) / 2;
+            const faces = show('confetti', [anchors[0]], (rec) => {
+                const shown = new Map<string, number>();
+                let points: number[][] = [];
+                let alpha = 1;
+                for (const line of rec.lines) {
+                    const at = /^(?:moveTo|lineTo)\(([^,]+), ([^)]+)\)$/.exec(line);
+                    if (at) points.push([Number(at[1]), Number(at[2])]);
+                    else if (line.startsWith('globalAlpha = ')) alpha = Number(line.slice(14));
+                    else if (line === 'beginPath()') points = [];
+                    else if (line === 'fill()') shown.set(String(shown.size), area(points) * alpha);
+                }
+                return shown;
+            });
+            expect(faces.length).toBeGreaterThanOrEqual(60);
+            for (const face of faces) for (let second = 0; second < 2; second++) expect(swings(face.slice(second * 60, second * 60 + 61)) / 2).toBeLessThanOrEqual(3);
+            // A path trace's comet lights each link once: the second through a reroute, with the third, which leads into the same node.
+            await start({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Flow.Trail': false, '📦 Enhanced Nodes.Completion.Style': 'trace' }, { ...PAIR, nodes: [...PAIR.nodes, { pos: [1100, 200], output: true }], links: [...PAIR.links!, { from: 1, to: 2 }] });
+            frames(1);
+            run('flash trace', [1, 2, 3]);
+            frames(1);
+            const legs = ([[[100, 100], [260, 100], 2], [[260, 220], [500, 400], 3], [[500, 400], [760, 520], 3]] as const).map(([a, b, target]) => {
+                const s = new Segment();
+                s.path.set(a, b, RIGHT, LEFT, SPLINE);
+                s.len = s.chain = s.path.length;
+                s.flow = stepInto({ target_id: target });
+                return s;
+            });
+            for (const leg of legs) {
+                const light = Array.from({ length: 100 }, (_, i) => {
+                    clock.burstTime = i / 60;
+                    return draw((ctx) => drawFlows(ctx, [leg])).paints.reduce((sum, p) => sum + p.globalAlpha, 0);
+                });
+                expect(swings(light)).toBe(1);
+            }
+            endBursts();
+            // A node a loop runs again each frame bursts, a ring with reduced motion, at most three times a second.
+            for (const reduced of [false, true]) {
+                const canvas = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Completion.PerNode': true }, { nodes: [{ pos: [300, 300] }] });
+                fake.reducedMotion.matches = reduced;
+                fake.reducedMotion.dispatchEvent(new Event('change'));
+                frames(1);
+                send('execution_start', { prompt_id: 'loop', timestamp: 0 });
+                // When the node finished each time, on the run's clock, which the bursts keep time by.
+                const finished: number[] = [];
+                const bursts = Array.from({ length: 120 }, () => {
+                    progress('loop', { 1: 'running' });
+                    progress('loop', { 1: 'finished' });
+                    finished.push(clock.runTime);
+                    const from = canvas.front.paints.length;
+                    frames(1);
+                    // The sparks in the default palette's primary and secondary colours, or the ring.
+                    const paints = canvas.front.paints.slice(from);
+                    const lit = paints.filter((p) => (reduced ? p.op === 'stroke' && p.lineWidth === 2 : p.op === 'fill' && (p.style === '#44aaff' || p.style === '#88ccff')));
+                    return Math.max(0, ...lit.map((p) => p.globalAlpha));
+                });
+                send('execution_success', { prompt_id: 'loop', timestamp: 0 });
+                // Each burst starts, its alpha up on the frame before's, a third of a second or more after the last.
+                const starts = bursts.flatMap((alpha, i) => (alpha > (bursts[i - 1] ?? 0) ? [finished[i]] : []));
+                expect(starts.length, reduced ? 'ring' : 'sparks').toBeGreaterThan(4);
+                for (let i = 1; i < starts.length; i++) expect(starts[i] - starts[i - 1], reduced ? 'ring' : 'sparks').toBeGreaterThanOrEqual(1 / 3);
+            }
+            fake.reducedMotion.matches = false;
+            fake.reducedMotion.dispatchEvent(new Event('change'));
             // A marker's alpha, or its luminance for Rainbow, over two seconds at speed 3, sampled at 60 Hz.
             for (const effect of ['pulse', 'fade', 'rainbow']) {
                 storeSettings({ ...V1_LINK_SETTINGS, '🔗 Enhanced Links.Marker.Effects': effect, '🔗 Enhanced Links.Marker.Size': 1, '🔗 Enhanced Links.Animation.Speed': 3 });
@@ -1121,7 +1232,7 @@ export const DEVIATIONS: Deviation[] = [
         title: "A node's own effect takes its own style's colours",
         why: "v1 drew every node in the colours of the style Node effect picks (getCustomColors, old_node_animations.js:795-835), as its nodes had no style of their own. A node given its own in Node FX takes that style's colours in Style colors mode, for its effect, halo, frame, particles and title. The fireworks keep Node effect's, as v1's took them.",
         async proof() {
-            const canvas = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 2, '📦 Enhanced Nodes.Color.Mode': 'default' }, RUN);
+            const canvas = await start({ ...FIREWORKS, '📦 Enhanced Nodes.Animate': 2, '📦 Enhanced Nodes.Color.Mode': 'default' }, RUN);
             const [, own] = canvas.graph._nodes;
             own.properties.enhanced_fx_style = 3;
             for (const node of canvas.graph._nodes) node.selected = true;
@@ -1209,7 +1320,7 @@ export const DEVIATIONS: Deviation[] = [
         async proof() {
             // Each node of a run its own show, and the same one each time the run is played.
             const speeds = async (prompt: string) => {
-                await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+                await start(FIREWORKS, RUN);
                 run(prompt, [1, 2]);
                 // The sparks of the first burst over each node: its bursts are the owners 0 to 2, the other's 3 to 5.
                 return [0, 3].map((owner) => Array.from(pool.speed.subarray(0, pool.count)).filter((_, i) => pool.owner[i] === owner && pool.kind[i] === 1));
@@ -1253,7 +1364,7 @@ export const DEVIATIONS: Deviation[] = [
         title: "Fireworks play over the run's output nodes, at one size on screen",
         why: "v1 burst over every node whenever the queue emptied, for anyone's run (its 'status' event), from each node's drawNodeShape, so later nodes covered its bursts, and it placed and sized them by the canvas in graph space, so zooming out shrank them. v3 bursts when this client's own run succeeds (execution_success, which ComfyUI sends only to the client that queued it), over the nodes whose Completion FX makes them primary and the output nodes the run reached, but not those it excludes, the three nearest the middle of the view, and over all the nodes. It places and sizes them in the view's terms, so at any zoom they are as large on screen as v1's at zoom 1.",
         async proof() {
-            const canvas = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+            const canvas = await start(FIREWORKS, RUN);
             // The queue emptying, which v1 burst on, is not a run of this client's.
             queue(1);
             queue(0);
@@ -1279,7 +1390,7 @@ export const DEVIATIONS: Deviation[] = [
             // Completion FX: over a primary node the run did not reach, none over one excluded; with End Animation off, none.
             for (const ended of [true, false]) {
                 // The node excluded stands where no other node does.
-                const again = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.End Animation.Enabled': ended }, { nodes: [...RUN.nodes, { pos: [1200, 900], output: true }] });
+                const again = await start({ ...FIREWORKS, '📦 Enhanced Nodes.End Animation.Enabled': ended }, { nodes: [...RUN.nodes, { pos: [1200, 900], output: true }] });
                 again.graph._nodes[1].properties.enhanced_fx_completion = 'primary';
                 again.graph._nodes[3].properties.enhanced_fx_completion = 'exclude';
                 run(`set ${ended}`, [1, 4]);
@@ -1293,7 +1404,7 @@ export const DEVIATIONS: Deviation[] = [
         title: 'Firework sparks are stamped from sprites',
         why: "v1 made a gradient for every spark each frame, 750 a frame with three bursts in the air, and a fill for each of their trails. While a show plays, v3 stamps each spark and trail from a sprite of v1's own disc, painted once a colour and size, at the spark's alpha; the cores, three a show, keep their gradients. The traces draw the discs as v1 did.",
         async proof() {
-            const canvas = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+            const canvas = await start(FIREWORKS, RUN);
             // A setting change drops the sprites earlier shows cast.
             preview('📦 Enhanced Nodes.Glow', 0.4);
             preview('📦 Enhanced Nodes.Glow', 0.5);
@@ -1321,7 +1432,7 @@ export const DEVIATIONS: Deviation[] = [
         title: 'With reduced motion, fireworks are one soft glow',
         why: "v1 drew its fireworks whatever the system asked for. With reduced motion (the system's, or ComfyUI's Disable animations) v3 ends a run with one soft glow over each anchor instead, fading in and out once over the show.",
         async proof() {
-            const canvas = await start({ '🔗 Enhanced Links.Animate': 0 }, RUN);
+            const canvas = await start(FIREWORKS, RUN);
             fake.reducedMotion.matches = true;
             fake.reducedMotion.dispatchEvent(new Event('change'));
             run('calm', [1, 2]);

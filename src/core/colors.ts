@@ -150,13 +150,15 @@ export function palette(colour: unknown): Palette | undefined {
 
 const solids = new Map<string, Palette>();
 const lifted = new Map<string, string>();
+const sunk = new Map<string, string>();
 let solidsSince = -1;
 
-/** solids and lifted, emptied when a setting changes. */
+/** solids, lifted and sunk, emptied when a setting changes. */
 function solidCaches(): void {
     if (solidsSince === revision) return;
     solids.clear();
     lifted.clear();
+    sunk.clear();
     solidsSince = revision;
 }
 
@@ -181,6 +183,21 @@ export function lighter(colour: string): string {
         lifted.set(colour, light);
     }
     return light;
+}
+
+/** A channel two fifths of the way to black. */
+const sink = (v: number) => Math.round(v * 0.6);
+
+/** `colour` darkened 40 %, which stands out from a light canvas; a colour the canvas would not take stays as it is. */
+export function darker(colour: string): string {
+    solidCaches();
+    let deep = sunk.get(colour);
+    if (deep === undefined) {
+        const rgba = parse(colour);
+        deep = rgba ? show([sink(rgba[0]), sink(rgba[1]), sink(rgba[2]), rgba[3]]) : colour;
+        sunk.set(colour, deep);
+    }
+    return deep;
 }
 
 /** The theme's accent, as the frontend's own controls take it (--primary-background, 1.39.5 to 1.60), and the panel does. */

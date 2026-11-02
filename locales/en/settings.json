@@ -200,7 +200,7 @@
   },
   "📦 Enhanced Nodes_Enabled": {
     "name": "Node effects",
-    "tooltip": "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or fireworks, and leaves every other node setting as it is."
+    "tooltip": "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is."
   },
   "📦 Enhanced Nodes_Animate": {
     "name": "Node effect",
@@ -467,8 +467,19 @@
     "tooltip": "Failed node pulses red."
   },
   "📦 Enhanced Nodes_End Animation_Enabled": {
-    "name": "Fireworks when a run finishes",
-    "tooltip": "Plays when your run succeeds."
+    "name": "Effect when a run finishes",
+    "tooltip": "Plays the Completion style when your run succeeds."
+  },
+  "📦 Enhanced Nodes_Completion_Style": {
+    "name": "Completion style",
+    "tooltip": "Path trace runs a comet along the links your run took; Surprise plays another style each time.",
+    "options": {
+      "Fireworks": "Fireworks",
+      "Confetti": "Confetti",
+      "Shockwave": "Shockwave",
+      "Path trace": "Path trace",
+      "Surprise": "Surprise"
+    }
   },
   "📦 Enhanced Nodes_Completion_Anchor": {
     "name": "Completion anchor",
@@ -478,6 +489,10 @@
       "Primary nodes": "Primary nodes",
       "Center of screen": "Center of screen"
     }
+  },
+  "📦 Enhanced Nodes_Completion_PerNode": {
+    "name": "Burst when each node finishes",
+    "tooltip": "Sparks pop from the corner of each node on screen as your run finishes it."
   },
   "🔗 Enhanced Links_Perf_MaxFps": {
     "name": "Effect frame-rate cap",

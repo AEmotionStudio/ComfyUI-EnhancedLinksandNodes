@@ -12,9 +12,11 @@
  * the nodes running and the trail into those that ran (drawFlows), whole
  * whatever selection focus dims or hides, until the trail has faded; the nodes
  * get a progress ring while they run and a red outline where the run failed,
- * until the next run or an edit of that node. A run that succeeds sets off the
- * fireworks at its anchors. What the run is running and where it failed are
- * there to go to (ui/menus.ts).
+ * until the next run or an edit of that node, and with Completion.PerNode a
+ * burst as each finishes (fx/bursts.ts pop()). A run that succeeds plays its
+ * completion effect at its anchors: a path trace runs a comet along the links
+ * of the trail, in the order their nodes ran, in the link pass. What the run is
+ * running and where it failed are there to go to (ui/menus.ts).
  *
  * @module fx/execution
  */
@@ -25,7 +27,7 @@ import { api } from '/scripts/api.js';
 import { L, N } from '@/core/settings';
 import { clock, during, env, guard, layers, live, overlaps, wake } from '@/core/engine';
 import { accent, lighter } from '@/core/colors';
-import { FIREWORKS, endBursts, fireworks, type Anchor } from '@/fx/bursts';
+import { COMPLETION, STYLES, drawPops, endBursts, play, pop, surprise, tracing, type Anchor, type Style } from '@/fx/bursts';
 import { disc, startSprites, stopSprites } from '@/fx/particles';
 import type { Segment } from '@/links/pipeline';
 
@@ -73,7 +75,18 @@ const SHOWS_MS = 3000;
 /** RenderShape.BOX and CIRCLE (litegraph types/globalEnums.ts); any other shape is round. */
 const [BOX, CIRCLE] = [1, 3];
 
-/** Where a node keeps its Completion FX, which the node menu sets: 'primary' to anchor the fireworks, 'exclude' to keep them off it. */
+/**
+ * The path trace's comet: the least of the show its run along a link takes, and how much of a run after it its tail
+ * takes to go into the node and fade; and in px on screen, the length of its tail, the discs it is drawn with, and how
+ * wide its head is.
+ */
+const LEG = 0.25;
+const FADE = 0.5;
+const TAIL = 120;
+const TAIL_DISCS = 16;
+const HEAD = 6;
+
+/** Where a node keeps its Completion FX, which the node menu sets: 'primary' to anchor the completion effect, 'exclude' to keep it off it. */
 export const OWN_COMPLETION = 'enhanced_fx_completion';
 
 /** A node of the run: when it started and stopped running on clock.runTime, its end Infinity while it runs; its progress, NaN while it reports none; and whether it failed. */
@@ -95,7 +108,7 @@ const held = new Map<string, string>();
 /** Counts the changes to steps, which the graph shown takes up. */
 let changes = 0;
 
-/** Whether the node extension set up, which draws the rings and sets off the fireworks, and whether the events are listened to. */
+/** Whether the node extension set up, which draws the rings and plays the completion effects, and whether the events are listened to. */
 let celebrating = false;
 let listening = false;
 
@@ -107,6 +120,9 @@ interface Shown {
 const shown: Shown[] = [];
 /** shown by node id, for the links into those nodes. */
 const into = new Map<number, Shown>();
+/** The steps of the nodes shown that links lead into, numbered in the order they ran, which the path trace takes; and how many. */
+const rank = new Map<Step, number>();
+let ranks = 0;
 /** What shown was taken from: the graph, its version and the changes to steps. */
 const taken = { graph: undefined as Graph | null | undefined, version: -1, changes: -1 };
 
@@ -134,8 +150,9 @@ export function syncRuns(canvas: Canvas): void {
     const { graph } = canvas;
     if (graph === taken.graph && graph?._version === taken.version && changes === taken.changes) return;
     Object.assign(taken, { graph, version: graph?._version ?? -1, changes });
-    shown.length = 0;
+    shown.length = ranks = 0;
     into.clear();
+    rank.clear();
     if (!graph || !steps.size || !here()) return;
     for (const [id, step] of steps) {
         const node = standIn(graph, id);
@@ -151,6 +168,7 @@ export function syncRuns(canvas: Canvas): void {
         const { start, end, progress, failed } = seen.step;
         seen.step = { start: Math.min(start, step.start), end: Math.max(end, step.end), progress: step.end === Infinity ? step.progress : progress, failed: failed || step.failed };
     }
+    for (const { node, step } of shown) if (node.inputs.some((input) => input.link != null)) rank.set(step, ranks++);
 }
 
 /** The step of the node a link of the graph shown leads into, if the run reached it. */
@@ -159,9 +177,12 @@ export const stepInto = (link: { target_id: unknown }): Step | undefined => into
 /** The step a node of the graph shown shows, if the run reached it. */
 export const stepOf = (node: Node): Step | undefined => into.get(Number(node.id))?.step;
 
-/** Whether the run's visuals are on links of the graph shown: from the first node's start until the trail, or else the last river, is gone. */
+/** Whether the run's visuals are on links of the graph shown: from the first node's start until the trail, or else the last river, is gone, and while a path trace plays. */
 export const flowsShown = (): boolean =>
-    (L.flowRiver || L.flowTrail) && shown.length > 0 && !guard.off(RUNS) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT);
+    shown.length > 0 && !guard.off(RUNS) && (tracing() >= 0 || ((L.flowRiver || L.flowTrail) && clock.runTime < run.end + (L.flowTrail ? L.flowTrailFade : RIVER_OUT)));
+
+/** Whether the link pass draws the run's visuals on a canvas's links now; the link part's setup() puts its own in place. */
+export const linkPass: { drawsRuns: (canvas: Canvas) => boolean } = { drawsRuns: () => false };
 
 /** The river's alpha into a node with `step` at `t`: in once the node has run RIVER_DELAY, out once it stops; while nothing moves between events, whole while it runs. */
 function riverAlpha(step: Step, t: number, still: boolean): number {
@@ -176,9 +197,37 @@ const trailLeft = (step: Step, t: number) => (step.end > t ? 0 : Math.max(0, Mat
 const point = new Float64Array(4);
 
 /**
+ * The path trace's comet on segment `s`, `p` of the way through the show, where `unit` is a px on screen: each link's
+ * run takes a stretch of the show, the stretches one after another in the order the nodes they lead into ran, as many
+ * as overlap at LEG of the show each. Its head, white in a glow of the accent, crosses the link in its run and leads a
+ * fading tail, which goes on into the node and fades as the next run starts. Whether it is on the link.
+ */
+function comet(ctx: CanvasRenderingContext2D, s: Segment, order: number, p: number, unit: number): boolean {
+    const leg = Math.max(1 / (ranks + FADE), LEG);
+    const f = (p - (ranks > 1 ? (order * (1 - leg * (1 + FADE))) / (ranks - 1) : 0)) / leg;
+    if (f <= 0 || f >= 1 + FADE) return false;
+    const tail = TAIL * unit;
+    const head = f * s.chain;
+    const fade = Math.min(1, (1 + FADE - f) / FADE);
+    for (let i = TAIL_DISCS - 1; i >= 0; i--) {
+        const d = head - (i / TAIL_DISCS) * tail;
+        if (d < s.u0 || d >= s.u0 + s.len) continue;
+        // px along the path Link.Style lays, which a wave makes longer.
+        s.path.find(((d - s.u0) / s.len) * s.path.length, point);
+        const left = 1 - i / TAIL_DISCS;
+        disc(ctx, point[0], point[1], HEAD * unit * (0.4 + 0.6 * left), tint, left * fade, true);
+        if (i) continue;
+        disc(ctx, point[0], point[1], 2 * HEAD * unit, tint, 0.4, true);
+        disc(ctx, point[0], point[1], 0.75 * HEAD * unit, '#ffffff', 1, false);
+    }
+    return true;
+}
+
+/**
  * Draws the run's visuals on `segments`, those with a step: the trail into a node that ran, a wider red link into one
  * that failed, and the river into one running, a wider link in its colour lightened, with sparks flowing toward the
- * node. Pause.Mode's Freeze holds the river still, as reduced motion holds its sparks. How many move.
+ * node; then the path trace's comet over them. Pause.Mode's Freeze holds the river still, as reduced motion holds its
+ * sparks. How many move.
  */
 export function drawFlows(ctx: CanvasRenderingContext2D, segments: readonly Segment[]): number {
     const t = clock.runTime;
@@ -218,6 +267,15 @@ export function drawFlows(ctx: CanvasRenderingContext2D, segments: readonly Segm
             for (let d = s.u0 + ((((shift - s.u0) % SPACING) + SPACING) % SPACING); d < s.u0 + s.len; d += SPACING) {
                 s.path.at((d - s.u0) / s.len, point);
                 disc(ctx, point[0], point[1], L.thickness, '#ffffff', 1, true);
+            }
+        }
+        const p = tracing();
+        if (p >= 0) {
+            ctx.globalAlpha = 1;
+            const unit = 1 / app.canvas.ds.scale;
+            for (const s of segments) {
+                const order = s.flow && rank.get(s.flow);
+                if (order !== undefined && !s.empty && comet(ctx, s, order, p, unit)) moving++;
             }
         }
     } catch (error) {
@@ -302,7 +360,7 @@ function failure(ctx: CanvasRenderingContext2D, node: Node, step: Step, t: numbe
     return !steady;
 }
 
-/** Over the nodes on screen, with node effects on: each running node's ring and each failed node's outline, as Run.Ring and Run.Error say. */
+/** Over the nodes on screen, with node effects on: each running node's ring and each failed node's outline, as Run.Ring and Run.Error say, and the bursts as nodes finish. */
 function drawSteps(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     syncRuns(canvas);
     live.rings = 0;
@@ -322,6 +380,11 @@ function drawSteps(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
             ctx.restore();
         }
     }
+    try {
+        live.rings += drawPops(canvas, ctx);
+    } catch (error) {
+        guard.fail(RUNS, error);
+    }
     if (live.rings) wake();
 }
 
@@ -329,7 +392,7 @@ function drawSteps(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
 let celebrated = -Infinity;
 
 /**
- * Where the fireworks go off as Completion.Anchor says: over the primary nodes and the output nodes the run reached,
+ * Where the completion effect plays as Completion.Anchor says: over the primary nodes and the output nodes the run reached,
  * the primary ones first, else, for Primary nodes, over those alone; the ANCHORS of them nearest the middle of the view,
  * with a smaller show there for those off screen, or for outputs in another graph when none of them shows; or there,
  * for Center of screen. An output node in a subgraph anchors at the node holding it. Excluded nodes never.
@@ -362,15 +425,38 @@ function anchors(canvas: Canvas, graph: Graph): Anchor[] {
     return shows;
 }
 
-/** A run that succeeded sets off the fireworks at its anchors, with End Animation on, unless a show started less than SHOWS_MS before. */
+/**
+ * Plays Completion.Style over `shows` for run `prompt`, or Surprise's pick. A path trace needs links into nodes of the
+ * run shown, which the link pass draws the run's visuals on; else it is a shockwave.
+ */
+export function complete(shows: Anchor[], prompt: string): void {
+    const { canvas } = app;
+    syncRuns(canvas);
+    const styles: readonly Style[] = ranks && !guard.off(RUNS) && linkPass.drawsRuns(canvas) ? STYLES : STYLES.filter((style) => style !== 'trace');
+    const chosen = N.completionStyle === 'random' ? surprise(prompt, styles) : (N.completionStyle as Style);
+    const style = styles.includes(chosen) ? chosen : 'shockwave';
+    // The background pass records the links the trace runs along.
+    if (style === 'trace') canvas.setDirty(true, true);
+    play(style, shows, prompt);
+}
+
+/** A run that succeeded plays its completion effect at its anchors, with End Animation on, unless a show started less than SHOWS_MS before. */
 function celebrate(prompt: string): void {
     const { canvas } = app;
     const now = performance.now();
-    if (!celebrating || !N.enabled || !N.endAnimationEnabled || guard.off(FIREWORKS) || !canvas.graph || now - celebrated < SHOWS_MS) return;
+    if (!celebrating || !N.enabled || !N.endAnimationEnabled || guard.off(COMPLETION) || !canvas.graph || now - celebrated < SHOWS_MS) return;
     const shows = anchors(canvas, canvas.graph);
     if (!shows.length) return;
     celebrated = now;
-    fireworks(shows, prompt);
+    complete(shows, prompt);
+}
+
+/** A burst as node `id` of the run finishes, with Completion.PerNode on: from a node of the graph shown, unless a Freeze holds the node effects. */
+function burst(id: string): void {
+    const { canvas } = app;
+    const node = path(id).at(-1);
+    if (!celebrating || !N.enabled || !N.completionPerNode || guard.off(RUNS) || !node || node.graph !== canvas.graph || !here() || during(N.pauseDuringRender) === 'pause') return;
+    pop(canvas, node, run.prompt);
 }
 
 /** The execution id of the node running that started last. */
@@ -420,7 +506,7 @@ function finish(): void {
 /** What an edit of a node changes. */
 const signature = (node: Node) => JSON.stringify([node.mode, node.widgets?.map((widget) => widget.value), node.inputs.map((_, i) => node.getInputLink(i)?.id)]);
 
-/** Each extension's setup() calls this with its part; the first listens to this client's runs, and the node part draws their rings and outlines and sets off their fireworks. */
+/** Each extension's setup() calls this with its part; the first listens to this client's runs, and the node part draws their rings and outlines and plays their completion effects. */
 export function installRuns(part: 'links' | 'nodes'): void {
     if (part === 'nodes') {
         layers.runs = drawSteps;
@@ -466,6 +552,7 @@ export function installRuns(part: 'links' | 'nodes'): void {
             } else if (state === 'finished' && step?.end === Infinity) {
                 step.end = clock.runTime;
                 moved = true;
+                burst(id);
             }
         }
         changed(moved);
@@ -492,7 +579,7 @@ export function installRuns(part: 'links' | 'nodes'): void {
         if (ours(detail)) finish();
     });
     // A run whose end never came, as the server restarted or the socket dropped as it ended, is over once the socket is
-    // back (FE157 scripts/api.ts L944, FE1395 L564), without fireworks.
+    // back (FE157 scripts/api.ts L944, FE1395 L564), without a completion effect.
     api.addEventListener('reconnected', () => {
         if (env.running) finish();
     });

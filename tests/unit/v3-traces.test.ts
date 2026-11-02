@@ -2,19 +2,23 @@
  * Traces of what v3 draws that v1 had no trace of: the merkaba marker and the
  * stroked spiral, markers over another animation (Marker.All), v2's drop
  * shadow (Shadow.Style drop), Classic Flow on Wave and Coil links, and a node
- * effect on a bypassed node beside a collapsed one. They are v3's own
+ * effect on a bypassed node beside a collapsed one, and the completion styles
+ * after the fireworks: confetti, the shockwave and the path trace's comet,
+ * along a link through a reroute too. They are v3's own
  * snapshots, in __traces__/v3: `vitest -u` on this file rewrites them, after a
  * change to what they show has been checked.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { clock } from '@/core/engine';
+import { drawBursts, endBursts, play, type Anchor, type Style } from '@/fx/bursts';
+import { drawFlows, stepInto } from '@/fx/execution';
 import { palette } from '@/core/colors';
 import { MOVING } from '@/links/animations';
 import { Segment } from '@/links/pipeline';
 import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
-import { frames, start } from '../helpers/fake-litegraph';
+import { frames, run, start } from '../helpers/fake-litegraph';
 import { V1_LINK_SETTINGS, V1_NODE_SETTINGS, storeSettings, traceFrames } from './characterize/v1-inputs';
 
 const [LEFT, RIGHT, SPLINE] = [3, 4, 2];
@@ -58,6 +62,25 @@ function still(title: string, animate: number, markers = animate === 9) {
     }]]);
 }
 
+/** The view the completion styles are drawn on: 1600 × 900 at zoom 1, a node on it and the view's middle. */
+const graph = {};
+const VIEW = { visible_area: new Float32Array([0, 0, 1600, 900]), ds: { scale: 1 }, graph } as unknown as Parameters<typeof drawBursts>[0];
+const NODE: Anchor = { id: 1, pos: [600, 400], graph, boundingRect: [600, 370, 240, 130] } as unknown as Anchor;
+const MIDDLE: Anchor = { id: 'view', pos: [800, 450], graph } as unknown as Anchor;
+
+/** A show of `style` over `anchors`, drawn `times` s in. */
+function completion(title: string, style: Style, anchors: Anchor[], times: number[]) {
+    storeSettings({});
+    endBursts();
+    play(style, anchors, 'v3 trace');
+    const rec = traceFrames(title, times.map((t) => [`t=${t}s`, (ctx) => {
+        clock.burstTime = t;
+        drawBursts(VIEW, ctx);
+    }]));
+    endBursts();
+    return rec;
+}
+
 afterEach(() => {
     vi.restoreAllMocks();
 });
@@ -90,6 +113,41 @@ describe('v3 traces', () => {
             await expect(moving(`Classic Flow, Link.Style ${style}`, 9, { linkStyle: style, times: FEW }).trace()).toMatchFileSnapshot(`__traces__/v3/path-${name}.txt`);
         });
     }
+
+    it('confetti over a node', async () => {
+        await expect(completion('Confetti over a node', 'confetti', [NODE], [0.3, 1, 1.8]).trace()).toMatchFileSnapshot('__traces__/v3/completion-confetti.txt');
+    });
+
+    it('a shockwave over a node, and over the middle of the view a third of a second later', async () => {
+        await expect(completion('Shockwave over a node, then the middle', 'shockwave', [NODE, MIDDLE], [0.1, 0.4, 0.65, 0.9]).trace())
+            .toMatchFileSnapshot('__traces__/v3/completion-shockwave.txt');
+    });
+
+    it("the path trace's comet along the links into the nodes that ran, the second through a reroute, in the order they ran", async () => {
+        await start({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Flow.River': false, '🔗 Enhanced Links.Flow.Trail': false, '📦 Enhanced Nodes.Completion.Style': 'trace' }, {
+            nodes: [{ pos: [100, 100] }, { pos: [400, 100] }, { pos: [800, 500], output: true }],
+            links: [{ from: 0, to: 1 }, { from: 1, to: 2 }],
+        });
+        frames(1);
+        run('v3 trace', [1, 2, 3]);
+        frames(1);
+        // Into the second node, then into the third through a reroute at (500, 400).
+        const segments = ([[[100, 100], [260, 100], 2], [[260, 220], [500, 400], 3], [[500, 400], [760, 520], 3]] as const).map(([a, b, target]) => {
+            const s = new Segment();
+            s.path.set(a, b, RIGHT, LEFT, SPLINE);
+            s.len = s.path.length;
+            s.flow = stepInto({ target_id: target });
+            return s;
+        });
+        segments[0].chain = segments[0].len;
+        segments[2].u0 = segments[1].len;
+        segments[1].chain = segments[2].chain = segments[1].len + segments[2].len;
+        await expect(traceFrames('Path trace', [0.2, 0.45, 0.7, 0.95].map((p) => [`p=${p}`, (ctx) => {
+            clock.burstTime = p * 1.5;
+            drawFlows(ctx, segments);
+        }])).trace()).toMatchFileSnapshot('__traces__/v3/completion-trace.txt');
+        endBursts();
+    });
 
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {
         const canvas = await start({ ...V1_NODE_SETTINGS, '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 3 }, {
