@@ -18,9 +18,11 @@
  *
  * With reduced motion or links frozen nothing pops in, waves, marches or
  * blinks, and the ticker rests. It is drawn over the nodes, as large on screen
- * at any zoom, and only draws: native connects as it always does. A link
- * dropped on the canvas draws none, though native keeps it while the
- * link-release search shows.
+ * at any zoom. Native connects a link let go on a slot, a node or a reroute as
+ * it always does; one let go on nothing connects to the candidate as if let go
+ * on it, with Assist.AutoConnect wherever the guide line points or once the
+ * hands clasp, and with Assist.SnapKey held anywhere in reach, while the hands
+ * draw clasped. Else native's link-release search shows, and assist draws none.
  *
  * @module fx/assist
  */
@@ -33,6 +35,7 @@ import { dark, darker } from '@/core/colors';
 type Canvas = typeof app.canvas;
 type Node = InstanceType<typeof LGraphNode> | NonNullable<Canvas['subgraph']>['inputNode' | 'outputNode'];
 type Link = Canvas['linkConnector']['renderLinks'][number];
+type Drop = Parameters<Canvas['linkConnector']['dropOnNothing']>[0];
 
 /** The guard's key, which its toast names when it turns assist off. */
 const ASSIST = 'Connection assist';
@@ -292,6 +295,44 @@ function seek(canvas: Canvas, link: Link, x: number, y: number): boolean {
     return found.node !== undefined;
 }
 
+/** Whether `event` holds Assist.SnapKey. */
+const snapKey = (event: { ctrlKey: boolean; metaKey: boolean; altKey: boolean }): boolean =>
+    L.assistSnapKey === 'ctrl' ? event.ctrlKey || event.metaKey : L.assistSnapKey === 'alt' && event.altKey;
+
+/** Whether the snap key is held, as the keyboard last said. */
+let snapping = false;
+
+/**
+ * Whether letting go `d` px on screen from the candidate connects to it: with the snap key `held`, anywhere in reach;
+ * with Assist.AutoConnect, anywhere the guide line points, and once the hands clasp.
+ */
+const grips = (d: number, held: boolean): boolean => held || (L.assistAutoConnect && (L.assistMode === 'line' || d <= CLASP));
+
+/**
+ * Where native lets the link of `canvas` go on nothing at `event`, the drop on the candidate there, if grips() says it
+ * connects: native's own drop on its node, or on the subgraph's input or output node, with the event moved onto its slot,
+ * so that native's rules connect the links. Whether it dropped them there.
+ */
+function drop(canvas: Canvas, event: Drop): boolean {
+    const { linkConnector } = canvas;
+    const link = linkConnector.renderLinks[0];
+    if (!link || !L.enabled || L.assistMode === 'off' || guard.off(ASSIST)) return false;
+    const { canvasX: x, canvasY: y } = event;
+    if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) * canvas.ds.scale, snapKey(event))) return false;
+    const node = found.node!;
+    const at = event as { canvasX: number; canvasY: number };
+    at.canvasX = found.x;
+    at.canvasY = found.y;
+    try {
+        if (node instanceof LGraphNode) linkConnector.dropOnNode(node, event);
+        else linkConnector.dropOnIoNode(node, event);
+    } finally {
+        at.canvasX = x;
+        at.canvasY = y;
+    }
+    return true;
+}
+
 /**
  * The link being dragged, as its first render link, and the one dropped on the canvas, which native keeps while the
  * link-release search or menu shows. As a drag starts: when on clock.assistTime, and the colour its link is drawn in.
@@ -344,7 +385,7 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     const scale = canvas.ds.scale;
     const unit = 1 / scale;
     const d = Math.hypot(found.x - x, found.y - y) * scale;
-    const clasped = there && d <= CLASP;
+    const clasped = there && (d <= CLASP || snapping);
     const t = clock.assistTime;
     if (found.node !== shown.node || found.slot !== shown.slot || there !== shown.there || clasped !== shown.clasped) {
         shown.node = found.node;
@@ -388,8 +429,9 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
 }
 
 /**
- * Puts connection assist over the nodes of app.canvas, and hears when a link dragged there is dropped on the canvas or
- * the drag ends, which native need not paint for: then what assist drew goes with one paint.
+ * Puts connection assist over the nodes of app.canvas, connects a link let go on nothing to its candidate where drop()
+ * says so, and hears when one dragged there is dropped on the canvas or the drag ends, which native need not paint for:
+ * then what assist drew goes with one paint. The hands clasp while the snap key is held.
  */
 export function installAssist(): void {
     layers.assist = (canvas, ctx) => {
@@ -408,4 +450,33 @@ export function installAssist(): void {
         clear();
     });
     linkConnector.events.addEventListener('reset', clear);
+    // Classic mode lets a link go on nothing here from dropLinks, Nodes 2.0 from its adapter's dropOnCanvas. Native's
+    // drop on a subgraph's input or output node comes back here where it finds no slot, which goes on to native.
+    const { dropOnNothing } = linkConnector;
+    let dropping = false;
+    linkConnector.dropOnNothing = function (event) {
+        let dropped = false;
+        if (!dropping) {
+            dropping = true;
+            try {
+                dropped = drop(app.canvas, event);
+            } catch (error) {
+                guard.fail(ASSIST, error);
+            } finally {
+                dropping = false;
+            }
+        }
+        if (!dropped) dropOnNothing.call(this, event);
+    };
+    const track = (event: KeyboardEvent) => {
+        const held = snapKey(event);
+        if (held === snapping) return;
+        snapping = held;
+        if (dragged) app.canvas.setDirty(true);
+    };
+    window.addEventListener('keydown', track, { capture: true, passive: true });
+    window.addEventListener('keyup', track, { capture: true, passive: true });
+    window.addEventListener('blur', () => {
+        snapping = false;
+    });
 }

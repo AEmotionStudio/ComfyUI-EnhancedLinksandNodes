@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { l as layers, g as guard, L, a as live, c as clock, d as darker, b as dark, e as env, w as wake, i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, f as TOGGLE_ALL, p as panelShown, h as checked, F as FROZEN, S as SELECTION_FX, j as linkSettings, k as install, m as installPanel, o as installRuns, q as installFollow, r as installLinks, s as errorNodes, t as currentLook, u as keyName, v as commandKeys, x as TOGGLE, y as keyText, z as running, A as setting, C as shown$1, D as DISABLED, E as showPanel, G as LINKS_ON, N as NODES_ON, H as toggleLinks, I as toggleNodes, J as N, K as toggleStatic, M as toggleFocus, O as FOCUS_ON, P as commit, Q as showPicker, R as surpriseMe, U as goBack, V as selectedNodes, W as effects, X as pick, Y as complete, Z as resetEverything, _ as goToRunning, $ as nextError, a0 as goAlong } from "./chunks/menus-RVtp4dSR.js";
+import { g as guard, L, l as layers, a as live, c as clock, d as darker, b as dark, e as env, w as wake, i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, f as TOGGLE_ALL, p as panelShown, h as checked, F as FROZEN, S as SELECTION_FX, j as linkSettings, k as install, m as installPanel, o as installRuns, q as installFollow, r as installLinks, s as errorNodes, t as currentLook, u as keyName, v as commandKeys, x as TOGGLE, y as keyText, z as running, A as setting, C as shown$1, D as DISABLED, E as showPanel, G as LINKS_ON, N as NODES_ON, H as toggleLinks, I as toggleNodes, J as N, K as toggleStatic, M as toggleFocus, O as FOCUS_ON, P as commit, Q as showPicker, R as surpriseMe, U as goBack, V as selectedNodes, W as effects, X as pick, Y as complete, Z as resetEverything, _ as goToRunning, $ as nextError, a0 as goAlong } from "./chunks/menus-BXp8gltf.js";
 const ASSIST = "Connection assist";
 const RANGE = 150;
 const CLASP = 75;
@@ -193,6 +193,28 @@ function seek(canvas, link, x, y) {
   }
   return found.node !== void 0;
 }
+const snapKey = (event) => L.assistSnapKey === "ctrl" ? event.ctrlKey || event.metaKey : L.assistSnapKey === "alt" && event.altKey;
+let snapping = false;
+const grips = (d, held) => held || L.assistAutoConnect && (L.assistMode === "line" || d <= CLASP);
+function drop(canvas, event) {
+  const { linkConnector } = canvas;
+  const link = linkConnector.renderLinks[0];
+  if (!link || !L.enabled || L.assistMode === "off" || guard.off(ASSIST)) return false;
+  const { canvasX: x, canvasY: y } = event;
+  if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) * canvas.ds.scale, snapKey(event))) return false;
+  const node = found.node;
+  const at = event;
+  at.canvasX = found.x;
+  at.canvasY = found.y;
+  try {
+    if (node instanceof LGraphNode) linkConnector.dropOnNode(node, event);
+    else linkConnector.dropOnIoNode(node, event);
+  } finally {
+    at.canvasX = x;
+    at.canvasY = y;
+  }
+  return true;
+}
 let dragged;
 let released;
 let began = 0;
@@ -231,7 +253,7 @@ function drawAssist(canvas, ctx) {
   const scale = canvas.ds.scale;
   const unit = 1 / scale;
   const d = Math.hypot(found.x - x, found.y - y) * scale;
-  const clasped = there && d <= CLASP;
+  const clasped = there && (d <= CLASP || snapping);
   const t = clock.assistTime;
   if (found.node !== shown.node || found.slot !== shown.slot || there !== shown.there || clasped !== shown.clasped) {
     shown.node = found.node;
@@ -289,6 +311,33 @@ function installAssist() {
     clear();
   });
   linkConnector.events.addEventListener("reset", clear);
+  const { dropOnNothing } = linkConnector;
+  let dropping = false;
+  linkConnector.dropOnNothing = function(event) {
+    let dropped = false;
+    if (!dropping) {
+      dropping = true;
+      try {
+        dropped = drop(app.canvas, event);
+      } catch (error) {
+        guard.fail(ASSIST, error);
+      } finally {
+        dropping = false;
+      }
+    }
+    if (!dropped) dropOnNothing.call(this, event);
+  };
+  const track = (event) => {
+    const held = snapKey(event);
+    if (held === snapping) return;
+    snapping = held;
+    if (dragged) app.canvas.setDirty(true);
+  };
+  window.addEventListener("keydown", track, { capture: true, passive: true });
+  window.addEventListener("keyup", track, { capture: true, passive: true });
+  window.addEventListener("blur", () => {
+    snapping = false;
+  });
 }
 const SAY_MS = 2e3;
 const HINT_MS = 5e3;

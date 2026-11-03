@@ -153,6 +153,8 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Perf.MinZoom': 25,
     '📦 Enhanced Nodes.Run.Ring.Color.Mode': 'accent',
     '📦 Enhanced Nodes.Run.Ring.Color': '#00e5ff',
+    '🔗 Enhanced Links.Assist.AutoConnect': true,
+    '🔗 Enhanced Links.Assist.SnapKey': 'ctrl',
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -169,6 +171,7 @@ const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Physics.Profile': ['off', 'rope', 'whip', 'gel'],
     '🔗 Enhanced Links.Assist.Mode': ['off', 'line', 'hands', 'hands-eyes'],
     '📦 Enhanced Nodes.Run.Ring.Color.Mode': ['accent', 'effect', 'custom', 'rainbow', 'status'],
+    '🔗 Enhanced Links.Assist.SnapKey': ['ctrl', 'alt', 'off'],
 };
 const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
@@ -340,14 +343,14 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 59 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(59);
+    it('shows 61 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(61);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
         const alone = SETTINGS.filter((s) => s.type === 'hidden' || ('look' in s && s.look === false)).map((s) => s.id);
         expect(alone).toEqual([
-            '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled',
+            '🔗 Enhanced Links.Enabled', '🔗 Enhanced Links.Assist.AutoConnect', '🔗 Enhanced Links.Assist.SnapKey', '📦 Enhanced Nodes.Enabled',
             ...['Enabled', 'Mode', 'Color', 'Depth', 'OnTop', 'Hover', 'Dim'].map((key) => `🔗 Enhanced Links.Focus.${key}`),
             '🔗 Enhanced Links.Navigate.DoubleClick', '🔗 Enhanced Links.Navigate.Follow', '🔗 Enhanced Links.Flow.Trail.Fade', '📦 Enhanced Nodes.Run.Ring.Color.Mode', '📦 Enhanced Nodes.Run.Ring.Color', '📦 Enhanced Nodes.Completion.Anchor',
             '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Perf.Adaptive', '🔗 Enhanced Links.Perf.KeepGlow', '🔗 Enhanced Links.Perf.StaticAbove', '🔗 Enhanced Links.Perf.MinZoom', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',

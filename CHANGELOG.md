@@ -37,6 +37,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 
 ### Connection assist
 - **Connection assist** (Guide line, Reaching hands, or Hands & eyes): while you drag a link, it points out the nearest slot within reach the link can connect to. Inspired by nodezator, as suggested in #3.
+- **Connect on release**: let go once the hands clasp, or wherever the guide line points, and the link connects; hold the **Snap key** (Ctrl or Alt) as you let go to connect from anywhere in reach.
 
 ### Nodes
 - **Node effects show again**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Flower of Life draw over the node at v1's strength (2.x drew them under the node, where they could not be seen), with their halo, a glowing frame around selected nodes, and particles on their own.

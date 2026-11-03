@@ -65,6 +65,8 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Connection assist | `🔗 Enhanced Links.Assist.Mode` | combo | `off` Off, `line` Guide line, `hands` Reaching hands, `hands-eyes` Hands & eyes | `off` Off | While you drag a link, show the nearest slot it can connect to. |
+| Connect on release | `🔗 Enhanced Links.Assist.AutoConnect` | boolean | `true`, `false` | `true` | Let go once the hands clasp, or once the guide line points at a slot, and the link connects there. |
+| Snap key | `🔗 Enhanced Links.Assist.SnapKey` | combo | `ctrl` Ctrl (⌘ on Mac), `alt` Alt (Option on Mac), `off` Off | `ctrl` Ctrl (⌘ on Mac) | Hold it as you let go to connect to the slot connection assist shows, anywhere in its reach. |
 
 ## Nodes · Effect
 

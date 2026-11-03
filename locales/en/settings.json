@@ -225,6 +225,19 @@
       "Hands & eyes": "Hands & eyes"
     }
   },
+  "🔗 Enhanced Links_Assist_AutoConnect": {
+    "name": "Connect on release",
+    "tooltip": "Let go once the hands clasp, or once the guide line points at a slot, and the link connects there."
+  },
+  "🔗 Enhanced Links_Assist_SnapKey": {
+    "name": "Snap key",
+    "tooltip": "Hold it as you let go to connect to the slot connection assist shows, anywhere in its reach.",
+    "options": {
+      "Ctrl (⌘ on Mac)": "Ctrl (⌘ on Mac)",
+      "Alt (Option on Mac)": "Alt (Option on Mac)",
+      "Off": "Off"
+    }
+  },
   "📦 Enhanced Nodes_Enabled": {
     "name": "Node effects",
     "tooltip": "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is."

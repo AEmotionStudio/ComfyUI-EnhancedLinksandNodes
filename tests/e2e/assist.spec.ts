@@ -5,7 +5,8 @@
 // nothing drawn; it works inside a subgraph, toward its output node too, and, in Nodes 2.0, on the canvas above the DOM
 // nodes at device pixel ratios 1 and 2; and Showcase and Living Wires turn it on. The gloves are the only near-white on
 // the dark palette's canvas. Drops connect natively in the -native projects too; the rest comes with the extensions, so
-// they skip it.
+// they skip it. Let go on nothing, a link connects to the slot assist shows where the guide line points or once the
+// hands clasp, and with the snap key held anywhere in reach, as one undo; else the link-release search opens.
 import type { Locator, Page } from '@playwright/test';
 import { buildGraph, expect, openApp, openSubgraph, readProbe, resetProbe, setSetting, settingValues, settle, test, vueSlotCentres, type GraphSpec, type Point } from './helpers';
 
@@ -66,6 +67,21 @@ const toward = (from: Point, to: Point, px: number): Point => {
     const d = Math.hypot(from[0] - to[0], from[1] - to[1]);
     return [to[0] + ((from[0] - to[0]) * px) / d, to[1] + ((from[1] - to[1]) * px) / d];
 };
+
+/** The node and slot, and the type, of the link into input 0 of node `id`, if one is; 'no node' while there is no node `id`. */
+const linkInto = (page: Page, id: number) => page.evaluate((id) => {
+    const graph = window.app.canvas.graph;
+    const node = graph.getNodeById(id);
+    if (!node) return 'no node';
+    const link = graph.getLink(node.inputs[0].link);
+    return link ? [Number(link.origin_id), link.origin_slot, link.type] : null;
+}, id);
+
+/** Has the workflow's change tracker take the graph as it stands, so that an undo goes back to it rather than past it. */
+const checkpoint = (page: Page) => page.evaluate(() => {
+    const tracker = window.app.extensionManager.workflow.activeWorkflow.changeTracker;
+    (tracker.captureCanvasState ?? tracker.checkState).call(tracker);
+});
 
 /** Polls the whites of a box until they are `none` or some. */
 const expectWhites = (page: Page, at: Point, box: Point, some: boolean, overlay = false, message = '') =>
@@ -151,6 +167,87 @@ test.describe('dragging from an output', () => {
     });
 });
 
+test.describe('let go on nothing', () => {
+    /** Drags a new link from the source's output to `px` from the target's input and lets it go, with `key` held from just before. */
+    async function letGo(page: Page, px: number, key?: string) {
+        const graph = await buildGraph(page, scene);
+        await checkpoint(page);
+        const [from, to] = [await slot(page, graph.nodes.source, false), await slot(page, graph.nodes.target, true)];
+        await page.mouse.move(...from);
+        await page.mouse.down();
+        await page.mouse.move(...toward(from, to, px), { steps: 12 });
+        if (key) await page.keyboard.down(key);
+        return { graph, from, to, up: async () => {
+            await page.mouse.up();
+            if (key) await page.keyboard.up(key);
+        } };
+    }
+
+    // 1.57 opens a dialog, 1.39.5 a search popup.
+    const searchBox = (page: Page) => page.getByRole('dialog').or(page.getByRole('search')).first();
+
+    test('inside the clasp, connects the link to the slot the hands hold, as one undo', async ({ page, profile }) => {
+        ours(profile);
+        const { graph, up } = await letGo(page, 60);
+        await up();
+        expect(await linkInto(page, graph.nodes.target)).toEqual([graph.nodes.source, 0, 'IMAGE']);
+        await expect(searchBox(page)).toBeHidden();
+        expect(await page.evaluate(() => window.app.canvas.linkConnector.isConnecting)).toBe(false);
+        await page.keyboard.press('Control+z');
+        await expect.poll(() => linkInto(page, graph.nodes.target)).toBeNull();
+    });
+
+    test('between the clasp and the reach, leaves it to native: the link-release search opens', async ({ page, profile }) => {
+        ours(profile);
+        const { graph, up } = await letGo(page, 110);
+        await up();
+        await expect(searchBox(page)).toBeVisible({ timeout: 3000 });
+        expect(await linkInto(page, graph.nodes.target)).toBeNull();
+        await page.keyboard.press('Escape');
+    });
+
+    test('with the snap key held, the hands clasp anywhere in reach, and letting go connects', async ({ page, profile }) => {
+        ours(profile);
+        const { graph, from, to, up } = await letGo(page, 110, 'Control');
+        await expectWhites(page, toward(from, to, 55), [10, 10], true, false, 'clasped halfway');
+        await up();
+        expect(await linkInto(page, graph.nodes.target)).toEqual([graph.nodes.source, 0, 'IMAGE']);
+    });
+
+    test.describe('with the guide line', () => {
+        test.use({ settings: { '🔗 Enhanced Links.Animate': 0, [MODE]: 'line' } });
+
+        test('connects anywhere the line points', async ({ page, profile }) => {
+            ours(profile);
+            const { graph, up } = await letGo(page, 110);
+            await up();
+            expect(await linkInto(page, graph.nodes.target)).toEqual([graph.nodes.source, 0, 'IMAGE']);
+        });
+    });
+
+    test.describe('with Connect on release off', () => {
+        test.use({ settings: { '🔗 Enhanced Links.Animate': 0, [MODE]: 'hands', '🔗 Enhanced Links.Assist.AutoConnect': false } });
+
+        test('leaves even a clasp to native, but for the snap key', async ({ page, profile }) => {
+            ours(profile);
+            const first = await letGo(page, 60);
+            await first.up();
+            await expect(searchBox(page)).toBeVisible({ timeout: 3000 });
+            expect(await linkInto(page, first.graph.nodes.target)).toBeNull();
+            await page.keyboard.press('Escape');
+            await expect(searchBox(page)).toBeHidden();
+            const [from, to] = [await slot(page, first.graph.nodes.source, false), await slot(page, first.graph.nodes.target, true)];
+            await page.mouse.move(...from);
+            await page.mouse.down();
+            await page.mouse.move(...toward(from, to, 60), { steps: 12 });
+            await page.keyboard.down('Control');
+            await page.mouse.up();
+            await page.keyboard.up('Control');
+            expect(await linkInto(page, first.graph.nodes.target)).toEqual([first.graph.nodes.source, 0, 'IMAGE']);
+        });
+    });
+});
+
 test('dragging from an input reaches for an output of its type', async ({ page, profile }) => {
     ours(profile);
     const graph = await buildGraph(page, scene);
@@ -197,8 +294,12 @@ test("reaches for the empty slot of a subgraph's output node", async ({ page, pr
     await page.mouse.down();
     await page.mouse.move(...toward(from, to, 110), { steps: 12 });
     await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the empty slot');
-    await page.keyboard.press('Escape');
+    // Let go inside the clasp, it makes the subgraph an output, as a drop on the empty slot does.
+    const outputs = () => page.evaluate(() => window.app.canvas.subgraph.outputNode.slots.length);
+    const before = await outputs();
+    await page.mouse.move(...toward(from, to, 50), { steps: 4 });
     await page.mouse.up();
+    await expect.poll(outputs).toBe(before + 1);
 });
 
 for (const scale of [1, 2]) {
@@ -226,6 +327,24 @@ for (const scale of [1, 2]) {
             await page.mouse.up();
             expect(await page.evaluate((id) => window.app.canvas.graph.getNodeById(id).inputs[0].link != null, graph.nodes.target)).toBe(true);
             await expectWhites(page, toward(from, to, 30), [80, 40], false, true, 'nothing once dropped');
+        });
+
+        test('let go on nothing inside the clasp, connects the link to the DOM slot, as one undo', async ({ page, profile }) => {
+            ours(profile);
+            const graph = await buildGraph(page, scene);
+            await expect(page.locator('.lg-node[data-node-id]')).toHaveCount(3);
+            await checkpoint(page);
+            const [from, to] = [await slot(page, graph.nodes.source, false, true), await slot(page, graph.nodes.target, true, true)];
+            await page.mouse.move(...from);
+            await page.mouse.down();
+            await page.mouse.move(...toward(from, to, 60), { steps: 12 });
+            await page.mouse.up();
+            expect(await linkInto(page, graph.nodes.target)).toEqual([graph.nodes.source, 0, 'IMAGE']);
+            // 1.39.5's Nodes 2.0 records no link drop for undo, a drop on the slot itself neither (FE1395
+            // renderer/extensions/vueNodes/composables/useSlotLinkInteraction.ts finishInteraction).
+            if (test.info().project.name.startsWith('fe1395')) return;
+            await page.keyboard.press('Control+z');
+            await expect.poll(() => linkInto(page, graph.nodes.target)).toBeNull();
         });
     });
 }

@@ -110,7 +110,8 @@
 ![Connection assist](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/assist.webp)
 
 *   While you drag a link, the nearest slot within reach that it can connect to gets a **Guide line**, **Reaching hands** that clasp when you are close, or **Hands & eyes**.
-*   It only draws: connecting works exactly as in ComfyUI.
+*   **Connect on release** (on by default): let go once the hands clasp, or wherever the guide line points, and the link connects there. Hold the **Snap key** (Ctrl, ⌘ on Mac) as you let go to connect from anywhere in reach.
+*   A link let go on a slot, a node or a reroute connects exactly as in ComfyUI; one let go far from any slot opens ComfyUI's link-release search.
 
 </td>
 <td width="50%">

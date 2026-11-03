@@ -118,6 +118,12 @@ const ASSIST_OPTIONS = [
     { value: 'hands-eyes', text: 'Hands & eyes' },
 ] as const;
 
+const SNAP_KEY_OPTIONS = [
+    { value: 'ctrl', text: 'Ctrl (⌘ on Mac)' },
+    { value: 'alt', text: 'Alt (Option on Mac)' },
+    { value: 'off', text: 'Off' },
+] as const;
+
 const MARKER_SHAPE_OPTIONS = [
     { value: 'none', text: 'None' },
     { value: 'arrow', text: 'Arrow' },
@@ -313,6 +319,7 @@ const focusOn = (): boolean => L.focusEnabled;
 /** Whether a run changes anything: Pause.Mode is not Keep animating. */
 const runsChange = (): boolean => L.pauseMode !== 'ignore';
 const titles = (): boolean => N.enabled && N.textAnimationEnabled;
+const assisting = (): boolean => L.enabled && L.assistMode !== 'off';
 
 /** The fix for a node colour that only Custom colours use. */
 const customNodes = (): Need | undefined =>
@@ -375,6 +382,8 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
 
     { id: '🔗 Enhanced Links.Assist.Mode', key: 'assistMode', name: 'Connection assist', type: 'combo', options: ASSIST_OPTIONS, default: 'off', group: 'Links · Connecting', showIf: (): boolean => L.enabled, tooltip: 'While you drag a link, show the nearest slot it can connect to.' },
+    { id: '🔗 Enhanced Links.Assist.AutoConnect', key: 'assistAutoConnect', name: 'Connect on release', type: 'boolean', default: true, group: 'Links · Connecting', look: false, showIf: assisting, tooltip: 'Let go once the hands clasp, or once the guide line points at a slot, and the link connects there.' },
+    { id: '🔗 Enhanced Links.Assist.SnapKey', key: 'assistSnapKey', name: 'Snap key', type: 'combo', options: SNAP_KEY_OPTIONS, default: 'ctrl', group: 'Links · Connecting', look: false, showIf: assisting, tooltip: 'Hold it as you let go to connect to the slot connection assist shows, anywhere in its reach.' },
 
     { id: '📦 Enhanced Nodes.Enabled', key: 'enabled', name: 'Node effects', type: 'boolean', default: true, group: 'Nodes · Effect', look: false, tooltip: 'Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is.' },
     { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', showIf: (): boolean => N.enabled, tooltip: 'Effect drawn on and around every node. Node FX in the node menu picks one for a node.' },
