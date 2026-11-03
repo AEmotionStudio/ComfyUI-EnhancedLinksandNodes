@@ -205,7 +205,7 @@ const V3_CHANGED_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Particle.Density': [0.5, 1, 2, 3],
     '📦 Enhanced Nodes.Particle.Density': [0.5, 1, 2, 3],
     // M9d: Merkaba Beads, Comet Trails and DNA Helix 3D, each in the gallery beside its kin.
-    '🔗 Enhanced Links.Animate': [0, 9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8],
+    '🔗 Enhanced Links.Animate': [0, 9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8, 13],
 };
 const V3_CHANGED_RANGES: Record<string, [min: number, max: number, step: number]> = {
     // M4: v1's speed works quadratically, so 3× moves effects 9× as fast.

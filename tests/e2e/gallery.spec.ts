@@ -264,6 +264,7 @@ const ANIMATIONS: [number, string, string][] = [
     [10, 'Merkaba Beads', 'New in v3: star tetrahedra turning as they glide along a faint link, grown out of the output and back into the input.'],
     [11, 'DNA Helix 3D', 'New in v3: a helix with depth screwing toward the input, its far side faint and fine behind the rungs, its near side bright and glowing.'],
     [12, 'Comet Trails', 'New in v3: bright heads flying along a faint link, their tails tapering and fading behind them along the path.'],
+    [13, 'Stardust', 'New in v3: star dust drifting along a faint link, swelling and twinkling toward the middle, the brightest flashing a sparkle.'],
 ];
 
 const MARKER_SHAPES = ['diamond', 'circle', 'square', 'triangle', 'star', 'heart', 'cross', 'hexagon', 'flower', 'spiral', 'none'];

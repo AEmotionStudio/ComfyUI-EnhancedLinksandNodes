@@ -3,7 +3,7 @@
  * v1's nine are each v1's own still design, posed at a fixed phase, and drawn
  * segment by segment along the real path, counted per link like the moving
  * ones (animations.ts). Classic Flow's still markers are drawn by styles.ts.
- * v3's own three hold their motion's pose at that phase, nothing flowed.
+ * v3's own four hold their motion's pose at that phase, nothing flowed.
  *
  * Ported from v1's StaticRenderers (old_link_animations.js:1820-2401). Cosmic
  * Weave follows the link's own path rather than a curve from its other end,
@@ -246,4 +246,5 @@ export const STILL: Record<number, (ctx: CanvasRenderingContext2D, s: Segment, p
     10: posed(10),
     11: posed(11),
     12: posed(12),
+    13: posed(13),
 };

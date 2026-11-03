@@ -810,7 +810,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: 'Nothing flashes more than three times a second',
-        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, and a DNA Helix 3D strand turns from back to front 1.25 times a second.",
+        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, a DNA Helix 3D strand turns from back to front 1.25 times a second, and Stardust's motes twinkle 2.5 times a second.",
         async proof() {
             // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the glow it breathes or where it shakes its copies.
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Animation.Speed': 3 });
@@ -1000,6 +1000,13 @@ export const DEVIATIONS: Deviation[] = [
             }
             expect(swings(strand[0])).toBeGreaterThan(0);
             for (let second = 0; second < 2; second++) expect(swings(strand[0].slice(second * 30, second * 30 + 31)) / 2).toBeLessThanOrEqual(3);
+            // Stardust's mote nearest x 250, the dust held where it is, as it twinkles.
+            const star = Array.from({ length: 61 }, (_, i) => {
+                const cores = draw((ctx) => MOVING[13](ctx, level, moment(-PHI2 * 3 * (i / 30), 0))).paints.filter((p) => p.op === 'fill' && p.style === '#ffffff');
+                return cores.reduce((a, b) => (Math.abs(a.box![0] - 250) < Math.abs(b.box![0] - 250) ? a : b)).globalAlpha;
+            });
+            expect(turns(star)).toBeGreaterThan(0);
+            for (let second = 0; second < 2; second++) expect(turns(star.slice(second * 30, second * 30 + 31)) / 2).toBeLessThanOrEqual(3);
         },
     },
     {

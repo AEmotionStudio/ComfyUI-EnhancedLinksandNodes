@@ -169,9 +169,9 @@ describe('v3 traces', () => {
         await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/physics-wires.txt');
     });
 
-    it('Merkaba Beads, DNA Helix 3D and Comet Trails, moving and still, along a spline, a link through a reroute and a rope wire', async () => {
+    /** v3's own animations, moving at 0.4 s and 1.9 s and still at phase 9π/4, along v1's short link, a link through a reroute at (300, 560) and a rope wire at rest, as the pipeline lays them. */
+    function ownTraces(animations: [number, string][]): string {
         storeSettings({ '🔗 Enhanced Links.Physics.Profile': 'rope' });
-        /** v1's short link, a link through a reroute at (300, 560) and a rope wire at rest, as the pipeline lays them. */
         const laid = () => {
             const segment = (a: [number, number], b: [number, number], colour: string) => {
                 const s = new Segment();
@@ -190,22 +190,29 @@ describe('v3 traces', () => {
             wire.len = wire.chain = wire.path.length;
             return [segment([100, 100], [260, 100], '#64B5F6'), into, out, wire];
         };
-        const traces = [[10, 'Merkaba Beads'], [11, 'DNA Helix 3D'], [12, 'Comet Trails']].map(([animate, name]) => traceFrames(name as string, [
+        return animations.map(([animate, name]) => traceFrames(name, [
             ...[0.4, 1.9].map((t): Parameters<typeof traceFrames>[1][number] => [`t=${t}s`, (ctx) => {
                 const k = { linkPhase: -PHI2 * t, quantumPhase: -PHI2 * t, linkFlow: 2 * t, linkDir: 1 };
                 for (const s of laid()) {
-                    drawBase(ctx, s, animate as number, false);
-                    MOVING[animate as number](ctx, s, k);
+                    drawBase(ctx, s, animate, false);
+                    MOVING[animate](ctx, s, k);
                 }
             }]),
             ['still, phase=9pi/4', (ctx) => {
                 for (const s of laid()) {
-                    drawBase(ctx, s, animate as number, true);
-                    STILL[animate as number](ctx, s, (9 * Math.PI) / 4);
+                    drawBase(ctx, s, animate, true);
+                    STILL[animate](ctx, s, (9 * Math.PI) / 4);
                 }
             }],
-        ]).trace());
-        await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/animations-v3.txt');
+        ]).trace()).join('');
+    }
+
+    it('Merkaba Beads, DNA Helix 3D and Comet Trails, moving and still, along a spline, a link through a reroute and a rope wire', async () => {
+        await expect(ownTraces([[10, 'Merkaba Beads'], [11, 'DNA Helix 3D'], [12, 'Comet Trails']])).toMatchFileSnapshot('__traces__/v3/animations-v3.txt');
+    });
+
+    it('Stardust, moving and still, along a spline, a link through a reroute and a rope wire', async () => {
+        await expect(ownTraces([[13, 'Stardust']])).toMatchFileSnapshot('__traces__/v3/animations-stardust.txt');
     });
 
     it('connection assist over a link dragged from an IMAGE output: the guide line, the open, reaching and clasped hands, and the eyes', async () => {

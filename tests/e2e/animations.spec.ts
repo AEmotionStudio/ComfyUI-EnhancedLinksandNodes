@@ -13,7 +13,7 @@ declare global {
 
 const ANIMATE = '🔗 Enhanced Links.Animate';
 const STATIC = '🔗 Enhanced Links.Static.Mode';
-const NEW: [number, string][] = [[10, 'Merkaba Beads'], [11, 'DNA Helix 3D'], [12, 'Comet Trails']];
+const NEW: [number, string][] = [[10, 'Merkaba Beads'], [11, 'DNA Helix 3D'], [12, 'Comet Trails'], [13, 'Stardust']];
 
 test.beforeEach(async ({ page, profile }) => {
     test.skip(profile === 'native', 'the animations are the extension’s');

@@ -192,6 +192,8 @@ describe('the commands', () => {
 
         await start({ '🔗 Enhanced Links.Animate': 8 });
         await run('NextLinkStyle');
+        expect([L.animate, said()]).toEqual([13, 'Link animation: Stardust']);
+        await run('NextLinkStyle');
         expect([L.animate, said()]).toEqual([0, 'Link animation: None']);
         await run('NextLinkStyle');
         expect(L.animate).toBe(9);

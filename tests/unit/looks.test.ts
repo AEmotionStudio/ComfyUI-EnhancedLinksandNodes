@@ -357,7 +357,7 @@ describe('Surprise me', () => {
         }
         expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['📦 Enhanced Nodes.Completion.Style'])).size).toBe(4);
         // Every link animation but None, the new three too.
-        expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['🔗 Enhanced Links.Animate']))).toEqual(new Set([9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8]));
+        expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['🔗 Enhanced Links.Animate']))).toEqual(new Set([9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8, 13]));
         // Darker colours for a light palette, which the seed's lowest bit marks.
         const lightness = (seed: number) => {
             const colour = String(mix(seed).values['🔗 Enhanced Links.Color.Primary']);

@@ -57,7 +57,7 @@ const ANIMATED: Record<string, Record<string, unknown>> = {
 };
 
 /** v3's own animations, measured too but on v1 and v2.0.1 (the -ref projects), which do not have them. */
-const OWN: Record<string, number> = { 'Merkaba Beads': 10, 'DNA Helix 3D': 11, 'Comet Trails': 12 };
+const OWN: Record<string, number> = { 'Merkaba Beads': 10, 'DNA Helix 3D': 11, 'Comet Trails': 12, Stardust: 13 };
 const own = (testInfo: TestInfo) => !testInfo.project.name.endsWith('-ref');
 
 /** The looks measured in Nodes 2.0: the default, and Gentle Pulse on every node, whose glows breathe in CSS. */

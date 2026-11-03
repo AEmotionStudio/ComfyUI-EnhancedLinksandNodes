@@ -27,7 +27,7 @@
 *   **Selection focus and navigation.** The selected nodes' links in ComfyUI's white, with the rest dimmed or hidden if you like. Go to connected node, double-click a slot to jump to the other end, Go back, and Follow execution.
 *   **Run visuals and completion effects.** For the runs you queue: light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, then fireworks, confetti, a shockwave or a path trace when the run finishes.
 *   **The FX panel.** 11 looks with live previews, search, Undo and a first-run look picker; every setting also has a readable name and group in ComfyUI's settings dialog.
-*   **New effects.** Merkaba Beads, DNA Helix 3D and Comet Trails, wire physics, and connection assist with reaching hands and googly eyes.
+*   **New effects.** Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust, wire physics, and connection assist with reaching hands and googly eyes.
 
 > **Upgrading from 2.x:** your settings are kept. On first load a **Choose your look** card asks for a look; until you pick, Subtle shows and nothing is written to your settings. If you had changed settings in 2.x, **Keep my settings** keeps them.
 
@@ -44,7 +44,7 @@
 ### 🔗 Links
 ![Link animations](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/links.webp)
 
-*   **12 animations**: v1's Classic Flow, Sacred Flow, Crystal Stream, Quantum Field, Cosmic Weave, Energy Pulse, DNA Helix, Lava Flow and Stellar Plasma on v1's clock, plus Merkaba Beads, DNA Helix 3D and Comet Trails.
+*   **13 animations**: v1's Classic Flow, Sacred Flow, Crystal Stream, Quantum Field, Cosmic Weave, Energy Pulse, DNA Helix, Lava Flow and Stellar Plasma on v1's clock, plus Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust (drifting, twinkling star dust).
 *   **15 path shapes**, from Same as ComfyUI to Wave, Coil, Rope and Chain, and **12 marker shapes**, which can ride on every animation.
 *   **Halo or drop shadows**, custom colors, color boost and additive glow on dark palettes.
 

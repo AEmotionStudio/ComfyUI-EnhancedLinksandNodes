@@ -13,7 +13,8 @@ const LINK_ANIMATION_OPTIONS = [
   { value: 6, text: "DNA Helix" },
   { value: 11, text: "DNA Helix 3D" },
   { value: 7, text: "Lava Flow" },
-  { value: 8, text: "Stellar Plasma" }
+  { value: 8, text: "Stellar Plasma" },
+  { value: 13, text: "Stardust" }
 ];
 const LINK_STYLE_OPTIONS = [
   { value: "spline", text: "Same as ComfyUI" },
@@ -199,7 +200,7 @@ const COEXIST_OPTIONS = [
   { value: "defer", text: "Always step aside" }
 ];
 const CLASSIC$2 = 9;
-const DENSE = /* @__PURE__ */ new Set([1, 2, 3, 7, 8, 10, 12]);
+const DENSE = /* @__PURE__ */ new Set([1, 2, 3, 7, 8, 10, 12, 13]);
 const linksOn = () => L.enabled && L.animate !== 0;
 const wired = () => L.physicsProfile !== "off" && L.physicsAmount > 0;
 const SHAPES = /* @__PURE__ */ new Set(["straight", "linear", "stepped", "zigzag", "coil"]);
@@ -1312,7 +1313,7 @@ const BURSTS = [
 const RATE = 0.84;
 const SPARKS = 250;
 const SPARKLES = 40;
-const [CORE$1, SPARK, SPARKLE, GLOW, PIECE, RING, COMET$1] = [0, 1, 2, 3, 4, 5, 6];
+const [CORE$1, SPARK, SPARKLE$1, GLOW, PIECE, RING, COMET$1] = [0, 1, 2, 3, 4, 5, 6];
 const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
 const LASTS = { confetti: 2, shockwave: 0.7, trace: 1.5 };
 const STAGGER = 1 / MAX_FLASH_HZ;
@@ -1376,7 +1377,7 @@ function fireworks(nodes, run2) {
         const shade = Math.floor(random() * 4);
         add$2(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
       }
-      for (let j = 0; j < SPARKLES; j++) add$2(SPARKLE, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
+      for (let j = 0; j < SPARKLES; j++) add$2(SPARKLE$1, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
     }
   }
 }
@@ -1526,7 +1527,7 @@ function drawBursts(canvas, ctx) {
           }
           break;
         }
-        case SPARKLE: {
+        case SPARKLE$1: {
           if (t >= 0.3 || pool$1.seq[i] >= Math.floor(SPARKLES * (1 - t / 0.3))) break;
           const dist = reach2 * 0.7 * t * pool$1.speed[i];
           disc(ctx, x + Math.cos(pool$1.angle[i]) * dist, y + Math.sin(pool$1.angle[i]) * dist, (1 + pool$1.size[i] * 4 * (1 - t)) * unit, colour2, 0.95 * (1 - t * 3), false);
@@ -3148,6 +3149,51 @@ function cometTrails(ctx, s, k2) {
     ctx.fill();
   }
 }
+const STAR_PX = 8;
+const STAR_RATE = 0.075;
+const STAR = 0.8;
+const SPARKLE = 5;
+const BRIGHT = 0.8;
+const CROSS = {
+  path(ctx, x, y, size) {
+    ctx.beginPath();
+    ctx.moveTo(x - size, y);
+    ctx.lineTo(x + size, y);
+    ctx.moveTo(x, y - size);
+    ctx.lineTo(x, y + size);
+  },
+  stroked: true,
+  turn: Math.PI / 2
+};
+function stardust(ctx, s, k2) {
+  const { primary } = s.pal;
+  const dust = lighter(primary);
+  const glowIntensity = L.glowIntensity * moving.glow;
+  const count2 = Math.max(1, Math.floor(s.chain * L.quality * L.particleDensity * moving.density / STAR_PX));
+  for (let i = 0; i < count2; i++) {
+    const T = wrap(i / count2 + k2.linkFlow * STAR_RATE);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    const life = Math.sin(Math.PI * T);
+    const bright = life * (0.6 + 0.4 * Math.sin(2 * k2.linkPhase + i * 2.4));
+    if (bright <= 0.05) continue;
+    along$1(s, u);
+    const r = L.thickness * STAR * (0.3 + 0.7 * life);
+    ctx.globalAlpha = bright * moving.alpha;
+    DOT.path(ctx, here$5[0], here$5[1], r, 0);
+    shine(ctx, DOT, here$5[0], here$5[1], r, 0, dust, primary, glowIntensity * life);
+    ctx.shadowBlur = 0;
+    DOT.path(ctx, here$5[0], here$5[1], r * 0.45, 0);
+    ctx.fillStyle = WHITE$1;
+    ctx.fill();
+    if (i % SPARKLE || bright <= BRIGHT) continue;
+    ctx.lineWidth = Math.max(1, L.thickness / 3);
+    ctx.globalAlpha = (bright - BRIGHT) / (1 - BRIGHT) * 0.8 * moving.alpha;
+    CROSS.path(ctx, here$5[0], here$5[1], r * 3, 0);
+    shine(ctx, CROSS, here$5[0], here$5[1], r * 3, 0, WHITE$1, dust, glowIntensity * 0.5);
+    ctx.shadowBlur = 0;
+  }
+}
 const STROKES = /* @__PURE__ */ new Set([1, 3, 4, 6, 7]);
 const MOVING = {
   1: sacredFlow$1,
@@ -3160,7 +3206,8 @@ const MOVING = {
   8: stellarPlasma$1,
   10: merkabaBeads,
   11: dnaHelix3d,
-  12: cometTrails
+  12: cometTrails,
+  13: stardust
 };
 const MOST$1 = 2e3;
 const HOVER_MS = 150;
@@ -4024,7 +4071,8 @@ const STILL = {
   8: stellarPlasma,
   10: posed(10),
   11: posed(11),
-  12: posed(12)
+  12: posed(12),
+  13: posed(13)
 };
 const LINK_STYLES = {
   spline: {},
@@ -4187,7 +4235,8 @@ const BASES = {
   9: ["classic", "classic"],
   10: ["ghost", "ghost"],
   11: ["none", "none"],
-  12: ["ghost", "ghost"]
+  12: ["ghost", "ghost"],
+  13: ["ghost", "ghost"]
 };
 const shadowBlur = (blur) => L.shadowStyle === "drop" ? L.shadowBlur * 4 : blur;
 const shadowOffset = () => L.shadowStyle === "drop" ? L.shadowOffset * 3 : 0;
@@ -7416,7 +7465,7 @@ const NEWS$1 = [
   "Quick toggles: View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, buttons on the action bar and the selection toolbox, and keys for this panel, every effect and the running node, which Shortcut keys under Perf turns on.",
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
-  "Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.",
+  "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8040,4 +8089,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-OPZLsIug.js.map
+//# sourceMappingURL=menus-Bsdl8O1v.js.map

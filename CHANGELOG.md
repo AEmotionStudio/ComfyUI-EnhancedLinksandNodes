@@ -30,7 +30,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - **Glow blending**: Additive glow on dark palettes.
 
 ### New link animations
-- **Merkaba Beads**, **DNA Helix 3D** and **Comet Trails**.
+- **Merkaba Beads**, **DNA Helix 3D**, **Comet Trails** and **Stardust**: glittering motes drifting along the link, swelling and twinkling toward its middle.
 
 ### Wire physics
 - **Wire physics** (Rope, Whip or Gel, with a strength): links sag and swing as you move nodes, with any animation or none, and stay clickable along the wire.

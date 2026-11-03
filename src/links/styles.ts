@@ -199,7 +199,7 @@ function drawBody(ctx: CanvasRenderingContext2D, s: Segment, color: string, thic
 /** What each animation draws under its motion, moving and still: nothing, a ghost of the link at 30 %, the link with its glow, or Classic Flow's. */
 type Base = 'none' | 'ghost' | 'glow' | 'classic';
 
-/** v1's (old_link_animations.js:1823-2400, 2554-3359), but that Crystal Stream's still link glows as Sacred Flow's does; and v3's own three. */
+/** v1's (old_link_animations.js:1823-2400, 2554-3359), but that Crystal Stream's still link glows as Sacred Flow's does; and v3's own four. */
 const BASES: Record<number, [moving: Base, still: Base]> = {
     1: ['none', 'glow'],
     2: ['ghost', 'glow'],
@@ -213,6 +213,7 @@ const BASES: Record<number, [moving: Base, still: Base]> = {
     10: ['ghost', 'ghost'],
     11: ['none', 'none'],
     12: ['ghost', 'ghost'],
+    13: ['ghost', 'ghost'],
 };
 
 /**

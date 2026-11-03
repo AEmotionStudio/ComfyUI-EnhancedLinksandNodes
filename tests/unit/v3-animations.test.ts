@@ -1,6 +1,6 @@
 /**
  * v3's own link animations (src/links/animations.ts): Merkaba Beads, DNA
- * Helix 3D and Comet Trails. Each keeps its pace in px along the link and
+ * Helix 3D and Comet Trails, and Stardust's drifting star dust at the end. Each keeps its pace in px along the link and
  * carries on across its reroutes, and plays backwards going Reverse. Merkaba
  * Beads and Comet Trails count their elements by the link's length, Quality
  * and Particle.Density, one a link at least, and half as many while
@@ -24,7 +24,7 @@ import { storeSettings } from './characterize/v1-inputs';
 const [LEFT, RIGHT, SPLINE] = [3, 4, 2];
 const PHI2 = ((1 + Math.sqrt(5)) / 2) ** 2;
 type Moment = Parameters<(typeof MOVING)[number]>[2];
-const [BEADS, HELIX, COMETS] = [10, 11, 12];
+const [BEADS, HELIX, COMETS, STARDUST] = [10, 11, 12, 13];
 const DENSITY = '🔗 Enhanced Links.Particle.Density';
 /** Custom colours, the defaults, so that each role is told apart. */
 const CUSTOM = { '🔗 Enhanced Links.Color.Mode': 'custom' };
@@ -274,5 +274,86 @@ describe("v3's own link animations", () => {
         preview('🔗 Enhanced Links.Direction', -1);
         expect(still(COMETS)).not.toBe(forward);
         expect(still(BEADS)).toBe(draw(BEADS, { linkPhase: STILL_PHASE, quantumPhase: STILL_PHASE, linkFlow: 0, linkDir: -1 }, level(900, [450])).trace());
+    });
+});
+
+describe('Stardust', () => {
+    /** Each mote's white core: where along x, how wide, and its alpha; and the dust round it, in the link's colour lifted. */
+    const cores = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style === WHITE).map((p) => ({ x: (p.box![0] + p.box![2]) / 2, width: p.box![2] - p.box![0], alpha: p.globalAlpha }));
+    const sparkles = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'stroke' && p.style === WHITE);
+
+    it('counts a mote every 8 px of the link at Quality and Density 1, fewer by the ends where they fade, as many along a link through reroutes', () => {
+        storeSettings(CUSTOM);
+        for (const quality of [1, 2]) {
+            preview('🔗 Enhanced Links.Quality', quality);
+            for (const density of [0.5, 1, 2]) {
+                preview(DENSITY, density);
+                const n = Math.floor((800 * quality * density) / 8);
+                const drawn = cores(draw(STARDUST, at(0.3))).length;
+                expect(drawn, `${quality}, ${density}`).toBeLessThanOrEqual(n);
+                expect(drawn, `${quality}, ${density}`).toBeGreaterThan(0.8 * n);
+                // Where a spline's table of lengths puts them, through the reroutes.
+                const [through, whole] = [draw(STARDUST, at(0.3), level(900, [300, 650])), draw(STARDUST, at(0.3))].map((rec) => cores(rec).map((c) => c.x).sort((a, b) => a - b));
+                expect(through).toHaveLength(whole.length);
+                for (const [i, x] of through.entries()) expect(Math.abs(x - whole[i])).toBeLessThan(0.5);
+            }
+        }
+        preview('🔗 Enhanced Links.Quality', 1);
+        moving.density = 0.5;
+        storeSettings({ ...CUSTOM, [DENSITY]: 1 });
+        expect(cores(draw(STARDUST, at(0.3))).length).toBeLessThanOrEqual(50);
+    });
+
+    it('drifts the dust across the link in 6.7 s at speed 1, the other way going Reverse', () => {
+        storeSettings(CUSTOM);
+        for (const direction of [1, -1]) {
+            const [now, next] = [0.5, 0.52].map((t) => cores(draw(STARDUST, at(t, direction))).map((c) => c.x));
+            // 0.075 of the link a unit of flow, 2 units a second: 0.02 s moves it 0.003 of the 800 px link.
+            const moved = now.map((x) => Math.min(...next.map((y) => Math.abs(y - x - direction * 2.4))));
+            expect(moved.filter((d) => d < 0.1).length, `direction ${direction}`).toBeGreaterThan(0.9 * now.length);
+        }
+    });
+
+    it('swells and brightens toward the middle of the link and fades toward its ends, twinkling on each mote\'s own phase', () => {
+        storeSettings(CUSTOM);
+        const all = cores(draw(STARDUST, at(0.3)));
+        const middle = all.reduce((a, b) => (Math.abs(a.x - 500) < Math.abs(b.x - 500) ? a : b));
+        const end = all.reduce((a, b) => (a.x < b.x ? a : b));
+        // At the middle 0.45 × 0.8 × Thickness 3 to each side, at its least 0.3 of that.
+        expect(middle.width).toBeCloseTo(2 * 0.45 * 0.8 * 3, 1);
+        expect(end.width).toBeLessThan(middle.width);
+        expect(end.alpha).toBeLessThan(0.5);
+        expect(Math.max(...all.map((c) => c.alpha))).toBeGreaterThan(0.9);
+        // The motes about the middle are not all as bright at once.
+        expect(new Set(all.filter((c) => Math.abs(c.x - 500) < 100).map((c) => c.alpha.toFixed(2))).size).toBeGreaterThan(3);
+    });
+
+    it('flashes a white cross over the brightest of every fifth mote alone, glowing in the dust\'s colour', () => {
+        storeSettings(CUSTOM);
+        let seen = 0;
+        for (let t = 0; t < 2; t += 0.1) {
+            const rec = draw(STARDUST, at(t));
+            for (const p of sparkles(rec)) {
+                seen++;
+                expect(p.shadowColor).toBe(lighter(PRIMARY));
+            }
+        }
+        expect(seen).toBeGreaterThan(0);
+        // None without glow, but the crosses still show.
+        moving.glow = 0;
+        expect(draw(STARDUST, at(0.3)).paints.every((p) => !p.shadowBlur)).toBe(true);
+    });
+
+    it("holds its motion's pose at the still phase while still, whatever the clock", () => {
+        storeSettings(CUSTOM);
+        const still = () => {
+            const rec = new CanvasRecorder();
+            for (const s of level(900, [450])) STILL[STARDUST](rec.ctx, s, STILL_PHASE);
+            return rec.trace();
+        };
+        const before = still();
+        Object.assign(clock, { linkPhase: -12.3, quantumPhase: -4.5, linkFlow: 77.7, linkDir: -0.4 });
+        expect(still()).toBe(before);
+        expect(draw(STARDUST, { linkPhase: STILL_PHASE, quantumPhase: STILL_PHASE, linkFlow: 0, linkDir: 1 }, level(900, [450])).trace()).toBe(before);
     });
 });

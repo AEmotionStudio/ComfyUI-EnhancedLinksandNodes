@@ -13,8 +13,8 @@
  * Energy Pulse's orbs fade along their trip; Stellar Plasma's sparks stream
  * instead of piling up at one end; and every count is at least one.
  *
- * v3's own three keep their pace in px along the path: Merkaba Beads, DNA
- * Helix 3D and Comet Trails.
+ * v3's own four keep their pace in px along the path: Merkaba Beads, DNA
+ * Helix 3D, Comet Trails and Stardust.
  *
  * @module links/animations
  */
@@ -654,6 +654,65 @@ function cometTrails(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void
     }
 }
 
+/**
+ * Stardust: px of link for each mote of star dust at Quality 1 and Density 1; how fast the dust drifts, in links per unit
+ * of flow, across a link in 6.7 s at speed 1; how wide a mote is at the middle of the link, × Thickness; and one mote in
+ * SPARKLE flashes a cross, from BRIGHT to its brightest.
+ */
+const STAR_PX = 8;
+const STAR_RATE = 0.075;
+const STAR = 0.8;
+const SPARKLE = 5;
+const BRIGHT = 0.8;
+/** A sparkle: a cross `size` out from its middle each way. */
+const CROSS: Shape = {
+    path(ctx, x, y, size) {
+        ctx.beginPath();
+        ctx.moveTo(x - size, y);
+        ctx.lineTo(x + size, y);
+        ctx.moveTo(x, y - size);
+        ctx.lineTo(x, y + size);
+    },
+    stroked: true,
+    turn: Math.PI / 2,
+};
+
+/**
+ * 13. Stardust: star dust drifting along the link, each mote swelling and brightening toward the middle of the link and
+ * fading toward its ends, twinkling on a phase of its own, white at its core in the link's colour lifted, the brightest
+ * flashing a four-point sparkle.
+ */
+function stardust(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
+    const { primary } = s.pal;
+    const dust = lighter(primary);
+    const glowIntensity = L.glowIntensity * moving.glow;
+    const count = Math.max(1, Math.floor((s.chain * L.quality * L.particleDensity * moving.density) / STAR_PX));
+    for (let i = 0; i < count; i++) {
+        const T = wrap(i / count + k.linkFlow * STAR_RATE);
+        const u = s.local(T);
+        if (!s.within(u)) continue;
+        const life = Math.sin(Math.PI * T);
+        // A twinkle 0.83 times a second at speed 1, 2.5 at the fastest, under MAX_FLASH_HZ.
+        const bright = life * (0.6 + 0.4 * Math.sin(2 * k.linkPhase + i * 2.4));
+        if (bright <= 0.05) continue;
+        along(s, u);
+        const r = L.thickness * STAR * (0.3 + 0.7 * life);
+        ctx.globalAlpha = bright * moving.alpha;
+        DOT.path(ctx, here[0], here[1], r, 0);
+        shine(ctx, DOT, here[0], here[1], r, 0, dust, primary, glowIntensity * life);
+        ctx.shadowBlur = 0;
+        DOT.path(ctx, here[0], here[1], r * 0.45, 0);
+        ctx.fillStyle = WHITE;
+        ctx.fill();
+        if (i % SPARKLE || bright <= BRIGHT) continue;
+        ctx.lineWidth = Math.max(1, L.thickness / 3);
+        ctx.globalAlpha = ((bright - BRIGHT) / (1 - BRIGHT)) * 0.8 * moving.alpha;
+        CROSS.path(ctx, here[0], here[1], r * 3, 0);
+        shine(ctx, CROSS, here[0], here[1], r * 3, 0, WHITE, dust, glowIntensity * 0.5);
+        ctx.shadowBlur = 0;
+    }
+}
+
 /** The animations that stroke glowing lines while they move: Sacred Flow's ribbon, Quantum Field's filaments, Cosmic Weave's and DNA Helix's strands, and Lava Flow's tube. */
 export const STROKES = new Set([1, 3, 4, 6, 7]);
 
@@ -670,4 +729,5 @@ export const MOVING: Record<number, (ctx: CanvasRenderingContext2D, s: Segment, 
     10: merkabaBeads,
     11: dnaHelix3d,
     12: cometTrails,
+    13: stardust,
 };
