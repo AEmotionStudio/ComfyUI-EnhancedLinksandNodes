@@ -26,8 +26,10 @@ import {
     redraw,
     resetProbe,
     setSetting,
+    settle,
     slotPoint,
     test,
+    toClient,
     vueSlotCentres,
     type LogMessage,
     type Point,
@@ -272,6 +274,57 @@ test.describe('baselines', { tag: '@perf' }, () => {
         }
         const retainedMB = [...runs].sort((a, b) => a.retainedMB - b.retainedMB)[1].retainedMB;
         await record(testInfo, { heap: { look: profile === 'native' ? 'native' : 'Animate 6', retainedMB, runs } });
+    });
+
+    // A node with links dragged on the big graph at zoom 1, natively, with Animation None, and with Animation None and rope
+    // wires, which more links on screen than Perf.StaticAbove hold at rest, and which swing with it off: front and
+    // background paints a second while the pointer drags it, how long after the drop the canvas goes still, and its paints
+    // a second over 3 s after that.
+    test('node drag with wire physics', async ({ page, profile }, testInfo) => {
+        test.setTimeout(300_000);
+        await buildGraph(page, perfGraph(200, 500));
+        await setView(page, 'zoom 1');
+        const looks: Record<string, Record<string, unknown>> = profile === 'native' ? { native: {} } : {
+            'Animation None': { '🔗 Enhanced Links.Animate': 0 },
+            'Animation None, rope': { '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Physics.Profile': 'rope' },
+            'Animation None, rope, never frozen': { '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Physics.Profile': 'rope', '🔗 Enhanced Links.Perf.StaticAbove': 0 },
+        };
+        // The node on screen with the most links, where it is and where its title bar is.
+        const { id, pos, title } = await page.evaluate(() => {
+            const { canvas } = window.app;
+            const [x0, y0, w, h] = canvas.visible_area;
+            const inView = (n: { pos: number[]; size: number[] }) => n.pos[0] > x0 + 50 && n.pos[1] > y0 + 50 && n.pos[0] + n.size[0] < x0 + w - 300 && n.pos[1] + n.size[1] < y0 + h - 300;
+            const links = (n: { inputs?: { link: unknown }[]; outputs?: { links?: unknown[] | null }[] }) =>
+                (n.inputs ?? []).filter((i) => i.link != null).length + (n.outputs ?? []).reduce((sum, o) => sum + (o.links?.length ?? 0), 0);
+            const node = canvas.graph._nodes.filter(inView).sort((a: never, b: never) => links(b) - links(a))[0];
+            return { id: node.id as number, pos: [node.pos[0], node.pos[1]], title: [node.pos[0] + 30, node.pos[1] - 15] as Point };
+        });
+        const rows: { look: string; dragFps: number; dragBackPerSecond: number; stillAfterS: number | null; idleFront: number; idleBack: number }[] = [];
+        for (const [look, settings] of Object.entries(looks)) {
+            for (const [id, value] of Object.entries(settings)) await setSetting(page, id, value);
+            await setView(page, 'zoom 1');
+            await page.waitForTimeout(1500);
+            const [x, y] = await toClient(page, title);
+            await resetProbe(page);
+            const start = Date.now();
+            await page.mouse.move(x, y);
+            await page.mouse.down();
+            for (let i = 1; i <= 60; i++) await page.mouse.move(x + 2 * i, y + Math.round(40 * Math.sin(i / 6)));
+            const dragged = await readProbe(page);
+            const seconds = (Date.now() - start) / 1000;
+            await page.mouse.up();
+            const dropped = Date.now();
+            expect(await page.evaluate((id) => window.app.canvas.graph.getNodeById(id).pos[0], id)).toBeCloseTo(pos[0] + 120, 0);
+            const still = await settle(page, 500, 20_000);
+            const stillAfterS = still ? round((Date.now() - dropped - 500) / 1000) : null;
+            const idle = await sample(page, 3000);
+            rows.push({ look, dragFps: round(dragged.front / seconds), dragBackPerSecond: round(dragged.back / seconds), stillAfterS, idleFront: round(idle.front / idle.seconds), idleBack: round(idle.back / idle.seconds) });
+            // The node back where it was for the next look.
+            await page.evaluate(([id, pos]) => {
+                window.app.canvas.graph.getNodeById(id).pos = pos;
+            }, [id, pos] as const);
+        }
+        await record(testInfo, { physics: rows });
     });
 
     test('link colours', async ({ page }, testInfo) => {

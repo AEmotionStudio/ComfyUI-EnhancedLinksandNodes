@@ -4,7 +4,7 @@
  * shadow (Shadow.Style drop), Classic Flow on Wave and Coil links, and a node
  * effect on a bypassed node beside a collapsed one, and the completion styles
  * after the fireworks: confetti, the shockwave and the path trace's comet,
- * along a link through a reroute too. They are v3's own
+ * along a link through a reroute too; and rope and whip wires at rest. They are v3's own
  * snapshots, in __traces__/v3: `vitest -u` on this file rewrites them, after a
  * change to what they show has been checked.
  */
@@ -147,6 +147,22 @@ describe('v3 traces', () => {
             drawFlows(ctx, segments);
         }])).trace()).toMatchFileSnapshot('__traces__/v3/completion-trace.txt');
         endBursts();
+    });
+
+    it('a rope and a whip wire at rest, drawn with Animation None and with Classic Flow held still', async () => {
+        const traces: string[] = [];
+        for (const profile of ['rope', 'whip']) {
+            for (const animate of [0, 9]) {
+                const canvas = await start({ '🔗 Enhanced Links.Physics.Profile': profile, '🔗 Enhanced Links.Animate': animate, '🔗 Enhanced Links.Static.Mode': true }, {
+                    nodes: [{ pos: [100, 100] }, { pos: [500, 260] }],
+                    links: [{ from: 0, to: 1 }],
+                });
+                const from = canvas.back.lines.length;
+                frames(1);
+                traces.push(`# ${profile}, ${animate ? 'Classic Flow' : 'Animation None'}: the background pass\n${canvas.back.lines.slice(from).join('\n')}\n`);
+            }
+        }
+        await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/physics-wires.txt');
     });
 
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {

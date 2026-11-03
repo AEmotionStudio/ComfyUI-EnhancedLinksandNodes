@@ -460,8 +460,8 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, s: Segment, phase: nu
 /** LinkMarkerShape.Arrow; None (0) draws no centre marker and any other shape a circle (litegraphLinkAdapter.ts L105-108). */
 const ARROW = 2;
 
-/** The centre marker native draws on a segment (pathRenderer.ts L149-156, L798-837), in native's colour at the centre of our path. */
-export function centreMarker(canvas: Canvas, ctx: CanvasRenderingContext2D, s: Segment): void {
+/** The centre marker native draws on a segment (pathRenderer.ts L149-156, L798-837), in native's colour unless given a fill, at the centre of our path. */
+export function centreMarker(canvas: Canvas, ctx: CanvasRenderingContext2D, s: Segment, fill: string | CanvasPattern = s.pal.native): void {
     const shape: number = canvas.linkMarkerShape;
     if (!shape || canvas.ds.scale < 0.6 || !canvas.highquality_render) return;
     const { cx, cy, angle } = s.path;
@@ -476,6 +476,6 @@ export function centreMarker(canvas: Canvas, ctx: CanvasRenderingContext2D, s: S
     } else {
         ctx.arc(cx, cy, 5, 0, Math.PI * 2);
     }
-    ctx.fillStyle = s.pal.native;
+    ctx.fillStyle = fill;
     ctx.fill();
 }

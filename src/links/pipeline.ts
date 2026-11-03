@@ -14,9 +14,12 @@
  * their glow. What moves is drawn over the background in every front pass,
  * under the nodes, adding up where it crosses with Blend's additive glow on a
  * dark palette. A shape of our own takes the segment's hit data with it, so
- * clicks and the link menu follow what is drawn. When another extension draws
- * links too, Coexist can leave every link to it; Link effects off leaves every
- * link to native.
+ * clicks and the link menu follow what is drawn. With Physics.Profile on, each
+ * segment hangs as a wire (links/physics.ts) whatever its Link.Style's shape,
+ * and everything is drawn along the wire: with Animation None, the body native
+ * would draw, as for floating links and the links focus dims or hides. When
+ * another extension draws links too, Coexist can leave every link to it; Link
+ * effects off leaves every link to native.
  *
  * Selection focus (links/focus.ts) works on the same calls, with link effects
  * on or off: the links it leaves out are drawn natively, dimmed or not at all,
@@ -32,14 +35,15 @@
 
 import type { CanvasColour, LLink, Point, Reroute } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { L, revision } from '@/core/settings';
-import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, wake } from '@/core/engine';
+import { L, revision, wired } from '@/core/settings';
+import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, steps, wake } from '@/core/engine';
 import { HIGHLIGHT, dark, palette, type Palette } from '@/core/colors';
 import { drawFlows, flowsShown, linkPass, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { MOVING, STROKES, moving } from './animations';
 import { focus, focusPalette, focuses, focusing, syncFocus } from './focus';
 import { LinkPath, stub } from './geometry';
+import { endWires, hang, startWires, stepWires, wireOf, type Wire } from './physics';
 import { STILL } from './stills';
 import { LINK_STYLES, centreMarker, drawBase, drawMarkers } from './styles';
 
@@ -122,17 +126,18 @@ export class Segment {
     /**
      * Lays the segment from a to b on the path `linkStyle` gives it, Link.Style's unless given, the render mode's `mode`
      * where that keeps native's: `u0` px along its link, from a slot if `fromSlot` and to one if `toSlot`, where a wave
-     * or a coil starts and ends.
+     * or a coil starts and ends. A `wire` hangs from native's path instead, whatever the shape, and the path follows it.
      */
     lay(a: Readonly<ArrayLike<number>>, b: Readonly<ArrayLike<number>>, startDir: number, endDir: number, mode: number, u0 = 0, fromSlot = true,
-        toSlot = true, startControl?: Readonly<ArrayLike<number>>, endControl?: Readonly<ArrayLike<number>>, linkStyle = L.linkStyle): void {
-        const style = LINK_STYLES[linkStyle];
+        toSlot = true, startControl?: Readonly<ArrayLike<number>>, endControl?: Readonly<ArrayLike<number>>, linkStyle = L.linkStyle, wire?: Wire): void {
+        const style = LINK_STYLES[wire ? NATIVE : linkStyle];
         this.u0 = u0;
         this.path.set(a, b, startDir, endDir, style.mode ?? mode, startControl, endControl);
+        if (wire) hang(wire, this.path);
         if (style.shape === 'step') this.path.step(endDir);
         this.len = this.path.length;
         if (style.shape === 'wave' || style.shape === 'coil') this.path.bend(style.shape === 'coil', u0, fromSlot, toSlot);
-        this.custom = Boolean(style.shape) || (style.mode ?? mode) !== mode;
+        this.custom = Boolean(wire || style.shape) || (style.mode ?? mode) !== mode;
         this.linkStyle = linkStyle;
     }
 }
@@ -160,13 +165,13 @@ const flowing: Segment[] = [];
 
 /**
  * The link pass: its context while drawConnections runs, whether we draw its links, whether they are still, whether
- * their bases go without their glows and halos, whether they go on the glow layer, whether it keeps the layer as it is
- * and whether a segment changed since the pass before, how many renderLink calls it saw, how many bases it drew, the
- * highlighted links (the selected nodes' links), what selection focus does in it (focusIn()), whether the focused
- * links take the focus colour, and whether the run's visuals show on its links.
+ * they hang as physics wires, whether their bases go without their glows and halos, whether they go on the glow layer,
+ * whether it keeps the layer as it is and whether a segment changed since the pass before, how many renderLink calls it
+ * saw, how many bases it drew, the highlighted links (the selected nodes' links), what selection focus does in it
+ * (focusIn()), whether the focused links take the focus colour, and whether the run's visuals show on its links.
  */
 const pass = {
-    ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, plain: false, layered: false, kept: false, changed: false,
+    ctx: undefined as CanvasRenderingContext2D | undefined, on: false, still: false, wires: false, plain: false, layered: false, kept: false, changed: false,
     calls: 0, bases: 0, highlighted: {} as Record<string, boolean>, focus: '' as '' | 'highlight' | 'animate' | 'dim' | 'hide', tinted: false, runs: false,
 };
 
@@ -238,13 +243,13 @@ function paintWhole(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
 /**
  * Whether the layer shows the links as they look now, but for where the view is: drawn by the pass before, as big as the
  * background, at its zoom, for the graph as it is, the settings, the highlighted links and the palette; nor are nodes
- * dragged, nor did selection focus change.
+ * dragged, nor wires swinging, nor did selection focus change.
  */
 function shows(canvas: Canvas, ctx: CanvasRenderingContext2D, refocused: boolean): boolean {
     const own = layer.ctx;
     return own !== undefined && layer.pass === passes - 1 && own.canvas.width === ctx.canvas.width && own.canvas.height === ctx.canvas.height
         && canvas.ds.scale === layer.scale
-        && !canvas.isDragging && !refocused && layer.graph === canvas.graph && layer.version === canvas.graph?._version && layer.revision === revision
+        && !canvas.isDragging && !live.wires && !refocused && layer.graph === canvas.graph && layer.version === canvas.graph?._version && layer.revision === revision
         && layer.highlighted === canvas.highlighted_links && layer.background === canvas.clear_background_color;
 }
 
@@ -419,9 +424,9 @@ function enableAntiAliasing(ctx: CanvasRenderingContext2D): void {
     ctx.miterLimit = 2;
 }
 
-/** Whether the look has anything that moves: Classic Flow moves only its markers, and dotted and dashed links march. */
+/** Whether the look has anything that moves: None nothing, Classic Flow only its markers, and dotted and dashed links march. */
 function moves(): boolean {
-    return L.animate !== CLASSIC || (L.markerEnabled && L.markerShape !== 'none') || Boolean(LINK_STYLES[L.linkStyle].moving);
+    return L.animate !== 0 && (L.animate !== CLASSIC || (L.markerEnabled && L.markerShape !== 'none') || Boolean(LINK_STYLES[L.linkStyle].moving));
 }
 
 /**
@@ -448,9 +453,12 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     raised.length = flowing.length = 0;
     pass.ctx = ctx;
     pass.calls = pass.bases = 0;
-    pass.on = L.enabled && L.animate !== 0 && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
-    // Native's links never move.
-    pass.still = !pass.on || L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion || !moves() || crowded || adaptive.level >= HELD;
+    pass.on = L.enabled && (L.animate !== 0 || wired()) && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
+    // Native's links never move. Wires swing through a run, which only holds what the user did not move.
+    const held = L.staticMode || env.reducedMotion || crowded || adaptive.level >= HELD;
+    pass.still = !pass.on || held || heldByRun(L.pauseDuringRender) || !moves();
+    pass.wires = pass.on && wired();
+    startWires(canvas.graph, held);
     pass.highlighted = canvas.highlighted_links;
     syncRuns(canvas);
     pass.runs = flowsShown() && drawsRuns(canvas);
@@ -458,10 +466,10 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     pass.focus = focusIn();
     pass.tinted = (pass.focus === 'highlight' || pass.focus === 'dim' || pass.focus === 'hide') && !deferring();
     // A graph with many glowing links on screen draws them on the glow layer, which a pan moves along. While it is
-    // zoomed, has nodes dragged or otherwise cannot pan the layer, the bases go plain, as they do while Perf.Adaptive
-    // draws glows plain. A pass drawn whole follows once the view and the graph keep still.
+    // zoomed, has nodes dragged or wires swinging, or otherwise cannot pan the layer, the bases go plain, as they do
+    // while Perf.Adaptive draws glows plain. A pass drawn whole follows once the view and the graph keep still.
     const { scale, offset } = canvas.ds;
-    const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging;
+    const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging || live.wires > 0;
     glows.scale = scale;
     glows.x = offset[0];
     glows.y = offset[1];
@@ -492,6 +500,7 @@ function end(canvas: Canvas): void {
     const ctx = pass.ctx!;
     pass.ctx = undefined;
     if (open) close();
+    endWires();
     if (pass.changed) repaint(canvas);
     else if (pass.kept || stripCount) for (let i = 0; i < counted; i++) if (before[i].pass !== passes) mend(canvas, before[i]);
     if (!pass.plain && !stripCount && !pass.kept) glows.bases = pass.bases;
@@ -556,6 +565,12 @@ const own = (canvas: Canvas, link: LLink, color: CanvasColour | null): Palette =
     palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR)!;
 
 /**
+ * The key of a segment's wire: the reroute it leads into, else its link, a floating one apart, as 1.39.5 numbers
+ * floating links on their own (LGraph.ts L1307).
+ */
+const keyOf = (link: LLink, extras: RenderLink[9]): number => (extras?.reroute ? 3 * extras.reroute.id + 1 : 3 * link.id + (extras?.disabled ? 2 : 0));
+
+/**
  * Records the segment of a renderLink call from the arguments native gets, along native's path where native draws it;
  * `focused` if selection focus holds it, with the run's `flow` into its node.
  */
@@ -578,7 +593,7 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     const from = canvas.graph?.getReroute((reroute ?? link).parentId);
     segment.link = link;
     segment.lay(a, b, startDir, endDir, canvas.links_render_mode, (from && ends.get(from)) || 0, !from, !reroute, extras?.startControl, extras?.endControl,
-        pass.on ? L.linkStyle : NATIVE);
+        pass.on ? L.linkStyle : NATIVE, pass.wires ? wireOf(keyOf(link, extras)) : undefined);
     if (reroute) ends.set(reroute, segment.u0 + segment.len);
     // The segment into the input is the link's last.
     open = Boolean(reroute);
@@ -598,8 +613,8 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     return segment;
 }
 
-/** Whether the look draws flow markers: Classic Flow's, or every animation's with Marker.All. */
-const marked = () => L.animate === CLASSIC || L.markerAll;
+/** Whether the look draws flow markers: Classic Flow's, or every animation's with Marker.All, of which None is none. */
+const marked = () => L.animate === CLASSIC || (L.markerAll && L.animate !== 0);
 
 /**
  * Draws what does not move where native would have drawn the segment, or on the glow layer: the animation's base, unless
@@ -623,7 +638,7 @@ function draw(canvas: Canvas, ctx: CanvasRenderingContext2D, segment: Segment, w
     try {
         if (within) clipTo(ctx, within);
         enableAntiAliasing(ctx);
-        if (drawBase(ctx, segment, L.animate, pass.still, pass.plain)) pass.bases++;
+        if (body(canvas, ctx, segment, pass.still, pass.plain)) pass.bases++;
         for (let i = first; whole && i < count; i++) {
             if (pool[i].empty) continue;
             STILL[L.animate]?.(ctx, pool[i], STILL_PHASE);
@@ -642,6 +657,72 @@ function draw(canvas: Canvas, ctx: CanvasRenderingContext2D, segment: Segment, w
         ctx.restore();
     }
     return true;
+}
+
+/** Native's border under a link (pathRenderer.ts drawLink, L118-128). */
+const BORDER = 'rgba(0,0,0,0.5)';
+
+/**
+ * Draws a segment's body as native's renderLink draws a link (pathRenderer.ts drawLink, L93-162): a border 4 px wider
+ * unless the canvas draws none or draws in low quality, then the link in its colour, as wide as the canvas draws links
+ * and Highlight widens them, at the alpha the context has.
+ */
+function nativeBody(canvas: Canvas, ctx: CanvasRenderingContext2D, s: Segment): void {
+    const width = canvas.connections_width * s.width;
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'butt';
+    ctx.beginPath();
+    s.path.trace(ctx);
+    if (canvas.render_connections_border && !canvas.low_quality) {
+        ctx.strokeStyle = BORDER;
+        ctx.lineWidth = width + 4;
+        ctx.stroke();
+    }
+    ctx.strokeStyle = s.pal.native;
+    ctx.lineWidth = width;
+    ctx.stroke();
+    ctx.restore();
+}
+
+/** Draws a segment's base, or with Animation None the body native would draw. Whether it drew a base. */
+function body(canvas: Canvas, ctx: CanvasRenderingContext2D, s: Segment, still: boolean, plain: boolean): boolean {
+    if (L.animate) return drawBase(ctx, s, L.animate, still, plain);
+    nativeBody(canvas, ctx, s);
+    return false;
+}
+
+/**
+ * The segment of a call kept out of the pass's segments, laid along its wire in native's colours: a floating link's, or
+ * one focus dims or hides.
+ */
+function hung(canvas: Canvas, [, a, b, link, , , color, startDir, endDir, extras]: RenderLink): Segment {
+    const owner = extras?.reroute ?? link!;
+    let segment = segments.get(owner);
+    if (!segment) segments.set(owner, (segment = new Segment()));
+    segment.lay(a, b, startDir, endDir, canvas.links_render_mode, 0, true, true, extras?.startControl, extras?.endControl, NATIVE, wireOf(keyOf(link!, extras)));
+    segment.pal = pass.highlighted[link!.id] ? HIGHLIGHT : own(canvas, link!, color);
+    segment.width = 1;
+    return segment;
+}
+
+/**
+ * Draws a call native would draw, as native does but along its wire, with its centre marker, in the disabled pattern
+ * at 0.75 for a floating link (pathRenderer.ts L825-835); native's call goes where nobody sees it.
+ */
+function alongWire(canvas: Canvas, args: RenderLink): void {
+    const [ctx, , , link, , , , , , extras] = args;
+    const segment = hung(canvas, args);
+    nativeBody(canvas, ctx, segment);
+    ctx.save();
+    if (extras?.disabled && canvas._pattern) {
+        ctx.globalAlpha = 0.75;
+        centreMarker(canvas, ctx, segment, canvas._pattern);
+    } else centreMarker(canvas, ctx, segment);
+    ctx.restore();
+    args[0] = dummy();
+    original.apply(canvas, args);
+    hit(extras?.reroute ?? link!, segment.path);
 }
 
 /**
@@ -782,13 +863,14 @@ function tint(canvas: Canvas, args: RenderLink): void {
     widened(canvas, args);
 }
 
-/** Dim others: native draws a link focus leaves out at Focus.Dim. */
+/** Dim others: native draws a link focus leaves out at Focus.Dim, along its wire where it has one. */
 function dim(canvas: Canvas, args: RenderLink): void {
     const ctx = args[0];
     const alpha = ctx.globalAlpha;
     ctx.globalAlpha = (alpha * L.focusDim) / 100;
     try {
-        original.apply(canvas, args);
+        if (pass.wires) alongWire(canvas, args);
+        else original.apply(canvas, args);
     } finally {
         ctx.globalAlpha = alpha;
     }
@@ -798,10 +880,12 @@ function dim(canvas: Canvas, args: RenderLink): void {
  * Hide others: native draws a link focus leaves out where nobody sees it, so other wrappers still get their call, and
  * its hit data goes, so it cannot be clicked (the 8×8 centre test and isPointInStroke, FE157 canvas/resolvePointerTarget.ts
  * L91-112, FE1395 LGraphCanvas.ts L2452-2512). Its reroutes go too: native draws each after every segment (FE157
- * LGraphCanvas.ts L6186-6205, FE1395 L5766-5785), where they draw nothing. Stubs at its slots show that it is there.
+ * LGraphCanvas.ts L6186-6205, FE1395 L5766-5785), where they draw nothing. Stubs at its slots, along its wire where it
+ * has one, show that it is there.
  */
 function hide(canvas: Canvas, args: RenderLink): void {
     const [ctx, a, b, link, , , color, startDir, endDir, extras] = args;
+    const path = pass.wires ? hung(canvas, args).path : undefined;
     args[0] = dummy();
     original.apply(canvas, args);
     const owner = extras?.reroute ?? link!;
@@ -818,12 +902,31 @@ function hide(canvas: Canvas, args: RenderLink): void {
     const reach = LiteGraph.NODE_SLOT_HEIGHT * 0.5 + STUB;
     ctx.save();
     ctx.beginPath();
-    if (fromSlot) stub(ctx, a, startDir || RIGHT, reach);
-    if (!extras?.reroute) stub(ctx, b, endDir || LEFT, reach);
+    if (fromSlot) {
+        if (path) along(ctx, path, 0, reach);
+        else stub(ctx, a, startDir || RIGHT, reach);
+    }
+    if (!extras?.reroute) {
+        if (path) along(ctx, path, path.length, path.length - reach);
+        else stub(ctx, b, endDir || LEFT, reach);
+    }
     ctx.strokeStyle = own(canvas, link!, color).native;
     ctx.lineWidth = canvas.connections_width;
     ctx.stroke();
     ctx.restore();
+}
+
+/** The point and direction a path writes. */
+const here = new Float64Array(4);
+
+/** Adds the stretch of `path` from `from` px along it to `to` to the context's path, in 2 px steps. */
+function along(ctx: CanvasRenderingContext2D, path: LinkPath, from: number, to: number): void {
+    const n = Math.ceil(Math.abs(to - from) / 2);
+    for (let i = 0; i <= n; i++) {
+        path.find(from + ((to - from) * i) / n, here);
+        if (i) ctx.lineTo(here[0], here[1]);
+        else ctx.moveTo(here[0], here[1]);
+    }
 }
 
 /**
@@ -845,7 +948,7 @@ function raise(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
             enableAntiAliasing(ctx);
             if (!pass.still && !STROKES.has(L.animate) && !LINK_STYLES[L.linkStyle].moving) startSprites(ctx);
             for (const segment of shown) {
-                drawBase(ctx, segment, L.animate, pass.still, true);
+                body(canvas, ctx, segment, pass.still, true);
                 if (!pass.still || segment.empty) continue;
                 STILL[L.animate]?.(ctx, segment, STILL_PHASE);
                 if (marked()) drawMarkers(ctx, segment, STILL_PHASE);
@@ -878,6 +981,7 @@ export function installLinks(): void {
     warned = told = false;
     glows.bases = 0;
     linkPass.drawsRuns = drawsRuns;
+    steps.wires = stepWires;
 
     proto.drawConnections = function (this: Canvas, ...args: Parameters<Canvas['drawConnections']>) {
         begin(this, args[0]);
@@ -911,6 +1015,8 @@ export function installLinks(): void {
                 return;
             }
         } else {
+            // A floating link hangs too, drawn as native draws it.
+            if (disabled && pass.wires) return alongWire(this, args);
             // Native draws it, with the run's visuals over it.
             if (step) record(this, link, a, b, color, startDir, endDir, extras, focused, step);
             if (focused && pass.tinted) return tint(this, args);

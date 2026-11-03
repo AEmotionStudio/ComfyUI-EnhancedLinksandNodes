@@ -323,7 +323,7 @@ describe('ticker', () => {
         preview('📦 Enhanced Nodes.Animate', 2);
         frames(5);
         expect(page.waiting).toHaveLength(1);
-        expect(live).toEqual({ links: 1, nodes: 2, particles: 2, bursts: 0, marks: 0, flows: 0, rings: 0 });
+        expect(live).toEqual({ links: 1, nodes: 2, particles: 2, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 });
     });
 });
 

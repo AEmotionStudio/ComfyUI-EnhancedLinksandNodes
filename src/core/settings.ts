@@ -101,6 +101,13 @@ const LINK_STYLE_OPTIONS = [
     { value: 'holographic', text: 'Holographic' },
 ] as const;
 
+const PHYSICS_OPTIONS = [
+    { value: 'off', text: 'Off' },
+    { value: 'rope', text: 'Rope' },
+    { value: 'whip', text: 'Whip' },
+    { value: 'gel', text: 'Gel' },
+] as const;
+
 const MARKER_SHAPE_OPTIONS = [
     { value: 'none', text: 'None' },
     { value: 'arrow', text: 'Arrow' },
@@ -272,6 +279,10 @@ const CLASSIC = 9;
 const DENSE = new Set<number>([1, 2, 3, 7, 8]);
 
 const linksOn = (): boolean => L.enabled && L.animate !== 0;
+/** Whether physics wires shape the links: a profile at a strength above 0, as at 0 links keep native's path. */
+export const wired = (): boolean => L.physicsProfile !== 'off' && L.physicsAmount > 0;
+/** The Link.Style values that only shape the path, which a wire's shape takes the place of. */
+const SHAPES = new Set<string>(['straight', 'linear', 'stepped', 'zigzag', 'coil']);
 /** Whether the links carry flow markers: Classic Flow's, or every animation's with Marker.All. */
 const markers = (): boolean => linksOn() && (L.animate === CLASSIC || L.markerAll) && L.markerEnabled;
 const shadows = (): boolean => (linksOn() && L.animate === CLASSIC && L.linkShadowEnabled) || (markers() && L.markerShadowEnabled);
@@ -313,10 +324,14 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Direction', key: 'direction', name: 'Link flow direction', type: 'combo', options: DIRECTION_OPTIONS, default: 1, group: 'Links · Effect', advanced: true, showIf: linksOn, tooltip: 'Which way effects travel.' },
     { id: '🔗 Enhanced Links.Static.Mode', key: 'staticMode', name: 'Freeze link animation', type: 'boolean', default: false, group: 'Links · Effect', showIf: linksOn, tooltip: 'Keep the look but stop the motion.' },
 
-    { id: '🔗 Enhanced Links.Link.Style', key: 'linkStyle', name: 'Link path shape', type: 'combo', options: LINK_STYLE_OPTIONS, default: 'spline', group: 'Links · Path', showIf: linksOn, tooltip: 'Same as ComfyUI follows the Link Render Mode setting.' },
+    { id: '🔗 Enhanced Links.Link.Style', key: 'linkStyle', name: 'Link path shape', type: 'combo', options: LINK_STYLE_OPTIONS, default: 'spline', group: 'Links · Path', showIf: linksOn,
+        needs: (): Need | undefined => (wired() && SHAPES.has(L.linkStyle) ? { reason: 'Wire physics shapes the path.', id: '🔗 Enhanced Links.Link.Style', value: 'spline' } : undefined),
+        tooltip: 'Same as ComfyUI follows the Link Render Mode setting.' },
     { id: '🔗 Enhanced Links.Thickness', key: 'thickness', name: 'Link thickness', type: 'slider', min: 1, max: 10, step: 0.5, default: 3, group: 'Links · Path', showIf: linksOn },
+    { id: '🔗 Enhanced Links.Physics.Profile', key: 'physicsProfile', name: 'Wire physics', type: 'combo', options: PHYSICS_OPTIONS, default: 'off', group: 'Links · Path', showIf: (): boolean => L.enabled, tooltip: 'Wires sag and swing; works with any animation, including None.' },
     { id: '🔗 Enhanced Links.Quality', key: 'quality', name: 'Link effect quality', type: 'combo', options: QUALITY_OPTIONS, default: 1, group: 'Links · Path', advanced: true, showIf: linksOn, tooltip: 'More detail, more GPU.' },
     { id: '🔗 Enhanced Links.Particle.Density', key: 'particleDensity', name: 'Link particle density', type: 'combo', options: DENSITY_OPTIONS, snap: true, default: 0.5, group: 'Links · Path', advanced: true, showIf: (): boolean => (linksOn() && DENSE.has(L.animate)) || markers(), tooltip: 'How many particles or markers each link carries.' },
+    { id: '🔗 Enhanced Links.Physics.Amount', key: 'physicsAmount', name: 'Wire physics strength', type: 'slider', min: 0, max: 2, step: 0.1, default: 1, group: 'Links · Path', advanced: true, showIf: (): boolean => L.enabled && L.physicsProfile !== 'off', tooltip: 'How far wires sag and swing: 0 keeps the native shape, 2 is twice the profile.' },
 
     { id: '🔗 Enhanced Links.Color.Mode', key: 'colorMode', name: 'Link colors', type: 'combo', options: LINK_COLOR_MODE_OPTIONS, default: 'default', group: 'Links · Color', showIf: linksOn, tooltip: 'Type colors follow your palette.' },
     { id: '🔗 Enhanced Links.Color.Primary', key: 'colorPrimary', name: 'Link primary color', type: 'color', default: '#ffb300', group: 'Links · Color', showIf: (): boolean => linksOn() && L.colorMode === 'custom', tooltip: 'Used when Link colors is Custom.' },

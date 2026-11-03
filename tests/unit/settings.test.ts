@@ -143,6 +143,9 @@ const V3_DEFAULTS: Record<string, unknown> = {
     // M9b
     '📦 Enhanced Nodes.Completion.Style': 'shockwave',
     '📦 Enhanced Nodes.Completion.PerNode': false,
+    // M9c
+    '🔗 Enhanced Links.Physics.Profile': 'off',
+    '🔗 Enhanced Links.Physics.Amount': 1,
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -156,11 +159,13 @@ const V3_OPTIONS: Record<string, unknown[]> = {
     '📦 Enhanced Nodes.Completion.Anchor': ['outputs', 'primary', 'viewport'],
     '🔗 Enhanced Links.Blend': ['normal', 'additive'],
     '📦 Enhanced Nodes.Completion.Style': ['fireworks', 'confetti', 'shockwave', 'trace', 'random'],
+    '🔗 Enhanced Links.Physics.Profile': ['off', 'rope', 'whip', 'gel'],
 };
 const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
     '🔗 Enhanced Links.Flow.Trail.Fade': [2, 30, 1],
     '🔗 Enhanced Links.Perf.StaticAbove': [0, 5000, 50],
+    '🔗 Enhanced Links.Physics.Amount': [0, 2, 0.1],
 };
 
 /** The v2.0.1 defaults v3 changes, by the milestone that changes them. */
@@ -323,8 +328,8 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 53 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(53);
+    it('shows 54 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(54);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
@@ -342,7 +347,7 @@ describe('how the panel shows each setting', () => {
         const visible = () => shownSettings().filter((s) => !('showIf' in s) || s.showIf()).map((s) => s.id.replace(/^\S+ Enhanced \w+\./, (p) => (p.startsWith('🔗') ? 'L.' : 'N.')));
         // The defaults: Classic Flow links with markers and shadows; no node effect, particles or titles.
         expect(visible()).toEqual([
-            'L.Enabled', 'L.Animate', 'L.Animation.Speed', 'L.Direction', 'L.Static.Mode', 'L.Link.Style', 'L.Thickness', 'L.Quality', 'L.Particle.Density',
+            'L.Enabled', 'L.Animate', 'L.Animation.Speed', 'L.Direction', 'L.Static.Mode', 'L.Link.Style', 'L.Thickness', 'L.Physics.Profile', 'L.Quality', 'L.Particle.Density',
             'L.Color.Mode', 'L.Color.Scheme', 'L.Glow.Intensity', 'L.Blend', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Size', 'L.Marker.Color.Mode',
             'L.Marker.Glow', 'L.Marker.Effects', 'L.Link.Shadow.Enabled', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style',
             'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
@@ -386,6 +391,31 @@ describe('how the panel shows each setting', () => {
         expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([fix, fix]);
         preview(fix.id, fix.value);
         expect([needs('📦 Enhanced Nodes.Text.Color'), needs('📦 Enhanced Nodes.Color.Particle')]).toEqual([undefined, undefined]);
+    });
+
+    it('shows wire physics strength while a profile is on, and says the shape-only path shapes give way to the wire, with a fix that takes Same as ComfyUI', () => {
+        const entry = (id: string) => SETTINGS.find((e) => e.id === id)!;
+        const needs = () => {
+            const s = entry('🔗 Enhanced Links.Link.Style');
+            return 'needs' in s ? s.needs() : undefined;
+        };
+        const amount = entry('🔗 Enhanced Links.Physics.Amount');
+        showing({ '🔗 Enhanced Links.Link.Style': 'stepped' });
+        expect(['showIf' in amount && amount.showIf(), needs()]).toEqual([false, undefined]);
+        preview('🔗 Enhanced Links.Physics.Profile', 'rope');
+        expect('showIf' in amount && amount.showIf()).toBe(true);
+        // Its fix keeps the wire and frees the row for a decoration that draws along it.
+        const fix = { reason: 'Wire physics shapes the path.', id: '🔗 Enhanced Links.Link.Style', value: 'spline' };
+        for (const style of ['straight', 'linear', 'stepped', 'zigzag', 'coil']) {
+            preview('🔗 Enhanced Links.Link.Style', style);
+            expect(needs(), style).toEqual(fix);
+        }
+        // Decorations draw along the wire; at strength 0 the shape is native's.
+        preview('🔗 Enhanced Links.Link.Style', 'dotted');
+        expect(needs()).toBeUndefined();
+        preview('🔗 Enhanced Links.Link.Style', 'coil');
+        preview('🔗 Enhanced Links.Physics.Amount', 0);
+        expect(needs()).toBeUndefined();
     });
 
     it('disables the titles, the hover outline, focus on hover and double-click jumps in Nodes 2.0, with a fix that turns classic nodes back on, ahead of the colours they need', () => {

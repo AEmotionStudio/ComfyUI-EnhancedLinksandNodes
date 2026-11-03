@@ -56,12 +56,14 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
-        // TODO(M9c, M9e): rope physics at 0.6 and hands & eyes.
+        description: 'Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
+        // TODO(M9e): hands & eyes.
         values: {
             '🔗 Enhanced Links.Animate': 4,
+            '🔗 Enhanced Links.Physics.Profile': 'rope',
             '🔗 Enhanced Links.Quality': 2,
             '🔗 Enhanced Links.Particle.Density': 2,
+            '🔗 Enhanced Links.Physics.Amount': 0.6,
             '🔗 Enhanced Links.Glow.Intensity': 14,
             '🔗 Enhanced Links.Blend': 'additive',
             '📦 Enhanced Nodes.Animate': 2,
@@ -173,6 +175,16 @@ export const LOOKS: readonly Look[] = [
             '📦 Enhanced Nodes.Color.Secondary': '#ff8800',
             '📦 Enhanced Nodes.Color.Accent': '#fff3b0',
             '📦 Enhanced Nodes.Completion.Style': 'trace',
+        },
+    },
+    {
+        id: 'living-wires',
+        name: 'Living Wires',
+        description: 'Native-looking wires that sag like rope.',
+        // TODO(M9e): Assist hands.
+        values: {
+            '🔗 Enhanced Links.Animate': 0,
+            '🔗 Enhanced Links.Physics.Profile': 'rope',
         },
     },
     {
@@ -381,8 +393,8 @@ export const light = () => !document.documentElement.classList.contains('dark-th
 /**
  * The mix `seed` alone decides: a link animation and a node effect (or none), in custom colours at hues h, h + 40° and
  * h + 180°, lighter for a dark palette and darker for a light one as the seed's lowest bit says, at speeds from 0.6 to
- * 1.4, a glow from 6 to 16, and quality and density up to Balanced and Dense; half of them with node particles; and a
- * completion style other than Surprise.
+ * 1.4, a glow from 6 to 16, and quality and density up to Balanced and Dense; half of them with node particles; a
+ * completion style other than Surprise; and no wire physics.
  */
 function mix(seed: number): Look {
     const random = rng(seed);

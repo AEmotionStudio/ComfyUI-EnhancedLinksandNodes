@@ -58,6 +58,16 @@
   "🔗 Enhanced Links_Thickness": {
     "name": "Link thickness"
   },
+  "🔗 Enhanced Links_Physics_Profile": {
+    "name": "Wire physics",
+    "tooltip": "Wires sag and swing; works with any animation, including None.",
+    "options": {
+      "Off": "Off",
+      "Rope": "Rope",
+      "Whip": "Whip",
+      "Gel": "Gel"
+    }
+  },
   "🔗 Enhanced Links_Quality": {
     "name": "Link effect quality",
     "tooltip": "More detail, more GPU.",
@@ -76,6 +86,10 @@
       "Dense": "Dense",
       "Ultra": "Ultra"
     }
+  },
+  "🔗 Enhanced Links_Physics_Amount": {
+    "name": "Wire physics strength",
+    "tooltip": "How far wires sag and swing: 0 keeps the native shape, 2 is twice the profile."
   },
   "🔗 Enhanced Links_Color_Mode": {
     "name": "Link colors",

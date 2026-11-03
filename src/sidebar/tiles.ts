@@ -11,10 +11,11 @@
  */
 
 import { app } from '/scripts/app.js';
-import { L, N } from '@/core/settings';
+import { L, N, wired } from '@/core/settings';
 import { STILL_PHASE, advance, clock, env, heldByRun } from '@/core/engine';
 import { nodePalette, palette } from '@/core/colors';
 import { Segment } from '@/links/pipeline';
+import { Wire, rest } from '@/links/physics';
 import { MOVING } from '@/links/animations';
 import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
@@ -43,24 +44,35 @@ const CLASSIC = 9;
 const LINK_COLOR = '#9A9';
 
 /** Everything on a tile moves. */
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0 };
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 };
 /** The tiles' clock. */
 const k: Clock = { ...clock };
 
 const segment = new Segment();
+/** What a link hangs as with wire physics on: at rest, as the canvas shows it once still. */
+const wire = new Wire();
 
 /** Whether links show still, as the link pass decides it. */
 const linksStill = () => L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion;
 
-/** A link from an output at `a` to an input at `b` with link animation `animate`, in the palette's IMAGE colours; None draws it as native does. */
+/**
+ * A link from an output at `a` to an input at `b` with link animation `animate`, in the palette's IMAGE colours; None
+ * draws it as native does. With wire physics on it hangs at rest from native's path.
+ */
 function link(ctx: CanvasRenderingContext2D, animate: number, a: Point, b: Point, k: Clock): void {
     segment.pal = palette(LGraphCanvas.link_type_colors.IMAGE) ?? palette(app.canvas.default_link_color) ?? palette(LINK_COLOR)!;
     ctx.save();
     if (!animate) {
         segment.path.set(a, b, RIGHT, LEFT, app.canvas.links_render_mode);
+        if (wired()) rest(wire, segment.path);
         segment.path.draw(ctx, segment.pal.native, app.canvas.connections_width);
     } else {
         segment.lay(a, b, RIGHT, LEFT, SPLINE);
+        if (wired()) {
+            segment.path.set(a, b, RIGHT, LEFT, SPLINE);
+            rest(wire, segment.path);
+            segment.len = segment.path.length;
+        }
         segment.chain = segment.len;
         const still = linksStill();
         segment.isStatic = still;

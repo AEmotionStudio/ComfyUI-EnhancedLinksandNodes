@@ -816,6 +816,20 @@ describe('a graph with many glowing links on screen', () => {
         expect(canvas.dirty_bgcanvas).toBe(false);
     });
 
+    it('bakes the bases plain while a physics wire swings, panned or not, and whole on the layer as it falls asleep', async () => {
+        const canvas = await settled(rows(13), { '🔗 Enhanced Links.Physics.Profile': 'rope' });
+        canvas.graph._nodes[1].pos[1] += 40;
+        expect(bake(canvas), 'woken').toEqual(expect.objectContaining({ back: [] }));
+        expect(live.wires).toBe(1);
+        let passes = 0;
+        for (; live.wires && passes < 300; passes++) {
+            if (passes === 5) canvas.ds.offset = [40, 0];
+            // The pass the ticker put it to sleep in draws whole.
+            expect(bake(canvas), `pass ${passes}`).toEqual(expect.objectContaining(live.wires ? { back: PLAIN, layer: [] } : { back: [], layer: GLOWING }));
+        }
+        expect([passes > 5, live.wires]).toEqual([true, 0]);
+    });
+
     it('draws whole on the layer a link a pan brings on screen, which native skipped in the pass before, unclipped by the strips', async () => {
         const canvas = await settled(rows(14));
         // Native skips a link off screen, or one whose end is dragged.

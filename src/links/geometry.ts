@@ -4,7 +4,8 @@
  * pathRenderer.ts, the same in 1.39.5 and 1.57.1), so effects follow
  * Comfy.LinkRenderMode and reroutes. Link.Style can ask for another of those
  * rules, or for a shape of our own: steps with rounded corners, or a wave or a
- * coil along the native path. at() finds points the way v1's renderers took
+ * coil along the native path; a physics wire (links/physics.ts) makes it the
+ * polyline the wire hangs as. at() finds points the way v1's renderers took
  * theirs: at the bezier parameter on a spline and at the fraction of the
  * length along a polyline. find() finds them by length instead, for what is
  * spaced in pixels.
@@ -181,6 +182,15 @@ export class LinkPath {
             this.measurePolyline();
         }
         [this.cx, this.cy, this.angle] = [cx, cy, angle];
+    }
+
+    /** Turns the path into the polyline through the first `count` points of `points`, as x, y pairs: a physics wire's. */
+    follow(points: Float64Array, count: number): void {
+        this.spline = false;
+        this.n = 0;
+        for (let i = 0; i < count; i++) this.add(points[2 * i], points[2 * i + 1]);
+        this.measurePolyline();
+        this.centre();
     }
 
     /**

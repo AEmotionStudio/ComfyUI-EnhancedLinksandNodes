@@ -1,7 +1,8 @@
 /**
  * What both extensions animate by: one clock that only the ticker moves; one
  * requestAnimationFrame ticker that asks app.canvas for front paints while
- * anything animated is on screen and stops otherwise; the onRender and
+ * anything animated is on screen, and background paints too while physics
+ * wires swing, and stops otherwise; the onRender and
  * onDrawForeground hooks, chained with whatever else uses them, which draw the
  * extensions' layers in each front pass, those over the nodes on a canvas
  * above them in Nodes 2.0, whose nodes are DOM elements over the main canvas;
@@ -190,9 +191,10 @@ const calm = () => during(L.pauseDuringRender) === 'calm' || during(N.pauseDurin
  * playing, on screen or not, so that they end, and marks the nodes marked. A
  * run's visuals that move count too: flows, the links of its river and trail,
  * and rings, its progress rings, error outlines and the bursts as its nodes
- * finish.
+ * finish. wires counts the physics wires on screen that swing, which the
+ * ticker moves on and the background shows.
  */
-export const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0 };
+export const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 };
 
 /**
  * A layer of each front pass, in graph space: `over` is false when onRender
@@ -210,6 +212,9 @@ type Draw = (canvas: Canvas, ctx: CanvasRenderingContext2D) => void;
  * over everything.
  */
 export const layers: { nodes?: Draw; links?: Layer; runs?: Draw; marks?: Draw; bursts?: Draw } = {};
+
+/** What the ticker moves on with the clock, by `dt` s: the physics wires that swing (links/physics.ts), which the link setup() puts in place. */
+export const steps: { wires?: (dt: number) => void } = {};
 
 /** Whether `box` grown by `margin` on each side overlaps `area`, as the layers cull what they draw to the view. */
 export const overlaps = (box: ArrayLike<number>, area: ArrayLike<number>, margin: number) =>
@@ -236,7 +241,7 @@ let due = 0;
 
 /** Whether the front canvas needs repainting: anything animated is on screen and the tab shows. */
 function want(): boolean {
-    return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings > 0;
+    return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings + live.wires > 0;
 }
 
 /** Moves a direction toward `to` by what turning around in TURNAROUND allows in `dt`. */
@@ -285,7 +290,11 @@ function tick(now: number): void {
         if (!--judged.probe) judged.display = judged.shortest;
         last = due = now;
     } else if (now >= due - JITTER_MS) {
-        advance(clock, Math.min((now - last) / 1000, 0.1), live);
+        const dt = Math.min((now - last) / 1000, 0.1);
+        advance(clock, dt, live);
+        // Swinging wires change the background, which shows them once more as they come to rest.
+        const swinging = live.wires > 0;
+        if (swinging) steps.wires?.(dt);
         // Paced by when each paint is due rather than by the time since the last one, so a cap the display's rate is
         // no multiple of still holds on average: at 60 a 75 Hz display skips one frame in five, not every other one.
         // A paint more than an interval late starts the pacing afresh instead of catching up.
@@ -295,7 +304,7 @@ function tick(now: number): void {
         const interval = fps ? 1000 / fps : 0;
         due = due + interval > now ? due + interval : now + interval;
         heal(app.canvas);
-        app.canvas.setDirty(true, false);
+        app.canvas.setDirty(true, swinging);
     }
     frame = requestAnimationFrame(tick);
 }

@@ -67,10 +67,12 @@ export interface GraphSpec {
     nodes: { pos: Point; size?: Point; title?: string; collapsed?: boolean; ghost?: boolean; mode?: number; shape?: number; output?: boolean; type?: string; subgraph?: GraphSpec }[];
     /**
      * `from` and `to` index `nodes`; each link takes the next input of its target. Reroutes are positions from
-     * the output on; a floating link is what is left of one whose input was disconnected: the output and its reroutes.
-     * A flashing link is an event link triggered within the last second.
+     * the output on; a floating link is what is left of one whose input was disconnected: the output and its reroutes,
+     * or with floating 'input', of one whose output was: its reroutes and the input. A link is numbered by its place
+     * unless given an id, as 1.39.5 numbers floating links on their own (LGraph.ts L1307). A flashing link is an event
+     * link triggered within the last second.
      */
-    links?: { from: number; to: number; type?: string; reroutes?: Point[]; floating?: boolean; flash?: boolean }[];
+    links?: { from: number; to: number; type?: string; reroutes?: Point[]; floating?: boolean | 'input'; id?: number; flash?: boolean }[];
 }
 
 class Reroute {
@@ -81,6 +83,9 @@ class Reroute {
     _centreAngle?: number;
     path?: Path2D;
     _colour?: string;
+    /** Set on the last reroute of a floating link into an input (FE157 Reroute.ts L123-130), and on the first, whose segment native skips. */
+    floating?: { slotType: 'input' };
+    _dragging?: boolean;
 
     /** parentId is the reroute before it, on the output side (FE157 Reroute.ts L94-103). */
     constructor(readonly id: number, readonly pos: Point, readonly parentId?: number) {}
@@ -351,7 +356,7 @@ class Graph {
             for (const pos of l.reroutes ?? []) chain.push(new Reroute(++reroutes, pos, chain.at(-1)?.id));
             for (const reroute of chain) this.reroutes.set(reroute.id, reroute);
             const link: Link = {
-                id: i + 1,
+                id: l.id ?? i + 1,
                 origin_id: origin.id,
                 origin_slot: 0,
                 target_id: target.id,
@@ -366,6 +371,11 @@ class Graph {
             link.reroutes.forEach((r, j) => r.aim(points[j], points[j + 2]));
             if (l.floating) {
                 this.floatingLinks.set(link.id, link);
+                // Its input stays, unconnected.
+                if (l.floating === 'input') {
+                    chain.at(-1)!.floating = { slotType: 'input' };
+                    target.inputs.push({ name: `in ${target.inputs.length}`, link: null });
+                }
                 return;
             }
             this.links[link.id] = link;
@@ -441,8 +451,9 @@ export class FakeCanvas {
     visible_nodes: FakeNode[] = [];
     /** What is selected: nodes, groups and reroutes (FE157 L895-897, FE1395 L652). */
     selectedItems = new Set<unknown>();
-    /** FE157 L1288, FE1395 L624: what native strokes links at. */
+    /** FE157 L1288, FE1395 L624: what native strokes links at; and whether it draws a border under them (FE157 L1286, FE1395 L945). */
     connections_width = 3;
+    render_connections_border = true;
     /** The node under the pointer (FE157 L915, FE1395 L664), whether the view is being dragged (FE157 L1007, FE1395 L432), and the link drag (LinkConnector.isConnecting, FE157 L132-134, FE1395 L124). */
     node_over?: FakeNode;
     dragging_canvas = false;
@@ -573,10 +584,16 @@ export class FakeCanvas {
                 this.renderSegments(ctx, link, origin.getOutputPos(link.origin_slot), node.getInputPos(slot), reroutes, origin.outputs[link.origin_slot].dir, input.dir);
             });
         }
-        // FE157 L6243-6311, FE1395 L5797-5862: a third of the alpha, the output-side case (the input was disconnected).
+        // FE157 L6243-6311, FE1395 L5797-5862: a third of the alpha, from the first reroute where the output was disconnected.
         const { globalAlpha } = ctx;
         ctx.globalAlpha = globalAlpha * 0.33;
         for (const link of graph.floatingLinks.values()) {
+            if (link.reroutes.at(-1)!.floating) {
+                const target = graph._nodes_by_id[link.target_id];
+                link.reroutes[0]._dragging = true;
+                this.renderSegments(ctx, link, link.reroutes[0].pos, target.getInputPos(link.target_slot), reroutes, LinkDirection.CENTER, target.inputs[link.target_slot].dir, true);
+                continue;
+            }
             const origin = graph._nodes_by_id[link.origin_id];
             link._dragging = true;
             this.renderSegments(ctx, link, origin.getOutputPos(link.origin_slot), link.reroutes[link.reroutes.length - 1].pos, reroutes,
@@ -609,12 +626,15 @@ export class FakeCanvas {
                 reroutes.push(reroute);
                 // FE157 L6365-6368, FE1395 L5912-5915.
                 reroute._colour = link.color || (this.constructor as typeof FakeCanvas & { link_type_colors: Record<string, string> }).link_type_colors[link.type] || this.default_link_color;
-                this.renderLink(ctx, from, reroute.pos, link, false, 0, null, startControl ? LinkDirection.CENTER : startDir, LinkDirection.CENTER,
-                    { startControl, endControl: reroute.controlPoint, reroute, disabled });
+                if (!reroute._dragging) {
+                    this.renderLink(ctx, from, reroute.pos, link, false, 0, null, startControl ? LinkDirection.CENTER : startDir, LinkDirection.CENTER,
+                        { startControl, endControl: reroute.controlPoint, reroute, disabled });
+                }
             }
             const next = link.reroutes[j + 1]?.pos ?? end;
             const dist = Math.min(80, Math.hypot(next[0] - reroute.pos[0], next[1] - reroute.pos[1]) * 0.25);
-            startControl = [dist * reroute.cos, dist * reroute.sin];
+            // A floating link into an input leaves its first reroute without a control (FE157 L6397-6399, FE1395 L5943-5945).
+            startControl = !startControl && link.reroutes.at(-1)!.floating ? [0, 0] : [dist * reroute.cos, dist * reroute.sin];
             from = reroute.pos;
         });
         // The last segment, unless its end is being dragged: a floating link ends at its last reroute (FE157 L6411-6444, FE1395 L5957-5990).

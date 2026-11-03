@@ -716,6 +716,7 @@ const NEWS = [
     'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.',
     'Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.',
     "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
+    'Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.',
     'Much lighter than 2.x on big graphs.',
 ];
 

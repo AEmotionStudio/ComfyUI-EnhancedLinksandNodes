@@ -51,8 +51,8 @@ afterEach(() => {
 });
 
 describe('curated looks', () => {
-    it('are the ten of the design, Subtle the defaults, each setting only what differs from them and looks may set, to valid values', () => {
-        expect(LOOKS.map((l) => l.id)).toEqual(['off', 'subtle', 'showcase', 'performance', 'classic-v1', 'neon-night', 'lava-lamp', 'sacred-geometry', 'presenter', 'blueprint']);
+    it('are the eleven of the design, Subtle the defaults, each setting only what differs from them and looks may set, to valid values', () => {
+        expect(LOOKS.map((l) => l.id)).toEqual(['off', 'subtle', 'showcase', 'performance', 'classic-v1', 'neon-night', 'lava-lamp', 'sacred-geometry', 'living-wires', 'presenter', 'blueprint']);
         expect(look('subtle').values).toEqual({});
         for (const l of LOOKS) {
             expect(l.name, l.id).not.toBe('');
@@ -89,9 +89,17 @@ describe('curated looks', () => {
             'neon-night': [true, 'confetti', false],
             'lava-lamp': [true, 'fireworks', false],
             'sacred-geometry': [true, 'trace', false],
+            'living-wires': [true, 'shockwave', false],
             presenter: [true, 'shockwave', false],
             blueprint: [true, 'trace', false],
         });
+    });
+
+    it('hang Showcase on rope at 0.6 and Living Wires, native-looking, on rope at 1; the others leave wires off', () => {
+        const wires = (l: Look) => [l.values['🔗 Enhanced Links.Physics.Profile'] ?? 'off', l.values['🔗 Enhanced Links.Physics.Amount'] ?? 1];
+        expect(Object.fromEntries(LOOKS.map((l) => [l.id, wires(l)]))).toEqual(Object.fromEntries(LOOKS.map((l) => [l.id,
+            l.id === 'showcase' ? ['rope', 0.6] : l.id === 'living-wires' ? ['rope', 1] : ['off', 1]])));
+        expect(look('living-wires').values).toEqual({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Physics.Profile': 'rope' });
     });
 
     it('Off leaves links, nodes and runs native', async () => {
@@ -112,8 +120,10 @@ describe('applying a look', () => {
         // Showcase's link animation is saved already, and its node quality is the default; the thickness goes back to it.
         expect(fake.posts).toEqual([
             [THICKNESS, 3],
+            ['🔗 Enhanced Links.Physics.Profile', 'rope'],
             ['🔗 Enhanced Links.Quality', 2],
             ['🔗 Enhanced Links.Particle.Density', 2],
+            ['🔗 Enhanced Links.Physics.Amount', 0.6],
             ['🔗 Enhanced Links.Glow.Intensity', 14],
             ['🔗 Enhanced Links.Blend', 'additive'],
             ['📦 Enhanced Nodes.Animate', 2],
@@ -132,7 +142,7 @@ describe('applying a look', () => {
         fake.posts = [];
         undo();
         await settle();
-        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend',
+        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Physics.Profile', '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Physics.Amount', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend',
             '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
             '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', '📦 Enhanced Nodes.Completion.Style', '📦 Enhanced Nodes.Completion.PerNode', LOOK]);
         expect(showing()).toEqual(before);
@@ -329,6 +339,8 @@ describe('Surprise me', () => {
             expect([1, 2]).toContain(values['🔗 Enhanced Links.Quality']);
             expect([0.5, 1, 2]).toContain(values['🔗 Enhanced Links.Particle.Density']);
             expect(['fireworks', 'confetti', 'shockwave', 'trace']).toContain(values['📦 Enhanced Nodes.Completion.Style']);
+            // No wire physics: the defaults, off.
+            expect(Object.keys(values).filter((key) => key.includes('Physics'))).toEqual([]);
         }
         expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['📦 Enhanced Nodes.Completion.Style'])).size).toBe(4);
         // Darker colours for a light palette, which the seed's lowest bit marks.
