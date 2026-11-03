@@ -4,14 +4,15 @@
  * shadow (Shadow.Style drop), Classic Flow on Wave and Coil links, and a node
  * effect on a bypassed node beside a collapsed one, and the completion styles
  * after the fireworks: confetti, the shockwave and the path trace's comet,
- * along a link through a reroute too; rope and whip wires at rest; and v3's own
- * link animations, Merkaba Beads, DNA Helix 3D and Comet Trails. They are v3's own
+ * along a link through a reroute too; rope and whip wires at rest; v3's own
+ * link animations, Merkaba Beads, DNA Helix 3D and Comet Trails; and connection
+ * assist's guide line, gloves and eyes over a dragged link. They are v3's own
  * snapshots, in __traces__/v3: `vitest -u` on this file rewrites them, after a
  * change to what they show has been checked.
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { clock } from '@/core/engine';
+import { clock, layers } from '@/core/engine';
 import { drawBursts, endBursts, play, type Anchor, type Style } from '@/fx/bursts';
 import { drawFlows, stepInto } from '@/fx/execution';
 import { palette } from '@/core/colors';
@@ -21,6 +22,7 @@ import { Wire, rest } from '@/links/physics';
 import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
 import { frames, run, start } from '../helpers/fake-litegraph';
+import { CanvasRecorder } from '../helpers/recording-context';
 import { V1_LINK_SETTINGS, V1_NODE_SETTINGS, storeSettings, traceFrames } from './characterize/v1-inputs';
 
 const [LEFT, RIGHT, SPLINE] = [3, 4, 2];
@@ -204,6 +206,32 @@ describe('v3 traces', () => {
             }],
         ]).trace());
         await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/animations-v3.txt');
+    });
+
+    it('connection assist over a link dragged from an IMAGE output: the guide line, the open, reaching and clasped hands, and the eyes', async () => {
+        type Point = [number, number];
+        /** The end far off, 133 px from the IMAGE input at (510, 214), 60 px from it, and held on it by native with the pointer by it. */
+        const poses: [string, Point, Point?][] = [['far', [200, 400]], ['133 px', [400, 140]], ['60 px', [460, 180]], ['snapped', [470, 230], [510, 214]]];
+        const traces: string[] = [];
+        for (const mode of ['line', 'hands', 'hands-eyes']) {
+            const canvas = await start({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Assist.Mode': mode }, { nodes: [{ pos: [100, 100] }, { pos: [500, 200] }] });
+            const [source, target] = canvas.graph._nodes;
+            source.outputs = [{ name: 'out', links: [], type: 'IMAGE' }];
+            target.inputs = [{ name: 'image', link: null, type: 'IMAGE' }];
+            LGraphCanvas.link_type_colors.IMAGE = '#64B5F6';
+            frames(1);
+            Object.assign(canvas.linkConnector, { isConnecting: true, state: { connectingTo: 'input' } });
+            canvas.linkConnector.renderLinks.push({ node: source, fromSlot: source.outputs[0] as { type: string }, fromPos: source.getOutputPos(0) });
+            traces.push(traceFrames(`Assist ${mode}`, poses.map(([name, at, held]) => [`${name}, 0.6 s in`, (ctx) => {
+                [canvas.graph_mouse, canvas._highlight_pos] = [at, held];
+                // The pose starts at 10 s, as the drag did, and has popped in by 10.6 s.
+                clock.assistTime = 10;
+                layers.assist!(canvas as never, new CanvasRecorder().ctx);
+                clock.assistTime = 10.6;
+                layers.assist!(canvas as never, ctx);
+            }])).trace());
+        }
+        await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/assist.txt');
     });
 
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {

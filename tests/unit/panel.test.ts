@@ -142,6 +142,16 @@ describe('the panel', () => {
         close(slot);
     });
 
+    it('the Links tab ends with Connecting, whose connection assist shows while link effects are on', async () => {
+        const slot = await open('links');
+        expect([...slot.querySelectorAll('.eln-section-toggle')].map((t) => t.textContent)).toEqual(['Effect', 'Path', 'Color', 'Markers', 'Shadows', 'Connecting']);
+        const row = rowOf(slot, '🔗 Enhanced Links.Assist.Mode');
+        expect([sectionOf(slot, 'Connecting').contains(row), row.hidden]).toEqual([true, false]);
+        await app.extensionManager.setting.set(LINKS_ON, false);
+        expect(rowOf(slot, '🔗 Enhanced Links.Assist.Mode').hidden).toBe(true);
+        close(slot);
+    });
+
     it("the quick bar's Look menu moves with the arrows and applies only the look picked; looks applied one after another undo together", async () => {
         const slot = await open('about', { '🔗 Enhanced Links.Thickness': 6, '📦 Enhanced Nodes.Animate': 3 });
         const choose = slot.querySelector<HTMLElement>('#eln-look')!;

@@ -111,6 +111,13 @@ const PHYSICS_OPTIONS = [
     { value: 'gel', text: 'Gel' },
 ] as const;
 
+const ASSIST_OPTIONS = [
+    { value: 'off', text: 'Off' },
+    { value: 'line', text: 'Guide line' },
+    { value: 'hands', text: 'Reaching hands' },
+    { value: 'hands-eyes', text: 'Hands & eyes' },
+] as const;
+
 const MARKER_SHAPE_OPTIONS = [
     { value: 'none', text: 'None' },
     { value: 'arrow', text: 'Arrow' },
@@ -358,6 +365,8 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Shadow.Style', key: 'shadowStyle', name: 'Shadow style', type: 'combo', options: SHADOW_STYLE_OPTIONS, default: 'halo', group: 'Links · Shadows', advanced: true, showIf: shadows, tooltip: 'Halo is the soft dark outline v1 drew; Drop shadow is offset, as in v2.' },
     { id: '🔗 Enhanced Links.Shadow.Blur', key: 'shadowBlur', name: 'Drop shadow blur', type: 'slider', min: 0, max: 10, step: 0.5, default: 5, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
     { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
+
+    { id: '🔗 Enhanced Links.Assist.Mode', key: 'assistMode', name: 'Connection assist', type: 'combo', options: ASSIST_OPTIONS, default: 'off', group: 'Links · Connecting', showIf: (): boolean => L.enabled, tooltip: 'While you drag a link, show the nearest slot it can connect to.' },
 
     { id: '📦 Enhanced Nodes.Enabled', key: 'enabled', name: 'Node effects', type: 'boolean', default: true, group: 'Nodes · Effect', look: false, tooltip: 'Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is.' },
     { id: '📦 Enhanced Nodes.Animate', key: 'animate', name: 'Node effect', type: 'combo', options: NODE_ANIMATION_OPTIONS, default: 0, group: 'Nodes · Effect', showIf: (): boolean => N.enabled, tooltip: 'Effect drawn on and around every node. Node FX in the node menu picks one for a node.' },

@@ -38,6 +38,12 @@ const PHYSICS_OPTIONS = [
   { value: "whip", text: "Whip" },
   { value: "gel", text: "Gel" }
 ];
+const ASSIST_OPTIONS = [
+  { value: "off", text: "Off" },
+  { value: "line", text: "Guide line" },
+  { value: "hands", text: "Reaching hands" },
+  { value: "hands-eyes", text: "Hands & eyes" }
+];
 const MARKER_SHAPE_OPTIONS = [
   { value: "none", text: "None" },
   { value: "arrow", text: "Arrow" },
@@ -237,6 +243,7 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Shadow.Style", key: "shadowStyle", name: "Shadow style", type: "combo", options: SHADOW_STYLE_OPTIONS, default: "halo", group: "Links · Shadows", advanced: true, showIf: shadows, tooltip: "Halo is the soft dark outline v1 drew; Drop shadow is offset, as in v2." },
   { id: "🔗 Enhanced Links.Shadow.Blur", key: "shadowBlur", name: "Drop shadow blur", type: "slider", min: 0, max: 10, step: 0.5, default: 5, group: "Links · Shadows", advanced: true, showIf: () => shadows() && L.shadowStyle === "drop", tooltip: "Used by Drop shadow." },
   { id: "🔗 Enhanced Links.Shadow.Offset", key: "shadowOffset", name: "Drop shadow offset", type: "slider", min: 0, max: 10, step: 0.5, default: 3, group: "Links · Shadows", advanced: true, showIf: () => shadows() && L.shadowStyle === "drop", tooltip: "Used by Drop shadow." },
+  { id: "🔗 Enhanced Links.Assist.Mode", key: "assistMode", name: "Connection assist", type: "combo", options: ASSIST_OPTIONS, default: "off", group: "Links · Connecting", showIf: () => L.enabled, tooltip: "While you drag a link, show the nearest slot it can connect to." },
   { id: "📦 Enhanced Nodes.Enabled", key: "enabled", name: "Node effects", type: "boolean", default: true, group: "Nodes · Effect", look: false, tooltip: "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is." },
   { id: "📦 Enhanced Nodes.Animate", key: "animate", name: "Node effect", type: "combo", options: NODE_ANIMATION_OPTIONS, default: 0, group: "Nodes · Effect", showIf: () => N.enabled, tooltip: "Effect drawn on and around every node. Node FX in the node menu picks one for a node." },
   { id: "📦 Enhanced Nodes.Animations.Enabled", key: "animationsEnabled", name: "Show base effect", type: "boolean", default: true, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "Off draws only the effect's own particles." },
@@ -490,7 +497,7 @@ const FAILURES = 5;
 const CALM = 0.25;
 const CALM_ALPHA = 0.5;
 const CALM_FPS = 20;
-const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0 };
+const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
 const STILL_PHASE = 9 * Math.PI / 4;
 const env = { running: false, reducedMotion: false };
 const PLAIN = 1;
@@ -589,7 +596,7 @@ function heldByRun(applies) {
   return mode === "pause" || mode === "spotlight";
 }
 const calm$1 = () => during(L.pauseDuringRender) === "calm" || during(N.pauseDuringRender) === "calm";
-const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 };
+const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0, assist: 0 };
 const layers = {};
 const steps$1 = {};
 const overlaps = (box2, area, margin) => box2[0] - margin <= area[0] + area[2] && box2[0] + box2[2] + margin >= area[0] && box2[1] - margin <= area[1] + area[3] && box2[1] + box2[3] + margin >= area[1];
@@ -605,7 +612,7 @@ let frame$2 = 0;
 let last$1 = 0;
 let due$1 = 0;
 function want() {
-  return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings + live.wires > 0;
+  return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings + live.wires + live.assist > 0;
 }
 const toward = (dir, to, dt) => dir + Math.max(-2 * dt / TURNAROUND, Math.min(2 * dt / TURNAROUND, to - dir));
 function advance(k2, dt, moving2) {
@@ -629,6 +636,7 @@ function advance(k2, dt, moving2) {
   if (moving2.bursts) k2.burstTime += dt;
   if (moving2.marks) k2.markTime += dt;
   if (moving2.flows || moving2.rings) k2.runTime += dt;
+  if (moving2.assist) k2.assistTime += dt;
 }
 function tick$1(now) {
   frame$2 = 0;
@@ -702,6 +710,7 @@ function foreground(canvas, ctx) {
   layers.runs?.(canvas, ctx);
   layers.marks?.(canvas, ctx);
   layers.bursts?.(canvas, ctx);
+  layers.assist?.(canvas, ctx);
 }
 function overNodes(canvas, ctx) {
   if (!LiteGraph.vueNodesMode) {
@@ -4520,8 +4529,7 @@ const LOOKS = [
   {
     id: "showcase",
     name: "Showcase",
-    description: "Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.",
-    // TODO(M9e): hands & eyes.
+    description: "Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.",
     values: {
       "🔗 Enhanced Links.Animate": 4,
       "🔗 Enhanced Links.Physics.Profile": "rope",
@@ -4530,6 +4538,7 @@ const LOOKS = [
       "🔗 Enhanced Links.Physics.Amount": 0.6,
       "🔗 Enhanced Links.Glow.Intensity": 14,
       "🔗 Enhanced Links.Blend": "additive",
+      "🔗 Enhanced Links.Assist.Mode": "hands-eyes",
       "📦 Enhanced Nodes.Animate": 2,
       "📦 Enhanced Nodes.Intensity": 1.2,
       "📦 Enhanced Nodes.Glow": 1,
@@ -4643,11 +4652,11 @@ const LOOKS = [
   {
     id: "living-wires",
     name: "Living Wires",
-    description: "Native-looking wires that sag like rope.",
-    // TODO(M9e): Assist hands.
+    description: "Native-looking wires that sag like rope, and hands that reach for the slot a link can go to.",
     values: {
       "🔗 Enhanced Links.Animate": 0,
-      "🔗 Enhanced Links.Physics.Profile": "rope"
+      "🔗 Enhanced Links.Physics.Profile": "rope",
+      "🔗 Enhanced Links.Assist.Mode": "hands"
     }
   },
   {
@@ -5435,7 +5444,7 @@ const RIGHT = 4;
 const LEFT = 3;
 const CLASSIC = 9;
 const LINK_COLOR = "#9A9";
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0 };
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, assist: 0 };
 const k = { ...clock };
 const segment = new Segment();
 const wire = new Wire();
@@ -7351,6 +7360,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
   "Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.",
+  "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
 const PLACES = [
@@ -7894,85 +7904,87 @@ function installFollow() {
   app.canvas.canvas.addEventListener("pointermove", interrupted, { passive: true });
 }
 export {
-  holdsStill as $,
-  toggleStatic as A,
+  nextError as $,
+  setting as A,
   BADGES as B,
-  toggleFocus as C,
+  shown$3 as C,
   DISABLED as D,
-  FOCUS_ON as E,
+  showPanel as E,
   FROZEN as F,
-  commit as G,
-  showPicker as H,
-  surpriseMe as I,
-  goBack as J,
-  selectedNodes as K,
-  LINKS_ON as L,
-  effects as M,
+  LINKS_ON as G,
+  toggleLinks as H,
+  toggleNodes as I,
+  N as J,
+  toggleStatic as K,
+  L,
+  toggleFocus as M,
   NODES_ON as N,
-  pick as O,
-  complete as P,
-  resetEverything as Q,
-  goToRunning as R,
+  FOCUS_ON as O,
+  commit as P,
+  showPicker as Q,
+  surpriseMe as R,
   SELECTION_FX as S,
   TITLE as T,
-  nextError as U,
-  goAlong as V,
-  translucent as W,
-  revision as X,
-  transformPane as Y,
-  syncRuns as Z,
-  overlaps as _,
-  TOGGLE_ALL as a,
-  during as a0,
-  nodePalette as a1,
-  effectOf as a2,
-  particlesOnly as a3,
-  stepOf as a4,
-  BYPASS as a5,
-  NEVER as a6,
-  nodeMenu as a7,
-  nodeSettings as a8,
-  layers as a9,
-  live as aa,
-  startSprites as ab,
-  drawBursts as ac,
-  guard as ad,
-  COMPLETION as ae,
-  drawNodeFx as af,
-  clock as ag,
-  OVER as ah,
-  dummy as ai,
-  reach as aj,
-  UNDER as ak,
-  wake as al,
-  ownStyle as am,
-  CALM_ALPHA as an,
-  STILL_NODE as ao,
-  stopSprites as ap,
-  install as b,
-  checked as c,
-  installPanel as d,
-  installRuns as e,
-  installFollow as f,
-  installLinks as g,
-  errorNodes as h,
+  goBack as U,
+  selectedNodes as V,
+  effects as W,
+  pick as X,
+  complete as Y,
+  resetEverything as Z,
+  goToRunning as _,
+  live as a,
+  goAlong as a0,
+  translucent as a1,
+  revision as a2,
+  transformPane as a3,
+  syncRuns as a4,
+  overlaps as a5,
+  holdsStill as a6,
+  during as a7,
+  nodePalette as a8,
+  effectOf as a9,
+  particlesOnly as aa,
+  stepOf as ab,
+  BYPASS as ac,
+  NEVER as ad,
+  nodeMenu as ae,
+  nodeSettings as af,
+  startSprites as ag,
+  drawBursts as ah,
+  COMPLETION as ai,
+  drawNodeFx as aj,
+  OVER as ak,
+  dummy as al,
+  reach as am,
+  UNDER as an,
+  ownStyle as ao,
+  CALM_ALPHA as ap,
+  STILL_NODE as aq,
+  stopSprites as ar,
+  dark as b,
+  clock as c,
+  darker as d,
+  env as e,
+  TOGGLE_ALL as f,
+  guard as g,
+  checked as h,
   installStyle as i,
-  currentLook as j,
-  keyName as k,
-  linkSettings as l,
-  commandKeys as m,
+  linkSettings as j,
+  install as k,
+  layers as l,
+  installPanel as m,
   navigateOnDoubleClick as n,
-  TOGGLE as o,
+  installRuns as o,
   panelShown as p,
-  keyText as q,
-  running as r,
-  env as s,
-  setting as t,
-  shown$3 as u,
-  showPanel as v,
-  toggleLinks as w,
-  L as x,
-  toggleNodes as y,
-  N as z
+  installFollow as q,
+  installLinks as r,
+  errorNodes as s,
+  currentLook as t,
+  keyName as u,
+  commandKeys as v,
+  wake as w,
+  TOGGLE as x,
+  keyText as y,
+  running as z
 };
-//# sourceMappingURL=menus-Cfshl9F4.js.map
+//# sourceMappingURL=menus-DmUNL11J.js.map

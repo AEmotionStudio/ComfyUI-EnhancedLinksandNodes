@@ -106,7 +106,12 @@ describe('curated looks', () => {
         const wires = (l: Look) => [l.values['🔗 Enhanced Links.Physics.Profile'] ?? 'off', l.values['🔗 Enhanced Links.Physics.Amount'] ?? 1];
         expect(Object.fromEntries(LOOKS.map((l) => [l.id, wires(l)]))).toEqual(Object.fromEntries(LOOKS.map((l) => [l.id,
             l.id === 'showcase' ? ['rope', 0.6] : l.id === 'living-wires' ? ['rope', 1] : ['off', 1]])));
-        expect(look('living-wires').values).toEqual({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Physics.Profile': 'rope' });
+        expect(look('living-wires').values).toEqual({ '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Physics.Profile': 'rope', '🔗 Enhanced Links.Assist.Mode': 'hands' });
+    });
+
+    it('give Showcase hands and eyes and Living Wires hands; the others leave connection assist off', () => {
+        expect(Object.fromEntries(LOOKS.map((l) => [l.id, l.values['🔗 Enhanced Links.Assist.Mode'] ?? 'off']))).toEqual(Object.fromEntries(LOOKS.map((l) => [l.id,
+            l.id === 'showcase' ? 'hands-eyes' : l.id === 'living-wires' ? 'hands' : 'off'])));
     });
 
     it('Off leaves links, nodes and runs native', async () => {
@@ -133,6 +138,7 @@ describe('applying a look', () => {
             ['🔗 Enhanced Links.Physics.Amount', 0.6],
             ['🔗 Enhanced Links.Glow.Intensity', 14],
             ['🔗 Enhanced Links.Blend', 'additive'],
+            ['🔗 Enhanced Links.Assist.Mode', 'hands-eyes'],
             ['📦 Enhanced Nodes.Animate', 2],
             ['📦 Enhanced Nodes.Intensity', 1.2],
             ['📦 Enhanced Nodes.Glow', 1],
@@ -149,7 +155,7 @@ describe('applying a look', () => {
         fake.posts = [];
         undo();
         await settle();
-        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Physics.Profile', '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Physics.Amount', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend',
+        expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Physics.Profile', '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Physics.Amount', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend', '🔗 Enhanced Links.Assist.Mode',
             '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
             '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', '📦 Enhanced Nodes.Completion.Style', '📦 Enhanced Nodes.Completion.PerNode', LOOK]);
         expect(showing()).toEqual(before);
@@ -346,8 +352,8 @@ describe('Surprise me', () => {
             expect([1, 2]).toContain(values['🔗 Enhanced Links.Quality']);
             expect([0.5, 1, 2]).toContain(values['🔗 Enhanced Links.Particle.Density']);
             expect(['fireworks', 'confetti', 'shockwave', 'trace']).toContain(values['📦 Enhanced Nodes.Completion.Style']);
-            // No wire physics: the defaults, off.
-            expect(Object.keys(values).filter((key) => key.includes('Physics'))).toEqual([]);
+            // No wire physics or connection assist: the defaults, off.
+            expect(Object.keys(values).filter((key) => key.includes('Physics') || key.includes('Assist'))).toEqual([]);
         }
         expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['📦 Enhanced Nodes.Completion.Style'])).size).toBe(4);
         // Every link animation but None, the new three too.

@@ -176,8 +176,8 @@ export class FakeNode {
     subgraph?: Graph;
     selected = false;
     mouseOver = false;
-    inputs: { name: string; link: number | null; dir?: number }[] = [];
-    outputs: { name: string; links: number[]; dir?: number }[] = [{ name: 'out', links: [] }];
+    inputs: { name: string; link: number | null; dir?: number; type?: string }[] = [];
+    outputs: { name: string; links: number[]; dir?: number; type?: string }[] = [{ name: 'out', links: [] }];
     /** FE157 LGraphNode.ts L1156-1159, FE1395 L788-791: the selection outline (and an error one, never shown here). */
     strokeStyles: Record<string, (this: FakeNode) => StrokeStyle | undefined> = {
         selected() {
@@ -454,10 +454,22 @@ export class FakeCanvas {
     /** FE157 L1288, FE1395 L624: what native strokes links at; and whether it draws a border under them (FE157 L1286, FE1395 L945). */
     connections_width = 3;
     render_connections_border = true;
-    /** The node under the pointer (FE157 L915, FE1395 L664), whether the view is being dragged (FE157 L1007, FE1395 L432), and the link drag (LinkConnector.isConnecting, FE157 L132-134, FE1395 L124). */
+    /** The node under the pointer (FE157 L915, FE1395 L664), and whether the view is being dragged (FE157 L1007, FE1395 L432). */
     node_over?: FakeNode;
     dragging_canvas = false;
-    linkConnector = { isConnecting: false };
+    /**
+     * The link drag (FE157 canvas/LinkConnector.ts L82-134, FE1395 L74-124): whether one goes on, the slots it goes to,
+     * where Nodes 2.0 holds its end, its links (each from a node's slot at fromPos), and its events.
+     */
+    linkConnector = {
+        isConnecting: false,
+        state: { connectingTo: undefined as 'input' | 'output' | undefined, snapLinksPos: undefined as Point | undefined },
+        renderLinks: [] as { node: unknown; fromSlot: { type: string }; fromPos: Point }[],
+        events: new EventTarget(),
+    };
+    /** Where the pointer is in graph space (FE157 L831, FE1395 L599), and what a dragged link snaps to (FE157 L1025, FE1395 L708). */
+    graph_mouse: Point = [0, 0];
+    _highlight_pos?: Point;
     /** What a palette sets the canvas background to (FE157 services/colorPaletteService.ts L157). */
     clear_background_color = '#222';
     /** Each DragAndScale.animateToBounds call: the bounds, and the duration and zoom it was given. */
@@ -795,7 +807,10 @@ export async function start(settings: Record<string, unknown> = {}, spec: GraphS
         static link_type_colors: Record<string, string> = { '-1': '#A86', number: '#AAA', node: '#DCA' };
     };
     const LGraphNode = class extends FakeNode {};
-    Object.assign(globalThis, { LiteGraph: { NODE_TITLE_HEIGHT, NODE_TITLE_TEXT_Y, NODE_SLOT_HEIGHT, NODE_FONT, ROUND_RADIUS, vueNodesMode: false }, LGraphCanvas, LGraphNode, LGraphGroup: FakeGroup });
+    // LiteGraphGlobal.isValidConnection (FE157 LiteGraphGlobal.ts L716-744) for single types: any, or the same; and
+    // whether dragged links snap to slots, as Comfy.Node.AutoSnapLinkToSlot sets it, on by default.
+    const isValidConnection = (a: unknown, b: unknown) => !a || !b || a === '*' || b === '*' || String(a).toLowerCase() === String(b).toLowerCase();
+    Object.assign(globalThis, { LiteGraph: { NODE_TITLE_HEIGHT, NODE_TITLE_TEXT_Y, NODE_SLOT_HEIGHT, NODE_FONT, ROUND_RADIUS, vueNodesMode: false, isValidConnection, snaps_for_comfy: true }, LGraphCanvas, LGraphNode, LGraphGroup: FakeGroup });
 
     vi.spyOn(console, 'log').mockImplementation(() => {});
     await import('@/extensions/link-animations');

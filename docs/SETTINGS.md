@@ -60,6 +60,12 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Drop shadow blur | `🔗 Enhanced Links.Shadow.Blur` | slider | 0 to 10, step 0.5 | `5` | Used by Drop shadow. |
 | Drop shadow offset | `🔗 Enhanced Links.Shadow.Offset` | slider | 0 to 10, step 0.5 | `3` | Used by Drop shadow. |
 
+## Links · Connecting
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Connection assist | `🔗 Enhanced Links.Assist.Mode` | combo | `off` Off, `line` Guide line, `hands` Reaching hands, `hands-eyes` Hands & eyes | `off` Off | While you drag a link, show the nearest slot it can connect to. |
+
 ## Nodes · Effect
 
 | Name | Id | Type | Options or range | Default | Tooltip |

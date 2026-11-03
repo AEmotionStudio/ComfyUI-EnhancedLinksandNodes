@@ -46,11 +46,11 @@ const CALM_FPS = 20;
  * (old_node_animations.js:71-127, 2945-2957), whatever the frame rate: their phase turns TURN × speed radians a second,
  * their particles' time runs Particle.Speed seconds a second and nodeTime one, and nodeDir turns them around as linkDir
  * does the links. A Calm run moves both at a quarter of their pace. burstTime runs a second a second while a burst
- * plays, from 0 as its show starts, markTime while a node is marked, from 0 as its mark starts, and runTime while a
- * run's visuals move. Only the ticker moves the clock, never a draw, so a canvas drawn again within a frame (as
- * MagnifyGlass does) shows the same moment.
+ * plays, from 0 as its show starts, markTime while a node is marked, from 0 as its mark starts, runTime while a
+ * run's visuals move, and assistTime while connection assist draws. Only the ticker moves the clock, never a draw, so
+ * a canvas drawn again within a frame (as MagnifyGlass does) shows the same moment.
  */
-export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0 };
+export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
 
 /** The pose of still links: the first frame v1 drew in Static mode (old_link_animations.js:2440-2456). */
 export const STILL_PHASE = (9 * Math.PI) / 4;
@@ -192,9 +192,10 @@ const calm = () => during(L.pauseDuringRender) === 'calm' || during(N.pauseDurin
  * run's visuals that move count too: flows, the links of its river and trail,
  * and rings, its progress rings, error outlines and the bursts as its nodes
  * finish. wires counts the physics wires on screen that swing, which the
- * ticker moves on and the background shows.
+ * ticker moves on and the background shows, and assist is 1 while connection
+ * assist draws over a link being dragged.
  */
-export const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 };
+export const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0, assist: 0 };
 
 /**
  * A layer of each front pass, in graph space: `over` is false when onRender
@@ -208,10 +209,10 @@ type Draw = (canvas: Canvas, ctx: CanvasRenderingContext2D) => void;
 
 /**
  * The layers each extension's setup() puts in place: what the node effects draw around the nodes, under the link
- * motion; the link motion; the run's rings and outlines on nodes, and the marks on them, over them; and the bursts,
- * over everything.
+ * motion; the link motion; the run's rings and outlines on nodes, and the marks on them, over them; the bursts, over
+ * those; and connection assist, over everything.
  */
-export const layers: { nodes?: Draw; links?: Layer; runs?: Draw; marks?: Draw; bursts?: Draw } = {};
+export const layers: { nodes?: Draw; links?: Layer; runs?: Draw; marks?: Draw; bursts?: Draw; assist?: Draw } = {};
 
 /** What the ticker moves on with the clock, by `dt` s: the physics wires that swing (links/physics.ts), which the link setup() puts in place. */
 export const steps: { wires?: (dt: number) => void } = {};
@@ -241,13 +242,13 @@ let due = 0;
 
 /** Whether the front canvas needs repainting: anything animated is on screen and the tab shows. */
 function want(): boolean {
-    return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings + live.wires > 0;
+    return !document.hidden && live.links + live.nodes + live.particles + live.bursts + live.marks + live.flows + live.rings + live.wires + live.assist > 0;
 }
 
 /** Moves a direction toward `to` by what turning around in TURNAROUND allows in `dt`. */
 const toward = (dir: number, to: number, dt: number) => dir + Math.max((-2 * dt) / TURNAROUND, Math.min((2 * dt) / TURNAROUND, to - dir));
 
-/** Moves clock `k` on by `dt` seconds: its links, nodes, particles, bursts, marks and run visuals where `moving` counts any. The panel's gallery tiles run a clock of their own. */
+/** Moves clock `k` on by `dt` seconds: its links, nodes, particles, bursts, marks, run visuals and assist where `moving` counts any. The panel's gallery tiles run a clock of their own. */
 export function advance(k: typeof clock, dt: number, moving: typeof live): void {
     if (moving.links) {
         const speed = L.animationSpeed;
@@ -270,6 +271,7 @@ export function advance(k: typeof clock, dt: number, moving: typeof live): void 
     if (moving.bursts) k.burstTime += dt;
     if (moving.marks) k.markTime += dt;
     if (moving.flows || moving.rings) k.runTime += dt;
+    if (moving.assist) k.assistTime += dt;
 }
 
 function tick(now: number): void {
@@ -370,6 +372,7 @@ function foreground(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     layers.runs?.(canvas, ctx);
     layers.marks?.(canvas, ctx);
     layers.bursts?.(canvas, ctx);
+    layers.assist?.(canvas, ctx);
 }
 
 /**

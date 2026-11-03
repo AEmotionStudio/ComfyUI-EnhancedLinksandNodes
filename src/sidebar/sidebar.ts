@@ -718,6 +718,7 @@ const NEWS = [
     "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
     'Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.',
     'Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.',
+    'Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.',
     'Much lighter than 2.x on big graphs.',
 ];
 

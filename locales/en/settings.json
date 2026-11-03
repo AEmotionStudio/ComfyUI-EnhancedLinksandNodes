@@ -215,6 +215,16 @@
     "name": "Drop shadow offset",
     "tooltip": "Used by Drop shadow."
   },
+  "🔗 Enhanced Links_Assist_Mode": {
+    "name": "Connection assist",
+    "tooltip": "While you drag a link, show the nearest slot it can connect to.",
+    "options": {
+      "Off": "Off",
+      "Guide line": "Guide line",
+      "Reaching hands": "Reaching hands",
+      "Hands & eyes": "Hands & eyes"
+    }
+  },
   "📦 Enhanced Nodes_Enabled": {
     "name": "Node effects",
     "tooltip": "Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is."

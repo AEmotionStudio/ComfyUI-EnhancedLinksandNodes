@@ -56,8 +56,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
-        // TODO(M9e): hands & eyes.
+        description: 'Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Physics.Profile': 'rope',
@@ -66,6 +65,7 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Physics.Amount': 0.6,
             '🔗 Enhanced Links.Glow.Intensity': 14,
             '🔗 Enhanced Links.Blend': 'additive',
+            '🔗 Enhanced Links.Assist.Mode': 'hands-eyes',
             '📦 Enhanced Nodes.Animate': 2,
             '📦 Enhanced Nodes.Intensity': 1.2,
             '📦 Enhanced Nodes.Glow': 1,
@@ -179,11 +179,11 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'living-wires',
         name: 'Living Wires',
-        description: 'Native-looking wires that sag like rope.',
-        // TODO(M9e): Assist hands.
+        description: 'Native-looking wires that sag like rope, and hands that reach for the slot a link can go to.',
         values: {
             '🔗 Enhanced Links.Animate': 0,
             '🔗 Enhanced Links.Physics.Profile': 'rope',
+            '🔗 Enhanced Links.Assist.Mode': 'hands',
         },
     },
     {
@@ -393,7 +393,7 @@ export const light = () => !document.documentElement.classList.contains('dark-th
  * The mix `seed` alone decides: a link animation and a node effect (or none), in custom colours at hues h, h + 40° and
  * h + 180°, lighter for a dark palette and darker for a light one as the seed's lowest bit says, at speeds from 0.6 to
  * 1.4, a glow from 6 to 16, and quality and density up to Balanced and Dense; half of them with node particles; a
- * completion style other than Surprise; and no wire physics.
+ * completion style other than Surprise; and no wire physics or connection assist.
  */
 function mix(seed: number): Look {
     const random = rng(seed);

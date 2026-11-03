@@ -44,7 +44,7 @@ const CLASSIC = 9;
 const LINK_COLOR = '#9A9';
 
 /** Everything on a tile moves. */
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0 };
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0, assist: 0 };
 /** The tiles' clock. */
 const k: Clock = { ...clock };
 

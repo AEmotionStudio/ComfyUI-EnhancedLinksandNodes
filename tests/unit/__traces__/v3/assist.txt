@@ -1,0 +1,557 @@
+# Assist line
+# far, 0.6 s in
+save()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# 133 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(400, 140)
+rotate(0.59)
+scale(1, 1)
+strokeStyle = #64b5f6
+beginPath()
+moveTo(0, 0)
+lineTo(123.57, 0)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+setLineDash([6, 6])
+lineDashOffset = -2.4
+stroke()
+setLineDash([])
+beginPath()
+arc(132.57, 0, 9, 0, 6.28)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+stroke()
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# 60 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(460, 180)
+rotate(0.6)
+scale(1, 1)
+strokeStyle = #64b5f6
+beginPath()
+moveTo(0, 0)
+lineTo(51.46, 0)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+setLineDash([6, 6])
+lineDashOffset = -2.4
+stroke()
+setLineDash([])
+beginPath()
+arc(60.46, 0, 9, 0, 6.28)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+stroke()
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# snapped, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(510, 214)
+rotate(0)
+scale(1, 1)
+strokeStyle = #64b5f6
+beginPath()
+moveTo(0, 0)
+lineTo(0, 0)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+setLineDash([6, 6])
+lineDashOffset = -2.4
+stroke()
+setLineDash([])
+beginPath()
+arc(0, 0, 9, 0, 6.28)
+globalAlpha = 0.3
+lineWidth = 6
+stroke()
+globalAlpha = 1
+lineWidth = 2
+stroke()
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# Assist hands
+# far, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(200, 400)
+rotate(2.05)
+scale(1, -1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path1 = Path2D[moveTo(19.5, 0.5) ellipse(9, 0.5, 10.5, 10, 0, 0, 6.28) moveTo(15.2, -15.66) ellipse(13.15, -9.49, 6.5, 3.4, -1.25, 0, 6.28)]
+stroke(path1)
+fillStyle = #fdfdfd
+fill(path1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path2 = Path2D[moveTo(27.5, -11.99) ellipse(20.58, -7.05, 8.5, 3.1, -0.62, 0, 6.28) moveTo(32.05, 4.97) ellipse(22.74, 3.08, 9.5, 3.1, 0.2, 0, 6.28)]
+stroke(path2)
+fillStyle = #fdfdfd
+fill(path2)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path3 = Path2D[moveTo(32.49, -4.29) ellipse(22.71, -2.21, 10, 3.1, -0.21, 0, 6.28) moveTo(26.92, 12.08) ellipse(20.73, 7.84, 7.5, 3.1, 0.6, 0, 6.28)]
+stroke(path3)
+fillStyle = #fdfdfd
+fill(path3)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path4 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=11
+# 133 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(400, 140)
+rotate(0.59)
+scale(0.78, 0.78)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path5 = Path2D[moveTo(20, 1) ellipse(9, 1, 11, 9.5, 0, 0, 6.28) moveTo(19.15, -12.68) ellipse(12.5, -8.6, 7.8, 3.6, -0.55, 0, 6.28) moveTo(32.99, -6.62) ellipse(22.5, -6.1, 10.5, 2.9, -0.05, 0, 6.28) moveTo(35, -0.91) ellipse(23.5, -0.8, 11.5, 2.9, -0.01, 0, 6.28) moveTo(33, 4.81) ellipse(22.5, 4.5, 10.5, 2.9, 0.03, 0, 6.28) moveTo(28.47, 9.96) ellipse(20.25, 9.3, 8.25, 2.9, 0.08, 0, 6.28)]
+stroke(path5)
+fillStyle = #fdfdfd
+fill(path5)
+lineWidth = 1.2
+path6 = Path2D[moveTo(17, -3.45) lineTo(26, -3.55) moveTo(17, 1.85) lineTo(26, 1.91) moveTo(17, 6.9) lineTo(26, 7.11)]
+stroke(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+globalAlpha = 1
+save()
+translate(510, 214)
+rotate(3.73)
+scale(0.78, -0.78)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path5)
+fillStyle = #fdfdfd
+fill(path5)
+lineWidth = 1.2
+stroke(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+globalAlpha = 1
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# 60 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(485, 197)
+rotate(0.6)
+scale(1, 1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path7 = Path2D[moveTo(0.5, 1) ellipse(-12, 1, 12.5, 10, 0, 0, 6.28) moveTo(24.5, -0.5) ellipse(12, -0.5, 12.5, 10, 0, 0, 6.28)]
+stroke(path7)
+fillStyle = #fdfdfd
+fill(path7)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path8 = Path2D[moveTo(4.95, -8.4) ellipse(-5, -7.4, 10, 2.7, -0.1, 0, 6.28) moveTo(4.95, 3.47) ellipse(-5.75, 2.4, 10.75, 2.7, 0.1, 0, 6.28)]
+stroke(path8)
+fillStyle = #fdfdfd
+fill(path8)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path9 = Path2D[moveTo(5, -2.5) ellipse(-6, -2.5, 11, 2.7, 0, 0, 6.28) moveTo(4.82, 8.99) ellipse(-4, 7.2, 9, 2.7, 0.2, 0, 6.28)]
+stroke(path9)
+fillStyle = #fdfdfd
+fill(path9)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path10 = Path2D[moveTo(11.9, -11) ellipse(2, -9.6, 10, 3.5, -0.14, 0, 6.28)]
+stroke(path10)
+fillStyle = #fdfdfd
+fill(path10)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path11 = Path2D[roundRect(-35, -9.5, 10.5, 19, 4) roundRect(24.5, -9.5, 10.5, 19, 4)]
+stroke(path11)
+fillStyle = #64b5f6
+fill(path11)
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# snapped, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(510, 214)
+rotate(0)
+scale(1, 1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path7)
+fillStyle = #fdfdfd
+fill(path7)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path8)
+fillStyle = #fdfdfd
+fill(path8)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path9)
+fillStyle = #fdfdfd
+fill(path9)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path10)
+fillStyle = #fdfdfd
+fill(path10)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path11)
+fillStyle = #64b5f6
+fill(path11)
+restore()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# Assist hands-eyes
+# far, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(200, 400)
+rotate(2.05)
+scale(1, -1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path1 = Path2D[moveTo(19.5, 0.5) ellipse(9, 0.5, 10.5, 10, 0, 0, 6.28) moveTo(15.2, -15.66) ellipse(13.15, -9.49, 6.5, 3.4, -1.25, 0, 6.28)]
+stroke(path1)
+fillStyle = #fdfdfd
+fill(path1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path2 = Path2D[moveTo(27.5, -11.99) ellipse(20.58, -7.05, 8.5, 3.1, -0.62, 0, 6.28) moveTo(32.05, 4.97) ellipse(22.74, 3.08, 9.5, 3.1, 0.2, 0, 6.28)]
+stroke(path2)
+fillStyle = #fdfdfd
+fill(path2)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path3 = Path2D[moveTo(32.49, -4.29) ellipse(22.71, -2.21, 10, 3.1, -0.21, 0, 6.28) moveTo(26.92, 12.08) ellipse(20.73, 7.84, 7.5, 3.1, 0.6, 0, 6.28)]
+stroke(path3)
+fillStyle = #fdfdfd
+fill(path3)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path4 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+beginPath()
+ellipse(200, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(200, 73.6, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(198.9, 72.5, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+beginPath()
+ellipse(220, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(219.78, 73.59, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(218.68, 72.49, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# 133 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(400, 140)
+rotate(0.59)
+scale(0.78, 0.78)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path5 = Path2D[moveTo(20, 1) ellipse(9, 1, 11, 9.5, 0, 0, 6.28) moveTo(19.15, -12.68) ellipse(12.5, -8.6, 7.8, 3.6, -0.55, 0, 6.28) moveTo(32.99, -6.62) ellipse(22.5, -6.1, 10.5, 2.9, -0.05, 0, 6.28) moveTo(35, -0.91) ellipse(23.5, -0.8, 11.5, 2.9, -0.01, 0, 6.28) moveTo(33, 4.81) ellipse(22.5, 4.5, 10.5, 2.9, 0.03, 0, 6.28) moveTo(28.47, 9.96) ellipse(20.25, 9.3, 8.25, 2.9, 0.08, 0, 6.28)]
+stroke(path5)
+fillStyle = #fdfdfd
+fill(path5)
+lineWidth = 1.2
+path6 = Path2D[moveTo(17, -3.45) lineTo(26, -3.55) moveTo(17, 1.85) lineTo(26, 1.91) moveTo(17, 6.9) lineTo(26, 7.11)]
+stroke(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+globalAlpha = 1
+save()
+translate(510, 214)
+rotate(3.73)
+scale(0.78, -0.78)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path5)
+fillStyle = #fdfdfd
+fill(path5)
+lineWidth = 1.2
+stroke(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path4)
+fillStyle = #64b5f6
+fill(path4)
+restore()
+globalAlpha = 1
+beginPath()
+ellipse(600, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(596.44, 169.47, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(595.34, 168.37, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+beginPath()
+ellipse(620, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(616.43, 169.51, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(615.33, 168.41, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# 60 px, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(485, 197)
+rotate(0.6)
+scale(1, 1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path7 = Path2D[moveTo(0.5, 1) ellipse(-12, 1, 12.5, 10, 0, 0, 6.28) moveTo(24.5, -0.5) ellipse(12, -0.5, 12.5, 10, 0, 0, 6.28)]
+stroke(path7)
+fillStyle = #fdfdfd
+fill(path7)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path8 = Path2D[moveTo(4.95, -8.4) ellipse(-5, -7.4, 10, 2.7, -0.1, 0, 6.28) moveTo(4.95, 3.47) ellipse(-5.75, 2.4, 10.75, 2.7, 0.1, 0, 6.28)]
+stroke(path8)
+fillStyle = #fdfdfd
+fill(path8)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path9 = Path2D[moveTo(5, -2.5) ellipse(-6, -2.5, 11, 2.7, 0, 0, 6.28) moveTo(4.82, 8.99) ellipse(-4, 7.2, 9, 2.7, 0.2, 0, 6.28)]
+stroke(path9)
+fillStyle = #fdfdfd
+fill(path9)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path10 = Path2D[moveTo(11.9, -11) ellipse(2, -9.6, 10, 3.5, -0.14, 0, 6.28)]
+stroke(path10)
+fillStyle = #fdfdfd
+fill(path10)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path11 = Path2D[roundRect(-35, -9.5, 10.5, 19, 4) roundRect(24.5, -9.5, 10.5, 19, 4)]
+stroke(path11)
+fillStyle = #64b5f6
+fill(path11)
+restore()
+beginPath()
+ellipse(600, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(596.41, 170.26, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(595.31, 169.16, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+beginPath()
+ellipse(620, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(616.41, 170.22, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(615.31, 169.12, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0
+# snapped, 0.6 s in
+save()
+save()
+lineJoin = round
+lineCap = round
+save()
+translate(510, 214)
+rotate(0)
+scale(1, 1)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path7)
+fillStyle = #fdfdfd
+fill(path7)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path8)
+fillStyle = #fdfdfd
+fill(path8)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path9)
+fillStyle = #fdfdfd
+fill(path9)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path10)
+fillStyle = #fdfdfd
+fill(path10)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path11)
+fillStyle = #64b5f6
+fill(path11)
+restore()
+beginPath()
+ellipse(600, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(596.77, 171.58, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(595.67, 170.48, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+beginPath()
+ellipse(620, 170, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(616.66, 171.34, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(615.56, 170.24, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+restore()
+restore()
+# gradients=0 shadowBlurSets=0 path2d=0

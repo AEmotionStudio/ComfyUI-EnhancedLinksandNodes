@@ -182,14 +182,14 @@ test('a look applied from the panel saves only what differs, and its undo puts e
     await expect(panel.locator('[data-look=showcase]')).toHaveAttribute('aria-checked', 'true');
     await expect.poll(() => settingValues(page, [ANIMATE, '📦 Enhanced Nodes.Animate', '🔗 Enhanced Links.Glow.Intensity', LOOK])).toEqual([4, 2, 14, 'showcase']);
     await expect(panel.locator('#eln-look .eln-look-name')).toHaveText('Showcase');
-    await expect.poll(() => posts.filter(ours).length).toBe(17);
+    await expect.poll(() => posts.filter(ours).length).toBe(18);
     expect(posts).not.toEqual(expect.arrayContaining([LINKS_ON]));
 
     // A toast's Undo on 1.57+, the panel's own on 1.39.5.
     await page.getByTestId('toast').or(panel.locator('.eln-undo')).getByRole('button', { name: 'Undo', exact: true }).click();
     await expect.poll(() => settingValues(page, [ANIMATE, '📦 Enhanced Nodes.Animate', '🔗 Enhanced Links.Glow.Intensity', LOOK])).toEqual(before);
     await expect(panel.locator('[data-look=subtle]')).toHaveAttribute('aria-checked', 'true');
-    await expect.poll(() => posts.filter(ours).length).toBe(34);
+    await expect.poll(() => posts.filter(ours).length).toBe(36);
 });
 
 test('the quick bar’s Look menu moves with the arrow keys and saves nothing until Enter picks a look; looks picked one after another undo together', async ({ page }) => {

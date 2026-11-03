@@ -9,8 +9,8 @@
  * bar, Enhanced FX in the canvas menu, and the About page's badges. A command
  * says what it did in a short toast. setup() starts the engine, the link
  * pipeline (links/pipeline.ts) on ComfyUI's own link pass, the run visuals
- * (fx/execution.ts) and the panel; each node type learns Navigate.DoubleClick
- * as it registers (ui/menus.ts).
+ * (fx/execution.ts), connection assist (fx/assist.ts) and the panel; each node
+ * type learns Navigate.DoubleClick as it registers (ui/menus.ts).
  *
  * @module extensions/link-animations
  */
@@ -19,6 +19,7 @@ import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, checked, commit, linkSettings, setting, shown, type Setting } from '@/core/settings';
 import { env, install } from '@/core/engine';
+import { installAssist } from '@/fx/assist';
 import type { Anchor } from '@/fx/bursts';
 import { complete, errorNodes, installRuns } from '@/fx/execution';
 import { installLinks } from '@/links/pipeline';
@@ -319,6 +320,7 @@ const ext: ComfyExtension = {
         installRuns('links');
         installFollow();
         installLinks();
+        installAssist();
 
         console.log('[EnhancedLinks] Extension registered with full batched rendering pipeline.');
     },

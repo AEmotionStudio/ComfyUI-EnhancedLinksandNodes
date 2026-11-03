@@ -337,6 +337,44 @@ test.describe('baselines', { tag: '@perf' }, () => {
         await record(testInfo, { physics: rows });
     });
 
+    // A new link dragged from an IMAGE output on the big graph at zoom 1, the pointer circling 80 px from an IMAGE input,
+    // natively, and with connection assist off and Hands & eyes in turn, twice: front paints a second while it drags,
+    // and how long each took. Each drag ends back on its output.
+    test('link drag with connection assist', async ({ page, profile }, testInfo) => {
+        test.setTimeout(300_000);
+        await buildGraph(page, perfGraph(200, 500));
+        await setView(page, 'zoom 1');
+        const ASSIST = '🔗 Enhanced Links.Assist.Mode';
+        const runs: [string, string][] = profile === 'native' ? [['native', 'off']] : [['assist off', 'off'], ['Hands & eyes', 'hands-eyes'], ['assist off', 'off'], ['Hands & eyes', 'hands-eyes']];
+        // The nodes nearest (360, 500) and (880, 500): the IMAGE output of one, the IMAGE input of the other.
+        const [from, to] = await page.evaluate(() => {
+            const nodes = window.app.canvas.graph._nodes;
+            const nearest = (x: number, y: number) => nodes.reduce((a: { pos: number[] }, b: { pos: number[] }) => (Math.hypot(b.pos[0] - x, b.pos[1] - y) < Math.hypot(a.pos[0] - x, a.pos[1] - y) ? b : a));
+            return [[...nearest(360, 500).getOutputPos(0)], [...nearest(880, 500).getInputPos(0)]] as [Point, Point];
+        });
+        const [x0, y0] = await toClient(page, from);
+        const [x1, y1] = await toClient(page, [to[0] - 80, to[1]]);
+        const rows: { look: string; dragFps: number; front: { p50: number; p95: number } }[] = [];
+        for (const [look, mode] of runs) {
+            if (profile !== 'native') await setSetting(page, ASSIST, mode);
+            await page.waitForTimeout(1500);
+            await page.mouse.move(x0, y0);
+            await page.mouse.down();
+            await page.mouse.move(x1, y1, { steps: 10 });
+            await resetProbe(page);
+            const start = Date.now();
+            for (let i = 1; i <= 60; i++) await page.mouse.move(x1 + 40 * Math.cos(i / 5), y1 + 40 * Math.sin(i / 5));
+            const dragged = await readProbe(page);
+            const seconds = (Date.now() - start) / 1000;
+            expect(await page.evaluate(() => window.app.canvas.linkConnector.isConnecting)).toBe(true);
+            // Dropped back on its own output, where it connects to nothing and opens no search.
+            await page.mouse.move(x0, y0, { steps: 10 });
+            await page.mouse.up();
+            rows.push({ look, dragFps: round(dragged.front / seconds), front: { p50: percentile(dragged.frontMs, 0.5), p95: percentile(dragged.frontMs, 0.95) } });
+        }
+        await record(testInfo, { assist: rows });
+    });
+
     test('link colours', async ({ page }, testInfo) => {
         const graph = await buildGraph(page, graphs.typed);
         await redraw(page);
