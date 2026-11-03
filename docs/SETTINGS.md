@@ -20,7 +20,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | --- | --- | --- | --- | --- | --- |
 | Link path shape | `🔗 Enhanced Links.Link.Style` | combo | `spline` Same as ComfyUI, `straight` Direct, `linear` Right-angle, `hidden` Effect only, `dotted` Dotted, `dashed` Dashed, `double` Double, `stepped` Stepped, `zigzag` Wave, `coil` Coil, `rope` Rope, `glowpath` Glow path, `chain` Chain, `pulse` Pulse, `holographic` Holographic | `spline` Same as ComfyUI | Same as ComfyUI follows the Link Render Mode setting. |
 | Link thickness | `🔗 Enhanced Links.Thickness` | slider | 1 to 10, step 0.5 | `3` |  |
-| Wire physics | `🔗 Enhanced Links.Physics.Profile` | combo | `off` Off, `rope` Rope, `whip` Whip, `gel` Gel | `off` Off | Wires sag and swing; works with any animation, including None. |
+| Wire physics | `🔗 Enhanced Links.Physics.Profile` | combo | `off` Off, `rope` Cable, `whip` Spring, `gel` Syrup | `off` Off | Wires sag and swing; works with any animation, including None. |
 | Link effect quality | `🔗 Enhanced Links.Quality` | combo | `1` Fast, `2` Balanced, `3` Rich | `1` Fast | More detail, more GPU. |
 | Link particle density | `🔗 Enhanced Links.Particle.Density` | combo | `0.5` Minimal, `1` Balanced, `2` Dense, `3` Ultra | `0.5` Minimal | How many particles or markers each link carries. |
 | Wire physics strength | `🔗 Enhanced Links.Physics.Amount` | slider | 0 to 2, step 0.1 | `1` | How far wires sag and swing: 0 keeps the native shape, 2 is twice the profile. |

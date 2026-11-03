@@ -33,7 +33,7 @@ interface Profile {
     bend: number;
 }
 
-/** Rope hangs heavy and settles in about a second; a whip is taut and springs back; gel sags most and wobbles slowly. */
+/** Cable (`rope`) hangs heavy and settles in about a second; Spring (`whip`) is taut and springs back; Syrup (`gel`) sags most and wobbles slowly. */
 const PROFILES: Record<string, Profile> = {
     rope: { gravity: 1400, damping: 0.88, slack: 1.06, passes: 6, bend: 0.06 },
     whip: { gravity: 1200, damping: 0.95, slack: 1.02, passes: 10, bend: 0.06 },

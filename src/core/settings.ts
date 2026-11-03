@@ -107,9 +107,9 @@ const LINK_STYLE_OPTIONS = [
 
 const PHYSICS_OPTIONS = [
     { value: 'off', text: 'Off' },
-    { value: 'rope', text: 'Rope' },
-    { value: 'whip', text: 'Whip' },
-    { value: 'gel', text: 'Gel' },
+    { value: 'rope', text: 'Cable' },
+    { value: 'whip', text: 'Spring' },
+    { value: 'gel', text: 'Syrup' },
 ] as const;
 
 const ASSIST_OPTIONS = [

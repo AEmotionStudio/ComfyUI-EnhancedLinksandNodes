@@ -35,9 +35,9 @@ const LINK_STYLE_OPTIONS = [
 ];
 const PHYSICS_OPTIONS = [
   { value: "off", text: "Off" },
-  { value: "rope", text: "Rope" },
-  { value: "whip", text: "Whip" },
-  { value: "gel", text: "Gel" }
+  { value: "rope", text: "Cable" },
+  { value: "whip", text: "Spring" },
+  { value: "gel", text: "Syrup" }
 ];
 const ASSIST_OPTIONS = [
   { value: "off", text: "Off" },
@@ -5540,7 +5540,7 @@ const LOOKS = [
   {
     id: "showcase",
     name: "Showcase",
-    description: "Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.",
+    description: "Cosmic Weave links that hang like cables and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.",
     values: {
       "🔗 Enhanced Links.Animate": 4,
       "🔗 Enhanced Links.Physics.Profile": "rope",
@@ -5663,7 +5663,7 @@ const LOOKS = [
   {
     id: "living-wires",
     name: "Living Wires",
-    description: "Native-looking wires that sag like rope, and hands that reach for the slot a link can go to.",
+    description: "Native-looking wires that hang like cables, and hands that reach for the slot a link can go to.",
     values: {
       "🔗 Enhanced Links.Animate": 0,
       "🔗 Enhanced Links.Physics.Profile": "rope",
@@ -7782,7 +7782,7 @@ const NEWS$1 = [
   "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.",
   "Quick toggles: View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, buttons on the action bar and the selection toolbox, and keys for this panel, every effect and the running node, which Shortcut keys under Perf turns on.",
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
-  "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
+  "Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
   "Two new node effects: Flower of Life, which draws itself in and blooms, and Jelly, which wobbles the node itself like gel. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
@@ -8415,4 +8415,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-CZHMdN1T.js.map
+//# sourceMappingURL=menus-BpeAvtOf.js.map

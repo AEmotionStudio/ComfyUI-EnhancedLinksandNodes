@@ -56,7 +56,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links that sag like rope and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
+        description: 'Cosmic Weave links that hang like cables and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Physics.Profile': 'rope',
@@ -179,7 +179,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'living-wires',
         name: 'Living Wires',
-        description: 'Native-looking wires that sag like rope, and hands that reach for the slot a link can go to.',
+        description: 'Native-looking wires that hang like cables, and hands that reach for the slot a link can go to.',
         values: {
             '🔗 Enhanced Links.Animate': 0,
             '🔗 Enhanced Links.Physics.Profile': 'rope',

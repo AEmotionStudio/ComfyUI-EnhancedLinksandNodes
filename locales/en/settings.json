@@ -67,9 +67,9 @@
     "tooltip": "Wires sag and swing; works with any animation, including None.",
     "options": {
       "Off": "Off",
-      "Rope": "Rope",
-      "Whip": "Whip",
-      "Gel": "Gel"
+      "Cable": "Cable",
+      "Spring": "Spring",
+      "Syrup": "Syrup"
     }
   },
   "🔗 Enhanced Links_Quality": {

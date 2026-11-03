@@ -33,7 +33,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - **Merkaba Beads**, **DNA Helix 3D**, **Comet Trails** and **Stardust**: glittering motes drifting along the link, swelling and twinkling toward its middle.
 
 ### Wire physics
-- **Wire physics** (Rope, Whip or Gel, with a strength): links sag and swing as you move nodes, with any animation or none, and stay clickable along the wire.
+- **Wire physics** (Cable, Spring or Syrup, with a strength): links hang and swing as you move nodes, with any animation or none, and stay clickable along the wire.
 
 ### Connection assist
 - **Connection assist** (Guide line, Reaching hands, or Hands & eyes): while you drag a link, it points out the nearest slot within reach the link can connect to. Inspired by nodezator, as suggested in #3.
