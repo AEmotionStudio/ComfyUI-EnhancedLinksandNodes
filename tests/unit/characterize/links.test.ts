@@ -24,7 +24,7 @@ const CLASSIC = 9;
 type Moment = Parameters<(typeof MOVING)[number]>[2];
 
 /** v1's clock as v3's: its time × speed (1 here) is the flow, signed by the direction. */
-const moment = (phase: number, totalTime: number, direction: number): Moment => ({ linkPhase: phase, quantumPhase: phase, linkFlow: totalTime * direction });
+const moment = (phase: number, totalTime: number, direction: number): Moment => ({ linkPhase: phase, quantumPhase: phase, linkFlow: totalTime * direction, linkDir: direction });
 
 const v3Moving = (style: number): LinkDraw => (ctx, { items, phase, totalTime, direction }) => {
     const k = moment(phase, totalTime, direction);

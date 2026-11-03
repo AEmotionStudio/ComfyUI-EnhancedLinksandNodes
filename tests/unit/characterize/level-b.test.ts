@@ -47,7 +47,7 @@ function level(): Segment {
 }
 
 /** v1's clock at speed 1, `t` seconds in, the way Direction runs. */
-const at = (t: number, direction = 1): Moment => ({ linkPhase: -PHI2 * t * direction, quantumPhase: -PHI2 * t * direction, linkFlow: 2 * t * direction });
+const at = (t: number, direction = 1): Moment => ({ linkPhase: -PHI2 * t * direction, quantumPhase: -PHI2 * t * direction, linkFlow: 2 * t * direction, linkDir: direction });
 
 function draw(style: number, k: Moment, s = level()): CanvasRecorder {
     const rec = new CanvasRecorder();

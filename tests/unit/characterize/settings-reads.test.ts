@@ -74,6 +74,17 @@ describe('settings reads', () => {
         expect(fake.legacyCalls).toBe(0);
     });
 
+    it("v3's own link animations read nothing per frame", async () => {
+        for (const animate of [10, 11, 12]) {
+            const canvas = await start({ ...UNFROZEN, '🔗 Enhanced Links.Animate': animate }, links(100));
+            frames(1);
+            const painted = canvas.front.paints.length;
+            expect(reads(() => frames(2)), `Animate ${animate}`).toBe(0);
+            expect(canvas.front.paints.length - painted, `Animate ${animate}`).toBeGreaterThan(400);
+        }
+        expect(fake.legacyCalls).toBe(0);
+    });
+
     it('the node layers read nothing per node, per particle or per title', async () => {
         const canvas = await start({ '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Particle.Show': true, '📦 Enhanced Nodes.Text.Animation.Enabled': true }, {
             nodes: Array.from({ length: 20 }, (_, i) => ({ pos: [100 + (i % 5) * 300, 100 + Math.floor(i / 5) * 200] })),

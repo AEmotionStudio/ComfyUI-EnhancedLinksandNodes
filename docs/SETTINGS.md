@@ -9,7 +9,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Link effects | `🔗 Enhanced Links.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI links and leaves every other link setting as it is. |
-| Link animation | `🔗 Enhanced Links.Animate` | combo | `0` None, `9` Classic Flow, `1` Sacred Flow, `2` Crystal Stream, `3` Quantum Field, `4` Cosmic Weave, `5` Energy Pulse, `6` DNA Helix, `7` Lava Flow, `8` Stellar Plasma | `9` Classic Flow | Effect drawn along every link. |
+| Link animation | `🔗 Enhanced Links.Animate` | combo | `0` None, `9` Classic Flow, `1` Sacred Flow, `10` Merkaba Beads, `2` Crystal Stream, `3` Quantum Field, `4` Cosmic Weave, `5` Energy Pulse, `12` Comet Trails, `6` DNA Helix, `11` DNA Helix 3D, `7` Lava Flow, `8` Stellar Plasma | `9` Classic Flow | Effect drawn along every link. |
 | Link animation speed | `🔗 Enhanced Links.Animation.Speed` | slider | 0.1 to 3, step 0.05 | `1` |  |
 | Link flow direction | `🔗 Enhanced Links.Direction` | combo | `1` Forward, `-1` Reverse | `1` Forward | Which way effects travel. |
 | Freeze link animation | `🔗 Enhanced Links.Static.Mode` | boolean | `true`, `false` | `false` | Keep the look but stop the motion. |

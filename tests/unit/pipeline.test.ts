@@ -683,9 +683,10 @@ describe('glows', () => {
     }
 
     it('come from sprites in the motion layer, where nothing else casts a shadow', async () => {
-        // Classic Flow's two markers each stamp their halo and their glow; Crystal Stream, Energy Pulse and Stellar Plasma stamp theirs.
+        // Classic Flow's two markers each stamp their halo and their glow; Crystal Stream, Energy Pulse, Stellar Plasma and v3's
+        // own three stamp theirs, DNA Helix 3D round each spot where a strand crosses its link in front.
         expect(glows(await start({}, PAIR))).toEqual({ stamped: 4, front: [], back: [10], backStamped: 0 });
-        for (const animate of [2, 5, 8]) {
+        for (const animate of [2, 5, 8, 10, 11, 12]) {
             const { stamped, front } = glows(await start({ '🔗 Enhanced Links.Animate': animate }, PAIR));
             expect([stamped > 0, front], `Animate ${animate}`).toEqual([true, []]);
         }

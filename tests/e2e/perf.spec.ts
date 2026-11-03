@@ -56,6 +56,10 @@ const ANIMATED: Record<string, Record<string, unknown>> = {
     'Lava Flow, Adaptive': { '🔗 Enhanced Links.Animate': 7, [ADAPTIVE]: true },
 };
 
+/** v3's own animations, measured too but on v1 and v2.0.1 (the -ref projects), which do not have them. */
+const OWN: Record<string, number> = { 'Merkaba Beads': 10, 'DNA Helix 3D': 11, 'Comet Trails': 12 };
+const own = (testInfo: TestInfo) => !testInfo.project.name.endsWith('-ref');
+
 /** The looks measured in Nodes 2.0: the default, and Gentle Pulse on every node, whose glows breathe in CSS. */
 const NODES2: Record<string, Record<string, unknown>> = {
     default: {},
@@ -221,7 +225,9 @@ test.describe('baselines', { tag: '@perf' }, () => {
             return info ? String(gl!.getParameter(info.UNMASKED_RENDERER_WEBGL)) : 'unknown';
         });
         const rows: FrameRateRow[] = [];
-        for (const [look, settings] of Object.entries(ANIMATED)) {
+        const looks = { ...ANIMATED };
+        if (own(testInfo)) for (const [look, animate] of Object.entries(OWN)) looks[look] = { '🔗 Enhanced Links.Animate': animate };
+        for (const [look, settings] of Object.entries(looks)) {
             const ids = Object.keys(settings);
             const before = await page.evaluate((ids) => ids.map((id) => window.app.extensionManager.setting.get(id)), ids);
             for (const id of ids) await setSetting(page, id, settings[id]);
@@ -240,40 +246,44 @@ test.describe('baselines', { tag: '@perf' }, () => {
         await record(testInfo, { frameRate: rows });
     });
 
-    // What 120 frames of DNA Helix on every link on screen leave on the heap once garbage is collected (budget 2 MB, judged
-    // by the median of three runs), and how much it grew before that collection, which minor collections during the frames
-    // make a lower bound.
+    // What 120 frames of DNA Helix, and of each of v3's own animations, on every link on screen leave on the heap once
+    // garbage is collected (budget 2 MB, judged by the median of three runs), and how much it grew before that collection,
+    // which minor collections during the frames make a lower bound.
     test('heap after 120 animated frames', async ({ page, profile }, testInfo) => {
-        test.setTimeout(300_000);
+        test.setTimeout(600_000);
         await buildGraph(page, perfGraph(200, 500));
-        if (profile !== 'native') await setSetting(page, '🔗 Enhanced Links.Animate', 6);
         await setView(page, 'zoom 1');
-        await page.waitForTimeout(1000);
         const cdp = await page.context().newCDPSession(page);
         const heap = async (collect: boolean) => {
             if (collect) await cdp.send('HeapProfiler.collectGarbage');
             return (await cdp.send('Runtime.getHeapUsage')).usedSize / 2 ** 20;
         };
-        const runs: { seconds: number; beforeMB: number; grownMB: number; retainedMB: number }[] = [];
-        for (let run = 0; run < 3; run++) {
-            const before = await heap(true);
-            // Both canvases dirty every frame until the front one has painted 120 times.
-            const seconds = await page.evaluate(() => new Promise<number>((resolve) => {
-                const probe = window.__eln;
-                const [painted, start] = [probe.front + 120, performance.now()];
-                const frame = () => {
-                    if (probe.front >= painted) return resolve((performance.now() - start) / 1000);
-                    window.app.canvas.setDirty(true, true);
-                    requestAnimationFrame(frame);
-                };
-                frame();
-            }));
-            const grown = await heap(false);
-            const after = await heap(true);
-            runs.push({ seconds: round(seconds), beforeMB: round(before), grownMB: round(grown - before), retainedMB: round(after - before) });
+        const looks = [];
+        for (const animate of profile === 'native' ? [0] : own(testInfo) ? [6, ...Object.values(OWN)] : [6]) {
+            if (animate) await setSetting(page, '🔗 Enhanced Links.Animate', animate);
+            await page.waitForTimeout(1000);
+            const runs: { seconds: number; beforeMB: number; grownMB: number; retainedMB: number }[] = [];
+            for (let run = 0; run < 3; run++) {
+                const before = await heap(true);
+                // Both canvases dirty every frame until the front one has painted 120 times.
+                const seconds = await page.evaluate(() => new Promise<number>((resolve) => {
+                    const probe = window.__eln;
+                    const [painted, start] = [probe.front + 120, performance.now()];
+                    const frame = () => {
+                        if (probe.front >= painted) return resolve((performance.now() - start) / 1000);
+                        window.app.canvas.setDirty(true, true);
+                        requestAnimationFrame(frame);
+                    };
+                    frame();
+                }));
+                const grown = await heap(false);
+                const after = await heap(true);
+                runs.push({ seconds: round(seconds), beforeMB: round(before), grownMB: round(grown - before), retainedMB: round(after - before) });
+            }
+            const retainedMB = [...runs].sort((a, b) => a.retainedMB - b.retainedMB)[1].retainedMB;
+            looks.push({ look: animate ? `Animate ${animate}` : 'native', retainedMB, runs });
         }
-        const retainedMB = [...runs].sort((a, b) => a.retainedMB - b.retainedMB)[1].retainedMB;
-        await record(testInfo, { heap: { look: profile === 'native' ? 'native' : 'Animate 6', retainedMB, runs } });
+        await record(testInfo, { heap: looks });
     });
 
     // A node with links dragged on the big graph at zoom 1, natively, with Animation None, and with Animation None and rope

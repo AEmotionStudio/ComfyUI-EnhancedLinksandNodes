@@ -1,8 +1,8 @@
 /**
- * The nine link animations while they move, drawn segment by segment along
- * each segment's real path. A link's elements and strokes are counted per
- * link, at its own fractions, so they carry on across its reroutes. Classic
- * Flow moves only its markers (styles.ts).
+ * The link animations while they move, drawn segment by segment along each
+ * segment's real path. A link's elements and strokes are counted per link, at
+ * its own fractions, so they carry on across its reroutes. Classic Flow moves
+ * only its markers (styles.ts).
  *
  * Ported from v1's renderers (old_link_animations.js:2554-3359) on v1's clock:
  * where v1 took its time × speed, they take the flow, which is signed, so
@@ -13,11 +13,15 @@
  * Energy Pulse's orbs fade along their trip; Stellar Plasma's sparks stream
  * instead of piling up at one end; and every count is at least one.
  *
+ * v3's own three keep their pace in px along the path: Merkaba Beads, DNA
+ * Helix 3D and Comet Trails.
+ *
  * @module links/animations
  */
 
 import { L } from '@/core/settings';
-import { DOT, glow, shine, type Shape } from '@/fx/particles';
+import { lighter } from '@/core/colors';
+import { DOT, glow, noise, shine, type Shape } from '@/fx/particles';
 import type { Segment } from './pipeline';
 
 /** v1's pattern counts (old_link_animations.js:8-17). */
@@ -35,6 +39,7 @@ interface Moment {
     linkPhase: number;
     quantumPhase: number;
     linkFlow: number;
+    linkDir: number;
 }
 
 /** x % 1 in [0, 1), below 0 too: where along its link an element that flows is. */
@@ -106,6 +111,30 @@ const RUNG: Shape = {
     },
     stroked: true,
     turn: Math.PI,
+};
+
+/** A triangle `size` from its centre to each corner, its first corner at `angle`. */
+function triangle(ctx: CanvasRenderingContext2D, size: number, angle: number): void {
+    for (let i = 0; i <= SACRED.TRINITY; i++) {
+        const a = angle + (i / SACRED.TRINITY) * Math.PI * 2;
+        if (i) ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
+        else ctx.moveTo(Math.cos(a) * size, Math.sin(a) * size);
+    }
+}
+
+/** v1's createMerkaba (old_link_animations.js:1493-1520), which it never drew: two triangles, a sixth of a turn apart, turned by `angle`. */
+export const MERKABA: Shape = {
+    path(ctx, x, y, size, angle) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        triangle(ctx, size, 0);
+        triangle(ctx, size, Math.PI / SACRED.TRINITY);
+        ctx.restore();
+    },
+    stroked: true,
+    turn: Math.PI / SACRED.TRINITY,
 };
 
 /**
@@ -396,6 +425,235 @@ function stellarPlasma(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): vo
     }
 }
 
+/** Writes the point at segment s's own parameter u into `here`, by length along its path, so what flows keeps its pace in px. */
+const along = (s: Segment, u: number) => s.path.find(u * s.path.length, here);
+
+/** What grows out of the output and back into the input does so over its last px. */
+const SLOT_PX = 12;
+/** How far grown an element at fraction T of the link is: nothing at either end of the link, whole SLOT_PX in. */
+const grown = (s: Segment, T: number) => Math.min(1, (T * s.chain) / SLOT_PX, ((1 - T) * s.chain) / SLOT_PX);
+
+/** Merkaba Beads: px of link for each bead at Quality 1 and Density 1, and how fast they glide, in links per unit of flow. */
+const BEAD_PX = 60;
+const BEAD_RATE = 0.1;
+
+/** 10. Merkaba Beads: glowing star tetrahedra with a core gliding along the link, each turning with the phase, grown out of the output and back into the input. */
+function merkabaBeads(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
+    const { primary, secondary, accent } = s.pal;
+    const glowIntensity = L.glowIntensity * moving.glow;
+    const count = Math.max(1, Math.floor((s.chain * L.quality * L.particleDensity * moving.density) / BEAD_PX));
+    ctx.globalAlpha = moving.alpha;
+    for (let i = 0; i < count; i++) {
+        const T = wrap((i + 0.5) / count + k.linkFlow * BEAD_RATE);
+        const u = s.local(T);
+        if (!s.within(u)) continue;
+        along(s, u);
+        const size = L.thickness * 3 * grown(s, T);
+        ctx.lineWidth = size * 0.18;
+        MERKABA.path(ctx, here[0], here[1], size, k.linkPhase);
+        shine(ctx, MERKABA, here[0], here[1], size, k.linkPhase, primary, secondary, glowIntensity);
+        ctx.shadowBlur = 0;
+        DOT.path(ctx, here[0], here[1], size * 0.25, 0);
+        ctx.fillStyle = accent;
+        ctx.fill();
+    }
+}
+
+/** DNA Helix 3D: a turn of the helix every PITCH radii along the link, and a rung every RUNG_PX px. */
+const PITCH = 6.4;
+const RUNG_PX = 12;
+/** Each point of the strands along a segment: strand A's x and y, strand B's, and A's depth, from -1 at the back to 1 at the front, B's being its opposite. */
+let helix = new Float64Array(5 * 128);
+/** Each rung's middle and how far its half toward strand A reaches, and A's depth there. */
+let rungs = new Float64Array(5 * 64);
+
+/** Adds the stretches of the first `n` points of strand `strand` (0 or 1) on the near side if `near`, else the far side, to the current path. */
+function strandPath(ctx: CanvasRenderingContext2D, n: number, strand: number, near: boolean): void {
+    let open = false;
+    for (let j = 0; j + 1 < n; j++) {
+        if ((helix[5 * j + 4] + helix[5 * j + 9]) * (strand ? -1 : 1) > 0 !== near) {
+            open = false;
+            continue;
+        }
+        const o = 5 * j + 2 * strand;
+        if (!open) ctx.moveTo(helix[o], helix[o + 1]);
+        ctx.lineTo(helix[o + 5], helix[o + 6]);
+        open = true;
+    }
+}
+
+/**
+ * 11. DNA Helix 3D: two strands winding round the path along its normals and turning with the phase; their far side
+ * faint and fine, then rungs every RUNG_PX px whose halves are as deep as the strand each reaches, then their near side
+ * bright and glowing most where it crosses the path in front. The far side and the rungs are a third of Thickness wide,
+ * hairlines at the default.
+ */
+function dnaHelix3d(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
+    const { primary, secondary, accent } = s.pal;
+    const { thickness } = L;
+    const { path, u0, len } = s;
+    const radius = 4 + thickness * 2;
+    const pitch = PITCH * radius;
+    const n = Math.max(2, Math.ceil((len * L.quality) / 8) + 1);
+    if (helix.length < 5 * n) helix = new Float64Array(10 * n);
+    for (let j = 0; j < n; j++) {
+        path.find((j / (n - 1)) * path.length, here);
+        const angle = (2 * Math.PI * (u0 + (j / (n - 1)) * len)) / pitch + k.linkPhase;
+        const off = radius * Math.sin(angle);
+        helix[5 * j] = here[0] - here[3] * off;
+        helix[5 * j + 1] = here[1] + here[2] * off;
+        helix[5 * j + 2] = here[0] + here[3] * off;
+        helix[5 * j + 3] = here[1] - here[2] * off;
+        helix[5 * j + 4] = Math.cos(angle);
+    }
+    const gap = RUNG_PX / moving.density;
+    const first = Math.ceil(u0 / gap);
+    const m = Math.max(0, Math.ceil((u0 + len) / gap) - first);
+    if (rungs.length < 5 * m) rungs = new Float64Array(10 * m);
+    for (let r = 0; r < m; r++) {
+        const D = (first + r) * gap;
+        path.find(((D - u0) / len) * path.length, here);
+        const angle = (2 * Math.PI * D) / pitch + k.linkPhase;
+        const off = radius * Math.sin(angle);
+        rungs[5 * r] = here[0];
+        rungs[5 * r + 1] = here[1];
+        rungs[5 * r + 2] = -here[3] * off;
+        rungs[5 * r + 3] = here[2] * off;
+        rungs[5 * r + 4] = Math.cos(angle);
+    }
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
+    ctx.lineCap = 'butt';
+    ctx.beginPath();
+    strandPath(ctx, n, 0, false);
+    strandPath(ctx, n, 1, false);
+    ctx.strokeStyle = secondary;
+    ctx.lineWidth = thickness / 3;
+    ctx.globalAlpha = 0.4 * moving.alpha;
+    ctx.stroke();
+    ctx.strokeStyle = accent;
+    for (let near = 0; near < 2; near++) {
+        ctx.beginPath();
+        for (let r = 0; r < m; r++) {
+            const side = (rungs[5 * r + 4] > 0 ? 1 : -1) * (near ? 1 : -1);
+            ctx.moveTo(rungs[5 * r], rungs[5 * r + 1]);
+            ctx.lineTo(rungs[5 * r] + side * rungs[5 * r + 2], rungs[5 * r + 1] + side * rungs[5 * r + 3]);
+        }
+        ctx.globalAlpha = (near ? 0.7 : 0.3) * moving.alpha;
+        ctx.stroke();
+    }
+    // The near side's glow, round each spot where strand A (at even half turns) or B crosses the path in front, each
+    // strand's together: stamped from sprites in the motion layer, else cast by the near side's strokes, which glow()
+    // leaves the shadow to.
+    ctx.lineWidth = thickness * 1.1;
+    ctx.globalAlpha = moving.alpha;
+    const front = Math.ceil((2 * u0) / pitch + k.linkPhase / Math.PI);
+    for (let from = front; from < front + 2; from++) {
+        const color = from & 1 ? secondary : primary;
+        for (let half = from; ; half += 2) {
+            const D = ((half * Math.PI - k.linkPhase) * pitch) / (2 * Math.PI);
+            if (D >= u0 + len) break;
+            path.find(((D - u0) / len) * path.length, here);
+            glow(ctx, DOT, here[0], here[1], radius * 0.4, 0, color, color, L.glowIntensity * moving.glow);
+        }
+    }
+    ctx.beginPath();
+    strandPath(ctx, n, 0, true);
+    // B in the same stroke when it is A's colour, as it is but for custom colours.
+    if (secondary !== primary) {
+        ctx.strokeStyle = ctx.shadowColor = primary;
+        ctx.stroke();
+        ctx.beginPath();
+    }
+    strandPath(ctx, n, 1, true);
+    ctx.strokeStyle = ctx.shadowColor = secondary;
+    ctx.stroke();
+}
+
+/**
+ * Comet Trails: px of link for each comet at Quality 1 and Density 1, how fast they fly, in links per unit of flow, and
+ * how far a comet strays from even spacing, in spaces; how long their tails are in px, on links as long at least, and
+ * the tails' layers, the longest and faintest first: the share of the tail each covers, its width at the head × the
+ * head's, and its alpha.
+ */
+const COMET_PX = 120;
+const COMET_RATE = 0.125;
+const STRAY = 0.4;
+const TAIL_PX = 100;
+const LAYERS = [[1, 1, 0.2], [0.6, 0.75, 0.3], [0.3, 0.5, 0.5]];
+/** The palette colour each layer takes. */
+const LAYER_COLORS = ['primary', 'secondary', 'accent'] as const;
+/** A comet head's hot core. */
+const WHITE = '#ffffff';
+/** A tail's points along a segment and the normal there: x, y, nx, ny each. */
+let tail = new Float64Array(4 * 32);
+
+/**
+ * Fills the part of a comet's tail on segment s: from its head `head` px along the link back `length` px, the other way
+ * for a negative length, `width` px to each side at the head and tapering to nothing at the tip.
+ */
+function trail(ctx: CanvasRenderingContext2D, s: Segment, head: number, length: number, width: number): void {
+    const tip = head - length;
+    const from = Math.max(Math.min(head, tip), s.u0);
+    const to = Math.min(Math.max(head, tip), s.u0 + s.len);
+    if (from >= to) return;
+    const n = Math.max(2, Math.ceil((to - from) / 4) + 1);
+    if (tail.length < 4 * n) tail = new Float64Array(8 * n);
+    for (let j = 0; j < n; j++) {
+        const D = from + ((to - from) * j) / (n - 1);
+        s.path.find(((D - s.u0) / s.len) * s.path.length, here);
+        const w = width * Math.sqrt((D - tip) / length);
+        tail[4 * j] = here[0];
+        tail[4 * j + 1] = here[1];
+        tail[4 * j + 2] = -here[3] * w;
+        tail[4 * j + 3] = here[2] * w;
+    }
+    ctx.beginPath();
+    for (let j = 0; j < n; j++) ctx.lineTo(tail[4 * j] + tail[4 * j + 2], tail[4 * j + 1] + tail[4 * j + 3]);
+    for (let j = n - 1; j >= 0; j--) ctx.lineTo(tail[4 * j] - tail[4 * j + 2], tail[4 * j + 1] - tail[4 * j + 3]);
+    ctx.closePath();
+    ctx.fill();
+}
+
+/**
+ * 12. Comet Trails: bright heads flying along the link with tails that taper and fade behind them along the path, as
+ * long as they fly fast, each head grown out of the output and back into the input, whose tail trails on into it.
+ */
+function cometTrails(ctx: CanvasRenderingContext2D, s: Segment, k: Moment): void {
+    const { pal } = s;
+    const count = Math.max(1, Math.floor((s.chain * L.quality * L.particleDensity * moving.density) / COMET_PX));
+    const radius = L.thickness * 2;
+    // Behind the heads, the way they fly: toward the output going Forward; no longer than the link, so that only the
+    // comet a lap ahead trails onto it too.
+    const length = Math.min(TAIL_PX, s.chain) * k.linkDir;
+    const ahead = length < 0 ? -1 : 1;
+    const core = lighter(pal.accent);
+    for (let i = 0; i < count; i++) {
+        const T = wrap((i + 0.5 + STRAY * (noise(i) - 0.5)) / count + k.linkFlow * COMET_RATE);
+        ctx.shadowBlur = 0;
+        // The comet, and the one a lap ahead, which has flown on past the end of the link that its tail trails into.
+        for (let lap = 0; lap < 2; lap++) {
+            const head = (T + lap * ahead) * s.chain;
+            for (let l = 0; l < LAYERS.length; l++) {
+                ctx.fillStyle = pal[LAYER_COLORS[l]];
+                ctx.globalAlpha = LAYERS[l][2] * moving.alpha;
+                trail(ctx, s, head, length * LAYERS[l][0], radius * LAYERS[l][1]);
+            }
+        }
+        const u = s.local(T);
+        if (!s.within(u)) continue;
+        along(s, u);
+        const r = radius * grown(s, T);
+        ctx.globalAlpha = moving.alpha;
+        DOT.path(ctx, here[0], here[1], r, 0);
+        shine(ctx, DOT, here[0], here[1], r, 0, core, pal.accent, L.glowIntensity * moving.glow * 2);
+        ctx.shadowBlur = 0;
+        DOT.path(ctx, here[0], here[1], r * 0.5, 0);
+        ctx.fillStyle = WHITE;
+        ctx.fill();
+    }
+}
+
 /** The animations that stroke glowing lines while they move: Sacred Flow's ribbon, Quantum Field's filaments, Cosmic Weave's and DNA Helix's strands, and Lava Flow's tube. */
 export const STROKES = new Set([1, 3, 4, 6, 7]);
 
@@ -409,4 +667,7 @@ export const MOVING: Record<number, (ctx: CanvasRenderingContext2D, s: Segment, 
     6: dnaHelix,
     7: lavaFlow,
     8: stellarPlasma,
+    10: merkabaBeads,
+    11: dnaHelix3d,
+    12: cometTrails,
 };

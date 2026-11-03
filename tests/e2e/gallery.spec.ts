@@ -261,18 +261,22 @@ const ANIMATIONS: [number, string, string][] = [
     [7, 'Lava Flow', 'A molten core in a glowing sheath with embers. v3\'s ripples run downstream and across the path (v1\'s ran upstream, up and down only); the sheath glows in its own colour.'],
     [8, 'Stellar Plasma', 'Plasma beads on a rolling wave, in two colour halves, and sparks. v3\'s sparks stream along the link; v1\'s piled up at the input.'],
     [9, 'Classic Flow', 'Arrows gliding toward the input over a link with v1\'s dark halo: the default look.'],
+    [10, 'Merkaba Beads', 'New in v3: star tetrahedra turning as they glide along a faint link, grown out of the output and back into the input.'],
+    [11, 'DNA Helix 3D', 'New in v3: a helix with depth screwing toward the input, its far side faint and fine behind the rungs, its near side bright and glowing.'],
+    [12, 'Comet Trails', 'New in v3: bright heads flying along a faint link, their tails tapering and fading behind them along the path.'],
 ];
 
 const MARKER_SHAPES = ['diamond', 'circle', 'square', 'triangle', 'star', 'heart', 'cross', 'hexagon', 'flower', 'spiral', 'none'];
 
 const ROWS: Row[] = [
-    ...ANIMATIONS.map(([n, name, look]): Row => ({ slug: `animate-${n}`, title: name, look, settings: { [ANIMATE]: n } })),
+    ...ANIMATIONS.map(([n, name, look]): Row => ({ slug: `animate-${n}`, title: name, look, settings: { [ANIMATE]: n }, v3: n > 9 })),
     ...ANIMATIONS.map(([n, name]): Row => ({
         slug: `still-${n}`,
         title: `${name}, still`,
-        look: "Static Mode's pose. v3 always shows v1's first still pose; v1 switched between two after some setting changes.",
+        look: n > 9 ? "Static Mode's pose: its motion's, held at the still phase." : "Static Mode's pose. v3 always shows v1's first still pose; v1 switched between two after some setting changes.",
         settings: { [ANIMATE]: n, '🔗 Enhanced Links.Static.Mode': true },
         still: true,
+        v3: n > 9,
     })),
     ...MARKER_SHAPES.map((shape): Row => ({
         slug: `marker-${shape}`,

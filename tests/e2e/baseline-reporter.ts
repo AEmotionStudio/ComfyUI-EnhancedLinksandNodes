@@ -148,8 +148,9 @@ export default class BaselineReporter implements Reporter {
         for (const name of names) {
             const other = Object.entries(this.projects[name]).filter(([key]) => key !== 'perf' && key !== 'frameRate' && key !== 'nodes2');
             if (other.length) console.log(`${name}: ${JSON.stringify(Object.fromEntries(other))}`);
-            const heap = this.projects[name].heap as { retainedMB: number } | undefined;
-            if (/^fe\d+$/.test(name) && heap && heap.retainedMB > HEAP_BUDGET) over.push(`${name}: 120 animated frames keep ${heap.retainedMB} MB on the heap, over the ${HEAP_BUDGET} MB budget`);
+            for (const heap of (this.projects[name].heap ?? []) as { look: string; retainedMB: number }[]) {
+                if (/^fe\d+$/.test(name) && heap.retainedMB > HEAP_BUDGET) over.push(`${name}: 120 frames of ${heap.look} keep ${heap.retainedMB} MB on the heap, over the ${HEAP_BUDGET} MB budget`);
+            }
         }
         if (!over.length) return undefined;
         console.log(`\nOver budget:\n${over.join('\n')}`);

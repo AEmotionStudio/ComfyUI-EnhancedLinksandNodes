@@ -95,6 +95,13 @@ describe('curated looks', () => {
         });
     });
 
+    it("draw the design's link animations: Merkaba Beads in Sacred Geometry", () => {
+        const animate = (l: Look) => l.values['🔗 Enhanced Links.Animate'] ?? 9;
+        expect(Object.fromEntries(LOOKS.map((l) => [l.id, animate(l)]))).toEqual({
+            off: 0, subtle: 9, showcase: 4, performance: 9, 'classic-v1': 9, 'neon-night': 5, 'lava-lamp': 7, 'sacred-geometry': 10, 'living-wires': 0, presenter: 9, blueprint: 9,
+        });
+    });
+
     it('hang Showcase on rope at 0.6 and Living Wires, native-looking, on rope at 1; the others leave wires off', () => {
         const wires = (l: Look) => [l.values['🔗 Enhanced Links.Physics.Profile'] ?? 'off', l.values['🔗 Enhanced Links.Physics.Amount'] ?? 1];
         expect(Object.fromEntries(LOOKS.map((l) => [l.id, wires(l)]))).toEqual(Object.fromEntries(LOOKS.map((l) => [l.id,
@@ -343,6 +350,8 @@ describe('Surprise me', () => {
             expect(Object.keys(values).filter((key) => key.includes('Physics'))).toEqual([]);
         }
         expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['📦 Enhanced Nodes.Completion.Style'])).size).toBe(4);
+        // Every link animation but None, the new three too.
+        expect(new Set(Array.from({ length: 200 }, (_, seed) => mix(seed).values['🔗 Enhanced Links.Animate']))).toEqual(new Set([9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8]));
         // Darker colours for a light palette, which the seed's lowest bit marks.
         const lightness = (seed: number) => {
             const colour = String(mix(seed).values['🔗 Enhanced Links.Color.Primary']);

@@ -19,7 +19,7 @@ import { L } from '@/core/settings';
 import { rainbow } from '@/core/colors';
 import { shine, type Shape } from '@/fx/particles';
 import { LINEAR_LINK, STRAIGHT_LINK } from './geometry';
-import { SACRED, moving, wrap } from './animations';
+import { MERKABA, SACRED, moving, wrap } from './animations';
 import type { Segment } from './pipeline';
 
 type Canvas = InstanceType<typeof LGraphCanvas>;
@@ -199,7 +199,7 @@ function drawBody(ctx: CanvasRenderingContext2D, s: Segment, color: string, thic
 /** What each animation draws under its motion, moving and still: nothing, a ghost of the link at 30 %, the link with its glow, or Classic Flow's. */
 type Base = 'none' | 'ghost' | 'glow' | 'classic';
 
-/** v1's (old_link_animations.js:1823-2400, 2554-3359), but that Crystal Stream's still link glows as Sacred Flow's does. */
+/** v1's (old_link_animations.js:1823-2400, 2554-3359), but that Crystal Stream's still link glows as Sacred Flow's does; and v3's own three. */
 const BASES: Record<number, [moving: Base, still: Base]> = {
     1: ['none', 'glow'],
     2: ['ghost', 'glow'],
@@ -210,6 +210,9 @@ const BASES: Record<number, [moving: Base, still: Base]> = {
     7: ['none', 'none'],
     8: ['none', 'ghost'],
     9: ['classic', 'classic'],
+    10: ['ghost', 'ghost'],
+    11: ['none', 'none'],
+    12: ['ghost', 'ghost'],
 };
 
 /**
@@ -248,15 +251,6 @@ export function drawBase(ctx: CanvasRenderingContext2D, s: Segment, animate: num
     drawBody(ctx, s, color, thickness);
     ctx.globalAlpha = 1;
     return true;
-}
-
-/** A triangle `size` from its centre to each corner, its first corner at `angle`. */
-function triangle(ctx: CanvasRenderingContext2D, size: number, angle: number): void {
-    for (let i = 0; i <= SACRED.TRINITY; i++) {
-        const a = angle + (i / SACRED.TRINITY) * Math.PI * 2;
-        if (i) ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
-        else ctx.moveTo(Math.cos(a) * size, Math.sin(a) * size);
-    }
 }
 
 /**
@@ -398,21 +392,7 @@ const MARKERS: Record<string, Shape & { width?: number }> = {
         stroked: true,
         width: 0.2,
     },
-    merkaba: {
-        // v1's createMerkaba (old_link_animations.js:1493-1520), which it never drew: two triangles, a sixth of a turn apart.
-        path(ctx, x, y, size, angle) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.beginPath();
-            triangle(ctx, size, 0);
-            triangle(ctx, size, Math.PI / SACRED.TRINITY);
-            ctx.restore();
-        },
-        stroked: true,
-        width: 0.15,
-        turn: Math.PI / SACRED.TRINITY,
-    },
+    merkaba: { ...MERKABA, width: 0.15 },
 };
 
 /** Fills or strokes a marker in `color`, glowing `blur` px in `glow`, `offset` px off on screen. */

@@ -189,6 +189,8 @@ const V3_CHANGED_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Marker.Color.Mode': ['default', 'inherit', 'custom'],
     '🔗 Enhanced Links.Particle.Density': [0.5, 1, 2, 3],
     '📦 Enhanced Nodes.Particle.Density': [0.5, 1, 2, 3],
+    // M9d: Merkaba Beads, Comet Trails and DNA Helix 3D, each in the gallery beside its kin.
+    '🔗 Enhanced Links.Animate': [0, 9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8],
 };
 const V3_CHANGED_RANGES: Record<string, [min: number, max: number, step: number]> = {
     // M4: v1's speed works quadratically, so 3× moves effects 9× as fast.
@@ -254,8 +256,8 @@ describe('settings schema', () => {
         // The sliders v3 turns into presets are combos now.
         const sliders = Object.fromEntries(Object.entries(V2_RANGES).filter(([id]) => !(id in V3_CHANGED_OPTIONS)));
         expect(Object.fromEntries(SETTINGS.flatMap((s) => s.type === 'slider' ? [[s.id, [s.min, s.max, s.step]]] : []))).toEqual({ ...sliders, ...V3_CHANGED_RANGES, ...V3_RANGES });
-        // Every v2.0.1 Link.Style, Marker.Shape and Marker.Color.Mode value is still an option.
-        for (const id of ['🔗 Enhanced Links.Link.Style', '🔗 Enhanced Links.Marker.Shape', '🔗 Enhanced Links.Marker.Color.Mode']) {
+        // Every v2.0.1 Animate, Link.Style, Marker.Shape and Marker.Color.Mode value is still an option.
+        for (const id of ['🔗 Enhanced Links.Animate', '🔗 Enhanced Links.Link.Style', '🔗 Enhanced Links.Marker.Shape', '🔗 Enhanced Links.Marker.Color.Mode']) {
             expect(V3_CHANGED_OPTIONS[id], id).toEqual(expect.arrayContaining(V2_OPTIONS[id]));
         }
     });
@@ -366,6 +368,12 @@ describe('how the panel shows each setting', () => {
         for (const id of ['L.Animation.Speed', 'L.Particle.Density', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Link.Shadow.Enabled', 'L.Shadow.Style', 'N.Glow', 'N.Color.Particle', 'N.Text.Style']) {
             expect(visible(), id).not.toContain(id);
         }
+        // Merkaba Beads and Comet Trails space theirs by Particle.Density; DNA Helix 3D, like DNA Helix, has none.
+        for (const [animate, dense] of [[10, true], [11, false], [12, true]] as const) {
+            preview('🔗 Enhanced Links.Animate', animate);
+            expect(visible().includes('L.Particle.Density'), `Animate ${animate}`).toBe(dense);
+        }
+        preview('🔗 Enhanced Links.Animate', 6);
         preview('🔗 Enhanced Links.Marker.All', true);
         expect(visible()).toEqual(expect.arrayContaining(['L.Particle.Density', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style']));
         preview('🔗 Enhanced Links.Focus.Mode', 'dim');

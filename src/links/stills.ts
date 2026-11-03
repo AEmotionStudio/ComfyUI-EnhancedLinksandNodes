@@ -1,8 +1,9 @@
 /**
- * The nine link animations held still: Static Mode, a paused run, reduced
- * motion. Each is v1's own still design, posed at a fixed phase, and drawn
+ * The link animations held still: Static Mode, a paused run, reduced motion.
+ * v1's nine are each v1's own still design, posed at a fixed phase, and drawn
  * segment by segment along the real path, counted per link like the moving
  * ones (animations.ts). Classic Flow's still markers are drawn by styles.ts.
+ * v3's own three hold their motion's pose at that phase, nothing flowed.
  *
  * Ported from v1's StaticRenderers (old_link_animations.js:1820-2401). Cosmic
  * Weave follows the link's own path rather than a curve from its other end,
@@ -12,7 +13,7 @@
  */
 
 import { L } from '@/core/settings';
-import { SACRED, createCrystal, linkGradient, ts, vertices } from './animations';
+import { MOVING, SACRED, createCrystal, linkGradient, ts, vertices } from './animations';
 import type { Segment } from './pipeline';
 
 /** The point and direction at() writes. */
@@ -222,6 +223,16 @@ function stellarPlasma(ctx: CanvasRenderingContext2D, s: Segment, phase: number)
     });
 }
 
+/** The moment v3's own animations hold still at: the phase, nothing flowed, and facing the way Direction says. */
+const held = { linkPhase: 0, quantumPhase: 0, linkFlow: 0, linkDir: 1 };
+
+/** Animation `animate` as it moves, held at `phase`. */
+const posed = (animate: number) => (ctx: CanvasRenderingContext2D, s: Segment, phase: number) => {
+    held.linkPhase = held.quantumPhase = phase;
+    held.linkDir = L.direction;
+    MOVING[animate](ctx, s, held);
+};
+
 /** What each animation draws over its base while still, but Classic Flow, whose markers are all it draws. */
 export const STILL: Record<number, (ctx: CanvasRenderingContext2D, s: Segment, phase: number) => void> = {
     1: sacredFlow,
@@ -232,4 +243,7 @@ export const STILL: Record<number, (ctx: CanvasRenderingContext2D, s: Segment, p
     6: dnaHelix,
     7: lavaFlow,
     8: stellarPlasma,
+    10: posed(10),
+    11: posed(11),
+    12: posed(12),
 };

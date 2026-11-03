@@ -162,11 +162,22 @@ describe('the commands', () => {
         };
         await step('NextLinkStyle');
         expect([L.animate, said()]).toEqual([1, 'Link animation: Sacred Flow']);
+        await step('NextLinkStyle');
+        expect([L.animate, said()]).toEqual([10, 'Link animation: Merkaba Beads']);
         await step('NextNodeStyle');
         expect([N.animate, said()]).toEqual([0, 'Node effect: None']);
         await step('NextNodeStyle');
         expect([N.animate, said()]).toEqual([1, 'Node effect: Gentle Pulse']);
-        expect(posted()).toEqual(['🔗 Enhanced Links.Animate', '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Animate']);
+        expect(posted()).toEqual(['🔗 Enhanced Links.Animate', '🔗 Enhanced Links.Animate', '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Animate']);
+
+        // Comet Trails after Energy Pulse, and DNA Helix 3D after DNA Helix.
+        await start({ '🔗 Enhanced Links.Animate': 5 });
+        const order: number[] = [];
+        for (let i = 0; i < 4; i++) {
+            await step('NextLinkStyle');
+            order.push(L.animate);
+        }
+        expect(order).toEqual([12, 6, 11, 7]);
 
         await start({ '🔗 Enhanced Links.Animate': 8 });
         await run('NextLinkStyle');

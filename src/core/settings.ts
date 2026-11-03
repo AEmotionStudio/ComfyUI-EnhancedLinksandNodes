@@ -74,11 +74,14 @@ const LINK_ANIMATION_OPTIONS = [
     { value: 0, text: 'None' },
     { value: 9, text: 'Classic Flow' },
     { value: 1, text: 'Sacred Flow' },
+    { value: 10, text: 'Merkaba Beads' },
     { value: 2, text: 'Crystal Stream' },
     { value: 3, text: 'Quantum Field' },
     { value: 4, text: 'Cosmic Weave' },
     { value: 5, text: 'Energy Pulse' },
+    { value: 12, text: 'Comet Trails' },
     { value: 6, text: 'DNA Helix' },
+    { value: 11, text: 'DNA Helix 3D' },
     { value: 7, text: 'Lava Flow' },
     { value: 8, text: 'Stellar Plasma' },
 ] as const;
@@ -275,8 +278,8 @@ const COEXIST_OPTIONS = [
 
 /** Classic Flow, whose only motion is its markers. */
 const CLASSIC = 9;
-/** The link animations whose particles Particle.Density counts: Sacred Flow, Crystal Stream, Quantum Field, Lava Flow and Stellar Plasma. */
-const DENSE = new Set<number>([1, 2, 3, 7, 8]);
+/** The link animations whose particles Particle.Density counts: Sacred Flow, Crystal Stream, Quantum Field, Lava Flow, Stellar Plasma, Merkaba Beads and Comet Trails. */
+const DENSE = new Set<number>([1, 2, 3, 7, 8, 10, 12]);
 
 const linksOn = (): boolean => L.enabled && L.animate !== 0;
 /** Whether physics wires shape the links: a profile at a strength above 0, as at 0 links keep native's path. */

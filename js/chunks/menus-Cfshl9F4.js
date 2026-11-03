@@ -4,11 +4,14 @@ const LINK_ANIMATION_OPTIONS = [
   { value: 0, text: "None" },
   { value: 9, text: "Classic Flow" },
   { value: 1, text: "Sacred Flow" },
+  { value: 10, text: "Merkaba Beads" },
   { value: 2, text: "Crystal Stream" },
   { value: 3, text: "Quantum Field" },
   { value: 4, text: "Cosmic Weave" },
   { value: 5, text: "Energy Pulse" },
+  { value: 12, text: "Comet Trails" },
   { value: 6, text: "DNA Helix" },
+  { value: 11, text: "DNA Helix 3D" },
   { value: 7, text: "Lava Flow" },
   { value: 8, text: "Stellar Plasma" }
 ];
@@ -173,7 +176,7 @@ const COEXIST_OPTIONS = [
   { value: "defer", text: "Always step aside" }
 ];
 const CLASSIC$2 = 9;
-const DENSE = /* @__PURE__ */ new Set([1, 2, 3, 7, 8]);
+const DENSE = /* @__PURE__ */ new Set([1, 2, 3, 7, 8, 10, 12]);
 const linksOn = () => L.enabled && L.animate !== 0;
 const wired = () => L.physicsProfile !== "off" && L.physicsAmount > 0;
 const SHAPES = /* @__PURE__ */ new Set(["straight", "linear", "stepped", "zigzag", "coil"]);
@@ -1304,7 +1307,7 @@ function hash(text2) {
   for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
   return h2;
 }
-function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail = 0, seq = 0) {
+function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail2 = 0, seq = 0) {
   const i = pool$1.count++;
   pool$1.kind[i] = kind;
   pool$1.owner[i] = owner;
@@ -1312,7 +1315,7 @@ function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail =
   pool$1.speed[i] = speed;
   pool$1.size[i] = size;
   pool$1.colour[i] = colour2;
-  pool$1.trail[i] = trail;
+  pool$1.trail[i] = trail2;
   pool$1.seq[i] = seq;
 }
 const nth = (seed, n) => noise(seed + n * 1831565813);
@@ -1415,15 +1418,15 @@ function piece(ctx, burst2, n, t, unit) {
 function wave(ctx, burst2, t, unit) {
   const p = t / LASTS.shockwave;
   if (p >= 1) return;
-  const grown = 1 - (1 - p) ** 3;
+  const grown2 = 1 - (1 - p) ** 3;
   const box2 = anchor(burst2.node);
   ctx.beginPath();
   if (box2) {
-    const w = box2[2] * (1 + grown);
-    const h2 = box2[3] * (1 + grown);
-    ctx.roundRect(where[0] - w / 2, where[1] + (box2[3] - h2) / 2, w, h2, RING_CORNER * (1 + grown));
+    const w = box2[2] * (1 + grown2);
+    const h2 = box2[3] * (1 + grown2);
+    ctx.roundRect(where[0] - w / 2, where[1] + (box2[3] - h2) / 2, w, h2, RING_CORNER * (1 + grown2));
   } else {
-    ctx.arc(where[0], where[1], POINT_RING * burst2.size * unit * (0.1 + 0.9 * grown), 0, Math.PI * 2);
+    ctx.arc(where[0], where[1], POINT_RING * burst2.size * unit * (0.1 + 0.9 * grown2), 0, Math.PI * 2);
   }
   const alpha = Math.min(1, t / RING_IN) * (1 - p) ** 2;
   ctx.globalAlpha = alpha * 0.35;
@@ -1614,7 +1617,7 @@ const run = { prompt: "", workflow: void 0, end: -Infinity };
 const steps = /* @__PURE__ */ new Map();
 const cached = /* @__PURE__ */ new Set();
 let tint$1 = "";
-const held$3 = /* @__PURE__ */ new Map();
+const held$4 = /* @__PURE__ */ new Map();
 let changes = 0;
 let celebrating = false;
 let listening = false;
@@ -1673,11 +1676,11 @@ function comet(ctx, s, order, p, unit) {
   const leg = Math.max(1 / (ranks + FADE), LEG);
   const f = (p - (ranks > 1 ? order * (1 - leg * (1 + FADE)) / (ranks - 1) : 0)) / leg;
   if (f <= 0 || f >= 1 + FADE) return false;
-  const tail = TAIL * unit;
+  const tail2 = TAIL * unit;
   const head = f * s.chain;
   const fade2 = Math.min(1, (1 + FADE - f) / FADE);
   for (let i = TAIL_DISCS - 1; i >= 0; i--) {
-    const d = head - i / TAIL_DISCS * tail;
+    const d = head - i / TAIL_DISCS * tail2;
     if (d < s.u0 || d >= s.u0 + s.len) continue;
     s.path.find((d - s.u0) / s.len * s.path.length, point);
     const left = 1 - i / TAIL_DISCS;
@@ -1920,7 +1923,7 @@ function installRuns(part2) {
     Object.assign(run, { prompt: detail.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
     steps.clear();
     cached.clear();
-    held$3.clear();
+    held$4.clear();
     tint$1 = accent();
     env.running = true;
     changed$2(true);
@@ -1966,7 +1969,7 @@ function installRuns(part2) {
     }
     finish();
     const node2 = id === void 0 ? void 0 : path(id).at(-1);
-    if (node2) held$3.set(id, signature(node2));
+    if (node2) held$4.set(id, signature(node2));
   });
   api.addEventListener("execution_interrupted", ({ detail }) => {
     if (ours2(detail)) finish();
@@ -1976,10 +1979,10 @@ function installRuns(part2) {
   });
   api.addEventListener("graphChanged", () => {
     let edited = false;
-    for (const [id, before2] of held$3) {
+    for (const [id, before2] of held$4) {
       const node2 = path(id).at(-1);
       if (node2 && signature(node2) === before2) continue;
-      held$3.delete(id);
+      held$4.delete(id);
       const step2 = steps.get(id);
       if (step2) step2.failed = false;
       edited = true;
@@ -2040,6 +2043,26 @@ const RUNG = {
   },
   stroked: true,
   turn: Math.PI
+};
+function triangle(ctx, size, angle) {
+  for (let i = 0; i <= SACRED.TRINITY; i++) {
+    const a = angle + i / SACRED.TRINITY * Math.PI * 2;
+    if (i) ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
+    else ctx.moveTo(Math.cos(a) * size, Math.sin(a) * size);
+  }
+}
+const MERKABA = {
+  path(ctx, x, y, size, angle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    triangle(ctx, size, 0);
+    triangle(ctx, size, Math.PI / SACRED.TRINITY);
+    ctx.restore();
+  },
+  stroked: true,
+  turn: Math.PI / SACRED.TRINITY
 };
 const moved = (turn, T, cp) => turn(T * Math.PI * SACRED.TRINITY - cp) * 10 * Math.sin(T * Math.PI - cp) * 0.5;
 function sacredFlow$1(ctx, s, k2) {
@@ -2291,6 +2314,186 @@ function stellarPlasma$1(ctx, s, k2) {
     shine(ctx, DOT, here$5[0], y, size * 0.5, 0, accent2, accent2, glowIntensity * 0.5);
   }
 }
+const along$1 = (s, u) => s.path.find(u * s.path.length, here$5);
+const SLOT_PX = 12;
+const grown = (s, T) => Math.min(1, T * s.chain / SLOT_PX, (1 - T) * s.chain / SLOT_PX);
+const BEAD_PX = 60;
+const BEAD_RATE = 0.1;
+function merkabaBeads(ctx, s, k2) {
+  const { primary, secondary, accent: accent2 } = s.pal;
+  const glowIntensity = L.glowIntensity * moving.glow;
+  const count2 = Math.max(1, Math.floor(s.chain * L.quality * L.particleDensity * moving.density / BEAD_PX));
+  ctx.globalAlpha = moving.alpha;
+  for (let i = 0; i < count2; i++) {
+    const T = wrap((i + 0.5) / count2 + k2.linkFlow * BEAD_RATE);
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    along$1(s, u);
+    const size = L.thickness * 3 * grown(s, T);
+    ctx.lineWidth = size * 0.18;
+    MERKABA.path(ctx, here$5[0], here$5[1], size, k2.linkPhase);
+    shine(ctx, MERKABA, here$5[0], here$5[1], size, k2.linkPhase, primary, secondary, glowIntensity);
+    ctx.shadowBlur = 0;
+    DOT.path(ctx, here$5[0], here$5[1], size * 0.25, 0);
+    ctx.fillStyle = accent2;
+    ctx.fill();
+  }
+}
+const PITCH$1 = 6.4;
+const RUNG_PX = 12;
+let helix = new Float64Array(5 * 128);
+let rungs = new Float64Array(5 * 64);
+function strandPath(ctx, n, strand, near) {
+  let open2 = false;
+  for (let j = 0; j + 1 < n; j++) {
+    if ((helix[5 * j + 4] + helix[5 * j + 9]) * (strand ? -1 : 1) > 0 !== near) {
+      open2 = false;
+      continue;
+    }
+    const o = 5 * j + 2 * strand;
+    if (!open2) ctx.moveTo(helix[o], helix[o + 1]);
+    ctx.lineTo(helix[o + 5], helix[o + 6]);
+    open2 = true;
+  }
+}
+function dnaHelix3d(ctx, s, k2) {
+  const { primary, secondary, accent: accent2 } = s.pal;
+  const { thickness } = L;
+  const { path: path2, u0, len } = s;
+  const radius = 4 + thickness * 2;
+  const pitch = PITCH$1 * radius;
+  const n = Math.max(2, Math.ceil(len * L.quality / 8) + 1);
+  if (helix.length < 5 * n) helix = new Float64Array(10 * n);
+  for (let j = 0; j < n; j++) {
+    path2.find(j / (n - 1) * path2.length, here$5);
+    const angle = 2 * Math.PI * (u0 + j / (n - 1) * len) / pitch + k2.linkPhase;
+    const off = radius * Math.sin(angle);
+    helix[5 * j] = here$5[0] - here$5[3] * off;
+    helix[5 * j + 1] = here$5[1] + here$5[2] * off;
+    helix[5 * j + 2] = here$5[0] + here$5[3] * off;
+    helix[5 * j + 3] = here$5[1] - here$5[2] * off;
+    helix[5 * j + 4] = Math.cos(angle);
+  }
+  const gap = RUNG_PX / moving.density;
+  const first2 = Math.ceil(u0 / gap);
+  const m = Math.max(0, Math.ceil((u0 + len) / gap) - first2);
+  if (rungs.length < 5 * m) rungs = new Float64Array(10 * m);
+  for (let r = 0; r < m; r++) {
+    const D = (first2 + r) * gap;
+    path2.find((D - u0) / len * path2.length, here$5);
+    const angle = 2 * Math.PI * D / pitch + k2.linkPhase;
+    const off = radius * Math.sin(angle);
+    rungs[5 * r] = here$5[0];
+    rungs[5 * r + 1] = here$5[1];
+    rungs[5 * r + 2] = -here$5[3] * off;
+    rungs[5 * r + 3] = here$5[2] * off;
+    rungs[5 * r + 4] = Math.cos(angle);
+  }
+  ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  ctx.shadowBlur = 0;
+  ctx.lineCap = "butt";
+  ctx.beginPath();
+  strandPath(ctx, n, 0, false);
+  strandPath(ctx, n, 1, false);
+  ctx.strokeStyle = secondary;
+  ctx.lineWidth = thickness / 3;
+  ctx.globalAlpha = 0.4 * moving.alpha;
+  ctx.stroke();
+  ctx.strokeStyle = accent2;
+  for (let near = 0; near < 2; near++) {
+    ctx.beginPath();
+    for (let r = 0; r < m; r++) {
+      const side = (rungs[5 * r + 4] > 0 ? 1 : -1) * (near ? 1 : -1);
+      ctx.moveTo(rungs[5 * r], rungs[5 * r + 1]);
+      ctx.lineTo(rungs[5 * r] + side * rungs[5 * r + 2], rungs[5 * r + 1] + side * rungs[5 * r + 3]);
+    }
+    ctx.globalAlpha = (near ? 0.7 : 0.3) * moving.alpha;
+    ctx.stroke();
+  }
+  ctx.lineWidth = thickness * 1.1;
+  ctx.globalAlpha = moving.alpha;
+  const front = Math.ceil(2 * u0 / pitch + k2.linkPhase / Math.PI);
+  for (let from = front; from < front + 2; from++) {
+    const color = from & 1 ? secondary : primary;
+    for (let half = from; ; half += 2) {
+      const D = (half * Math.PI - k2.linkPhase) * pitch / (2 * Math.PI);
+      if (D >= u0 + len) break;
+      path2.find((D - u0) / len * path2.length, here$5);
+      glow(ctx, DOT, here$5[0], here$5[1], radius * 0.4, 0, color, color, L.glowIntensity * moving.glow);
+    }
+  }
+  ctx.beginPath();
+  strandPath(ctx, n, 0, true);
+  if (secondary !== primary) {
+    ctx.strokeStyle = ctx.shadowColor = primary;
+    ctx.stroke();
+    ctx.beginPath();
+  }
+  strandPath(ctx, n, 1, true);
+  ctx.strokeStyle = ctx.shadowColor = secondary;
+  ctx.stroke();
+}
+const COMET_PX = 120;
+const COMET_RATE = 0.125;
+const STRAY = 0.4;
+const TAIL_PX = 100;
+const LAYERS = [[1, 1, 0.2], [0.6, 0.75, 0.3], [0.3, 0.5, 0.5]];
+const LAYER_COLORS = ["primary", "secondary", "accent"];
+const WHITE$1 = "#ffffff";
+let tail = new Float64Array(4 * 32);
+function trail(ctx, s, head, length, width) {
+  const tip = head - length;
+  const from = Math.max(Math.min(head, tip), s.u0);
+  const to = Math.min(Math.max(head, tip), s.u0 + s.len);
+  if (from >= to) return;
+  const n = Math.max(2, Math.ceil((to - from) / 4) + 1);
+  if (tail.length < 4 * n) tail = new Float64Array(8 * n);
+  for (let j = 0; j < n; j++) {
+    const D = from + (to - from) * j / (n - 1);
+    s.path.find((D - s.u0) / s.len * s.path.length, here$5);
+    const w = width * Math.sqrt((D - tip) / length);
+    tail[4 * j] = here$5[0];
+    tail[4 * j + 1] = here$5[1];
+    tail[4 * j + 2] = -here$5[3] * w;
+    tail[4 * j + 3] = here$5[2] * w;
+  }
+  ctx.beginPath();
+  for (let j = 0; j < n; j++) ctx.lineTo(tail[4 * j] + tail[4 * j + 2], tail[4 * j + 1] + tail[4 * j + 3]);
+  for (let j = n - 1; j >= 0; j--) ctx.lineTo(tail[4 * j] - tail[4 * j + 2], tail[4 * j + 1] - tail[4 * j + 3]);
+  ctx.closePath();
+  ctx.fill();
+}
+function cometTrails(ctx, s, k2) {
+  const { pal } = s;
+  const count2 = Math.max(1, Math.floor(s.chain * L.quality * L.particleDensity * moving.density / COMET_PX));
+  const radius = L.thickness * 2;
+  const length = Math.min(TAIL_PX, s.chain) * k2.linkDir;
+  const ahead = length < 0 ? -1 : 1;
+  const core2 = lighter(pal.accent);
+  for (let i = 0; i < count2; i++) {
+    const T = wrap((i + 0.5 + STRAY * (noise(i) - 0.5)) / count2 + k2.linkFlow * COMET_RATE);
+    ctx.shadowBlur = 0;
+    for (let lap = 0; lap < 2; lap++) {
+      const head = (T + lap * ahead) * s.chain;
+      for (let l = 0; l < LAYERS.length; l++) {
+        ctx.fillStyle = pal[LAYER_COLORS[l]];
+        ctx.globalAlpha = LAYERS[l][2] * moving.alpha;
+        trail(ctx, s, head, length * LAYERS[l][0], radius * LAYERS[l][1]);
+      }
+    }
+    const u = s.local(T);
+    if (!s.within(u)) continue;
+    along$1(s, u);
+    const r = radius * grown(s, T);
+    ctx.globalAlpha = moving.alpha;
+    DOT.path(ctx, here$5[0], here$5[1], r, 0);
+    shine(ctx, DOT, here$5[0], here$5[1], r, 0, core2, pal.accent, L.glowIntensity * moving.glow * 2);
+    ctx.shadowBlur = 0;
+    DOT.path(ctx, here$5[0], here$5[1], r * 0.5, 0);
+    ctx.fillStyle = WHITE$1;
+    ctx.fill();
+  }
+}
 const STROKES = /* @__PURE__ */ new Set([1, 3, 4, 6, 7]);
 const MOVING = {
   1: sacredFlow$1,
@@ -2300,7 +2503,10 @@ const MOVING = {
   5: energyPulse$1,
   6: dnaHelix$1,
   7: lavaFlow$1,
-  8: stellarPlasma$1
+  8: stellarPlasma$1,
+  10: merkabaBeads,
+  11: dnaHelix3d,
+  12: cometTrails
 };
 const MOST$1 = 2e3;
 const HOVER_MS = 150;
@@ -2639,9 +2845,9 @@ class LinkPath {
     const { n } = this;
     if (n && this.p[2 * n - 2] === x && this.p[2 * n - 1] === y) return;
     if (this.p.length < 2 * n + 2) {
-      const grown = new Float64Array(4 * n + 4);
-      grown.set(this.p);
-      this.p = grown;
+      const grown2 = new Float64Array(4 * n + 4);
+      grown2.set(this.p);
+      this.p = grown2;
     }
     this.n = n + 1;
     this.point(n, x, y);
@@ -2780,14 +2986,14 @@ const wires = /* @__PURE__ */ new Map();
 let pass$1 = 0;
 let graph;
 let workflow;
-let held$2 = false;
+let held$3 = false;
 const laid = [];
 let due = 0;
 function startWires(shown2, still) {
   pass$1 += shown2 === graph && shown2?.id === workflow ? 1 : MISSED + 2;
   graph = shown2;
   workflow = shown2?.id;
-  held$2 = still;
+  held$3 = still;
   laid.length = 0;
 }
 function wireOf(key) {
@@ -2941,7 +3147,7 @@ function hang(wire2, path2) {
   laid.push(wire2);
   if (fresh) return rest(wire2, path2);
   const moved2 = pin(wire2, path2) > WAKE;
-  if (held$2 && (moved2 || wire2.awake)) return rest(wire2, path2);
+  if (held$3 && (moved2 || wire2.awake)) return rest(wire2, path2);
   if (moved2 && !wire2.awake) {
     wire2.awake = true;
     wire2.still = 0;
@@ -3147,6 +3353,12 @@ function stellarPlasma(ctx, s, phase) {
     ctx.fill();
   });
 }
+const held$2 = { linkPhase: 0, quantumPhase: 0, linkFlow: 0, linkDir: 1 };
+const posed = (animate) => (ctx, s, phase) => {
+  held$2.linkPhase = held$2.quantumPhase = phase;
+  held$2.linkDir = L.direction;
+  MOVING[animate](ctx, s, held$2);
+};
 const STILL = {
   1: sacredFlow,
   2: crystalStream,
@@ -3155,7 +3367,10 @@ const STILL = {
   5: energyPulse,
   6: dnaHelix,
   7: lavaFlow,
-  8: stellarPlasma
+  8: stellarPlasma,
+  10: posed(10),
+  11: posed(11),
+  12: posed(12)
 };
 const LINK_STYLES = {
   spline: {},
@@ -3315,7 +3530,10 @@ const BASES = {
   6: ["none", "none"],
   7: ["none", "none"],
   8: ["none", "ghost"],
-  9: ["classic", "classic"]
+  9: ["classic", "classic"],
+  10: ["ghost", "ghost"],
+  11: ["none", "none"],
+  12: ["ghost", "ghost"]
 };
 const shadowBlur = (blur) => L.shadowStyle === "drop" ? L.shadowBlur * 4 : blur;
 const shadowOffset = () => L.shadowStyle === "drop" ? L.shadowOffset * 3 : 0;
@@ -3342,13 +3560,6 @@ function drawBase(ctx, s, animate, still, plain = false) {
   drawBody(ctx, s, color, thickness);
   ctx.globalAlpha = 1;
   return true;
-}
-function triangle(ctx, size, angle) {
-  for (let i = 0; i <= SACRED.TRINITY; i++) {
-    const a = angle + i / SACRED.TRINITY * Math.PI * 2;
-    if (i) ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size);
-    else ctx.moveTo(Math.cos(a) * size, Math.sin(a) * size);
-  }
 }
 const MARKERS = {
   diamond: {
@@ -3485,21 +3696,7 @@ const MARKERS = {
     stroked: true,
     width: 0.2
   },
-  merkaba: {
-    // v1's createMerkaba (old_link_animations.js:1493-1520), which it never drew: two triangles, a sixth of a turn apart.
-    path(ctx, x, y, size, angle) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(angle);
-      ctx.beginPath();
-      triangle(ctx, size, 0);
-      triangle(ctx, size, Math.PI / SACRED.TRINITY);
-      ctx.restore();
-    },
-    stroked: true,
-    width: 0.15,
-    turn: Math.PI / SACRED.TRINITY
-  }
+  merkaba: { ...MERKABA, width: 0.15 }
 };
 function mark(ctx, shape2, x, y, size, angle, color, glow2, blur, offset = 0) {
   shape2.path(ctx, x, y, size, angle);
@@ -4428,10 +4625,9 @@ const LOOKS = [
   {
     id: "sacred-geometry",
     name: "Sacred Geometry",
-    description: "Sacred Flow links and Flower of Life nodes in gold, and a path trace when a run finishes.",
-    // TODO(M9d): Merkaba Beads links.
+    description: "Merkaba Beads links and Flower of Life nodes in gold, and a path trace when a run finishes.",
     values: {
-      "🔗 Enhanced Links.Animate": 1,
+      "🔗 Enhanced Links.Animate": 10,
       "🔗 Enhanced Links.Color.Mode": "custom",
       "🔗 Enhanced Links.Color.Primary": "#ffcc00",
       "🔗 Enhanced Links.Color.Secondary": "#ff8800",
@@ -5022,15 +5218,15 @@ function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
       const x = Math.cos(angle) * corona * spread2 + cx;
       const y = Math.sin(angle) * corona * spread2 + cy;
       const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion2);
-      const trail = Math.max(1, s * 2);
-      if (!circle(x, y, trail + 1.5 * 15 * dotGlow)) continue;
+      const trail2 = Math.max(1, s * 2);
+      if (!circle(x, y, trail2 + 1.5 * 15 * dotGlow)) continue;
       const slot = MOTES + 5 * i;
       const colour2 = kept(slot) ?? keep$1(slot, particleColour(pal, i, time, 1));
-      ctx.fillStyle = kept(slot + 1) ?? keep$1(slot + 1, mote(ctx, x, y, trail, colour2, dotGlow));
+      ctx.fillStyle = kept(slot + 1) ?? keep$1(slot + 1, mote(ctx, x, y, trail2, colour2, dotGlow));
       ctx.shadowColor = kept(slot + 2) ?? keep$1(slot + 2, translucent(colour2, dotGlow * 0.5));
       ctx.shadowBlur = 10 * dotGlow;
       ctx.beginPath();
-      ctx.arc(x, y, trail, 0, Math.PI * 2);
+      ctx.arc(x, y, trail2, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = kept(slot + 3) ?? keep$1(slot + 3, translucent(colour2, 0.7));
       ctx.shadowColor = kept(slot + 4) ?? keep$1(slot + 4, translucent(colour2, dotGlow));
@@ -7154,6 +7350,7 @@ const NEWS$1 = [
   "Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.",
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
+  "Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.",
   "Much lighter than 2.x on big graphs."
 ];
 const PLACES = [
@@ -7778,4 +7975,4 @@ export {
   toggleNodes as y,
   N as z
 };
-//# sourceMappingURL=menus-BlqtB1QB.js.map
+//# sourceMappingURL=menus-Cfshl9F4.js.map

@@ -4,7 +4,8 @@
  * shadow (Shadow.Style drop), Classic Flow on Wave and Coil links, and a node
  * effect on a bypassed node beside a collapsed one, and the completion styles
  * after the fireworks: confetti, the shockwave and the path trace's comet,
- * along a link through a reroute too; and rope and whip wires at rest. They are v3's own
+ * along a link through a reroute too; rope and whip wires at rest; and v3's own
+ * link animations, Merkaba Beads, DNA Helix 3D and Comet Trails. They are v3's own
  * snapshots, in __traces__/v3: `vitest -u` on this file rewrites them, after a
  * change to what they show has been checked.
  */
@@ -16,6 +17,7 @@ import { drawFlows, stepInto } from '@/fx/execution';
 import { palette } from '@/core/colors';
 import { MOVING } from '@/links/animations';
 import { Segment } from '@/links/pipeline';
+import { Wire, rest } from '@/links/physics';
 import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
 import { frames, run, start } from '../helpers/fake-litegraph';
@@ -43,7 +45,7 @@ function links(linkStyle = 'spline'): Segment[] {
 /** Frames at `times` going Forward at speed 1, each drawing the links' bases, the animation and the markers. */
 function moving(title: string, animate: number, { linkStyle = 'spline', markers = animate === 9, times = TIMES } = {}) {
     return traceFrames(title, times.map((t) => [`t=${t}s`, (ctx) => {
-        const k = { linkPhase: -PHI2 * t, quantumPhase: -PHI2 * t, linkFlow: 2 * t };
+        const k = { linkPhase: -PHI2 * t, quantumPhase: -PHI2 * t, linkFlow: 2 * t, linkDir: 1 };
         for (const s of links(linkStyle)) {
             drawBase(ctx, s, animate, false);
             MOVING[animate]?.(ctx, s, k);
@@ -163,6 +165,45 @@ describe('v3 traces', () => {
             }
         }
         await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/physics-wires.txt');
+    });
+
+    it('Merkaba Beads, DNA Helix 3D and Comet Trails, moving and still, along a spline, a link through a reroute and a rope wire', async () => {
+        storeSettings({ '🔗 Enhanced Links.Physics.Profile': 'rope' });
+        /** v1's short link, a link through a reroute at (300, 560) and a rope wire at rest, as the pipeline lays them. */
+        const laid = () => {
+            const segment = (a: [number, number], b: [number, number], colour: string) => {
+                const s = new Segment();
+                s.path.set(a, b, RIGHT, LEFT, SPLINE);
+                s.len = s.chain = s.path.length;
+                s.pal = palette(colour)!;
+                s.linkStyle = 'spline';
+                return s;
+            };
+            const [into, out] = [segment([100, 460], [300, 560], '#FF9CF9'), segment([300, 560], [480, 500], '#FF9CF9')];
+            out.u0 = into.len;
+            into.chain = out.chain = into.len + out.len;
+            into.t1 = out.t0 = into.len / into.chain;
+            const wire = segment([560, 100], [860, 220], '#64B5F6');
+            rest(new Wire(), wire.path);
+            wire.len = wire.chain = wire.path.length;
+            return [segment([100, 100], [260, 100], '#64B5F6'), into, out, wire];
+        };
+        const traces = [[10, 'Merkaba Beads'], [11, 'DNA Helix 3D'], [12, 'Comet Trails']].map(([animate, name]) => traceFrames(name as string, [
+            ...[0.4, 1.9].map((t): Parameters<typeof traceFrames>[1][number] => [`t=${t}s`, (ctx) => {
+                const k = { linkPhase: -PHI2 * t, quantumPhase: -PHI2 * t, linkFlow: 2 * t, linkDir: 1 };
+                for (const s of laid()) {
+                    drawBase(ctx, s, animate as number, false);
+                    MOVING[animate as number](ctx, s, k);
+                }
+            }]),
+            ['still, phase=9pi/4', (ctx) => {
+                for (const s of laid()) {
+                    drawBase(ctx, s, animate as number, true);
+                    STILL[animate as number](ctx, s, (9 * Math.PI) / 4);
+                }
+            }],
+        ]).trace());
+        await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/animations-v3.txt');
     });
 
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {
