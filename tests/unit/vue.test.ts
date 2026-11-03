@@ -204,7 +204,7 @@ describe('node effects in Nodes 2.0', () => {
         LiteGraph.vueNodesMode = true;
         const [el] = mountNodes(mountPane(), 1);
         frames(1);
-        expect(marks(el)).toEqual({ fx: 'flower' });
+        expect(marks(el)).toEqual({ fx: 'rosette' });
         const root = canvas.graph;
         Object.assign(canvas, { graph: holder.subgraph });
         canvas.setDirty(true, true);
@@ -213,7 +213,7 @@ describe('node effects in Nodes 2.0', () => {
         Object.assign(canvas, { graph: root });
         canvas.setDirty(true, true);
         frames(1);
-        expect(marks(el)).toEqual({ fx: 'flower' });
+        expect(marks(el)).toEqual({ fx: 'rosette' });
     });
 
     it('writes one stylesheet in the effects own colours, which a setting writes anew, and takes it and the marks off with node effects or the mode', async () => {

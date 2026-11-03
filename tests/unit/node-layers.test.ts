@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Flower of Life', 4], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -79,7 +79,8 @@ const halos = (paints: CanvasRecorder['paints']) => paints.filter((p) => p.op ==
 
 /**
  * How far paints reach past a box (left, top, right, bottom) on each of those sides: their boxes with half
- * their line, and their shadow moved by its offset and grown by its blur.
+ * their line, and their shadow moved by its offset and grown by its blur; but for a shape filled far off the canvas
+ * that only its shadow lands from, as Sacred Rosette's dots cast their glow, its shadow alone.
  */
 function overhang(paints: CanvasRecorder['paints'], [left, top, right, bottom]: number[]): number[] {
     const out = [-Infinity, -Infinity, -Infinity, -Infinity];
@@ -88,10 +89,12 @@ function overhang(paints: CanvasRecorder['paints'], [left, top, right, bottom]: 
         const line = p.op.startsWith('stroke') ? p.lineWidth / 2 : 0;
         const blur = parseColor(p.shadowColor)![3] > 0 ? p.shadowBlur : -Infinity;
         const [x0, y0, x1, y1] = p.box;
-        out[0] = Math.max(out[0], line + left - Math.min(x0, x0 + p.shadowOffsetX - blur));
-        out[1] = Math.max(out[1], line + top - Math.min(y0, y0 + p.shadowOffsetY - blur));
-        out[2] = Math.max(out[2], line + Math.max(x1, x1 + p.shadowOffsetX + blur) - right);
-        out[3] = Math.max(out[3], line + Math.max(y1, y1 + p.shadowOffsetY + blur) - bottom);
+        const [sx0, sy0, sx1, sy1] = [x0 + p.shadowOffsetX - blur, y0 + p.shadowOffsetY - blur, x1 + p.shadowOffsetX + blur, y1 + p.shadowOffsetY + blur];
+        const alone = Math.abs(p.shadowOffsetX) >= 1e4;
+        out[0] = Math.max(out[0], line + left - (alone ? sx0 : Math.min(x0, sx0)));
+        out[1] = Math.max(out[1], line + top - (alone ? sy0 : Math.min(y0, sy0)));
+        out[2] = Math.max(out[2], line + (alone ? sx1 : Math.max(x1, sx1)) - right);
+        out[3] = Math.max(out[3], line + (alone ? sy1 : Math.max(y1, sy1)) - bottom);
     }
     return out;
 }
@@ -169,6 +172,20 @@ describe('node effects', () => {
                 // A gradient's label counts the gradients made before it, which a part makes fewer of.
                 return rec.paints.map((p) => JSON.stringify({ ...p, style: p.style.replace(/^grad\d+$/, 'gradient') }));
             };
+            if (animate === 4) {
+                // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path: the parts draw
+                // the pieces of those paths that reach them, and the whole of the rest.
+                const pieces = (sides: number) => {
+                    const rec = new CanvasRecorder();
+                    const part = { sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 };
+                    drawNodeFx(rec.ctx, animate, node, 220, 120, clock, sides === (UNDER | OVER) ? WHOLE : part, 1, false);
+                    return new Set(rec.lines.filter((line) => /^(arc|lineTo)\(/.test(line)));
+                };
+                const [whole, under, over] = [UNDER | OVER, UNDER, OVER].map(pieces);
+                for (const piece of [...under, ...over]) expect(whole.has(piece), `${name}: ${piece}`).toBe(true);
+                expect(new Set([...under, ...over]), name).toEqual(whole);
+                continue;
+            }
             const [whole, under, over] = [UNDER | OVER, UNDER, OVER].map(paints);
             // Each part draws only what the whole does, in its order, and together they draw all of it.
             const within = (part: string[]) => {
@@ -587,11 +604,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Flower of Life', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -624,7 +641,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -652,7 +669,7 @@ describe('the node menu', () => {
         const before = JSON.stringify([odd.properties, kept.properties]);
         const from = canvas.front.paints.length;
         const { calls } = frame(canvas);
-        // The odd one draws Animate's Neon Nexus, whole; the other its Flower of Life; the one loaded with nothing set Animate's too.
+        // The odd one draws Animate's Neon Nexus, whole; the other its Sacred Rosette; the one loaded with nothing set Animate's too.
         expect(halos(canvas.front.paints.slice(from)).map((p) => p.shadowColor)).toEqual(['#00ff88', '#ffcc00', '#00ff88']);
         expect(calls.filter((call) => call.sides === OVER).map((call) => call.only)).toEqual([false, false, false]);
         menu(odd);

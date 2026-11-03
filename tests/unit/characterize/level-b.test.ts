@@ -277,7 +277,7 @@ describe('Level B: nodes', () => {
             2: ['fill #ffb300'],
             // Cosmic Ripple's corona, without its rings.
             3: ['fill gradient', 'fill rgba(255, 179, 0, 0.7)'],
-            // Flower of Life's dots, without its pattern.
+            // Sacred Rosette's dots, without its pattern.
             4: ['fill #ffb300'],
         });
     });

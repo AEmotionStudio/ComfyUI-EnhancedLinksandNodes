@@ -54,7 +54,7 @@
 ### 💫 Nodes
 ![Node effects](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/nodes.webp)
 
-*   **4 effects**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Flower of Life, drawn over the node at v1's strength, with a halo and a glowing frame on selected nodes.
+*   **4 effects**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Sacred Rosette (v1's Flower of Life, its rings now closed), drawn over the node at v1's strength, with a halo and a glowing frame on selected nodes.
 *   **Particles** with or without an effect, in 6 color modes.
 *   **5 title styles** and a **Node FX** menu to give one node its own effect.
 
@@ -145,7 +145,7 @@ A look sets how links and nodes look in one click; it never changes your focus, 
 </tr>
 <tr>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-lava-lamp.webp" alt="Lava Lamp"><br><b>Lava Lamp</b>: Lava Flow and Cosmic Ripple in reds and ambers, fireworks.</td>
-<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-sacred-geometry.webp" alt="Sacred Geometry"><br><b>Sacred Geometry</b>: Merkaba Beads and Flower of Life in gold, path trace.</td>
+<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-sacred-geometry.webp" alt="Sacred Geometry"><br><b>Sacred Geometry</b>: Merkaba Beads and Sacred Rosette in gold, path trace.</td>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-living-wires.webp" alt="Living Wires"><br><b>Living Wires</b>: native-looking wires that sag like rope, reaching hands.</td>
 </tr>
 <tr>
@@ -209,7 +209,7 @@ All 96 settings are in ComfyUI's settings dialog under **Enhanced Links & Nodes*
 | :--- | :--- |
 | **ComfyUI frontend** | 1.39.5 or later; tested on 1.39.5 and 1.57.1. |
 | **Classic nodes** | Everything. |
-| **Nodes 2.0** | Glows, particles, selection focus, run visuals, completion effects and connection assist. Classic only, as the panel says: the patterns inside nodes (Neon Nexus's tube and lattice, Cosmic Ripple's rings, Flower of Life's rosette), animated titles, the hover outline, focus on hover and the double-click jump. |
+| **Nodes 2.0** | Glows, particles, selection focus, run visuals, completion effects and connection assist. Classic only, as the panel says: the patterns inside nodes (Neon Nexus's tube and lattice, Cosmic Ripple's rings, Sacred Rosette's pattern), animated titles, the hover outline, focus on hover and the double-click jump. |
 | **Subgraphs** | Effects keep animating inside them, and links into and out of them stay native. |
 | **KJNodes, MagnifyGlass** | Work alongside, tested together. |
 | **LinkFX and other extensions that draw links** | **Other link extensions** is *Step aside if one is found* by default: the other extension draws the links, and node effects, progress rings and completion effects keep working. |

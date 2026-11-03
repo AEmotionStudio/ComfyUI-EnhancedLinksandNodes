@@ -275,7 +275,7 @@ test.describe('with the extensions', () => {
         await page.mouse.click(...(await bodyOf(page, graph.nodes.second)), { button: 'right' });
         const menu = page.locator('.litecontextmenu');
         await menu.getByText('Node FX (2 selected)', { exact: true }).click();
-        const submenu = menu.filter({ hasText: 'Flower of Life' });
+        const submenu = menu.filter({ hasText: 'Sacred Rosette' });
         await expect(submenu.locator('.litemenu-entry').first()).toHaveText('✓ Use global (Off)');
         await shoot(page, testInfo, 'node-menu', [menu.first(), submenu]);
         await submenu.getByText('Neon Nexus', { exact: true }).click();

@@ -53,7 +53,7 @@ const NODE_SCENES: Scene[] = [
     { name: 'Gentle Pulse', settings: { '📦 Enhanced Nodes.Animate': 1 } },
     { name: 'Neon Nexus', settings: { '📦 Enhanced Nodes.Animate': 2 } },
     { name: 'Cosmic Ripple', settings: { '📦 Enhanced Nodes.Animate': 3 } },
-    { name: 'Flower of Life', settings: { '📦 Enhanced Nodes.Animate': 4 } },
+    { name: 'Sacred Rosette', settings: { '📦 Enhanced Nodes.Animate': 4 } },
     { name: 'Gentle Pulse with particles', settings: { '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true } },
     {
         name: 'Cosmic Ripple at full energy with particles',
@@ -239,7 +239,7 @@ const NODE_EFFECTS: [number, string, string][] = [
     [1, 'Gentle Pulse', 'A light breathing over each node, white at its core, with fireflies about it. v3 draws it over the body as v1 did, and what falls outside the node under the other nodes.'],
     [2, 'Neon Nexus', "v1's default look: a flickering neon tube round each node, a scan line, and a lattice of spinning hexagons with a marching grid down its left side."],
     [3, 'Cosmic Ripple', 'Rings rippling out from the centre of each node, in a corona of motes circling it.'],
-    [4, 'Flower of Life', 'A rosette of circles turning on each node, with dots circling its points.'],
+    [4, 'Sacred Rosette', "v1's Flower of Life, renamed: a rosette of circles turning on each node, each ring now closed, with dots circling its points."],
 ];
 
 const TITLE_NAMES = { neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal' };

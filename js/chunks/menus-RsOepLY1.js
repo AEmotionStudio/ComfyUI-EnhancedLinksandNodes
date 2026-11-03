@@ -76,7 +76,7 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 1, text: "Gentle Pulse" },
   { value: 2, text: "Neon Nexus" },
   { value: 3, text: "Cosmic Ripple" },
-  { value: 4, text: "Flower of Life" }
+  { value: 4, text: "Sacred Rosette" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -2051,7 +2051,14 @@ function core(ctx, x, y, r, pulse) {
 }
 const xs = new Float64Array(127);
 const ys = new Float64Array(127);
-function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
+let dotX = new Float64Array(1024);
+let dotY = new Float64Array(1024);
+const grown$1 = (a) => {
+  const b = new Float64Array(2 * a.length);
+  b.set(a);
+  return b;
+};
+function sacredRosette(ctx, _node, w, h2, k2, pal, only) {
   const { primary, secondary, accent: accent2 } = pal;
   const { quality: quality2, particleGlow: dotGlow, particleIntensity: motion2, particleSpeed: speed } = N;
   const intensity = N.intensity * 1.5;
@@ -2086,23 +2093,36 @@ function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
       ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
       ctx.stroke();
     }
-    for (let layer2 = 1, j = 1; layer2 <= layers2; layer2++) {
-      for (let index = 0; index < layer2 * 6; index++, j++) {
-        if (j > 1 && index > 0 && shows$1(Math.min(xs[j - 1], xs[j]) - reach2, Math.min(ys[j - 1], ys[j]) - reach2, Math.max(xs[j - 1], xs[j]) + reach2, Math.max(ys[j - 1], ys[j]) + reach2)) {
-          ctx.beginPath();
-          ctx.moveTo(xs[j - 1], ys[j - 1]);
-          ctx.lineTo(xs[j], ys[j]);
-          ctx.strokeStyle = secondary;
-          ctx.globalAlpha = 0.3 * pulse * fade;
-          ctx.stroke();
-        }
-        if (circle(xs[j], ys[j], radius * pulse + reach2)) {
-          ctx.beginPath();
+    let drawn = false;
+    ctx.beginPath();
+    for (let layer2 = 1, first2 = 1; layer2 <= layers2; first2 += 6 * layer2, layer2++) {
+      for (let index = 0; index < layer2 * 6; index++) {
+        const [from, to] = [first2 + (index ? index - 1 : layer2 * 6 - 1), first2 + index];
+        if (!shows$1(Math.min(xs[from], xs[to]) - reach2, Math.min(ys[from], ys[to]) - reach2, Math.max(xs[from], xs[to]) + reach2, Math.max(ys[from], ys[to]) + reach2)) continue;
+        ctx.moveTo(xs[from], ys[from]);
+        ctx.lineTo(xs[to], ys[to]);
+        drawn = true;
+      }
+    }
+    if (drawn) {
+      ctx.strokeStyle = secondary;
+      ctx.globalAlpha = 0.3 * pulse * fade;
+      ctx.stroke();
+    }
+    for (let layer2 = 1, first2 = 1; layer2 <= layers2; first2 += 6 * layer2, layer2++) {
+      for (let odd = 0; odd < 2; odd++) {
+        drawn = false;
+        ctx.beginPath();
+        for (let j = first2 + odd; j < first2 + 6 * layer2; j += 2) {
+          if (!circle(xs[j], ys[j], radius * pulse + reach2)) continue;
+          ctx.moveTo(xs[j] + radius * pulse, ys[j]);
           ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = index % 2 === 0 ? secondary : accent2;
-          ctx.globalAlpha = (1 - layer2 / (layers2 + 1)) * fade;
-          ctx.stroke();
+          drawn = true;
         }
+        if (!drawn) continue;
+        ctx.strokeStyle = odd ? accent2 : secondary;
+        ctx.globalAlpha = (1 - layer2 / (layers2 + 1)) * fade;
+        ctx.stroke();
       }
     }
     if (circle(cx, cy, radius * layers2 * 2 + reach2)) {
@@ -2131,6 +2151,33 @@ function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
     const count2 = Math.floor(5 * N.particleDensity * motion2 * thin);
     const dot = 2 * quality2 * N.particleSize;
     const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    const shift = 1e5 / ctx.getTransform().a;
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 0.7 * dotGlow * fade;
+    let run2 = "";
+    let from = 0;
+    const glowRun = (to) => {
+      if (from === to) return;
+      save(ctx);
+      ctx.beginPath();
+      for (let i = from; i < to; i++) {
+        ctx.moveTo(dotX[i] + dot + shift, dotY[i]);
+        ctx.arc(dotX[i] + shift, dotY[i], dot, 0, Math.PI * 2);
+      }
+      ctx.shadowColor = ctx.fillStyle = run2;
+      ctx.shadowBlur = 10 * dotGlow;
+      ctx.shadowOffsetX = -1e5;
+      ctx.fill();
+      restore(ctx);
+      ctx.fillStyle = run2;
+      for (let i = from; i < to; i++) {
+        ctx.beginPath();
+        ctx.arc(dotX[i], dotY[i], dot, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      from = to;
+    };
+    let m = 0;
     for (let j = 0; j < n; j++) {
       for (let p = 0; p < count2; p++) {
         const angle = p / count2 * Math.PI * 2 + time * 2 * motion2;
@@ -2138,18 +2185,19 @@ function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
         const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion2);
         if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
         const colour2 = kept(DOTS + j * count2 + p) ?? keep$1(DOTS + j * count2 + p, particleColour(pal, j * count2 + p, time, rate));
-        ctx.beginPath();
-        ctx.arc(x, y, dot, 0, Math.PI * 2);
-        ctx.fillStyle = colour2;
-        ctx.shadowColor = colour2;
-        ctx.shadowBlur = 10 * dotGlow;
-        ctx.globalAlpha = 0.7 * dotGlow * fade;
-        ctx.fill();
+        if (colour2 !== run2) {
+          glowRun(m);
+          run2 = colour2;
+        }
+        if (m === dotX.length) [dotX, dotY] = [grown$1(dotX), grown$1(dotY)];
+        dotX[m] = x;
+        dotY[m++] = y;
       }
     }
+    glowRun(m);
   }
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, flowerOfLife];
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -5327,7 +5375,7 @@ const LOOKS = [
   {
     id: "sacred-geometry",
     name: "Sacred Geometry",
-    description: "Merkaba Beads links and Flower of Life nodes in gold, and a path trace when a run finishes.",
+    description: "Merkaba Beads links and Sacred Rosette nodes in gold, and a path trace when a run finishes.",
     values: {
       "🔗 Enhanced Links.Animate": 10,
       "🔗 Enhanced Links.Color.Mode": "custom",
@@ -8089,4 +8137,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-Bsdl8O1v.js.map
+//# sourceMappingURL=menus-RsOepLY1.js.map

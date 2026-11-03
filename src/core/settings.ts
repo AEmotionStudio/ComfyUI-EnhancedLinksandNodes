@@ -153,7 +153,7 @@ export const NODE_ANIMATION_OPTIONS = [
     { value: 1, text: 'Gentle Pulse' },
     { value: 2, text: 'Neon Nexus' },
     { value: 3, text: 'Cosmic Ripple' },
-    { value: 4, text: 'Flower of Life' },
+    { value: 4, text: 'Sacred Rosette' },
 ] as const;
 
 const PARTICLE_COLOR_MODE_OPTIONS = [

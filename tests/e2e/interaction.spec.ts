@@ -396,7 +396,7 @@ test.describe('node menus', () => {
             return data;
         }, [graph.nodes.node, own] as const);
         await load(page, workflow);
-        // Drawn a while, with Flower of Life on the node.
+        // Drawn a while, with Sacred Rosette on the node.
         await redraw(page);
         await page.waitForTimeout(1000);
         expect(await state(page, graph.nodes.node)).toEqual({ own, modified: false });

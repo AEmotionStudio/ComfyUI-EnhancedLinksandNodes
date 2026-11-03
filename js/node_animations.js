@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, L, a8 as zoomedOut, a9 as holdsStill, aa as during, ab as nodePalette, ac as effectOf, ad as particlesOnly$1, ae as stepOf, af as BYPASS, ag as NEVER, S as SELECTION_FX, ah as nodeMenu, ai as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, aj as startSprites, ak as drawBursts, g as guard, al as COMPLETION, am as drawNodeFx, c as clock, an as OVER, ao as dummy, ap as reach, aq as UNDER, w as wake, ar as ownStyle, as as CALM_ALPHA, at as STILL_NODE, au as stopSprites } from "./chunks/menus-Bsdl8O1v.js";
+import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, L, a8 as zoomedOut, a9 as holdsStill, aa as during, ab as nodePalette, ac as effectOf, ad as particlesOnly$1, ae as stepOf, af as BYPASS, ag as NEVER, S as SELECTION_FX, ah as nodeMenu, ai as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, aj as startSprites, ak as drawBursts, g as guard, al as COMPLETION, am as drawNodeFx, c as clock, an as OVER, ao as dummy, ap as reach, aq as UNDER, w as wake, ar as ownStyle, as as CALM_ALPHA, at as STILL_NODE, au as stopSprites } from "./chunks/menus-RsOepLY1.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -138,7 +138,7 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
     ctx.restore();
   }
 }
-const FX = ["", "gentle", "neon", "cosmic", "flower"];
+const FX = ["", "gentle", "neon", "cosmic", "rosette"];
 const SELECTED = 8;
 const RUNNING = 16;
 const FAILED = 32;
@@ -205,7 +205,7 @@ function stylesheet() {
     `.lg-node[data-eln-fx=gentle]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-breathe ${period(3)} ease-in-out infinite alternate}`,
     `.lg-node[data-eln-fx=neon]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 4px var(--eln-c1), 0 0 ${bloom}px ${light}`)}}`,
     `.lg-node[data-eln-fx=cosmic]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-ripple ${period(3)} ease-out infinite}`,
-    `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
+    `.lg-node[data-eln-fx=rosette]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
     `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
     `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo2 || "none"};animation:none}`,
     ".lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}",

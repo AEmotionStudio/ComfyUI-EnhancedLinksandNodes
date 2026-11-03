@@ -310,7 +310,7 @@ const apart = (a: number[], b: number[]) => a.reduce((sum, v, i) => sum + Math.a
 test('marks each DOM node with its effect, selection and mode, through a select, a move, a collapse and a workflow switch', async ({ page }) => {
     const nodes = await effects(page);
     const expected: Record<number, Record<string, string>> = {
-        [nodes.gentle]: { fx: 'gentle' }, [nodes.neon]: { fx: 'neon' }, [nodes.cosmic]: { fx: 'cosmic' }, [nodes.flower]: { fx: 'flower' },
+        [nodes.gentle]: { fx: 'gentle' }, [nodes.neon]: { fx: 'neon' }, [nodes.cosmic]: { fx: 'cosmic' }, [nodes.flower]: { fx: 'rosette' },
         [nodes.plain]: {}, [nodes.bypassed]: { fx: 'neon', mode: 'bypass' }, [nodes.muted]: { fx: 'neon', mode: 'muted' },
     };
     const all = async () => Object.fromEntries(await Promise.all(Object.keys(expected).map(async (id) => [id, await marks(page, Number(id))])));
@@ -358,7 +358,7 @@ for (const palette of PALETTES) {
 
         test('each effect glows around its DOM node, bypassed and muted ones fainter, and a selected one more', async ({ page }, testInfo) => {
             const nodes = await effects(page);
-            await expect.poll(() => marks(page, nodes.flower)).toEqual({ fx: 'flower' });
+            await expect.poll(() => marks(page, nodes.flower)).toEqual({ fx: 'rosette' });
             const ids = ['plain', 'gentle', 'neon', 'cosmic', 'flower', 'bypassed', 'muted'].map((name) => nodes[name]);
             const [plain, ...glows] = await besides(page, ids);
             const [gentle, neon, cosmic, flower, bypassed, muted] = glows.map((colour) => apart(colour, plain));
@@ -410,7 +410,7 @@ test.describe('with Disable animations on and Motion at Full', () => {
     test("the glows rest as they do held still, which ComfyUI's cut to 0.001 ms would freeze mid-animation", async ({ page, frontend }) => {
         test.skip(frontend === '1.39.5', 'the setting arrived in 1.43');
         const nodes = await effects(page);
-        await expect.poll(() => marks(page, nodes.flower)).toEqual({ fx: 'flower' });
+        await expect.poll(() => marks(page, nodes.flower)).toEqual({ fx: 'rosette' });
         expect(await page.evaluate(() => [document.body.classList.contains('disable-animations'), document.documentElement.getAttribute('data-eln-pace')])).toEqual([true, null]);
         const pose = (id: number) => node(page, id).evaluate((el) => {
             const glow = getComputedStyle(el, '::after');

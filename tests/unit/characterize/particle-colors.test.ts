@@ -16,7 +16,7 @@ const MODES = ['default', 'rainbow', 'complementary', 'energy', 'quantum', 'auro
 /** The nodes-rich frames' times, and the particle times the effects take at them: TURN × it, and the time itself for Cosmic Ripple. */
 const RICH_NODE_TIMES = [1.5, 3.7, 6.1, 8.3, 10.9, 13.4];
 const TIMES = RICH_NODE_TIMES.flatMap((t) => [TURN * t, t]);
-/** Flower of Life's 127 points at Quality 3 with two dots each number the most particles. */
+/** Sacred Rosette's 127 points at Quality 3 with two dots each number the most particles. */
 const PARTICLES = 127 * 2;
 
 describe('particle colours', () => {

@@ -4,10 +4,10 @@
  * Gentle Pulse breathes a light over the node with fireflies around it; Neon
  * Nexus wraps the body in a flickering neon tube with a scan line, beside a
  * lattice of spinning hexagons and a dashed energy grid; Cosmic Ripple sends
- * rings out from the centre inside a corona of motes; Flower of Life turns a
- * rosette with dots circling its points. A selected node takes v1's glowing
- * frame (:2104-2113), and the hover outline, which in v1 only Gentle Pulse
- * drew, frames the others too. With Show base effect off a style draws its own
+ * rings out from the centre inside a corona of motes; Sacred Rosette, which v1
+ * called Flower of Life, turns a rosette with dots circling its points. A
+ * selected node takes v1's glowing frame (:2104-2113), and the hover outline,
+ * which in v1 only Gentle Pulse drew, frames the others too. With Show base effect off a style draws its own
  * particles alone, as v1's Particles Only did.
  *
  * An effect is drawn in two parts, one each side of the node's edge: what falls
@@ -19,8 +19,10 @@
  * Where v3 draws differently from v1 on purpose: Gentle Pulse's fireflies
  * flicker by a hash of the time instead of Math.random(), so both parts draw a
  * firefly at one size; Cosmic Ripple's rings ripple going Reverse too, where
- * v1's vanished; and Flower of Life's particles circle its pattern without the
- * base effect, where v1's fell into its centre.
+ * v1's vanished; and Sacred Rosette closes each ring of chords, which v1 left
+ * open, draws its chords and each layer's circles of a colour as one path and
+ * its dots' glows from sprites, and its particles circle its pattern without
+ * the base effect, where v1's fell into its centre.
  *
  * Nodes of one palette and size make the same gradients and colours at one
  * moment, so each side's part makes them once a frame for them all, and once
@@ -601,7 +603,7 @@ function mote(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, co
     return gradient;
 }
 
-/** Flower of Life's white core about (x, y), `r` out, at `pulse`. */
+/** Sacred Rosette's white core about (x, y), `r` out, at `pulse`. */
 function core(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, pulse: number): CanvasGradient {
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
     gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
@@ -610,15 +612,24 @@ function core(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, pu
     return gradient;
 }
 
-/** Flower of Life's points: its centre, then each ring's circles, 6 to a ring more than the ring inside it; 127 at Quality 3. */
+/** Sacred Rosette's points: its centre, then each ring's circles, 6 to a ring more than the ring inside it; 127 at Quality 3. */
 const xs = new Float64Array(127);
 const ys = new Float64Array(127);
+/** Where its dots are, which they are kept in to glow together; and the same array, twice as long. */
+let dotX = new Float64Array(1024);
+let dotY = new Float64Array(1024);
+const grown = (a: Float64Array) => {
+    const b = new Float64Array(2 * a.length);
+    b.set(a);
+    return b;
+};
 
 /**
- * 4. Flower of Life (old_node_animations.js:1750-1897): a pulsing circle in the centre ringed by layers of smaller
- * circles joined by faint chords, framed by a turning hexagon round a white core, with dots circling every circle.
+ * 4. Sacred Rosette, v1's Flower of Life (old_node_animations.js:1750-1897): a pulsing circle in the centre ringed by
+ * layers of smaller circles, each layer's joined round by faint chords, framed by a turning hexagon round a white core,
+ * with dots circling every circle. Every chord is one stroke, and each layer's circles of a colour another.
  */
-function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+function sacredRosette(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
     const { primary, secondary, accent } = pal;
     const { quality, particleGlow: dotGlow, particleIntensity: motion, particleSpeed: speed } = N;
     const intensity = N.intensity * 1.5;
@@ -657,23 +668,38 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
             ctx.stroke();
         }
 
-        for (let layer = 1, j = 1; layer <= layers; layer++) {
-            for (let index = 0; index < layer * 6; index++, j++) {
-                if (j > 1 && index > 0 && shows(Math.min(xs[j - 1], xs[j]) - reach, Math.min(ys[j - 1], ys[j]) - reach, Math.max(xs[j - 1], xs[j]) + reach, Math.max(ys[j - 1], ys[j]) + reach)) {
-                    ctx.beginPath();
-                    ctx.moveTo(xs[j - 1], ys[j - 1]);
-                    ctx.lineTo(xs[j], ys[j]);
-                    ctx.strokeStyle = secondary;
-                    ctx.globalAlpha = 0.3 * pulse * fade;
-                    ctx.stroke();
-                }
-                if (circle(xs[j], ys[j], radius * pulse + reach)) {
-                    ctx.beginPath();
+        // Each circle to the one before it round its layer, the first to the last.
+        let drawn = false;
+        ctx.beginPath();
+        for (let layer = 1, first = 1; layer <= layers; first += 6 * layer, layer++) {
+            for (let index = 0; index < layer * 6; index++) {
+                const [from, to] = [first + (index ? index - 1 : layer * 6 - 1), first + index];
+                if (!shows(Math.min(xs[from], xs[to]) - reach, Math.min(ys[from], ys[to]) - reach, Math.max(xs[from], xs[to]) + reach, Math.max(ys[from], ys[to]) + reach)) continue;
+                ctx.moveTo(xs[from], ys[from]);
+                ctx.lineTo(xs[to], ys[to]);
+                drawn = true;
+            }
+        }
+        if (drawn) {
+            ctx.strokeStyle = secondary;
+            ctx.globalAlpha = 0.3 * pulse * fade;
+            ctx.stroke();
+        }
+        // Then the circles, every other one of a layer in the secondary colour and the rest in the accent, fainter outward.
+        for (let layer = 1, first = 1; layer <= layers; first += 6 * layer, layer++) {
+            for (let odd = 0; odd < 2; odd++) {
+                drawn = false;
+                ctx.beginPath();
+                for (let j = first + odd; j < first + 6 * layer; j += 2) {
+                    if (!circle(xs[j], ys[j], radius * pulse + reach)) continue;
+                    ctx.moveTo(xs[j] + radius * pulse, ys[j]);
                     ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
-                    ctx.strokeStyle = index % 2 === 0 ? secondary : accent;
-                    ctx.globalAlpha = (1 - (layer / (layers + 1))) * fade;
-                    ctx.stroke();
+                    drawn = true;
                 }
+                if (!drawn) continue;
+                ctx.strokeStyle = odd ? accent : secondary;
+                ctx.globalAlpha = (1 - (layer / (layers + 1))) * fade;
+                ctx.stroke();
             }
         }
 
@@ -705,6 +731,36 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
         const count = Math.floor(5 * N.particleDensity * motion * thin);
         const dot = 2 * quality * N.particleSize;
         const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        // Each run of dots of a colour casts one glow for them all, a few hundred dots each casting its own being the
+        // costliest of any effect: their shapes are filled far off the canvas, so only their shadows land, as the halo
+        // does. Then each dot is filled without one, so that they stack as v1's did.
+        const shift = 1e5 / ctx.getTransform().a;
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 0.7 * dotGlow * fade;
+        let run = '';
+        let from = 0;
+        const glowRun = (to: number) => {
+            if (from === to) return;
+            save(ctx);
+            ctx.beginPath();
+            for (let i = from; i < to; i++) {
+                ctx.moveTo(dotX[i] + dot + shift, dotY[i]);
+                ctx.arc(dotX[i] + shift, dotY[i], dot, 0, Math.PI * 2);
+            }
+            ctx.shadowColor = ctx.fillStyle = run;
+            ctx.shadowBlur = 10 * dotGlow;
+            ctx.shadowOffsetX = -1e5;
+            ctx.fill();
+            restore(ctx);
+            ctx.fillStyle = run;
+            for (let i = from; i < to; i++) {
+                ctx.beginPath();
+                ctx.arc(dotX[i], dotY[i], dot, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            from = to;
+        };
+        let m = 0;
         for (let j = 0; j < n; j++) {
             for (let p = 0; p < count; p++) {
                 const angle = (p / count) * Math.PI * 2 + time * 2 * motion;
@@ -712,22 +768,23 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
                 const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion);
                 if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
                 const colour = kept<string>(DOTS + j * count + p) ?? keep(DOTS + j * count + p, particleColour(pal, j * count + p, time, rate));
-                ctx.beginPath();
-                ctx.arc(x, y, dot, 0, Math.PI * 2);
-                ctx.fillStyle = colour;
-                ctx.shadowColor = colour;
-                ctx.shadowBlur = 10 * dotGlow;
-                ctx.globalAlpha = 0.7 * dotGlow * fade;
-                ctx.fill();
+                if (colour !== run) {
+                    glowRun(m);
+                    run = colour;
+                }
+                if (m === dotX.length) [dotX, dotY] = [grown(dotX), grown(dotY)];
+                dotX[m] = x;
+                dotY[m++] = y;
             }
         }
+        glowRun(m);
     }
 }
 
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, flowerOfLife];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {

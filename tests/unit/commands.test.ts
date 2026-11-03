@@ -356,7 +356,7 @@ describe('the commands', () => {
             await run('SelectionNodeFX');
             steps.push(said()!);
         }
-        expect(steps).toEqual(['2 nodes: Gentle Pulse', '2 nodes: Neon Nexus', '2 nodes: Cosmic Ripple', '2 nodes: Flower of Life', '2 nodes: Use global (Neon Nexus)']);
+        expect(steps).toEqual(['2 nodes: Gentle Pulse', '2 nodes: Neon Nexus', '2 nodes: Cosmic Ripple', '2 nodes: Sacred Rosette', '2 nodes: Use global (Neon Nexus)']);
         expect([first.properties, second.properties, other.properties, changes(canvas)]).toEqual([{}, {}, {}, 6]);
 
         first.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true };

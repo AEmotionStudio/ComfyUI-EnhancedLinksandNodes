@@ -54,6 +54,27 @@ const WHOLE_LINK = /^stroke \[\] moveTo\([^)]*\) (?:bezierCurveTo\([^)]*\)|lineT
 /** A mask that runs `f` over each line of a frame, and drops the lines it maps to ''. */
 const each = (f: (line: string) => string) => (lines: string[]) => lines.map(f).filter((line) => line !== '');
 
+/**
+ * A Sacred Rosette frame as the circles it strokes, whatever strokes them together: each stroke's circles one a line
+ * with its paint, sorted, after the rest, which loses the chords and the hexagon; and its dots without their glows,
+ * which v1 cast and v3 stamps from sprites.
+ */
+const ROSETTE = (lines: string[]) => {
+    const rest: string[] = [];
+    const circles: string[] = [];
+    for (const line of lines) {
+        // The glows its dots cast together, off the canvas.
+        if (line.startsWith('drawImage ') || line.startsWith('fill [] moveTo(')) continue;
+        if (!line.startsWith('stroke ')) {
+            rest.push(line.startsWith('fill [] arc(') && !line.includes('style=radial') ? line.replace(/ shadow=\S+$/, ' shadow=*') : line);
+            continue;
+        }
+        const paint = line.slice(line.indexOf(' style='));
+        for (const arc of line.match(/arc\([^)]*\)/g) ?? []) circles.push(`stroke ${arc}${paint}`);
+    }
+    return [...rest, ...circles.sort()];
+};
+
 /** The calls that put a path's points somewhere. */
 const POINTS = /\b(moveTo|lineTo|bezierCurveTo|quadraticCurveTo)\([^)]*\)/g;
 
@@ -1065,8 +1086,8 @@ export const DEVIATIONS: Deviation[] = [
         },
     },
     {
-        title: "Flower of Life's dots are v1's",
-        why: "The committed Flower of Life traces are v2's port, which shrank and dimmed the dots circling its pattern: 1.2 to 1.8 px with a twinkle, blur 5 × Particle.Glow, alpha 0.6 × it, glowing at that alpha too. v3 draws v1's own (old_node_animations.js:1866-1894): 2 × Quality × Particle.Size px, blur 10 × Particle.Glow and alpha 0.7 × it, glowing in their own colour.",
+        title: "Sacred Rosette's dots are v1's",
+        why: "The committed Flower of Life traces, of the effect v3 calls Sacred Rosette, are v2's port, which shrank and dimmed the dots circling its pattern: 1.2 to 1.8 px with a twinkle, blur 5 × Particle.Glow, alpha 0.6 × it, glowing at that alpha too. v3 draws v1's own (old_node_animations.js:1866-1894): 2 × Quality × Particle.Size px, blur 10 × Particle.Glow and alpha 0.7 × it, glowing in their own colour, each run of a colour casting one glow for all its dots.",
         frames: /^nodes(-rich)?\/4-flower-of-life/,
         mask: each((line) => (line.startsWith('fill ') && line.includes(' arc(') && !line.includes('style=radial')
             ? line.replace(/arc\(([^,]+), ([^,]+), [^,]+, /, 'arc($1, $2, *, ').replace(/ alpha=.*$/, ' alpha=* shadow=*')
@@ -1074,15 +1095,45 @@ export const DEVIATIONS: Deviation[] = [
         async proof() {
             const rec = nodeFx(4, { '📦 Enhanced Nodes.Quality': 3, '📦 Enhanced Nodes.Particle.Glow': 0.5, '📦 Enhanced Nodes.Particle.Size': 1.5 });
             const dots = rec.paints.filter((p) => p.op === 'fill' && p.style === '#ffb300');
-            // 127 points at Quality 3, two dots each.
-            expect(dots).toHaveLength(127 * 2);
-            for (const dot of dots) {
+            // 127 points at Quality 3, two dots each, filled one by one, after their glow, which one fill casts for them all
+            // from far off to the right.
+            const [glow, ...each] = dots;
+            expect(each).toHaveLength(127 * 2);
+            expect([glow.shadowColor, glow.shadowBlur, glow.shadowOffsetX, glow.globalAlpha]).toEqual(['#ffb300', 5, -1e5, 0.35]);
+            for (const dot of each) {
                 expect((dot.box![2] - dot.box![0]) / 2).toBeCloseTo(2 * 3 * 1.5, 9);
-                expect([dot.shadowColor, dot.shadowBlur, dot.globalAlpha]).toEqual(['#ffb300', 5, 0.35]);
+                expect([dot.shadowBlur, dot.globalAlpha]).toEqual([0, 0.35]);
             }
             if (!HAVE_V1) return;
-            // v3 draws v1's own Flower of Life, past the hover outline v3 draws round every effect.
-            for (const rich of [false, true]) sameFrames(await own('flowerOfLife', rich), ours(4, rich), (line) => (line.startsWith('strokeRect ') ? '' : line));
+            // v3 draws v1's own dots, round the circles of v1's own pattern, past the hover outline v3 draws round every effect.
+            const circles = (trace: string) => ROSETTE(canonical(trace).split('\n').filter((line) => line && !line.startsWith('strokeRect ')));
+            for (const rich of [false, true]) expect(circles(ours(4, rich)), `rich ${rich}`).toEqual(circles(await own('flowerOfLife', rich)));
+        },
+    },
+    {
+        title: 'Sacred Rosette closes its rings, and draws its pattern in fewer strokes',
+        why: "v1's Flower of Life, which v3 calls Sacred Rosette now that it adds the true Flower of Life, joined each circle of a ring to the one before it, but the first to none, so that every ring stayed open between its last circle and its first; v3 closes them. v1 stroked each circle and each chord on its own, each casting its glow, and gave each of the dots circling its points a glow of its own: some 250 glowing strokes and 635 glowing dots on each node at Quality 3, the costliest of the effects. v3 strokes every chord in one path and each layer's circles of a colour in another, in v1's colours, widths, alphas and glow, and fills each run of dots of a colour once far off the canvas to cast their glow together, then each dot without one, so that they stack as v1's did.",
+        frames: /^nodes(-rich|-particles-only)?\/4-flower-of-life/,
+        mask: ROSETTE,
+        proof() {
+            const lines = canonical(nodeFx(4, { '📦 Enhanced Nodes.Quality': 3, '📦 Enhanced Nodes.Particle.Show': false }).trace()).split('\n').filter((line) => line.startsWith('stroke '));
+            // The centre circle, every chord, two strokes for each of the 6 layers, and the hexagon.
+            expect(lines).toHaveLength(1 + 1 + 2 * 6 + 1);
+            const chords = lines[1];
+            const ends = [...chords.matchAll(/(moveTo|lineTo)\(([^)]*)\)/g)].map((m) => [m[1], m[2]]);
+            // Round each ring of 6, 12, ... 36 circles, from each one to the next, and from the last back to the first.
+            expect(ends.filter(([call]) => call === 'lineTo')).toHaveLength(6 * (1 + 2 + 3 + 4 + 5 + 6));
+            const from = new Set(ends.filter(([call]) => call === 'moveTo').map(([, at]) => at));
+            const to = new Set(ends.filter(([call]) => call === 'lineTo').map(([, at]) => at));
+            expect(from).toEqual(to);
+            // Each layer's circles alternate in two colours, fainter outward.
+            const alpha = (line: string) => Number(/ alpha=([\d.]+)/.exec(line)![1]);
+            const layers = lines.slice(2, 14);
+            for (let layer = 0; layer < 6; layer++) {
+                expect([layers[2 * layer], layers[2 * layer + 1]].map((line) => / style=(\S+)/.exec(line)![1])).toEqual(['#fb00ff', '#9d00ff']);
+                expect(alpha(layers[2 * layer])).toBeCloseTo(1 - (layer + 1) / 7, 2);
+                expect(layers[2 * layer].match(/arc\(/g)).toHaveLength(3 * (layer + 1));
+            }
         },
     },
     {
@@ -1103,8 +1154,8 @@ export const DEVIATIONS: Deviation[] = [
         },
     },
     {
-        title: "Flower of Life's particles circle its pattern without the base effect",
-        why: "With Show base effect off, v1 handed every effect energy 0 (old_node_animations.js:2088-2099), which only Flower of Life read, to size its pattern, so all its dots fell into the node's centre. v3 sizes the pattern as the base effect does, so the dots circle the same points.",
+        title: "Sacred Rosette's particles circle its pattern without the base effect",
+        why: "With Show base effect off, v1 handed every effect energy 0 (old_node_animations.js:2088-2099), which only its Flower of Life, v3's Sacred Rosette, read, to size its pattern, so all its dots fell into the node's centre. v3 sizes the pattern as the base effect does, so the dots circle the same points.",
         frames: /^nodes-particles-only\/4-flower-of-life/,
         mask: WHERE,
         proof() {
@@ -1187,7 +1238,9 @@ export const DEVIATIONS: Deviation[] = [
                     const nodes = await ownNodes();
                     fake.settings = new Map(Object.entries({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Static.Mode': true }));
                     const v1 = draw((ctx) => drawV1Effect(nodes, NODE_EFFECTS[style - 1][0], ctx, NODE, { phase: Math.PI / 4, particlePhase: 0, totalTime: 0 }));
-                    expect(canonical(still(NOW)), `style ${style}`).toBe(canonical(v1.trace()));
+                    // Sacred Rosette as the circles it strokes (Sacred Rosette closes its rings, and draws its pattern in fewer strokes).
+                    const pose = (trace: string) => (style === 4 ? ROSETTE(canonical(trace).split('\n')).join('\n') : canonical(trace));
+                    expect(pose(still(NOW)), `style ${style}`).toBe(pose(v1.trace()));
                 }
                 try {
                     env.running = true;
