@@ -169,6 +169,7 @@ const [LIGHT, HALO, FIREFLY_SHADOW, FIREFLIES] = [2, 3, 4, 5];
 const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
 const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
+const [SPARKS] = [2];
 
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
@@ -781,10 +782,145 @@ function sacredRosette(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: numbe
     }
 }
 
+/**
+ * Flower of Life: its 19 circles' centres, in radii from its middle, each a radius from those beside it, in the order it
+ * draws them in: the middle, the six of the Seed of Life a radius out, then the twelve round them, two radii out and √3
+ * between.
+ */
+const FLOWER: readonly (readonly [number, number])[] = [
+    [0, 0],
+    ...Array.from({ length: 6 }, (_, i) => [Math.cos((i * Math.PI) / 3), Math.sin((i * Math.PI) / 3)] as const),
+    ...Array.from({ length: 12 }, (_, i) => {
+        const d = i % 2 ? Math.sqrt(3) : 2;
+        return [d * Math.cos((i * Math.PI) / 6), d * Math.sin((i * Math.PI) / 6)] as const;
+    }),
+];
+/** Its petals, the lenses where circles a radius apart overlap: the two circles, and how far its middle is from the flower's, in radii. */
+const PETALS = FLOWER.flatMap(([ax, ay], a) => FLOWER.slice(a + 1).flatMap(([bx, by], i) =>
+    (Math.abs(Math.hypot(bx - ax, by - ay) - 1) < 1e-9 ? [[a, a + 1 + i, Math.hypot((ax + bx) / 2, (ay + by) / 2)] as const] : [])));
+/**
+ * Its cycle at speed 1, in s: drawn in over DRAWN_S, the Seed of Life over the first SEED_S and the ring from RING_S; in
+ * bloom, a shimmer running out through the petals every SHIMMER_S; fading out over the last FADE_S.
+ */
+const CYCLE_S = 16;
+const DRAWN_S = 4;
+const SEED_S = 1.5;
+const RING_S = 3.3;
+const SHIMMER_S = 2.75;
+const FADE_S = 1;
+/** Its circles' radius at Animation.Size 1, × the body's shorter side, and its ring's, × that: doubled at Rich. */
+const PETAL = 0.14;
+const FLOWER_RINGS = [[3], [3], [3], [3, 3.12]];
+/** Where its circles are, turned. */
+const fx = new Float64Array(FLOWER.length);
+const fy = new Float64Array(FLOWER.length);
+
+/** 0 to 1 as x goes from 0 to 1, easing in and out; 0 below, 1 above. */
+const ease = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+
+/** How much of circle `i` is drawn `s` seconds into the cycle: the Seed of Life's seven one after another, then the twelve. */
+const drawnOf = (i: number, s: number) =>
+    i < 7 ? ease((s - (i * SEED_S) / 8) / (SEED_S / 4)) : ease((s - SEED_S - ((i - 7) * (DRAWN_S - SEED_S - 0.5)) / 12) / 0.5);
+
+/**
+ * 5. Flower of Life: nineteen circles, each through the middles of those beside it, drawing themselves in round from
+ * where they meet the middle of the flower, the Seed of Life first, inside a ring, Balanced up, doubled at Rich; then in
+ * bloom as it slowly turns, at Rich with a shimmer running out through its petals; then fading out to draw itself in
+ * again. Its particles are sparks running round the circles drawn. Fast draws the Seed of Life alone.
+ */
+function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { primary, secondary, accent } = pal;
+    const { quality, particleGlow: dotGlow, particleSpeed: speed } = N;
+    const intensity = N.intensity * 1.5;
+    const [cx, cy] = [w / 2, h / 2];
+    const r = Math.min(w, h) * PETAL * N.animationSize;
+    const turn = k.nodePhase * 0.1;
+    // Where in its cycle it is, the way the phase runs; still, in bloom without its shimmer.
+    const s = held ? DRAWN_S : ((((k.nodePhase / TURN) % CYCLE_S) + CYCLE_S) % CYCLE_S);
+    const out = held ? 1 : Math.min(1, (CYCLE_S - s) / FADE_S);
+    const circles = quality > 1 ? FLOWER.length : 7;
+    const blur = 12 * intensity * N.animationGlow;
+    const reach = 1 + 1.5 * blur;
+    const [cos, sin] = [Math.cos(turn), Math.sin(turn)];
+    for (let i = 0; i < circles; i++) {
+        fx[i] = cx + r * (FLOWER[i][0] * cos - FLOWER[i][1] * sin);
+        fy[i] = cy + r * (FLOWER[i][0] * sin + FLOWER[i][1] * cos);
+    }
+
+    if (!only) {
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = ctx.shadowColor = primary;
+        ctx.shadowBlur = blur;
+        ctx.globalAlpha = 0.9 * out * fade;
+        let drawn = false;
+        ctx.beginPath();
+        for (let i = 0; i < circles; i++) {
+            const p = drawnOf(i, s);
+            if (!p || !circle(fx[i], fy[i], r + reach)) continue;
+            const from = i ? Math.atan2(fy[i] - cy, fx[i] - cx) + Math.PI : turn - Math.PI / 2;
+            ctx.moveTo(fx[i] + r * Math.cos(from), fy[i] + r * Math.sin(from));
+            ctx.arc(fx[i], fy[i], r, from, from + 2 * Math.PI * p);
+            drawn = true;
+        }
+        if (drawn) ctx.stroke();
+        const ring = ease((s - RING_S) / (DRAWN_S - RING_S));
+        if (quality > 1 && ring && circle(cx, cy, FLOWER_RINGS[quality].at(-1)! * r + reach)) {
+            ctx.beginPath();
+            for (const at of FLOWER_RINGS[quality]) {
+                ctx.moveTo(cx + at * r * Math.cos(turn - Math.PI / 2), cy + at * r * Math.sin(turn - Math.PI / 2));
+                ctx.arc(cx, cy, at * r, turn - Math.PI / 2, turn - Math.PI / 2 + 2 * Math.PI * ring);
+            }
+            ctx.strokeStyle = ctx.shadowColor = accent;
+            ctx.stroke();
+        }
+        if (quality > 2 && !held && s >= DRAWN_S) {
+            // The shimmer: the petals as far out as the wave lit, fading over 0.6 radii to each side of it.
+            const wave = (((s - DRAWN_S) % SHIMMER_S) / SHIMMER_S) * 2.6;
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = secondary;
+            for (const [a, b, d] of PETALS) {
+                const lit = 1 - Math.abs(d - wave) / 0.6;
+                if (lit <= 0 || !circle((fx[a] + fx[b]) / 2, (fy[a] + fy[b]) / 2, r)) continue;
+                const along = Math.atan2(fy[b] - fy[a], fx[b] - fx[a]);
+                ctx.beginPath();
+                ctx.arc(fx[a], fy[a], r, along - Math.PI / 3, along + Math.PI / 3);
+                ctx.arc(fx[b], fy[b], r, along + (2 * Math.PI) / 3, along + (4 * Math.PI) / 3);
+                ctx.closePath();
+                ctx.globalAlpha = 0.35 * lit * out * fade;
+                ctx.fill();
+            }
+        }
+    }
+
+    if (N.particleShow) {
+        const count = Math.max(1, Math.round(2 * N.particleDensity * thin));
+        const spark = 1.2 * N.particleSize;
+        const time = held ? 0 : k.particleTime;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        ctx.shadowBlur = 8 * dotGlow;
+        ctx.globalAlpha = 0.85 * dotGlow * out * fade;
+        for (let i = 0; i < circles; i++) {
+            if (drawnOf(i, s) < 1) continue;
+            for (let p = 0; p < count; p++) {
+                // Round each circle, every other one the other way.
+                const angle = turn + (i % 2 ? 1.5 : -1.5) * time * speed + (p / count) * Math.PI * 2 + i;
+                const x = fx[i] + r * Math.cos(angle);
+                const y = fy[i] + r * Math.sin(angle);
+                if (!circle(x, y, spark + 1.5 * 8 * dotGlow)) continue;
+                const colour = kept<string>(SPARKS + i * count + p) ?? keep(SPARKS + i * count + p, particleColour(pal, i * count + p, time, rate));
+                ctx.beginPath();
+                ctx.arc(x, y, spark, 0, Math.PI * 2);
+                ctx.fillStyle = ctx.shadowColor = colour;
+                ctx.fill();
+            }
+        }
+    }
+}
+
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
@@ -852,6 +988,12 @@ export function reach(style: number, w: number, h: number, only: boolean): numbe
             const rings = 0.7 * short * size + 1.5 * intensity + 1.5 * Math.max(2, 15 * glow);
             const corona = 0.7 * long * (0.8 + 0.2 * motion) + 2 * (2 * dotSize + 1.5 * motion) + 1.5 * 15 * dotGlow;
             return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
+        }
+        case 5: {
+            const radius = short * PETAL * size;
+            const pattern = (quality > 1 ? FLOWER_RINGS[quality].at(-1)! : 2) * radius + 1 + 1.5 * 12 * intensity * glow;
+            const sparks = (quality > 1 ? 3 : 2) * radius + 1.2 * dotSize + 1.5 * 8 * dotGlow;
+            return Math.max(r, (only ? 0 : pattern) - short / 2, (dots ? sparks : 0) - short / 2);
         }
         case 4: {
             const radius = short * 0.056 * intensity * size;

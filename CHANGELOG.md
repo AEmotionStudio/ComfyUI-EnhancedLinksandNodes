@@ -46,6 +46,9 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - Node menu: **Node FX ›** for that node, **Completion FX ›** (Use global, Primary or Exclude) and **Go to connected node ›**. A choice is saved in the workflow only when you make one.
 - Bypassed and muted nodes dim their effects. Particle colors Complementary, Quantum and Aurora are fixed.
 
+### New node effects
+- **Flower of Life**: nineteen circles, each through the middles of those beside it, draw themselves in round the node, the Seed of Life first, inside a ring; then the flower blooms and slowly turns, with a shimmer through its petals at Rich quality and sparks running round its circles, before it draws itself in again. The Sacred Geometry look uses it.
+
 ### Selection focus and navigation
 - **Selection focus** (#4, #5, #45): highlight the selected nodes' links, animate only them, or dim or hide the others; color them in ComfyUI's white, the theme accent or their type color; reach direct links, everything upstream or downstream, or the whole chain, through reroutes; draw them above nodes; optionally on hover. Works with link effects off.
 - **Go to connected node** in the node menu, a double-click on a slot to fly to the other end (again to cycle), and Go back. **Follow execution** pans to the running node when it is off screen.
@@ -58,7 +61,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - **Effect when a run finishes**: Fireworks (v1's), Confetti, Shockwave (the default), Path trace or Surprise, over the output nodes, the nodes you mark Primary, or the centre of the screen. Optionally a burst as each node finishes. **Preview completion effect** plays it on demand. (The 2.x End Animation switch did nothing.)
 
 ### Nodes 2.0
-- Node effects show on Nodes 2.0 as glows (halo, each effect, selection, running and failed), with particles beneath, and focused links, progress rings, error outlines, completion effects and connection assist on a layer above. Neon Nexus's tube and lattice, Cosmic Ripple's rings, Sacred Rosette's pattern, styled titles, the hover outline, focus on hover and the slot double-click are classic-only; the panel says so and offers to switch.
+- Node effects show on Nodes 2.0 as glows (halo, each effect, selection, running and failed), with particles beneath, and focused links, progress rings, error outlines, completion effects and connection assist on a layer above. Neon Nexus's tube and lattice, Cosmic Ripple's rings, Sacred Rosette's and Flower of Life's patterns, styled titles, the hover outline, focus on hover and the slot double-click are classic-only; the panel says so and offers to switch.
 
 ### Performance
 - Nothing redraws while nothing moves. Settings are read when they change, never per frame (2.x read them for every link and node, every frame). Off-screen links are skipped, and animation stops in a hidden tab.

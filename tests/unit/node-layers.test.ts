@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -124,7 +124,8 @@ describe('what node effects make', () => {
                 made.push(gradients(canvas));
             }
             expect(made[1], name).toBe(made[0]);
-            expect(made[0], name).toBeGreaterThan(0);
+            // Flower of Life strokes and fills in its colours alone.
+            if (animate !== 5) expect(made[0], name).toBeGreaterThan(0);
             preview('📦 Enhanced Nodes.Static.Mode', true);
             const canvas = app.canvas as unknown as FakeCanvas;
             frames(2);
@@ -172,9 +173,9 @@ describe('node effects', () => {
                 // A gradient's label counts the gradients made before it, which a part makes fewer of.
                 return rec.paints.map((p) => JSON.stringify({ ...p, style: p.style.replace(/^grad\d+$/, 'gradient') }));
             };
-            if (animate === 4) {
-                // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path: the parts draw
-                // the pieces of those paths that reach them, and the whole of the rest.
+            if (animate === 4 || animate === 5) {
+                // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path, and Flower of
+                // Life its circles and its rings: the parts draw the pieces of those paths that reach them.
                 const pieces = (sides: number) => {
                     const rec = new CanvasRecorder();
                     const part = { sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 };
@@ -604,11 +605,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -641,7 +642,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -680,5 +681,90 @@ describe('the node menu', () => {
         expect(bare.properties).toEqual({});
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual([]);
         expect(labels(menu(odd)[0])[0]).toBe('✓ Use global (Neon Nexus)');
+    });
+});
+
+describe('Flower of Life', () => {
+    const FLOWER = 5;
+    /** The node clock `t` s in at speed 1. */
+    const at = (t: number) => ({ nodePhase: ((2 * Math.PI) / 15) * t, particleTime: t, nodeTime: t });
+    /** What Flower of Life draws whole on the KSampler, 220 × 120, `t` s into its cycle. */
+    async function drawn(t: number, settings: Record<string, unknown> = {}) {
+        const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': FLOWER, ...settings }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, FLOWER, canvas.graph._nodes[0], 220, 120, at(t), WHOLE, 1, false);
+        return rec;
+    }
+    /** The arcs it strokes, as centre, radius and sweep. */
+    const arcs = (rec: CanvasRecorder) => rec.lines.flatMap((line) => {
+        const m = /^arc\(([^,]+), ([^,]+), ([^,]+), ([^,]+), ([^,)]+)\)$/.exec(line);
+        return m ? [{ x: Number(m[1]), y: Number(m[2]), r: Number(m[3]), sweep: Number(m[5]) - Number(m[4]) }] : [];
+    });
+    /** Its circles' radius on the KSampler at Animation.Size 1: 0.14 of the shorter side. */
+    const R = 0.14 * 120;
+
+    it("draws nineteen circles a radius across, each through the middles of those beside it, inside a ring at Balanced, the Seed of Life's seven at Fast", async () => {
+        const circles = (rec: CanvasRecorder) => arcs(rec).filter((a) => Math.abs(a.r - R) < 0.01);
+        const flower = circles(await drawn(8));
+        expect(flower).toHaveLength(19);
+        const near = (a: { x: number; y: number }) => flower.filter((b) => b !== a && Math.abs(Math.hypot(a.x - b.x, a.y - b.y) - R) < 0.05).length;
+        // The middle circle and the Seed of Life's six have six neighbours a radius off; of the outer twelve, those between
+        // two others four, and the six at its corners three.
+        expect(flower.map(near).sort((a, b) => b - a)).toEqual([6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3]);
+        expect(arcs(await drawn(8)).filter((a) => Math.abs(a.r - 3 * R) < 0.01)).toHaveLength(1);
+        expect(arcs(await drawn(8, { '📦 Enhanced Nodes.Quality': 3 })).filter((a) => a.r > 2 * R).map((a) => a.r)).toEqual([3 * R, 3.12 * R].map((r) => Number(r.toFixed(2))));
+        expect(circles(await drawn(8, { '📦 Enhanced Nodes.Quality': 1 }))).toHaveLength(7);
+        expect(arcs(await drawn(8, { '📦 Enhanced Nodes.Quality': 1 })).filter((a) => a.r > 2 * R)).toEqual([]);
+    });
+
+    it('draws itself in, the Seed of Life over the first 1.5 s, the rest and the ring by 4 s, and fades out over the last second of 16', async () => {
+        const sweeps = async (t: number) => arcs(await drawn(t)).filter((a) => Math.abs(a.r - R) < 0.01).map((a) => a.sweep);
+        const [start, seed, later, whole] = await Promise.all([0.1, 1.5, 3, 4].map(sweeps));
+        expect(start).toHaveLength(1);
+        expect(start[0]).toBeLessThan(2 * Math.PI - 0.1);
+        // Whole turns, but for the trace's rounding of each angle.
+        const whole360 = (sweep: number) => Math.abs(sweep - 2 * Math.PI) < 0.02;
+        expect(seed.filter(whole360)).toHaveLength(7);
+        expect(later.length).toBeGreaterThan(7);
+        expect(later.length).toBeLessThan(19);
+        expect(whole.filter(whole360)).toHaveLength(19);
+        const alpha = async (t: number) => (await drawn(t)).paints.find((p) => p.op === 'stroke')!.globalAlpha;
+        expect(await alpha(15.5)).toBeCloseTo((await alpha(8)) / 2, 6);
+        // Then round again, from nothing.
+        expect(await sweeps(16.1)).toEqual(await sweeps(0.1));
+    });
+
+    it('holds still in full bloom, whatever the clock, without its shimmer', async () => {
+        const still = async (t: number) => {
+            const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': FLOWER, '📦 Enhanced Nodes.Static.Mode': true, '📦 Enhanced Nodes.Quality': 3 }, { nodes: [KSAMPLER] });
+            const rec = new CanvasRecorder();
+            drawNodeFx(rec.ctx, FLOWER, canvas.graph._nodes[0], 220, 120, at(t), WHOLE, 1, false);
+            return rec;
+        };
+        const pose = (await still(0.3)).trace();
+        expect((await still(9.7)).trace()).toBe(pose);
+        expect(arcs(await still(0.3)).filter((a) => Math.abs(a.r - R) < 0.01)).toHaveLength(19);
+        expect((await still(9.7)).paints.filter((p) => p.op === 'fill')).toEqual([]);
+    });
+
+    it('shimmers through its petals in bloom at Rich alone, a wave out from the middle', async () => {
+        const petals = async (t: number, quality: number) => (await drawn(t, { '📦 Enhanced Nodes.Quality': quality })).paints.filter((p) => p.op === 'fill');
+        expect(await petals(8, 2)).toEqual([]);
+        expect(await petals(2, 3)).toEqual([]);
+        // Near the middle as the wave starts, farther out later.
+        const middle = async (t: number) => {
+            const lit = await petals(t, 3);
+            expect(lit.length, `${t} s`).toBeGreaterThan(0);
+            return Math.max(...lit.map((p) => Math.hypot((p.box![0] + p.box![2]) / 2 - 110, (p.box![1] + p.box![3]) / 2 - 60)));
+        };
+        expect(await middle(4.2)).toBeLessThan(await middle(6));
+    });
+
+    it('runs its sparks round the circles drawn in, and none round those still drawing', async () => {
+        const sparks = async (t: number) => (await drawn(t, PARTICLES)).paints.filter((p) => p.op === 'fill' && Math.abs((p.box![2] - p.box![0]) / 2 - 1.2) < 0.01);
+        // Two a circle at Density 1: the Seed of Life's seven at 1.5 s, all nineteen at 4 s.
+        expect(await sparks(1.5)).toHaveLength(14);
+        expect(await sparks(4)).toHaveLength(38);
+        expect(await sparks(0.2)).toHaveLength(0);
     });
 });

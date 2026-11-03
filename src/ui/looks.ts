@@ -161,14 +161,14 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'sacred-geometry',
         name: 'Sacred Geometry',
-        description: 'Merkaba Beads links and Sacred Rosette nodes in gold, and a path trace when a run finishes.',
+        description: 'Merkaba Beads links and Flower of Life nodes in gold, and a path trace when a run finishes.',
         values: {
             '🔗 Enhanced Links.Animate': 10,
             '🔗 Enhanced Links.Color.Mode': 'custom',
             '🔗 Enhanced Links.Color.Primary': '#ffcc00',
             '🔗 Enhanced Links.Color.Secondary': '#ff8800',
             '🔗 Enhanced Links.Color.Accent': '#fff3b0',
-            '📦 Enhanced Nodes.Animate': 4,
+            '📦 Enhanced Nodes.Animate': 5,
             '📦 Enhanced Nodes.Color.Mode': 'custom',
             '📦 Enhanced Nodes.Color.Primary': '#ffcc00',
             '📦 Enhanced Nodes.Color.Secondary': '#ff8800',

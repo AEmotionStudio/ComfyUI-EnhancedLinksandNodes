@@ -253,6 +253,7 @@ const STYLE_COLOURS = [
     ['#00ff88', '#00ffcc', '#00ff44'],
     ['#ff00ff', '#aa00ff', '#ff40ff'],
     ['#ffcc00', '#ff8800', '#ffaa00'],
+    ['#ffd36b', '#fff3c4', '#b48cff'],
 ];
 
 /** The colours a node effect draws in by role, its particles' in the default and complementary Particle.Color.Mode, and its nodes' styled titles'. */

@@ -73,7 +73,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Node effects | `📦 Enhanced Nodes.Enabled` | boolean | `true`, `false` | `true` | Off draws native ComfyUI nodes, with no effects, halos, particles, styled titles or completion effects, and leaves every other node setting as it is. |
-| Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Sacred Rosette | `0` None | Effect drawn on and around every node. Node FX in the node menu picks one for a node. |
+| Node effect | `📦 Enhanced Nodes.Animate` | combo | `0` None, `1` Gentle Pulse, `2` Neon Nexus, `3` Cosmic Ripple, `4` Sacred Rosette, `5` Flower of Life | `0` None | Effect drawn on and around every node. Node FX in the node menu picks one for a node. |
 | Show base effect | `📦 Enhanced Nodes.Animations.Enabled` | boolean | `true`, `false` | `true` | Off draws only the effect's own particles. |
 | Node effect speed | `📦 Enhanced Nodes.Animation.Speed` | slider | 0.1 to 3, step 0.1 | `1` |  |
 | Node effect direction | `📦 Enhanced Nodes.Direction` | combo | `1` Forward, `-1` Reverse | `1` Forward |  |

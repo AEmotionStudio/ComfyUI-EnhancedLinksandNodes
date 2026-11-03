@@ -306,6 +306,18 @@ describe('node effects in Nodes 2.0', () => {
         expect(await css('effect')).toBe(glow('var(--eln-c1, var(--primary-background))'));
     });
 
+    it('blooms Flower of Life\'s glow with its 16 s cycle, in its own colours', async () => {
+        await start({ '📦 Enhanced Nodes.Animate': 5 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        const [el] = mountNodes(mountPane(), 1);
+        frames(1);
+        expect(marks(el)).toEqual({ fx: 'flower' });
+        const css = sheets()[0].textContent!;
+        expect(css).toContain('.lg-node[data-eln-fx=flower]{--eln-c1:#ffd36b;--eln-c2:#fff3c4;--eln-c3:#b48cff}');
+        expect(css).toMatch(/\.lg-node\[data-eln-fx=flower\]::after\{[^}]*animation:eln-bloom calc\(16\.00s \* var\(--eln-slow, 1\)\) ease-in-out infinite normal\}/);
+        expect(css).toContain('@keyframes eln-bloom{');
+    });
+
     it('hides the glows but a run\'s while zoomed out below Perf.MinZoom', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 1 }, CHAIN);
         LiteGraph.vueNodesMode = true;

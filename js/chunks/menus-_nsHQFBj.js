@@ -76,7 +76,8 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 1, text: "Gentle Pulse" },
   { value: 2, text: "Neon Nexus" },
   { value: 3, text: "Cosmic Ripple" },
-  { value: 4, text: "Sacred Rosette" }
+  { value: 4, text: "Sacred Rosette" },
+  { value: 5, text: "Flower of Life" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -1055,7 +1056,8 @@ const STYLE_COLOURS = [
   ["#44aaff", "#88ccff", "#0088ff"],
   ["#00ff88", "#00ffcc", "#00ff44"],
   ["#ff00ff", "#aa00ff", "#ff40ff"],
-  ["#ffcc00", "#ff8800", "#ffaa00"]
+  ["#ffcc00", "#ff8800", "#ffaa00"],
+  ["#ffd36b", "#fff3c4", "#b48cff"]
 ];
 const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
@@ -1311,10 +1313,10 @@ const BURSTS = [
   { x: 0.06, y: -0.15, delay: 0.2, colour: "#FFEE33", size: 3 }
 ];
 const RATE = 0.84;
-const SPARKS = 250;
+const SPARKS$1 = 250;
 const SPARKLES = 40;
 const [CORE$1, SPARK, SPARKLE$1, GLOW, PIECE, RING, COMET$1] = [0, 1, 2, 3, 4, 5, 6];
-const SHOW = BURSTS.length * (1 + SPARKS + SPARKLES);
+const SHOW = BURSTS.length * (1 + SPARKS$1 + SPARKLES);
 const LASTS = { confetti: 2, shockwave: 0.7, trace: 1.5 };
 const STAGGER = 1 / MAX_FLASH_HZ;
 const MOST$2 = Math.floor(CAP / SHOW);
@@ -1372,10 +1374,10 @@ function fireworks(nodes, run2) {
         break;
       }
       add$2(CORE$1, owner);
-      for (let i = 0; i < SPARKS; i++) {
+      for (let i = 0; i < SPARKS$1; i++) {
         const speed = 0.3 + random() * 0.7;
         const shade = Math.floor(random() * 4);
-        add$2(SPARK, owner, i / SPARKS * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
+        add$2(SPARK, owner, i / SPARKS$1 * Math.PI * 2, speed, speed, shade, random() < speed * 0.7 ? Math.floor(speed * 3) + 1 : 0, i);
       }
       for (let j = 0; j < SPARKLES; j++) add$2(SPARKLE$1, owner, random() * Math.PI * 2, random(), random(), 3, 0, j);
     }
@@ -1681,6 +1683,7 @@ const [LIGHT, HALO, FIREFLY_SHADOW, FIREFLIES] = [2, 3, 4, 5];
 const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
 const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
+const [SPARKS] = [2];
 let depth = 0;
 function save(ctx) {
   ctx.save();
@@ -2197,7 +2200,111 @@ function sacredRosette(ctx, _node, w, h2, k2, pal, only) {
     glowRun(m);
   }
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette];
+const FLOWER = [
+  [0, 0],
+  ...Array.from({ length: 6 }, (_, i) => [Math.cos(i * Math.PI / 3), Math.sin(i * Math.PI / 3)]),
+  ...Array.from({ length: 12 }, (_, i) => {
+    const d = i % 2 ? Math.sqrt(3) : 2;
+    return [d * Math.cos(i * Math.PI / 6), d * Math.sin(i * Math.PI / 6)];
+  })
+];
+const PETALS = FLOWER.flatMap(([ax, ay], a) => FLOWER.slice(a + 1).flatMap(([bx, by], i) => Math.abs(Math.hypot(bx - ax, by - ay) - 1) < 1e-9 ? [[a, a + 1 + i, Math.hypot((ax + bx) / 2, (ay + by) / 2)]] : []));
+const CYCLE_S = 16;
+const DRAWN_S = 4;
+const SEED_S = 1.5;
+const RING_S = 3.3;
+const SHIMMER_S = 2.75;
+const FADE_S = 1;
+const PETAL = 0.14;
+const FLOWER_RINGS = [[3], [3], [3], [3, 3.12]];
+const fx = new Float64Array(FLOWER.length);
+const fy = new Float64Array(FLOWER.length);
+const ease = (x) => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+const drawnOf = (i, s) => i < 7 ? ease((s - i * SEED_S / 8) / (SEED_S / 4)) : ease((s - SEED_S - (i - 7) * (DRAWN_S - SEED_S - 0.5) / 12) / 0.5);
+function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
+  const { primary, secondary, accent: accent2 } = pal;
+  const { quality: quality2, particleGlow: dotGlow, particleSpeed: speed } = N;
+  const intensity = N.intensity * 1.5;
+  const [cx, cy] = [w / 2, h2 / 2];
+  const r = Math.min(w, h2) * PETAL * N.animationSize;
+  const turn = k2.nodePhase * 0.1;
+  const s = held$4 ? DRAWN_S : (k2.nodePhase / TURN % CYCLE_S + CYCLE_S) % CYCLE_S;
+  const out = held$4 ? 1 : Math.min(1, (CYCLE_S - s) / FADE_S);
+  const circles = quality2 > 1 ? FLOWER.length : 7;
+  const blur = 12 * intensity * N.animationGlow;
+  const reach2 = 1 + 1.5 * blur;
+  const [cos, sin] = [Math.cos(turn), Math.sin(turn)];
+  for (let i = 0; i < circles; i++) {
+    fx[i] = cx + r * (FLOWER[i][0] * cos - FLOWER[i][1] * sin);
+    fy[i] = cy + r * (FLOWER[i][0] * sin + FLOWER[i][1] * cos);
+  }
+  if (!only) {
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = ctx.shadowColor = primary;
+    ctx.shadowBlur = blur;
+    ctx.globalAlpha = 0.9 * out * fade;
+    let drawn = false;
+    ctx.beginPath();
+    for (let i = 0; i < circles; i++) {
+      const p = drawnOf(i, s);
+      if (!p || !circle(fx[i], fy[i], r + reach2)) continue;
+      const from = i ? Math.atan2(fy[i] - cy, fx[i] - cx) + Math.PI : turn - Math.PI / 2;
+      ctx.moveTo(fx[i] + r * Math.cos(from), fy[i] + r * Math.sin(from));
+      ctx.arc(fx[i], fy[i], r, from, from + 2 * Math.PI * p);
+      drawn = true;
+    }
+    if (drawn) ctx.stroke();
+    const ring2 = ease((s - RING_S) / (DRAWN_S - RING_S));
+    if (quality2 > 1 && ring2 && circle(cx, cy, FLOWER_RINGS[quality2].at(-1) * r + reach2)) {
+      ctx.beginPath();
+      for (const at of FLOWER_RINGS[quality2]) {
+        ctx.moveTo(cx + at * r * Math.cos(turn - Math.PI / 2), cy + at * r * Math.sin(turn - Math.PI / 2));
+        ctx.arc(cx, cy, at * r, turn - Math.PI / 2, turn - Math.PI / 2 + 2 * Math.PI * ring2);
+      }
+      ctx.strokeStyle = ctx.shadowColor = accent2;
+      ctx.stroke();
+    }
+    if (quality2 > 2 && !held$4 && s >= DRAWN_S) {
+      const wave2 = (s - DRAWN_S) % SHIMMER_S / SHIMMER_S * 2.6;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = secondary;
+      for (const [a, b, d] of PETALS) {
+        const lit = 1 - Math.abs(d - wave2) / 0.6;
+        if (lit <= 0 || !circle((fx[a] + fx[b]) / 2, (fy[a] + fy[b]) / 2, r)) continue;
+        const along2 = Math.atan2(fy[b] - fy[a], fx[b] - fx[a]);
+        ctx.beginPath();
+        ctx.arc(fx[a], fy[a], r, along2 - Math.PI / 3, along2 + Math.PI / 3);
+        ctx.arc(fx[b], fy[b], r, along2 + 2 * Math.PI / 3, along2 + 4 * Math.PI / 3);
+        ctx.closePath();
+        ctx.globalAlpha = 0.35 * lit * out * fade;
+        ctx.fill();
+      }
+    }
+  }
+  if (N.particleShow) {
+    const count2 = Math.max(1, Math.round(2 * N.particleDensity * thin));
+    const spark = 1.2 * N.particleSize;
+    const time = held$4 ? 0 : k2.particleTime;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    ctx.shadowBlur = 8 * dotGlow;
+    ctx.globalAlpha = 0.85 * dotGlow * out * fade;
+    for (let i = 0; i < circles; i++) {
+      if (drawnOf(i, s) < 1) continue;
+      for (let p = 0; p < count2; p++) {
+        const angle = turn + (i % 2 ? 1.5 : -1.5) * time * speed + p / count2 * Math.PI * 2 + i;
+        const x = fx[i] + r * Math.cos(angle);
+        const y = fy[i] + r * Math.sin(angle);
+        if (!circle(x, y, spark + 1.5 * 8 * dotGlow)) continue;
+        const colour2 = kept(SPARKS + i * count2 + p) ?? keep$1(SPARKS + i * count2 + p, particleColour(pal, i * count2 + p, time, rate));
+        ctx.beginPath();
+        ctx.arc(x, y, spark, 0, Math.PI * 2);
+        ctx.fillStyle = ctx.shadowColor = colour2;
+        ctx.fill();
+      }
+    }
+  }
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -2249,6 +2356,12 @@ function reach(style, w, h2, only) {
       const rings = 0.7 * short * size + 1.5 * intensity + 1.5 * Math.max(2, 15 * glow2);
       const corona = 0.7 * long * (0.8 + 0.2 * motion2) + 2 * (2 * dotSize + 1.5 * motion2) + 1.5 * 15 * dotGlow;
       return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
+    }
+    case 5: {
+      const radius = short * PETAL * size;
+      const pattern = (quality2 > 1 ? FLOWER_RINGS[quality2].at(-1) : 2) * radius + 1 + 1.5 * 12 * intensity * glow2;
+      const sparks = (quality2 > 1 ? 3 : 2) * radius + 1.2 * dotSize + 1.5 * 8 * dotGlow;
+      return Math.max(r, (only ? 0 : pattern) - short / 2, (dots ? sparks : 0) - short / 2);
     }
     case 4: {
       const radius = short * 0.056 * intensity * size;
@@ -5375,14 +5488,14 @@ const LOOKS = [
   {
     id: "sacred-geometry",
     name: "Sacred Geometry",
-    description: "Merkaba Beads links and Sacred Rosette nodes in gold, and a path trace when a run finishes.",
+    description: "Merkaba Beads links and Flower of Life nodes in gold, and a path trace when a run finishes.",
     values: {
       "🔗 Enhanced Links.Animate": 10,
       "🔗 Enhanced Links.Color.Mode": "custom",
       "🔗 Enhanced Links.Color.Primary": "#ffcc00",
       "🔗 Enhanced Links.Color.Secondary": "#ff8800",
       "🔗 Enhanced Links.Color.Accent": "#fff3b0",
-      "📦 Enhanced Nodes.Animate": 4,
+      "📦 Enhanced Nodes.Animate": 5,
       "📦 Enhanced Nodes.Color.Mode": "custom",
       "📦 Enhanced Nodes.Color.Primary": "#ffcc00",
       "📦 Enhanced Nodes.Color.Secondary": "#ff8800",
@@ -7514,6 +7627,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
+  "A new node effect, Flower of Life, which draws itself in and blooms; v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8137,4 +8251,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-RsOepLY1.js.map
+//# sourceMappingURL=menus-_nsHQFBj.js.map

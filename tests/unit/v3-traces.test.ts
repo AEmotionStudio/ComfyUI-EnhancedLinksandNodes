@@ -23,7 +23,7 @@ import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
 import { frames, run, start } from '../helpers/fake-litegraph';
 import { CanvasRecorder } from '../helpers/recording-context';
-import { V1_LINK_SETTINGS, V1_NODE_SETTINGS, storeSettings, traceFrames } from './characterize/v1-inputs';
+import { V1_LINK_SETTINGS, V1_NODE_RICH_SETTINGS, V1_NODE_SETTINGS, storeSettings, traceFrames, traceNodes, v3NodeEffect } from './characterize/v1-inputs';
 
 const [LEFT, RIGHT, SPLINE] = [3, 4, 2];
 const PHI2 = ((1 + Math.sqrt(5)) / 2) ** 2;
@@ -239,6 +239,12 @@ describe('v3 traces', () => {
             }])).trace());
         }
         await expect(traces.join('')).toMatchFileSnapshot('__traces__/v3/assist.txt');
+    });
+
+    it('Flower of Life drawing itself in, and in bloom at Rich with its shimmer and sparks, on the node sizes and clocks of the v1 traces', async () => {
+        const trace = traceNodes('Flower of Life', (c) => c.totalTime, v3NodeEffect(5)).trace()
+            + traceNodes('Flower of Life with other v1 settings', (c) => c.totalTime, v3NodeEffect(5, V1_NODE_RICH_SETTINGS), true).trace();
+        await expect(trace).toMatchFileSnapshot('__traces__/v3/nodes-flower-of-life.txt');
     });
 
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {

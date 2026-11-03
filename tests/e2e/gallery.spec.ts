@@ -54,6 +54,7 @@ const NODE_SCENES: Scene[] = [
     { name: 'Neon Nexus', settings: { '📦 Enhanced Nodes.Animate': 2 } },
     { name: 'Cosmic Ripple', settings: { '📦 Enhanced Nodes.Animate': 3 } },
     { name: 'Sacred Rosette', settings: { '📦 Enhanced Nodes.Animate': 4 } },
+    { name: 'Flower of Life', settings: { '📦 Enhanced Nodes.Animate': 5 } },
     { name: 'Gentle Pulse with particles', settings: { '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true } },
     {
         name: 'Cosmic Ripple at full energy with particles',
@@ -240,6 +241,7 @@ const NODE_EFFECTS: [number, string, string][] = [
     [2, 'Neon Nexus', "v1's default look: a flickering neon tube round each node, a scan line, and a lattice of spinning hexagons with a marching grid down its left side."],
     [3, 'Cosmic Ripple', 'Rings rippling out from the centre of each node, in a corona of motes circling it.'],
     [4, 'Sacred Rosette', "v1's Flower of Life, renamed: a rosette of circles turning on each node, each ring now closed, with dots circling its points."],
+    [5, 'Flower of Life', 'New in v3: the true Flower of Life, nineteen circles drawing themselves in round each node, the Seed of Life first, then turning slowly in bloom, with sparks running round them.'],
 ];
 
 const TITLE_NAMES = { neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal' };
@@ -334,7 +336,7 @@ const ROWS: Row[] = [
         ['holographic', 'Holographic', 'A sheen and scanlines across the curve.'],
     ] as const).map(([style, name, look]): Row => ({ slug: `style-${style}`, title: `Link path ${name}`, look, settings: { [STYLE]: style } })),
     { slug: 'style-coil', title: 'Link path Coil', look: 'New in v3: tapered loops along the link.', settings: { [STYLE]: 'coil' }, v3: true },
-    ...NODE_EFFECTS.map(([n, name, look]): Row => ({ slug: `node-${n}`, title: `${name}, with particles`, look, base: V1_NODES, settings: { [NODE_ANIMATE]: n, [PARTICLES]: true }, nodes: true })),
+    ...NODE_EFFECTS.map(([n, name, look]): Row => ({ slug: `node-${n}`, title: `${name}, with particles`, look, base: V1_NODES, settings: { [NODE_ANIMATE]: n, [PARTICLES]: true }, nodes: true, v3: n > 4 })),
     {
         slug: 'node-particles-only',
         title: 'Neon Nexus, particles only',

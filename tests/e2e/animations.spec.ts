@@ -1,5 +1,6 @@
 // v3's own link animations in ComfyUI: Merkaba Beads, DNA Helix 3D and Comet Trails each move along a link and hold
-// still in Static mode; the panel's gallery shows a live tile of each; the Sacred Geometry look draws Merkaba Beads; and
+// still in Static mode; the panel's gallery shows a live tile of each; the Sacred Geometry look draws Merkaba Beads and
+// Flower of Life; and
 // comets fly along a physics wire. They come with the extensions, so the -native projects skip them.
 import type { Page } from '@playwright/test';
 import * as graphs from './fixtures/graphs';
@@ -80,11 +81,11 @@ test("the panel's gallery shows a live tile of each", async ({ page }) => {
 test.describe('the Sacred Geometry look', () => {
     test.use({ settings: {} });
 
-    test('applied from the panel, draws Merkaba Beads', async ({ page }) => {
+    test('applied from the panel, draws Merkaba Beads and Flower of Life', async ({ page }) => {
         await setSetting(page, '🔗 Enhanced Links.Panel.State', { tab: 'looks', advanced: false, search: '' });
         await page.getByRole('button', { name: /^Enhanced Links & Nodes/ }).first().click();
         await page.locator('.eln [data-look=sacred-geometry]').click();
-        await expect.poll(() => settingValues(page, [ANIMATE, '🔗 Enhanced Links.Look'])).toEqual([10, 'sacred-geometry']);
+        await expect.poll(() => settingValues(page, [ANIMATE, '📦 Enhanced Nodes.Animate', '🔗 Enhanced Links.Look'])).toEqual([10, 5, 'sacred-geometry']);
     });
 });
 
