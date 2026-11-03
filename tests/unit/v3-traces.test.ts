@@ -253,6 +253,12 @@ describe('v3 traces', () => {
         await expect(trace).toMatchFileSnapshot('__traces__/v3/nodes-jelly.txt');
     });
 
+    it("Circuit Trace's pins, traces, pulses, lit pads and sparks, on the node sizes and clocks of the v1 traces", async () => {
+        const trace = traceNodes('Circuit Trace', (c) => c.totalTime, v3NodeEffect(7)).trace()
+            + traceNodes('Circuit Trace with other v1 settings', (c) => c.totalTime, v3NodeEffect(7, V1_NODE_RICH_SETTINGS), true).trace();
+        await expect(trace).toMatchFileSnapshot('__traces__/v3/nodes-circuit-trace.txt');
+    });
+
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {
         const canvas = await start({ ...V1_NODE_SETTINGS, '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 3 }, {
             nodes: [{ pos: [100, 100], mode: 4, title: 'Bypassed' }, { pos: [500, 100], collapsed: true, title: 'Collapsed' }],

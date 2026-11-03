@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, a8 as JELLY, a9 as kicked, L, aa as zoomedOut, ab as holdsStill, ac as during, ad as nodePalette, ae as effectOf, af as particlesOnly$1, ag as stepOf, ah as BYPASS, ai as NEVER, S as SELECTION_FX, aj as nodeMenu, ak as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, al as startSprites, am as drawBursts, g as guard, an as COMPLETION, ao as wobbles, ap as shapeNode, aq as drawNodeFx, c as clock, ar as OVER, as as dummy, at as startShaking, au as shake, av as reach, aw as UNDER, w as wake, ax as ownStyle, ay as CALM_ALPHA, az as STILL_NODE, aA as wobbling, aB as stopSprites } from "./chunks/menus-BpeAvtOf.js";
+import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, a8 as JELLY, a9 as kicked, L, aa as zoomedOut, ab as holdsStill, ac as during, ad as nodePalette, ae as effectOf, af as particlesOnly$1, ag as stepOf, ah as BYPASS, ai as NEVER, S as SELECTION_FX, aj as nodeMenu, ak as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, al as startSprites, am as drawBursts, g as guard, an as COMPLETION, ao as wobbles, ap as shapeNode, aq as drawNodeFx, c as clock, ar as OVER, as as dummy, at as startShaking, au as shake, av as reach, aw as UNDER, w as wake, ax as ownStyle, ay as CALM_ALPHA, az as STILL_NODE, aA as wobbling, aB as stopSprites } from "./chunks/menus-xV3JZlUR.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -138,7 +138,7 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
     ctx.restore();
   }
 }
-const FX = ["", "gentle", "neon", "cosmic", "rosette", "flower", "jelly"];
+const FX = ["", "gentle", "neon", "cosmic", "rosette", "flower", "jelly", "circuit"];
 const EFFECT$1 = 15;
 const SELECTED = 16;
 const RUNNING = 32;
@@ -148,7 +148,7 @@ const MUTED = 256;
 const ONLY = 512;
 const COLLAPSED = 1024;
 const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
-const MOVES = [false, true, false, true, true, true, false];
+const MOVES = [false, true, false, true, true, true, false, true];
 const ATTRIBUTES = ["data-eln-fx", "data-eln-only", "data-eln-collapsed", "data-eln-sel", "data-eln-run", "data-eln-mode"];
 let observed = null;
 let observer;
@@ -215,6 +215,7 @@ function stylesheet() {
     `.lg-node[data-eln-fx=rosette]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
     `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-bloom ${period(16)} ease-in-out infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
     `.lg-node[data-eln-fx=jelly]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)}}`,
+    `.lg-node[data-eln-fx=circuit]::after{border:1.5px dashed var(--eln-c2);box-shadow:${withHalo(`0 0 4px var(--eln-c1), 0 0 ${bloom}px ${light}`)};animation:eln-breathe ${period(2.4)} ease-in-out infinite alternate}`,
     `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
     `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo2 || "none"};animation:none}`,
     ".lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}",

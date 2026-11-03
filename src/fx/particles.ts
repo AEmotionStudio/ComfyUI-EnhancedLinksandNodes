@@ -46,6 +46,13 @@ export function noise(seed: number): number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
+/** FNV-1a: a seed from `text`, such as a show's run and node, or a node's id. */
+export function hash(text: string): number {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
+    return h;
+}
+
 /** mulberry32: a stream of numbers in [0, 1), the same ones for the same `seed`. */
 export function rng(seed: number): () => number {
     let state = seed | 0;

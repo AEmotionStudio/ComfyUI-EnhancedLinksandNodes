@@ -319,6 +319,17 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toContain('@keyframes eln-bloom{');
     });
 
+    it("pulses Circuit Trace's dashed edge with its 2.4 s pulses, in its own colours, past the effect values three bits held", async () => {
+        await start({ '📦 Enhanced Nodes.Animate': 7 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        const [el] = mountNodes(mountPane(), 1);
+        frames(1);
+        expect(marks(el)).toEqual({ fx: 'circuit' });
+        const css = sheets()[0].textContent!;
+        expect(css).toContain('.lg-node[data-eln-fx=circuit]{--eln-c1:#00e5ff;--eln-c2:#2bd47d;--eln-c3:#ffd54f}');
+        expect(css).toMatch(/\.lg-node\[data-eln-fx=circuit\]::after\{border:1\.5px dashed var\(--eln-c2\);[^}]*animation:eln-breathe calc\(2\.40s \* var\(--eln-slow, 1\)\) ease-in-out infinite alternate\}/);
+    });
+
     it('bounces a jelly node once as it is selected, alike both ways about its middle where the canvas puts it, and shapes nothing on the canvas', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 6 }, CHAIN);
         LiteGraph.vueNodesMode = true;

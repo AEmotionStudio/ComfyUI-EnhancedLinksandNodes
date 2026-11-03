@@ -78,7 +78,8 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 3, text: "Cosmic Ripple" },
   { value: 4, text: "Sacred Rosette" },
   { value: 5, text: "Flower of Life" },
-  { value: 6, text: "Jelly" }
+  { value: 6, text: "Jelly" },
+  { value: 7, text: "Circuit Trace" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -1059,7 +1060,8 @@ const STYLE_COLOURS = [
   ["#ff00ff", "#aa00ff", "#ff40ff"],
   ["#ffcc00", "#ff8800", "#ffaa00"],
   ["#ffd36b", "#fff3c4", "#b48cff"],
-  ["#7cf5a0", "#c9ffe0", "#2ad1c4"]
+  ["#7cf5a0", "#c9ffe0", "#2ad1c4"],
+  ["#00e5ff", "#2bd47d", "#ffd54f"]
 ];
 const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
@@ -1127,6 +1129,11 @@ function noise(seed) {
   t = Math.imul(t ^ t >>> 15, t | 1);
   t ^= t + Math.imul(t ^ t >>> 7, t | 61);
   return ((t ^ t >>> 14) >>> 0) / 4294967296;
+}
+function hash(text2) {
+  let h2 = 2166136261;
+  for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
+  return h2;
 }
 function rng(seed) {
   let state2 = seed | 0;
@@ -1345,11 +1352,6 @@ const bursts = [];
 const show = { style: "fireworks", rate: RATE };
 let played;
 const progress = () => clock.burstTime * show.rate;
-function hash(text2) {
-  let h2 = 2166136261;
-  for (let i = 0; i < text2.length; i++) h2 = Math.imul(h2 ^ text2.charCodeAt(i), 16777619);
-  return h2;
-}
 function add$2(kind, owner, angle = 0, speed = 0, size = 0, colour2 = 0, trail2 = 0, seq = 0) {
   const i = pool$1.count++;
   pool$1.kind[i] = kind;
@@ -1687,6 +1689,7 @@ const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
+const [CHIP_SPARKS] = [2];
 let depth = 0;
 function save(ctx) {
   ctx.save();
@@ -2351,7 +2354,173 @@ function gloss(ctx, x, y, r) {
   gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
   return gradient;
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly];
+const TRACES = [0, 1, 1.6, 2.4];
+const PULSE_S$1 = 2.4;
+const LIT = 0.12;
+const RUN = 14;
+const PIN = 5;
+const PAD = 2.2;
+const INSET = 6;
+const boards = /* @__PURE__ */ new WeakMap();
+function board(node2, w, h2) {
+  const { quality: quality2, animationSize: size } = N;
+  const laid2 = boards.get(node2);
+  if (laid2 && laid2.w === w && laid2.h === h2 && laid2.quality === quality2 && laid2.size === size) return laid2.traces;
+  const random = rng(hash(String(node2.id)));
+  const count2 = Math.max(2, Math.min(16, Math.round(TRACES[quality2] * (2 * h2 + w) / 100)));
+  const traces = [];
+  for (let i = 0; i < count2; i++) {
+    const pick2 = random() * (2 * h2 + w);
+    let x;
+    let y;
+    let dx2 = 0;
+    let dy2 = 0;
+    if (pick2 < 2 * h2) {
+      const y0 = INSET + (h2 - 2 * INSET) * (0.1 + 0.8 * random());
+      const x1 = w * (0.06 + 0.14 * random());
+      const way = y0 < h2 / 2 ? 1 : -1;
+      const jog = Math.min(h2 * (0.06 + 0.14 * random()), way > 0 ? h2 - INSET - y0 : y0 - INSET);
+      const x3 = Math.min(w * 0.46, x1 + jog + w * (0.05 + 0.15 * random()));
+      x = [0, x1, x1 + jog, Math.max(x1 + jog, x3)];
+      y = [y0, y0, y0 + way * jog, y0 + way * jog];
+      dx2 = -1;
+      if (pick2 >= h2) {
+        x = x.map((at2) => w - at2);
+        dx2 = 1;
+      }
+    } else {
+      const x0 = INSET + (w - 2 * INSET) * (0.1 + 0.8 * random());
+      const y1 = h2 - h2 * (0.08 + 0.18 * random());
+      const way = x0 < w / 2 ? 1 : -1;
+      const jog = Math.min(w * (0.04 + 0.1 * random()), way > 0 ? w - INSET - x0 : x0 - INSET);
+      const y3 = Math.max(INSET, y1 - jog - h2 * (0.05 + 0.15 * random()));
+      x = [x0, x0, x0 + way * jog, x0 + way * jog];
+      y = [h2, y1, y1 - jog, Math.min(y1 - jog, y3)];
+      dy2 = 1;
+    }
+    const at = [0];
+    for (let j = 1; j < x.length; j++) at.push(at[j - 1] + Math.hypot(x[j] - x[j - 1], y[j] - y[j - 1]));
+    const pad = (PAD + 1) * size;
+    traces.push({ x, y, at, length: at.at(-1), box: [Math.min(...x, x[3] - pad), Math.min(...y, y[3] - pad), Math.max(...x, x[3] + pad), Math.max(...y, y[3] + pad)], dx: dx2, dy: dy2 });
+  }
+  boards.set(node2, { w, h: h2, quality: quality2, size, traces });
+  return traces;
+}
+let atX = 0;
+let atY = 0;
+function locate(t, d) {
+  let j = 1;
+  while (j < t.at.length - 1 && t.at[j] < d) j++;
+  const span = t.at[j] - t.at[j - 1];
+  const f = span > 0 ? Math.max(0, Math.min(1, (d - t.at[j - 1]) / span)) : 1;
+  atX = t.x[j - 1] + (t.x[j] - t.x[j - 1]) * f;
+  atY = t.y[j - 1] + (t.y[j] - t.y[j - 1]) * f;
+}
+function stretch$1(ctx, t, d0, d1) {
+  locate(t, d0);
+  ctx.moveTo(atX, atY);
+  for (let j = 1; j < t.at.length - 1; j++) if (t.at[j] > d0 && t.at[j] < d1) ctx.lineTo(t.x[j], t.y[j]);
+  locate(t, d1);
+  ctx.lineTo(atX, atY);
+}
+function circuitTrace(ctx, node2, w, h2, k2, pal, only) {
+  const { primary, secondary, accent: accent2 } = pal;
+  const { animationGlow: glow2, animationSize: size } = N;
+  const intensity = N.intensity * 1.5;
+  const traces = board(node2, w, h2);
+  const blur = 10 * intensity * glow2;
+  const reach2 = 1 + 1.5 * blur;
+  const pulse = RUN * size;
+  const pad = PAD * size;
+  const s = held$4 ? 0 : k2.nodePhase / TURN;
+  const where2 = (j) => {
+    const u = s / PULSE_S$1 + noise(j + 1);
+    return u - Math.floor(u);
+  };
+  ctx.lineJoin = "round";
+  if (!only) {
+    let drawn = false;
+    ctx.strokeStyle = secondary;
+    ctx.lineWidth = 2 * size;
+    ctx.globalAlpha = 0.8 * fade;
+    ctx.beginPath();
+    for (const t of traces) {
+      const [x0, y0] = [t.x[0], t.y[0]];
+      const [x1, y1] = [x0 + t.dx * PIN * size, y0 + t.dy * PIN * size];
+      if (!shows$1(Math.min(x0, x1) - t.dy * size, Math.min(y0, y1) - t.dx * t.dx * size, Math.max(x0, x1) + t.dy * size, Math.max(y0, y1) + t.dx * t.dx * size)) continue;
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      drawn = true;
+    }
+    if (drawn) ctx.stroke();
+    drawn = false;
+    ctx.lineWidth = 1.2 * size;
+    ctx.globalAlpha = Math.min(1, 0.3 * intensity) * fade;
+    ctx.beginPath();
+    for (const t of traces) {
+      if (!shows$1(...t.box)) continue;
+      ctx.moveTo(t.x[0], t.y[0]);
+      for (let j = 1; j < t.x.length; j++) ctx.lineTo(t.x[j], t.y[j]);
+      ctx.moveTo(t.x[3] + pad, t.y[3]);
+      ctx.arc(t.x[3], t.y[3], pad, 0, Math.PI * 2);
+      drawn = true;
+    }
+    if (drawn) ctx.stroke();
+    drawn = false;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = ctx.shadowColor = primary;
+    ctx.shadowBlur = blur;
+    ctx.lineWidth = 2 * size;
+    ctx.globalAlpha = 0.95 * fade;
+    ctx.beginPath();
+    for (let j = 0; j < traces.length; j++) {
+      const t = traces[j];
+      const head = where2(j) * t.length;
+      locate(t, head);
+      if (!circle(atX, atY, pulse + reach2)) continue;
+      stretch$1(ctx, t, Math.max(0, head - pulse), head);
+      drawn = true;
+    }
+    if (drawn) ctx.stroke();
+    ctx.fillStyle = ctx.shadowColor = accent2;
+    for (let j = 0; j < traces.length; j++) {
+      const t = traces[j];
+      const u = where2(j);
+      const lit = 1 - Math.min(u, 1 - u) / LIT;
+      if (lit <= 0 || !circle(t.x[3], t.y[3], 1.4 * pad + reach2)) continue;
+      ctx.globalAlpha = lit * fade;
+      ctx.beginPath();
+      ctx.arc(t.x[3], t.y[3], 1.4 * pad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  if (N.particleShow) {
+    const { particleSize: dot, particleGlow: dotGlow, particleSpeed: speed } = N;
+    const count2 = Math.max(1, Math.round(3 * N.particleDensity * thin));
+    const time = held$4 ? 0 : k2.particleTime;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    ctx.shadowBlur = 6 * dotGlow;
+    for (let j = 0; j < traces.length; j++) {
+      const t = traces[j];
+      const head = where2(j) * t.length;
+      for (let p = 0; p < count2; p++) {
+        const back2 = (p + 1) / count2;
+        const d = head - pulse - back2 * 2.5 * pulse;
+        if (d <= 0) continue;
+        locate(t, d);
+        const r = dot * (1.2 - 0.6 * back2);
+        if (!circle(atX, atY, r + 1.5 * 6 * dotGlow)) continue;
+        const colour2 = kept(CHIP_SPARKS + j * count2 + p) ?? keep$1(CHIP_SPARKS + j * count2 + p, particleColour(pal, j * count2 + p, time, rate));
+        ctx.fillStyle = ctx.shadowColor = colour2;
+        ctx.globalAlpha = 0.9 * dotGlow * (1 - 0.7 * back2) * fade;
+        ctx.beginPath();
+        ctx.arc(atX, atY, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -2407,6 +2576,11 @@ function reach(style, w, h2, only) {
     // Jelly draws on the body alone.
     case 6:
       return r;
+    case 7: {
+      const blur = 10 * intensity * glow2;
+      const sparks = dots ? 1.2 * dotSize + 1.5 * 6 * dotGlow : 0;
+      return Math.max(r, only ? 0 : Math.max((PIN + 1) * size, 1 + size + 1.5 * blur), sparks);
+    }
     case 5: {
       const radius = short * PETAL * size;
       const pattern = (quality2 > 1 ? FLOWER_RINGS[quality2].at(-1) : 2) * radius + 1 + 1.5 * 12 * intensity * glow2;
@@ -7784,7 +7958,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
-  "Two new node effects: Flower of Life, which draws itself in and blooms, and Jelly, which wobbles the node itself like gel. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+  "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; and Circuit Trace, pulses racing along etched traces. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8415,4 +8589,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-BpeAvtOf.js.map
+//# sourceMappingURL=menus-xV3JZlUR.js.map

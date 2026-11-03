@@ -37,7 +37,7 @@ import type { app } from '/scripts/app.js';
 import { N } from '@/core/settings';
 import { MAX_FLASH_HZ, clock, env, live, overlaps, wake } from '@/core/engine';
 import { dark, darker, nodePalette, translucent } from '@/core/colors';
-import { CAP, disc, noise, pool, rng } from '@/fx/particles';
+import { CAP, disc, hash, noise, pool, rng } from '@/fx/particles';
 
 type Canvas = typeof app.canvas;
 
@@ -124,13 +124,6 @@ let played: Style | undefined;
 
 /** How far the show has got, from 0 as it starts to 1 as it ends: clock.burstTime runs from 0 at its start. */
 const progress = () => clock.burstTime * show.rate;
-
-/** FNV-1a, which seeds a show from its run and its node. */
-function hash(text: string): number {
-    let h = 0x811c9dc5;
-    for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
-    return h;
-}
 
 function add(kind: number, owner: number, angle = 0, speed = 0, size = 0, colour = 0, trail = 0, seq = 0): void {
     const i = pool.count++;

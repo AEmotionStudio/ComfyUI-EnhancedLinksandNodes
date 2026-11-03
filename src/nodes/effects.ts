@@ -35,7 +35,7 @@
 import { N, NODE_ANIMATION_OPTIONS, revision } from '@/core/settings';
 import { HELD, THIN, TURN, adaptive, env, heldByRun } from '@/core/engine';
 import { nodePalette, particleColour, translucent, type NodePalette } from '@/core/colors';
-import { noise } from '@/fx/particles';
+import { hash, noise, rng } from '@/fx/particles';
 import type { ComfyNode } from '@/core/types';
 
 /** Where a node keeps the Node FX style its menu gave it (ui/menus.ts). */
@@ -171,6 +171,7 @@ const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
+const [CHIP_SPARKS] = [2];
 
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
@@ -973,10 +974,220 @@ function gloss(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): 
     return gradient;
 }
 
+/**
+ * Circuit Trace: its traces for each 100 px of the body's sides and foot at Quality 1, 2 and 3; how long a pulse takes
+ * from its pin to its pad, in s at speed 1; how long about its arrival its pad glows, × that; and in px at Animation.Size
+ * 1, a pulse's run along its trace, how far a pin stands out, a pad's radius, and how far in from the edges the traces keep.
+ */
+const TRACES = [0, 1, 1.6, 2.4];
+const PULSE_S = 2.4;
+const LIT = 0.12;
+const RUN = 14;
+const PIN = 5;
+const PAD = 2.2;
+const INSET = 6;
+
+/** A trace: its corners from its pin on the edge to its pad, how far along it each is, its length, its box with its pad's, and the way its pin points out. */
+interface Trace {
+    x: number[];
+    y: number[];
+    at: number[];
+    length: number;
+    box: [number, number, number, number];
+    dx: number;
+    dy: number;
+}
+
+/** Each node's traces, and the body, Quality and Animation.Size they were laid for. */
+const boards = new WeakMap<object, { w: number; h: number; quality: number; size: number; traces: Trace[] }>();
+
+/**
+ * The traces of `node`'s w × h body, laid the same each time from its id: each in from a pin on its left, its right or its
+ * foot, a run, a jog at 45° toward the middle and a run, to a pad, the side ones in their own half.
+ */
+function board(node: ComfyNode, w: number, h: number): Trace[] {
+    const { quality, animationSize: size } = N;
+    const laid = boards.get(node);
+    if (laid && laid.w === w && laid.h === h && laid.quality === quality && laid.size === size) return laid.traces;
+    const random = rng(hash(String(node.id)));
+    const count = Math.max(2, Math.min(16, Math.round((TRACES[quality] * (2 * h + w)) / 100)));
+    const traces: Trace[] = [];
+    for (let i = 0; i < count; i++) {
+        const pick = random() * (2 * h + w);
+        let x: number[];
+        let y: number[];
+        let dx = 0;
+        let dy = 0;
+        if (pick < 2 * h) {
+            // A side: across, a jog up or down toward the middle, across.
+            const y0 = INSET + (h - 2 * INSET) * (0.1 + 0.8 * random());
+            const x1 = w * (0.06 + 0.14 * random());
+            const way = y0 < h / 2 ? 1 : -1;
+            const jog = Math.min(h * (0.06 + 0.14 * random()), way > 0 ? h - INSET - y0 : y0 - INSET);
+            const x3 = Math.min(w * 0.46, x1 + jog + w * (0.05 + 0.15 * random()));
+            x = [0, x1, x1 + jog, Math.max(x1 + jog, x3)];
+            y = [y0, y0, y0 + way * jog, y0 + way * jog];
+            dx = -1;
+            if (pick >= h) {
+                x = x.map((at) => w - at);
+                dx = 1;
+            }
+        } else {
+            // The foot: up, a jog toward the middle, up.
+            const x0 = INSET + (w - 2 * INSET) * (0.1 + 0.8 * random());
+            const y1 = h - h * (0.08 + 0.18 * random());
+            const way = x0 < w / 2 ? 1 : -1;
+            const jog = Math.min(w * (0.04 + 0.1 * random()), way > 0 ? w - INSET - x0 : x0 - INSET);
+            const y3 = Math.max(INSET, y1 - jog - h * (0.05 + 0.15 * random()));
+            x = [x0, x0, x0 + way * jog, x0 + way * jog];
+            y = [h, y1, y1 - jog, Math.min(y1 - jog, y3)];
+            dy = 1;
+        }
+        const at = [0];
+        for (let j = 1; j < x.length; j++) at.push(at[j - 1] + Math.hypot(x[j] - x[j - 1], y[j] - y[j - 1]));
+        const pad = (PAD + 1) * size;
+        traces.push({ x, y, at, length: at.at(-1)!, box: [Math.min(...x, x[3] - pad), Math.min(...y, y[3] - pad), Math.max(...x, x[3] + pad), Math.max(...y, y[3] + pad)], dx, dy });
+    }
+    boards.set(node, { w, h, quality, size, traces });
+    return traces;
+}
+
+/** The point `d` along trace `t`, kept in (atX, atY). */
+let atX = 0;
+let atY = 0;
+function locate(t: Trace, d: number): void {
+    let j = 1;
+    while (j < t.at.length - 1 && t.at[j] < d) j++;
+    const span = t.at[j] - t.at[j - 1];
+    const f = span > 0 ? Math.max(0, Math.min(1, (d - t.at[j - 1]) / span)) : 1;
+    atX = t.x[j - 1] + (t.x[j] - t.x[j - 1]) * f;
+    atY = t.y[j - 1] + (t.y[j] - t.y[j - 1]) * f;
+}
+
+/** Adds the stretch of trace `t` from `d0` to `d1` along it to the path. */
+function stretch(ctx: CanvasRenderingContext2D, t: Trace, d0: number, d1: number): void {
+    locate(t, d0);
+    ctx.moveTo(atX, atY);
+    for (let j = 1; j < t.at.length - 1; j++) if (t.at[j] > d0 && t.at[j] < d1) ctx.lineTo(t.x[j], t.y[j]);
+    locate(t, d1);
+    ctx.lineTo(atX, atY);
+}
+
+/**
+ * 7. Circuit Trace: the node as a chip, pins standing out of its sides and foot, each wired in by a trace etched faintly
+ * in the body to a pad; a pulse runs along each, from pin to pad going Forward, and lights the pad as it gets there, once
+ * every 2.4 s at speed 1 for each trace. Its particles are sparks trailing the pulses. Quality lays more traces.
+ */
+function circuitTrace(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { primary, secondary, accent } = pal;
+    const { animationGlow: glow, animationSize: size } = N;
+    const intensity = N.intensity * 1.5;
+    const traces = board(node, w, h);
+    const blur = 10 * intensity * glow;
+    const reach = 1 + 1.5 * blur;
+    const pulse = RUN * size;
+    const pad = PAD * size;
+    // Seconds at speed 1, back going Reverse; still, at its start.
+    const s = held ? 0 : k.nodePhase / TURN;
+    const where = (j: number) => {
+        const u = s / PULSE_S + noise(j + 1);
+        return u - Math.floor(u);
+    };
+    ctx.lineJoin = 'round';
+
+    if (!only) {
+        // Pins and traces end square, so that a pin falls around the body alone and a trace on it alone.
+        let drawn = false;
+        ctx.strokeStyle = secondary;
+        ctx.lineWidth = 2 * size;
+        ctx.globalAlpha = 0.8 * fade;
+        ctx.beginPath();
+        for (const t of traces) {
+            const [x0, y0] = [t.x[0], t.y[0]];
+            const [x1, y1] = [x0 + t.dx * PIN * size, y0 + t.dy * PIN * size];
+            if (!shows(Math.min(x0, x1) - t.dy * size, Math.min(y0, y1) - t.dx * t.dx * size, Math.max(x0, x1) + t.dy * size, Math.max(y0, y1) + t.dx * t.dx * size)) continue;
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            drawn = true;
+        }
+        if (drawn) ctx.stroke();
+
+        drawn = false;
+        ctx.lineWidth = 1.2 * size;
+        ctx.globalAlpha = Math.min(1, 0.3 * intensity) * fade;
+        ctx.beginPath();
+        for (const t of traces) {
+            if (!shows(...t.box)) continue;
+            ctx.moveTo(t.x[0], t.y[0]);
+            for (let j = 1; j < t.x.length; j++) ctx.lineTo(t.x[j], t.y[j]);
+            ctx.moveTo(t.x[3] + pad, t.y[3]);
+            ctx.arc(t.x[3], t.y[3], pad, 0, Math.PI * 2);
+            drawn = true;
+        }
+        if (drawn) ctx.stroke();
+
+        drawn = false;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = ctx.shadowColor = primary;
+        ctx.shadowBlur = blur;
+        ctx.lineWidth = 2 * size;
+        ctx.globalAlpha = 0.95 * fade;
+        ctx.beginPath();
+        for (let j = 0; j < traces.length; j++) {
+            const t = traces[j];
+            const head = where(j) * t.length;
+            locate(t, head);
+            if (!circle(atX, atY, pulse + reach)) continue;
+            stretch(ctx, t, Math.max(0, head - pulse), head);
+            drawn = true;
+        }
+        if (drawn) ctx.stroke();
+
+        ctx.fillStyle = ctx.shadowColor = accent;
+        for (let j = 0; j < traces.length; j++) {
+            const t = traces[j];
+            const u = where(j);
+            const lit = 1 - Math.min(u, 1 - u) / LIT;
+            if (lit <= 0 || !circle(t.x[3], t.y[3], 1.4 * pad + reach)) continue;
+            ctx.globalAlpha = lit * fade;
+            ctx.beginPath();
+            ctx.arc(t.x[3], t.y[3], 1.4 * pad, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    if (N.particleShow) {
+        const { particleSize: dot, particleGlow: dotGlow, particleSpeed: speed } = N;
+        const count = Math.max(1, Math.round(3 * N.particleDensity * thin));
+        const time = held ? 0 : k.particleTime;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        ctx.shadowBlur = 6 * dotGlow;
+        for (let j = 0; j < traces.length; j++) {
+            const t = traces[j];
+            const head = where(j) * t.length;
+            for (let p = 0; p < count; p++) {
+                // Behind the pulse, smaller and fainter the further back.
+                const back = (p + 1) / count;
+                const d = head - pulse - back * 2.5 * pulse;
+                if (d <= 0) continue;
+                locate(t, d);
+                const r = dot * (1.2 - 0.6 * back);
+                if (!circle(atX, atY, r + 1.5 * 6 * dotGlow)) continue;
+                const colour = kept<string>(CHIP_SPARKS + j * count + p) ?? keep(CHIP_SPARKS + j * count + p, particleColour(pal, j * count + p, time, rate));
+                ctx.fillStyle = ctx.shadowColor = colour;
+                ctx.globalAlpha = 0.9 * dotGlow * (1 - 0.7 * back) * fade;
+                ctx.beginPath();
+                ctx.arc(atX, atY, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+}
+
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
@@ -1048,6 +1259,12 @@ export function reach(style: number, w: number, h: number, only: boolean): numbe
         // Jelly draws on the body alone.
         case 6:
             return r;
+        case 7: {
+            // Its pins, and its pulses' glow where their traces meet the edge.
+            const blur = 10 * intensity * glow;
+            const sparks = dots ? 1.2 * dotSize + 1.5 * 6 * dotGlow : 0;
+            return Math.max(r, only ? 0 : Math.max((PIN + 1) * size, 1 + size + 1.5 * blur), sparks);
+        }
         case 5: {
             const radius = short * PETAL * size;
             const pattern = (quality > 1 ? FLOWER_RINGS[quality].at(-1)! : 2) * radius + 1 + 1.5 * 12 * intensity * glow;

@@ -1,0 +1,1671 @@
+# Circuit Trace
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 51)
+moveTo(42.96, 46)
+lineTo(42.96, 51)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 35.48)
+lineTo(47.5, 19.38)
+lineTo(47.5, 13.12)
+moveTo(49.7, 13.12)
+arc(47.5, 13.12, 2.2, 0, 6.28)
+moveTo(42.96, 46)
+lineTo(42.96, 37.67)
+lineTo(54.2, 26.43)
+lineTo(54.2, 19.86)
+moveTo(56.4, 19.86)
+arc(54.2, 19.86, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(31.59, 35.28)
+lineTo(41.49, 25.38)
+moveTo(43.16, 37.47)
+lineTo(53.06, 27.57)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+shadowBlur = 6
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=0.4s phase=0.17 particleTime=0.4 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 125)
+moveTo(0, 44.52)
+lineTo(-5, 44.52)
+moveTo(0, 74.08)
+lineTo(-5, 74.08)
+moveTo(152.15, 120)
+lineTo(152.15, 125)
+moveTo(220, 77.48)
+lineTo(225, 77.48)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 107.44)
+lineTo(85.26, 80.64)
+lineTo(85.26, 65.43)
+moveTo(87.46, 65.43)
+arc(85.26, 65.43, 2.2, 0, 6.28)
+moveTo(0, 44.52)
+lineTo(30.61, 44.52)
+lineTo(46.84, 60.74)
+lineTo(83.97, 60.74)
+moveTo(86.17, 60.74)
+arc(83.97, 60.74, 2.2, 0, 6.28)
+moveTo(0, 74.08)
+lineTo(43.41, 74.08)
+lineTo(52.42, 65.08)
+lineTo(81.16, 65.08)
+moveTo(83.36, 65.08)
+arc(81.16, 65.08, 2.2, 0, 6.28)
+moveTo(152.15, 120)
+lineTo(152.15, 98.8)
+lineTo(137.94, 84.59)
+lineTo(137.94, 73.58)
+moveTo(140.14, 73.58)
+arc(137.94, 73.58, 2.2, 0, 6.28)
+moveTo(220, 77.48)
+lineTo(198.04, 77.48)
+lineTo(178.25, 57.69)
+lineTo(151.74, 57.69)
+moveTo(153.94, 57.69)
+arc(151.74, 57.69, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(93.98, 89.36)
+lineTo(85.26, 80.64)
+lineTo(85.26, 78.98)
+moveTo(60.98, 60.74)
+lineTo(74.98, 60.74)
+moveTo(57.56, 65.08)
+lineTo(71.56, 65.08)
+moveTo(152.15, 120)
+lineTo(152.15, 115.28)
+moveTo(176.71, 57.69)
+lineTo(162.71, 57.69)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.174
+beginPath()
+arc(83.97, 60.74, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.057
+beginPath()
+arc(81.16, 65.08, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.247
+beginPath()
+arc(137.94, 73.58, 3.08, 0, 6.28)
+fill()
+shadowBlur = 6
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(106.36, 101.74, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(112.06, 116.87, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(44.46, 58.37, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(32.09, 45.99, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(43.68, 73.81, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(26.29, 74.08, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(189.54, 68.98, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(203.52, 77.48, 0.6, 0, 6.28)
+fill()
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=0.9s phase=0.38 particleTime=0.9 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(175.94, 260)
+lineTo(175.94, 265)
+moveTo(133, 260)
+lineTo(133, 265)
+moveTo(227.5, 260)
+lineTo(227.5, 265)
+moveTo(0, 103.31)
+lineTo(-5, 103.31)
+moveTo(0, 33.15)
+lineTo(-5, 33.15)
+moveTo(175.08, 260)
+lineTo(175.08, 265)
+moveTo(320, 129.34)
+lineTo(325, 129.34)
+moveTo(320, 91.22)
+lineTo(325, 91.22)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(175.94, 260)
+lineTo(175.94, 202.87)
+lineTo(160.04, 186.97)
+lineTo(160.04, 148.1)
+moveTo(162.24, 148.1)
+arc(160.04, 148.1, 2.2, 0, 6.28)
+moveTo(133, 260)
+lineTo(133, 201.51)
+lineTo(153.31, 181.19)
+lineTo(153.31, 131.79)
+moveTo(155.51, 131.79)
+arc(153.31, 131.79, 2.2, 0, 6.28)
+moveTo(227.5, 260)
+lineTo(227.5, 200.64)
+lineTo(189.48, 162.62)
+lineTo(189.48, 126.64)
+moveTo(191.68, 126.64)
+arc(189.48, 126.64, 2.2, 0, 6.28)
+moveTo(0, 103.31)
+lineTo(50.51, 103.31)
+lineTo(87.04, 139.85)
+lineTo(145.27, 139.85)
+moveTo(147.47, 139.85)
+arc(145.27, 139.85, 2.2, 0, 6.28)
+moveTo(0, 33.15)
+lineTo(53.19, 33.15)
+lineTo(90.39, 70.34)
+lineTo(125.87, 70.34)
+moveTo(128.07, 70.34)
+arc(125.87, 70.34, 2.2, 0, 6.28)
+moveTo(175.08, 260)
+lineTo(175.08, 211.15)
+lineTo(150.43, 186.5)
+lineTo(150.43, 171.47)
+moveTo(152.63, 171.47)
+arc(150.43, 171.47, 2.2, 0, 6.28)
+moveTo(320, 129.34)
+lineTo(276.11, 129.34)
+lineTo(239.28, 166.18)
+lineTo(207.3, 166.18)
+moveTo(209.5, 166.18)
+arc(207.3, 166.18, 2.2, 0, 6.28)
+moveTo(320, 91.22)
+lineTo(273.88, 91.22)
+lineTo(242.78, 122.32)
+lineTo(214.48, 122.32)
+moveTo(216.68, 122.32)
+arc(214.48, 122.32, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(175.94, 260)
+lineTo(175.94, 259.75)
+moveTo(133, 259.07)
+lineTo(133, 245.07)
+moveTo(227.5, 259.8)
+lineTo(227.5, 245.8)
+moveTo(33.9, 103.31)
+lineTo(47.9, 103.31)
+moveTo(0, 33.15)
+lineTo(9.15, 33.15)
+moveTo(156.63, 192.7)
+lineTo(150.43, 186.5)
+lineTo(150.43, 181.27)
+moveTo(284.52, 129.34)
+lineTo(276.11, 129.34)
+lineTo(272.16, 133.3)
+moveTo(271.91, 93.19)
+lineTo(262.01, 103.09)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.983
+beginPath()
+arc(160.04, 148.1, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.09
+beginPath()
+arc(153.31, 131.79, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.206
+beginPath()
+arc(189.48, 126.64, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.46
+beginPath()
+arc(125.87, 70.34, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.173
+beginPath()
+arc(150.43, 171.47, 3.08, 0, 6.28)
+fill()
+shadowBlur = 6
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(16.4, 103.31, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(169.01, 205.08, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(175.08, 220.06, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(302.02, 129.34, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(319.52, 129.34, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(288.59, 91.22, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(306.09, 91.22, 0.6, 0, 6.28)
+fill()
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=1.9s phase=0.8 particleTime=1.9 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(0, 37.91)
+lineTo(-5, 37.91)
+moveTo(174.22, 80)
+lineTo(174.22, 85)
+moveTo(190.9, 80)
+lineTo(190.9, 85)
+moveTo(203.96, 80)
+lineTo(203.96, 85)
+moveTo(130.5, 80)
+lineTo(130.5, 85)
+moveTo(236.22, 80)
+lineTo(236.22, 85)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(0, 37.91)
+lineTo(71.87, 37.91)
+lineTo(80.11, 46.15)
+lineTo(156.33, 46.15)
+moveTo(158.53, 46.15)
+arc(156.33, 46.15, 2.2, 0, 6.28)
+moveTo(174.22, 80)
+lineTo(174.22, 71.54)
+lineTo(221.03, 24.72)
+lineTo(221.03, 19.68)
+moveTo(223.23, 19.68)
+arc(221.03, 19.68, 2.2, 0, 6.28)
+moveTo(190.9, 80)
+lineTo(190.9, 69.19)
+lineTo(219.28, 40.82)
+lineTo(219.28, 26.48)
+moveTo(221.48, 26.48)
+arc(219.28, 26.48, 2.2, 0, 6.28)
+moveTo(203.96, 80)
+lineTo(203.96, 65.61)
+lineTo(174.34, 36)
+lineTo(174.34, 26.23)
+moveTo(176.54, 26.23)
+arc(174.34, 26.23, 2.2, 0, 6.28)
+moveTo(130.5, 80)
+lineTo(130.5, 66.58)
+lineTo(160.56, 36.53)
+lineTo(160.56, 27.3)
+moveTo(162.76, 27.3)
+arc(160.56, 27.3, 2.2, 0, 6.28)
+moveTo(236.22, 80)
+lineTo(236.22, 67.34)
+lineTo(200.2, 31.32)
+lineTo(200.2, 20.26)
+moveTo(202.4, 20.26)
+arc(200.2, 20.26, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(52.89, 37.91)
+lineTo(66.89, 37.91)
+moveTo(187.97, 57.78)
+lineTo(197.87, 47.88)
+moveTo(196.99, 63.11)
+lineTo(206.89, 53.21)
+moveTo(190.63, 52.28)
+lineTo(180.73, 42.38)
+moveTo(133.3, 63.79)
+lineTo(143.2, 53.89)
+moveTo(236.22, 70.3)
+lineTo(236.22, 67.34)
+lineTo(228.41, 59.54)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+shadowBlur = 6
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(35.39, 37.91, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.27
+beginPath()
+arc(17.89, 37.91, 0.6, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(175.6, 70.15, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(190.9, 78.09, 0.9, 0, 6.28)
+fill()
+shadowColor = #ffb300
+fillStyle = #ffb300
+globalAlpha = 0.585
+beginPath()
+arc(203, 64.66, 0.9, 0, 6.28)
+fill()
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# Circuit Trace with other v1 settings
+# t=1.5s phase=0.63 particleTime=1.5 node=140x46 particles=default
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 51)
+moveTo(42.96, 46)
+lineTo(42.96, 51)
+moveTo(140, 17.24)
+lineTo(145, 17.24)
+moveTo(140, 35.66)
+lineTo(145, 35.66)
+moveTo(30.52, 46)
+lineTo(30.52, 51)
+moveTo(36.17, 46)
+lineTo(36.17, 51)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 35.48)
+lineTo(47.5, 19.38)
+lineTo(47.5, 13.12)
+moveTo(49.7, 13.12)
+arc(47.5, 13.12, 2.2, 0, 6.28)
+moveTo(42.96, 46)
+lineTo(42.96, 37.67)
+lineTo(54.2, 26.43)
+lineTo(54.2, 19.86)
+moveTo(56.4, 19.86)
+arc(54.2, 19.86, 2.2, 0, 6.28)
+moveTo(140, 17.24)
+lineTo(121.84, 17.24)
+lineTo(113.6, 25.48)
+lineTo(88.68, 25.48)
+moveTo(90.88, 25.48)
+arc(88.68, 25.48, 2.2, 0, 6.28)
+moveTo(140, 35.66)
+lineTo(127.58, 35.66)
+lineTo(119.71, 27.79)
+lineTo(106.88, 27.79)
+moveTo(109.08, 27.79)
+arc(106.88, 27.79, 2.2, 0, 6.28)
+moveTo(30.52, 46)
+lineTo(30.52, 34.39)
+lineTo(47.35, 17.57)
+lineTo(47.35, 9.17)
+moveTo(49.55, 9.17)
+arc(47.35, 9.17, 2.2, 0, 6.28)
+moveTo(36.17, 46)
+lineTo(36.17, 41.82)
+lineTo(45.3, 32.69)
+lineTo(45.3, 23.62)
+moveTo(47.5, 23.62)
+arc(45.3, 23.62, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 36.03)
+moveTo(42.96, 46)
+lineTo(42.96, 37.67)
+lineTo(44.89, 35.74)
+moveTo(135.1, 17.24)
+lineTo(121.84, 17.24)
+lineTo(121.32, 17.76)
+moveTo(134.04, 35.66)
+lineTo(127.58, 35.66)
+lineTo(122.25, 30.33)
+moveTo(30.52, 46)
+lineTo(30.52, 34.39)
+lineTo(32.06, 32.85)
+moveTo(36.17, 46)
+lineTo(36.17, 42.06)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+shadowBlur = 3
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=3.7s phase=1.55 particleTime=3.7 node=220x120 selected particles=rainbow
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 125)
+moveTo(0, 44.52)
+lineTo(-5, 44.52)
+moveTo(0, 74.08)
+lineTo(-5, 74.08)
+moveTo(152.15, 120)
+lineTo(152.15, 125)
+moveTo(220, 77.48)
+lineTo(225, 77.48)
+moveTo(220, 47.55)
+lineTo(225, 47.55)
+moveTo(89.76, 120)
+lineTo(89.76, 125)
+moveTo(111.84, 120)
+lineTo(111.84, 125)
+moveTo(0, 103.03)
+lineTo(-5, 103.03)
+moveTo(220, 53.77)
+lineTo(225, 53.77)
+moveTo(0, 62.77)
+lineTo(-5, 62.77)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 107.44)
+lineTo(85.26, 80.64)
+lineTo(85.26, 65.43)
+moveTo(87.46, 65.43)
+arc(85.26, 65.43, 2.2, 0, 6.28)
+moveTo(0, 44.52)
+lineTo(30.61, 44.52)
+lineTo(46.84, 60.74)
+lineTo(83.97, 60.74)
+moveTo(86.17, 60.74)
+arc(83.97, 60.74, 2.2, 0, 6.28)
+moveTo(0, 74.08)
+lineTo(43.41, 74.08)
+lineTo(52.42, 65.08)
+lineTo(81.16, 65.08)
+moveTo(83.36, 65.08)
+arc(81.16, 65.08, 2.2, 0, 6.28)
+moveTo(152.15, 120)
+lineTo(152.15, 98.8)
+lineTo(137.94, 84.59)
+lineTo(137.94, 73.58)
+moveTo(140.14, 73.58)
+arc(137.94, 73.58, 2.2, 0, 6.28)
+moveTo(220, 77.48)
+lineTo(198.04, 77.48)
+lineTo(178.25, 57.69)
+lineTo(151.74, 57.69)
+moveTo(153.94, 57.69)
+arc(151.74, 57.69, 2.2, 0, 6.28)
+moveTo(220, 47.55)
+lineTo(181.72, 47.55)
+lineTo(173.32, 55.94)
+lineTo(160.67, 55.94)
+moveTo(162.87, 55.94)
+arc(160.67, 55.94, 2.2, 0, 6.28)
+moveTo(89.76, 120)
+lineTo(89.76, 103.73)
+lineTo(109.5, 83.99)
+lineTo(109.5, 68.02)
+moveTo(111.7, 68.02)
+arc(109.5, 68.02, 2.2, 0, 6.28)
+moveTo(111.84, 120)
+lineTo(111.84, 97.86)
+lineTo(85.08, 71.1)
+lineTo(85.08, 63.67)
+moveTo(87.28, 63.67)
+arc(85.08, 63.67, 2.2, 0, 6.28)
+moveTo(0, 103.03)
+lineTo(20.22, 103.03)
+lineTo(41.78, 81.47)
+lineTo(63.79, 81.47)
+moveTo(65.99, 81.47)
+arc(63.79, 81.47, 2.2, 0, 6.28)
+moveTo(220, 53.77)
+lineTo(176.75, 53.77)
+lineTo(164.9, 65.61)
+lineTo(138.1, 65.61)
+moveTo(140.3, 65.61)
+arc(138.1, 65.61, 2.2, 0, 6.28)
+moveTo(0, 62.77)
+lineTo(30.76, 62.77)
+lineTo(42.08, 51.45)
+lineTo(56.84, 51.45)
+moveTo(59.04, 51.45)
+arc(56.84, 51.45, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 108.92)
+moveTo(11.02, 44.52)
+lineTo(25.02, 44.52)
+moveTo(8.23, 74.08)
+lineTo(22.23, 74.08)
+moveTo(152.15, 109.66)
+lineTo(152.15, 98.8)
+lineTo(149.93, 96.58)
+moveTo(216.31, 77.48)
+lineTo(202.31, 77.48)
+moveTo(220, 47.55)
+lineTo(215.77, 47.55)
+moveTo(91.9, 101.6)
+lineTo(101.8, 91.7)
+moveTo(104.13, 90.15)
+lineTo(94.23, 80.25)
+moveTo(34.1, 89.15)
+lineTo(41.78, 81.47)
+lineTo(44.91, 81.47)
+moveTo(220, 53.77)
+lineTo(216.21, 53.77)
+moveTo(0, 62.77)
+lineTo(3.28, 62.77)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.438
+beginPath()
+arc(160.67, 55.94, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.636
+beginPath()
+arc(138.1, 65.61, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.556
+beginPath()
+arc(56.84, 51.45, 3.08, 0, 6.28)
+fill()
+shadowBlur = 3
+shadowColor = #86eff9
+fillStyle = #86eff9
+globalAlpha = 0.293
+beginPath()
+arc(89.76, 118.21, 0.9, 0, 6.28)
+fill()
+shadowColor = #8f86f9
+fillStyle = #8f86f9
+globalAlpha = 0.293
+beginPath()
+arc(111.84, 104.45, 0.9, 0, 6.28)
+fill()
+shadowColor = #f986ef
+fillStyle = #f986ef
+globalAlpha = 0.293
+beginPath()
+arc(21.72, 101.53, 0.9, 0, 6.28)
+fill()
+shadowColor = #f986b6
+fillStyle = #f986b6
+globalAlpha = 0.135
+beginPath()
+arc(4.84, 103.03, 0.6, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0
+# t=6.1s phase=2.56 particleTime=6.1 node=320x260 particles=complementary
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(175.94, 260)
+lineTo(175.94, 265)
+moveTo(133, 260)
+lineTo(133, 265)
+moveTo(227.5, 260)
+lineTo(227.5, 265)
+moveTo(0, 103.31)
+lineTo(-5, 103.31)
+moveTo(0, 33.15)
+lineTo(-5, 33.15)
+moveTo(175.08, 260)
+lineTo(175.08, 265)
+moveTo(320, 129.34)
+lineTo(325, 129.34)
+moveTo(320, 91.22)
+lineTo(325, 91.22)
+moveTo(0, 176.46)
+lineTo(-5, 176.46)
+moveTo(243.57, 260)
+lineTo(243.57, 265)
+moveTo(0, 166.17)
+lineTo(-5, 166.17)
+moveTo(0, 184.94)
+lineTo(-5, 184.94)
+moveTo(320, 193.76)
+lineTo(325, 193.76)
+moveTo(160.68, 260)
+lineTo(160.68, 265)
+moveTo(66.04, 260)
+lineTo(66.04, 265)
+moveTo(0, 109.66)
+lineTo(-5, 109.66)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(175.94, 260)
+lineTo(175.94, 202.87)
+lineTo(160.04, 186.97)
+lineTo(160.04, 148.1)
+moveTo(162.24, 148.1)
+arc(160.04, 148.1, 2.2, 0, 6.28)
+moveTo(133, 260)
+lineTo(133, 201.51)
+lineTo(153.31, 181.19)
+lineTo(153.31, 131.79)
+moveTo(155.51, 131.79)
+arc(153.31, 131.79, 2.2, 0, 6.28)
+moveTo(227.5, 260)
+lineTo(227.5, 200.64)
+lineTo(189.48, 162.62)
+lineTo(189.48, 126.64)
+moveTo(191.68, 126.64)
+arc(189.48, 126.64, 2.2, 0, 6.28)
+moveTo(0, 103.31)
+lineTo(50.51, 103.31)
+lineTo(87.04, 139.85)
+lineTo(145.27, 139.85)
+moveTo(147.47, 139.85)
+arc(145.27, 139.85, 2.2, 0, 6.28)
+moveTo(0, 33.15)
+lineTo(53.19, 33.15)
+lineTo(90.39, 70.34)
+lineTo(125.87, 70.34)
+moveTo(128.07, 70.34)
+arc(125.87, 70.34, 2.2, 0, 6.28)
+moveTo(175.08, 260)
+lineTo(175.08, 211.15)
+lineTo(150.43, 186.5)
+lineTo(150.43, 171.47)
+moveTo(152.63, 171.47)
+arc(150.43, 171.47, 2.2, 0, 6.28)
+moveTo(320, 129.34)
+lineTo(276.11, 129.34)
+lineTo(239.28, 166.18)
+lineTo(207.3, 166.18)
+moveTo(209.5, 166.18)
+arc(207.3, 166.18, 2.2, 0, 6.28)
+moveTo(320, 91.22)
+lineTo(273.88, 91.22)
+lineTo(242.78, 122.32)
+lineTo(214.48, 122.32)
+moveTo(216.68, 122.32)
+arc(214.48, 122.32, 2.2, 0, 6.28)
+moveTo(0, 176.46)
+lineTo(40.87, 176.46)
+lineTo(65.41, 151.92)
+lineTo(100.22, 151.92)
+moveTo(102.42, 151.92)
+arc(100.22, 151.92, 2.2, 0, 6.28)
+moveTo(243.57, 260)
+lineTo(243.57, 213.75)
+lineTo(219.47, 189.66)
+lineTo(219.47, 142.67)
+moveTo(221.67, 142.67)
+arc(219.47, 142.67, 2.2, 0, 6.28)
+moveTo(0, 166.17)
+lineTo(27.82, 166.17)
+lineTo(56.81, 137.18)
+lineTo(90.94, 137.18)
+moveTo(93.14, 137.18)
+arc(90.94, 137.18, 2.2, 0, 6.28)
+moveTo(0, 184.94)
+lineTo(29.72, 184.94)
+lineTo(76.9, 137.77)
+lineTo(136.41, 137.77)
+moveTo(138.61, 137.77)
+arc(136.41, 137.77, 2.2, 0, 6.28)
+moveTo(320, 193.76)
+lineTo(296, 193.76)
+lineTo(249.58, 147.34)
+lineTo(199.72, 147.34)
+moveTo(201.92, 147.34)
+arc(199.72, 147.34, 2.2, 0, 6.28)
+moveTo(160.68, 260)
+lineTo(160.68, 222.68)
+lineTo(141.53, 203.53)
+lineTo(141.53, 180.01)
+moveTo(143.73, 180.01)
+arc(141.53, 180.01, 2.2, 0, 6.28)
+moveTo(66.04, 260)
+lineTo(66.04, 216.14)
+lineTo(97.38, 184.8)
+lineTo(97.38, 148.73)
+moveTo(99.58, 148.73)
+arc(97.38, 148.73, 2.2, 0, 6.28)
+moveTo(0, 109.66)
+lineTo(59.15, 109.66)
+lineTo(91.82, 142.34)
+lineTo(110.36, 142.34)
+moveTo(112.56, 142.34)
+arc(110.36, 142.34, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(175.94, 254.01)
+lineTo(175.94, 240.01)
+moveTo(133, 236.3)
+lineTo(133, 222.3)
+moveTo(227.5, 234.95)
+lineTo(227.5, 220.95)
+moveTo(57.67, 110.47)
+lineTo(67.57, 120.37)
+moveTo(18.7, 33.15)
+lineTo(32.7, 33.15)
+moveTo(175.08, 260)
+lineTo(175.08, 253.34)
+moveTo(266.98, 138.48)
+lineTo(257.08, 148.38)
+moveTo(257.96, 107.14)
+lineTo(248.06, 117.04)
+moveTo(59.86, 157.47)
+lineTo(65.41, 151.92)
+lineTo(71.56, 151.92)
+moveTo(243.57, 260)
+lineTo(243.57, 254.44)
+moveTo(0, 166.17)
+lineTo(5.48, 166.17)
+moveTo(95.87, 137.77)
+lineTo(109.87, 137.77)
+moveTo(318.94, 193.76)
+lineTo(304.94, 193.76)
+moveTo(141.53, 194.93)
+lineTo(141.53, 180.93)
+moveTo(93.62, 188.57)
+lineTo(97.38, 184.8)
+lineTo(97.38, 176.12)
+moveTo(7.44, 109.66)
+lineTo(21.44, 109.66)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.438
+beginPath()
+arc(150.43, 171.47, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.636
+beginPath()
+arc(219.47, 142.67, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.556
+beginPath()
+arc(90.94, 137.18, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.1
+beginPath()
+arc(199.72, 147.34, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.914
+beginPath()
+arc(141.53, 180.01, 3.08, 0, 6.28)
+fill()
+shadowBlur = 3
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(133, 253.8, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(227.5, 252.45, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(43.14, 103.31, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(25.64, 103.31, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(1.2, 33.15, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(280.69, 129.34, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(298.19, 129.34, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(270.33, 94.77, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(286.36, 91.22, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(47.48, 169.85, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(32.72, 176.46, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(78.37, 137.77, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(65.56, 149.1, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(147.82, 209.82, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(160.2, 222.19, 0.6, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.293
+beginPath()
+arc(81.24, 200.94, 0.9, 0, 6.28)
+fill()
+shadowColor = #004cff
+fillStyle = #004cff
+globalAlpha = 0.135
+beginPath()
+arc(68.87, 213.31, 0.6, 0, 6.28)
+fill()
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=8.3s phase=3.48 particleTime=8.3 node=400x80 hover particles=energy
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(0, 37.91)
+lineTo(-5, 37.91)
+moveTo(174.22, 80)
+lineTo(174.22, 85)
+moveTo(190.9, 80)
+lineTo(190.9, 85)
+moveTo(203.96, 80)
+lineTo(203.96, 85)
+moveTo(130.5, 80)
+lineTo(130.5, 85)
+moveTo(236.22, 80)
+lineTo(236.22, 85)
+moveTo(333.92, 80)
+lineTo(333.92, 85)
+moveTo(400, 57.26)
+lineTo(405, 57.26)
+moveTo(66.86, 80)
+lineTo(66.86, 85)
+moveTo(0, 22.3)
+lineTo(-5, 22.3)
+moveTo(107.26, 80)
+lineTo(107.26, 85)
+moveTo(281.11, 80)
+lineTo(281.11, 85)
+moveTo(239.49, 80)
+lineTo(239.49, 85)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(0, 37.91)
+lineTo(71.87, 37.91)
+lineTo(80.11, 46.15)
+lineTo(156.33, 46.15)
+moveTo(158.53, 46.15)
+arc(156.33, 46.15, 2.2, 0, 6.28)
+moveTo(174.22, 80)
+lineTo(174.22, 71.54)
+lineTo(221.03, 24.72)
+lineTo(221.03, 19.68)
+moveTo(223.23, 19.68)
+arc(221.03, 19.68, 2.2, 0, 6.28)
+moveTo(190.9, 80)
+lineTo(190.9, 69.19)
+lineTo(219.28, 40.82)
+lineTo(219.28, 26.48)
+moveTo(221.48, 26.48)
+arc(219.28, 26.48, 2.2, 0, 6.28)
+moveTo(203.96, 80)
+lineTo(203.96, 65.61)
+lineTo(174.34, 36)
+lineTo(174.34, 26.23)
+moveTo(176.54, 26.23)
+arc(174.34, 26.23, 2.2, 0, 6.28)
+moveTo(130.5, 80)
+lineTo(130.5, 66.58)
+lineTo(160.56, 36.53)
+lineTo(160.56, 27.3)
+moveTo(162.76, 27.3)
+arc(160.56, 27.3, 2.2, 0, 6.28)
+moveTo(236.22, 80)
+lineTo(236.22, 67.34)
+lineTo(200.2, 31.32)
+lineTo(200.2, 20.26)
+moveTo(202.4, 20.26)
+arc(200.2, 20.26, 2.2, 0, 6.28)
+moveTo(333.92, 80)
+lineTo(333.92, 63.81)
+lineTo(301.9, 31.78)
+lineTo(301.9, 16.49)
+moveTo(304.1, 16.49)
+arc(301.9, 16.49, 2.2, 0, 6.28)
+moveTo(400, 57.26)
+lineTo(365.4, 57.26)
+lineTo(353.88, 45.75)
+lineTo(305.95, 45.75)
+moveTo(308.15, 45.75)
+arc(305.95, 45.75, 2.2, 0, 6.28)
+moveTo(66.86, 80)
+lineTo(66.86, 70.98)
+lineTo(114.64, 23.21)
+lineTo(114.64, 13.5)
+moveTo(116.84, 13.5)
+arc(114.64, 13.5, 2.2, 0, 6.28)
+moveTo(0, 22.3)
+lineTo(27.26, 22.3)
+lineTo(36.43, 31.47)
+lineTo(80.44, 31.47)
+moveTo(82.64, 31.47)
+arc(80.44, 31.47, 2.2, 0, 6.28)
+moveTo(107.26, 80)
+lineTo(107.26, 67.2)
+lineTo(123.31, 51.15)
+lineTo(123.31, 45.38)
+moveTo(125.51, 45.38)
+arc(123.31, 45.38, 2.2, 0, 6.28)
+moveTo(281.11, 80)
+lineTo(281.11, 73.49)
+lineTo(256.66, 49.03)
+lineTo(256.66, 44.55)
+moveTo(258.86, 44.55)
+arc(256.66, 44.55, 2.2, 0, 6.28)
+moveTo(239.49, 80)
+lineTo(239.49, 64.87)
+lineTo(187.44, 12.82)
+lineTo(187.44, 6)
+moveTo(189.64, 6)
+arc(187.44, 6, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(0, 37.91)
+lineTo(13.64, 37.91)
+moveTo(174.22, 78.65)
+lineTo(174.22, 71.54)
+lineTo(179.09, 66.67)
+moveTo(190.9, 80)
+lineTo(190.9, 69.19)
+lineTo(191.5, 68.59)
+moveTo(203.96, 68.77)
+lineTo(203.96, 65.61)
+lineTo(196.29, 57.95)
+moveTo(130.5, 80)
+lineTo(130.5, 70.35)
+moveTo(203.12, 34.24)
+lineTo(200.2, 31.32)
+lineTo(200.2, 21.45)
+moveTo(329.75, 59.64)
+lineTo(319.86, 49.74)
+moveTo(356.82, 48.68)
+lineTo(353.88, 45.75)
+lineTo(344.03, 45.75)
+moveTo(90.67, 47.17)
+lineTo(100.57, 37.27)
+moveTo(63.1, 31.47)
+lineTo(77.1, 31.47)
+moveTo(116.61, 57.85)
+lineTo(123.31, 51.15)
+lineTo(123.31, 46.62)
+moveTo(271.56, 63.93)
+lineTo(261.66, 54.03)
+moveTo(239.49, 80)
+lineTo(239.49, 77.64)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.288
+beginPath()
+arc(156.33, 46.15, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.867
+beginPath()
+arc(200.2, 20.26, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.669
+beginPath()
+arc(80.44, 31.47, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.749
+beginPath()
+arc(123.31, 45.38, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.795
+beginPath()
+arc(187.44, 6, 3.08, 0, 6.28)
+fill()
+shadowBlur = 3
+shadowColor = #f986e5
+fillStyle = #f986e5
+globalAlpha = 0.293
+beginPath()
+arc(215.5, 46.62, 0.9, 0, 6.28)
+fill()
+shadowColor = #f986bf
+fillStyle = #f986bf
+globalAlpha = 0.135
+beginPath()
+arc(227.87, 58.99, 0.6, 0, 6.28)
+fill()
+shadowColor = #f98699
+fillStyle = #f98699
+globalAlpha = 0.293
+beginPath()
+arc(333.92, 75.41, 0.9, 0, 6.28)
+fill()
+shadowColor = #f9bf86
+fillStyle = #f9bf86
+globalAlpha = 0.293
+beginPath()
+arc(370.76, 57.26, 0.9, 0, 6.28)
+fill()
+shadowColor = #f9e586
+fillStyle = #f9e586
+globalAlpha = 0.135
+beginPath()
+arc(388.26, 57.26, 0.6, 0, 6.28)
+fill()
+shadowColor = #e5f986
+fillStyle = #e5f986
+globalAlpha = 0.293
+beginPath()
+arc(78.3, 59.54, 0.9, 0, 6.28)
+fill()
+shadowColor = #bff986
+fillStyle = #bff986
+globalAlpha = 0.135
+beginPath()
+arc(66.86, 72.3, 0.6, 0, 6.28)
+fill()
+shadowColor = #99f986
+fillStyle = #99f986
+globalAlpha = 0.293
+beginPath()
+arc(45.6, 31.47, 0.9, 0, 6.28)
+fill()
+shadowColor = #86f999
+fillStyle = #86f999
+globalAlpha = 0.135
+beginPath()
+arc(30.54, 25.58, 0.6, 0, 6.28)
+fill()
+shadowColor = #86f9bf
+fillStyle = #86f9bf
+globalAlpha = 0.293
+beginPath()
+arc(107.26, 71.47, 0.9, 0, 6.28)
+fill()
+shadowColor = #86e6f9
+fillStyle = #86e6f9
+globalAlpha = 0.293
+beginPath()
+arc(281.11, 77.48, 0.9, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 7.5
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 400, 80)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0
+# t=10.9s phase=4.57 particleTime=10.9 node=140x46 particles=quantum
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 51)
+moveTo(42.96, 46)
+lineTo(42.96, 51)
+moveTo(140, 17.24)
+lineTo(145, 17.24)
+moveTo(140, 35.66)
+lineTo(145, 35.66)
+moveTo(30.52, 46)
+lineTo(30.52, 51)
+moveTo(36.17, 46)
+lineTo(36.17, 51)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 35.48)
+lineTo(47.5, 19.38)
+lineTo(47.5, 13.12)
+moveTo(49.7, 13.12)
+arc(47.5, 13.12, 2.2, 0, 6.28)
+moveTo(42.96, 46)
+lineTo(42.96, 37.67)
+lineTo(54.2, 26.43)
+lineTo(54.2, 19.86)
+moveTo(56.4, 19.86)
+arc(54.2, 19.86, 2.2, 0, 6.28)
+moveTo(140, 17.24)
+lineTo(121.84, 17.24)
+lineTo(113.6, 25.48)
+lineTo(88.68, 25.48)
+moveTo(90.88, 25.48)
+arc(88.68, 25.48, 2.2, 0, 6.28)
+moveTo(140, 35.66)
+lineTo(127.58, 35.66)
+lineTo(119.71, 27.79)
+lineTo(106.88, 27.79)
+moveTo(109.08, 27.79)
+arc(106.88, 27.79, 2.2, 0, 6.28)
+moveTo(30.52, 46)
+lineTo(30.52, 34.39)
+lineTo(47.35, 17.57)
+lineTo(47.35, 9.17)
+moveTo(49.55, 9.17)
+arc(47.35, 9.17, 2.2, 0, 6.28)
+moveTo(36.17, 46)
+lineTo(36.17, 41.82)
+lineTo(45.3, 32.69)
+lineTo(45.3, 23.62)
+moveTo(47.5, 23.62)
+arc(45.3, 23.62, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(31.4, 46)
+lineTo(31.4, 39.33)
+moveTo(42.96, 46)
+lineTo(42.96, 37.67)
+lineTo(43.08, 37.55)
+moveTo(139.66, 17.24)
+lineTo(125.66, 17.24)
+moveTo(137.07, 35.66)
+lineTo(127.58, 35.66)
+lineTo(124.39, 32.47)
+moveTo(30.52, 46)
+lineTo(30.52, 35.86)
+moveTo(36.17, 46)
+lineTo(36.17, 44.24)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.438
+beginPath()
+arc(45.3, 23.62, 3.08, 0, 6.28)
+fill()
+shadowBlur = 3
+restore()
+# gradients=0 shadowBlurSets=4 path2d=0
+# t=13.4s phase=5.61 particleTime=13.4 node=220x120 selected particles=aurora
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+lineJoin = round
+strokeStyle = #fb00ff
+lineWidth = 2
+globalAlpha = 0.8
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 125)
+moveTo(0, 44.52)
+lineTo(-5, 44.52)
+moveTo(0, 74.08)
+lineTo(-5, 74.08)
+moveTo(152.15, 120)
+lineTo(152.15, 125)
+moveTo(220, 77.48)
+lineTo(225, 77.48)
+moveTo(220, 47.55)
+lineTo(225, 47.55)
+moveTo(89.76, 120)
+lineTo(89.76, 125)
+moveTo(111.84, 120)
+lineTo(111.84, 125)
+moveTo(0, 103.03)
+lineTo(-5, 103.03)
+moveTo(220, 53.77)
+lineTo(225, 53.77)
+moveTo(0, 62.77)
+lineTo(-5, 62.77)
+stroke()
+lineWidth = 1.2
+globalAlpha = 0.45
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 107.44)
+lineTo(85.26, 80.64)
+lineTo(85.26, 65.43)
+moveTo(87.46, 65.43)
+arc(85.26, 65.43, 2.2, 0, 6.28)
+moveTo(0, 44.52)
+lineTo(30.61, 44.52)
+lineTo(46.84, 60.74)
+lineTo(83.97, 60.74)
+moveTo(86.17, 60.74)
+arc(83.97, 60.74, 2.2, 0, 6.28)
+moveTo(0, 74.08)
+lineTo(43.41, 74.08)
+lineTo(52.42, 65.08)
+lineTo(81.16, 65.08)
+moveTo(83.36, 65.08)
+arc(81.16, 65.08, 2.2, 0, 6.28)
+moveTo(152.15, 120)
+lineTo(152.15, 98.8)
+lineTo(137.94, 84.59)
+lineTo(137.94, 73.58)
+moveTo(140.14, 73.58)
+arc(137.94, 73.58, 2.2, 0, 6.28)
+moveTo(220, 77.48)
+lineTo(198.04, 77.48)
+lineTo(178.25, 57.69)
+lineTo(151.74, 57.69)
+moveTo(153.94, 57.69)
+arc(151.74, 57.69, 2.2, 0, 6.28)
+moveTo(220, 47.55)
+lineTo(181.72, 47.55)
+lineTo(173.32, 55.94)
+lineTo(160.67, 55.94)
+moveTo(162.87, 55.94)
+arc(160.67, 55.94, 2.2, 0, 6.28)
+moveTo(89.76, 120)
+lineTo(89.76, 103.73)
+lineTo(109.5, 83.99)
+lineTo(109.5, 68.02)
+moveTo(111.7, 68.02)
+arc(109.5, 68.02, 2.2, 0, 6.28)
+moveTo(111.84, 120)
+lineTo(111.84, 97.86)
+lineTo(85.08, 71.1)
+lineTo(85.08, 63.67)
+moveTo(87.28, 63.67)
+arc(85.08, 63.67, 2.2, 0, 6.28)
+moveTo(0, 103.03)
+lineTo(20.22, 103.03)
+lineTo(41.78, 81.47)
+lineTo(63.79, 81.47)
+moveTo(65.99, 81.47)
+arc(63.79, 81.47, 2.2, 0, 6.28)
+moveTo(220, 53.77)
+lineTo(176.75, 53.77)
+lineTo(164.9, 65.61)
+lineTo(138.1, 65.61)
+moveTo(140.3, 65.61)
+arc(138.1, 65.61, 2.2, 0, 6.28)
+moveTo(0, 62.77)
+lineTo(30.76, 62.77)
+lineTo(42.08, 51.45)
+lineTo(56.84, 51.45)
+moveTo(59.04, 51.45)
+arc(56.84, 51.45, 2.2, 0, 6.28)
+stroke()
+lineCap = round
+shadowColor = #ffb300
+strokeStyle = #ffb300
+shadowBlur = 7.5
+lineWidth = 2
+globalAlpha = 0.95
+beginPath()
+moveTo(112.06, 120)
+lineTo(112.06, 107.44)
+lineTo(111.17, 106.55)
+moveTo(14.8, 44.52)
+lineTo(28.8, 44.52)
+moveTo(11.77, 74.08)
+lineTo(25.77, 74.08)
+moveTo(152.15, 107.48)
+lineTo(152.15, 98.8)
+lineTo(148.39, 95.04)
+moveTo(213.12, 77.48)
+lineTo(199.12, 77.48)
+moveTo(220, 47.55)
+lineTo(213.15, 47.55)
+moveTo(93.67, 99.82)
+lineTo(103.57, 89.92)
+moveTo(102.14, 88.16)
+lineTo(92.24, 78.26)
+moveTo(36.24, 87.01)
+lineTo(41.78, 81.47)
+lineTo(47.94, 81.47)
+moveTo(220, 53.77)
+lineTo(212.59, 53.77)
+moveTo(0, 62.77)
+lineTo(5.84, 62.77)
+stroke()
+shadowColor = #9d00ff
+fillStyle = #9d00ff
+globalAlpha = 0.091
+beginPath()
+arc(160.67, 55.94, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.289
+beginPath()
+arc(138.1, 65.61, 3.08, 0, 6.28)
+fill()
+globalAlpha = 0.209
+beginPath()
+arc(56.84, 51.45, 3.08, 0, 6.28)
+fill()
+shadowBlur = 3
+shadowColor = #59f8b9
+fillStyle = #59f8b9
+globalAlpha = 0.293
+beginPath()
+arc(89.76, 115.7, 0.9, 0, 6.28)
+fill()
+shadowColor = #59f859
+fillStyle = #59f859
+globalAlpha = 0.293
+beginPath()
+arc(111.84, 101.64, 0.9, 0, 6.28)
+fill()
+shadowColor = #59f879
+fillStyle = #59f879
+globalAlpha = 0.135
+beginPath()
+arc(111.84, 119.14, 0.6, 0, 6.28)
+fill()
+shadowColor = #59f899
+fillStyle = #59f899
+globalAlpha = 0.293
+beginPath()
+arc(23.86, 99.38, 0.9, 0, 6.28)
+fill()
+shadowColor = #59f8b9
+fillStyle = #59f8b9
+globalAlpha = 0.135
+beginPath()
+arc(7.87, 103.03, 0.6, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=0 shadowBlurSets=5 path2d=0

@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Circuit Trace', 7], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -124,8 +124,8 @@ describe('what node effects make', () => {
                 made.push(gradients(canvas));
             }
             expect(made[1], name).toBe(made[0]);
-            // Flower of Life strokes and fills in its colours alone.
-            if (animate !== 5) expect(made[0], name).toBeGreaterThan(0);
+            // Flower of Life and Circuit Trace stroke and fill in their colours alone.
+            if (animate !== 5 && animate !== 7) expect(made[0], name).toBeGreaterThan(0);
             preview('📦 Enhanced Nodes.Static.Mode', true);
             const canvas = app.canvas as unknown as FakeCanvas;
             frames(2);
@@ -174,9 +174,10 @@ describe('node effects', () => {
                 // A gradient's label counts the gradients made before it, which a part makes fewer of.
                 return rec.paints.map((p) => JSON.stringify({ ...p, style: p.style.replace(/^grad\d+$/, 'gradient') }));
             };
-            if (animate === 4 || animate === 5) {
-                // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path, and Flower of
-                // Life its circles and its rings: the parts draw the pieces of those paths that reach them.
+            if (animate === 4 || animate === 5 || animate === 7) {
+                // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path, Flower of Life
+                // its circles and its rings, and Circuit Trace its pins, traces and pulses: the parts draw the pieces of
+                // those paths that reach them.
                 const pieces = (sides: number) => {
                     const rec = new CanvasRecorder();
                     const part = { sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 };
@@ -606,11 +607,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -643,7 +644,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -666,7 +667,7 @@ describe('the node menu', () => {
     it('ignore what a workflow holds there that is not a choice, and write nothing as nodes are drawn or the menu is built', async () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER, { pos: [700, 300] }, { pos: [300, 700] }] });
         const [odd, kept, bare] = canvas.graph._nodes;
-        odd.properties = { enhanced_fx_style: 7, enhanced_fx_particles_only: 'yes', enhanced_fx_completion: 'loud' };
+        odd.properties = { enhanced_fx_style: 99, enhanced_fx_particles_only: 'yes', enhanced_fx_completion: 'loud' };
         kept.properties = { enhanced_fx_style: 4, enhanced_fx_completion: 'primary', other: 1 };
         const before = JSON.stringify([odd.properties, kept.properties]);
         const from = canvas.front.paints.length;
@@ -862,5 +863,71 @@ describe('Jelly', () => {
         expect(wobbled).toBe(true);
         settle(canvas);
         expect(ends()).toBe(rest);
+    });
+});
+
+describe('Circuit Trace', () => {
+    const CIRCUIT = 7;
+    /** The node clock `t` s in at speed 1. */
+    const at = (t: number) => ({ nodePhase: ((2 * Math.PI) / 15) * t, particleTime: t, nodeTime: t });
+    /** What Circuit Trace draws whole on a 220 × 120 node with id `id`, `t` s in. */
+    async function drawn(t: number, settings: Record<string, unknown> = {}, id = 1) {
+        await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': CIRCUIT, ...settings }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, CIRCUIT, { id, title: 'KSampler', size: [220, 120] }, 220, 120, at(t), WHOLE, 1, false);
+        return rec;
+    }
+    /** Its pads, where they are: the rings of 2.2 px it strokes at Animation.Size 1. */
+    const pads = (rec: CanvasRecorder) => rec.lines.flatMap((line) => {
+        const m = /^arc\(([^,]+), ([^,]+), 2\.2, /.exec(line);
+        return m ? [`${m[1]}, ${m[2]}`] : [];
+    });
+    /** How brightly each pad is lit: the fills in its accent, by where they are. */
+    const lit = (rec: CanvasRecorder) => new Map(rec.paints.filter((p) => p.op === 'fill' && p.style === '#ffd54f').map((p) => [`${fmt((p.box![0] + p.box![2]) / 2)}, ${fmt((p.box![1] + p.box![3]) / 2)}`, p.globalAlpha]));
+
+    it('lays a trace in from a pin for each 100 px of its sides and foot at Balanced, more at Rich, fewer at Fast, the same for a node every frame and its own for each node', async () => {
+        const balanced = pads(await drawn(1));
+        // 1.6 a 100 px of 2 × 120 + 220.
+        expect(balanced).toHaveLength(7);
+        expect(pads(await drawn(1, { '📦 Enhanced Nodes.Quality': 3 }))).toHaveLength(11);
+        expect(pads(await drawn(1, { '📦 Enhanced Nodes.Quality': 1 }))).toHaveLength(5);
+        expect(pads(await drawn(2.3))).toEqual(balanced);
+        expect(pads(await drawn(1, {}, 2))).not.toEqual(balanced);
+        // Each pad inside the body, clear of its edges.
+        for (const pad of balanced) {
+            const [x, y] = pad.split(', ').map(Number);
+            expect(x >= 6 && x <= 214 && y >= 6 && y <= 114, pad).toBe(true);
+        }
+    });
+
+    it('lights each pad once a pulse, as the pulse gets to it, every 2.4 s at speed 1', async () => {
+        const seen = new Map<string, number[]>();
+        const frames = 72;
+        for (let i = 0; i < frames; i++) {
+            const rec = await drawn((2.4 * i) / frames);
+            for (const pad of pads(rec)) if (!seen.has(pad)) seen.set(pad, []);
+            const now = lit(rec);
+            for (const [pad, alphas] of seen) alphas.push(now.get(pad) ?? 0);
+        }
+        expect(seen.size).toBe(7);
+        for (const [pad, alphas] of seen) {
+            // Once round, the glow up to full and down to nothing.
+            expect(Math.max(...alphas), pad).toBeGreaterThan(0.85);
+            const rises = alphas.filter((a, i) => a > 0 && !(alphas[(i + frames - 1) % frames] > 0)).length;
+            expect(rises, pad).toBe(1);
+        }
+    });
+
+    it('holds still in one pose, whatever the clock', async () => {
+        const still = async (t: number) => (await drawn(t, { '📦 Enhanced Nodes.Static.Mode': true, [PARTICLE_SHOW]: true })).trace();
+        expect(await still(9.7)).toBe(await still(0.3));
+    });
+
+    it('stands its pins out of the edges, which the under part draws', async () => {
+        const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': CIRCUIT }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, CIRCUIT, canvas.graph._nodes[0], 220, 120, at(1), { sides: UNDER, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 }, 1, false);
+        const pins = rec.lines.filter((line) => /^lineTo\((-5|225), /.test(line) || /^lineTo\([^,]+, 125\)$/.test(line));
+        expect(pins).toHaveLength(7);
     });
 });

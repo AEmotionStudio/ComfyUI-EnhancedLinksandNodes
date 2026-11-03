@@ -9,8 +9,9 @@
  * stylesheet draws them as a glow behind the node, from just outside ComfyUI's
  * own outlines: Gentle Pulse's breathes, Neon Nexus holds a neon edge, Cosmic
  * Ripple sends a ring out, Sacred Rosette's turns about the node and Flower
- * of Life's blooms and fades with its cycle, and Jelly bounces its node as it
- * is dropped, selected or finished by a run, in the
+ * of Life's blooms and fades with its cycle, Jelly bounces its node as it
+ * is dropped, selected or finished by a run, and Circuit Trace's dashed edge
+ * pulses with its traces, in the
  * effects' own colours, with the halo, which is all that shows with the
  * particles alone; a selected, running or failed node glows steadily, and a
  * collapsed one, which classic mode draws no effect on, only with its run. They
@@ -39,7 +40,7 @@ type Canvas = typeof app.canvas;
 type Node = InstanceType<typeof LGraphNode>;
 
 /** data-eln-fx by Animate value. */
-const FX = ['', 'gentle', 'neon', 'cosmic', 'rosette', 'flower', 'jelly'];
+const FX = ['', 'gentle', 'neon', 'cosmic', 'rosette', 'flower', 'jelly', 'circuit'];
 /** What a node's element shows, as a number: its effect in the low four bits (EFFECT), 0 for none, and these. */
 const EFFECT = 15;
 const SELECTED = 16;
@@ -49,9 +50,9 @@ const BYPASSED = 128;
 const MUTED = 256;
 const ONLY = 512;
 const COLLAPSED = 1024;
-/** What shows a steady glow, if any, whatever its effect; and the effects whose glow moves: Gentle Pulse's, Cosmic Ripple's, Sacred Rosette's and Flower of Life's. */
+/** What shows a steady glow, if any, whatever its effect; and the effects whose glow moves: Gentle Pulse's, Cosmic Ripple's, Sacred Rosette's, Flower of Life's and Circuit Trace's. */
 const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
-const MOVES = [false, true, false, true, true, true, false];
+const MOVES = [false, true, false, true, true, true, false, true];
 const ATTRIBUTES = ['data-eln-fx', 'data-eln-only', 'data-eln-collapsed', 'data-eln-sel', 'data-eln-run', 'data-eln-mode'];
 
 /** The pane observed, the stylesheet and the settings it was written for, and what the page's root says of the effects' pace. */
@@ -157,6 +158,7 @@ function stylesheet(): string {
         `.lg-node[data-eln-fx=rosette]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? 'reverse' : 'normal'}}`,
         `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-bloom ${period(16)} ease-in-out infinite ${N.direction < 0 ? 'reverse' : 'normal'}}`,
         `.lg-node[data-eln-fx=jelly]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)}}`,
+        `.lg-node[data-eln-fx=circuit]::after{border:1.5px dashed var(--eln-c2);box-shadow:${withHalo(`0 0 4px var(--eln-c1), 0 0 ${bloom}px ${light}`)};animation:eln-breathe ${period(2.4)} ease-in-out infinite alternate}`,
         `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
         `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo || 'none'};animation:none}`,
         '.lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}',
