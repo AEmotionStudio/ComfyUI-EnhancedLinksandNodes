@@ -1,0 +1,436 @@
+# Jelly
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad1 = createLinearGradient(0, -30, 0, 46)
+grad1.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad1.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad1
+fillRect(0, -30, 140, 76)
+grad2 = createRadialGradient(39.2, -17.84, 0, 39.2, -17.84, 38)
+grad2.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad2.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad2.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad2
+fillRect(0, -30, 140, 76)
+lineWidth = 1
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(90.19, 24.11, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(75.26, -0.88, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(20.77, -8.1, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=0.4s phase=0.17 particleTime=0.4 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad3 = createLinearGradient(0, -30, 0, 120)
+grad3.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad3.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad3
+fillRect(0, -30, 220, 150)
+grad4 = createRadialGradient(61.6, -6, 0, 61.6, -6, 75)
+grad4.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad4.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad4.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad4
+fillRect(0, -30, 220, 150)
+lineWidth = 1
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(143.88, 71.19, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(117.23, 19.52, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(29.36, 4.36, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=0.9s phase=0.38 particleTime=0.9 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad5 = createLinearGradient(0, -30, 0, 260)
+grad5.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad5.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad5
+fillRect(0, -30, 320, 290)
+grad6 = createRadialGradient(89.6, 16.4, 0, 89.6, 16.4, 145)
+grad6.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad6.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad6.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad6
+fillRect(0, -30, 320, 290)
+lineWidth = 1
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(209.07, 164.89, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(167.27, 62.73, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(39.41, 32.57, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=1.9s phase=0.8 particleTime=1.9 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad7 = createLinearGradient(0, -30, 0, 80)
+grad7.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad7.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad7
+fillRect(0, -30, 400, 110)
+grad8 = createRadialGradient(112, -12.4, 0, 112, -12.4, 55)
+grad8.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad8.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad8.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad8
+fillRect(0, -30, 400, 110)
+lineWidth = 1
+globalAlpha = 0.55
+strokeStyle = #ffb300
+beginPath()
+arc(255.86, 14.85, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.3
+strokeStyle = #ffb300
+beginPath()
+arc(204.84, -22.4, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.36
+strokeStyle = #ffb300
+beginPath()
+arc(50.16, 69.47, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# Jelly with other v1 settings
+# t=1.5s phase=0.63 particleTime=1.5 node=140x46 particles=default
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad1 = createLinearGradient(0, -30, 0, 46)
+grad1.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad1.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad1
+fillRect(0, -30, 140, 76)
+grad2 = createRadialGradient(39.2, -17.84, 0, 39.2, -17.84, 38)
+grad2.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad2.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad2.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad2
+fillRect(0, -30, 140, 76)
+lineWidth = 1
+globalAlpha = 0.275
+strokeStyle = #ffb300
+beginPath()
+arc(90.62, -2.89, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.032
+strokeStyle = #ffb300
+beginPath()
+arc(70.47, 41.97, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.228
+strokeStyle = #ffb300
+beginPath()
+arc(15.17, 33.63, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=3.7s phase=1.55 particleTime=3.7 node=220x120 selected particles=rainbow
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad3 = createLinearGradient(0, -30, 0, 120)
+grad3.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad3.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad3
+fillRect(0, -30, 220, 150)
+grad4 = createRadialGradient(61.6, -6, 0, 61.6, -6, 75)
+grad4.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad4.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad4.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad4
+fillRect(0, -30, 220, 150)
+lineWidth = 1
+globalAlpha = 0.275
+strokeStyle = #86eff9
+beginPath()
+arc(144.43, 11.79, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #86b6f9
+beginPath()
+arc(116.87, 103.97, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #8f86f9
+beginPath()
+arc(28.43, 87.7, 2.63, 0, 6.28)
+stroke()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=2 shadowBlurSets=3 path2d=0
+# t=6.1s phase=2.56 particleTime=6.1 node=320x260 particles=complementary
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad5 = createLinearGradient(0, -30, 0, 260)
+grad5.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad5.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad5
+fillRect(0, -30, 320, 290)
+grad6 = createRadialGradient(89.6, 16.4, 0, 89.6, 16.4, 145)
+grad6.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad6.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad6.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad6
+fillRect(0, -30, 320, 290)
+lineWidth = 1
+globalAlpha = 0.275
+strokeStyle = #004cff
+beginPath()
+arc(205.08, 71.29, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.131
+strokeStyle = #004cff
+beginPath()
+arc(168.04, 252.98, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #004cff
+beginPath()
+arc(44.24, 221.7, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=8.3s phase=3.48 particleTime=8.3 node=400x80 hover particles=energy
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad7 = createLinearGradient(0, -30, 0, 80)
+grad7.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad7.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad7
+fillRect(0, -30, 400, 110)
+grad8 = createRadialGradient(112, -12.4, 0, 112, -12.4, 55)
+grad8.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad8.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad8.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad8
+fillRect(0, -30, 400, 110)
+lineWidth = 1
+globalAlpha = 0.275
+strokeStyle = #99f986
+beginPath()
+arc(255.36, 2.6, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.226
+strokeStyle = #86f999
+beginPath()
+arc(204.98, 70.1, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #86f9bf
+beginPath()
+arc(50.82, 57, 2.63, 0, 6.28)
+stroke()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 7.5
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 400, 80)
+restore()
+restore()
+# gradients=2 shadowBlurSets=3 path2d=0
+# t=10.9s phase=4.57 particleTime=10.9 node=140x46 particles=quantum
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad9 = createLinearGradient(0, -30, 0, 46)
+grad9.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad9.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad9
+fillRect(0, -30, 140, 76)
+grad10 = createRadialGradient(39.2, -17.84, 0, 39.2, -17.84, 38)
+grad10.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad10.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad10.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad10
+fillRect(0, -30, 140, 76)
+lineWidth = 1
+globalAlpha = 0.21
+strokeStyle = #cd0b3e
+beginPath()
+arc(90.76, 34.77, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #cd0b25
+beginPath()
+arc(70.57, 12.47, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #8c0bcd
+beginPath()
+arc(15.13, 1.9, 2.63, 0, 6.28)
+stroke()
+restore()
+# gradients=2 shadowBlurSets=2 path2d=0
+# t=13.4s phase=5.61 particleTime=13.4 node=220x120 selected particles=aurora
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+globalAlpha = 0.8
+grad11 = createLinearGradient(0, -30, 0, 120)
+grad11.addColorStop(0, rgba(255, 179, 0, 0.2))
+grad11.addColorStop(1, rgba(251, 0, 255, 0.08))
+fillStyle = grad11
+fillRect(0, -30, 220, 150)
+grad12 = createRadialGradient(61.6, -6, 0, 61.6, -6, 75)
+grad12.addColorStop(0, rgba(255, 255, 255, 0.28))
+grad12.addColorStop(0.5, rgba(255, 255, 255, 0.08))
+grad12.addColorStop(1, rgba(255, 255, 255, 0))
+fillStyle = grad12
+fillRect(0, -30, 220, 150)
+lineWidth = 1
+globalAlpha = 0.18
+strokeStyle = #59f879
+beginPath()
+arc(144.72, -19.86, 2.52, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #59f899
+beginPath()
+arc(115.68, 73.22, 2.08, 0, 6.28)
+stroke()
+globalAlpha = 0.275
+strokeStyle = #59f8b9
+beginPath()
+arc(26.85, 55.83, 2.63, 0, 6.28)
+stroke()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=2 shadowBlurSets=3 path2d=0

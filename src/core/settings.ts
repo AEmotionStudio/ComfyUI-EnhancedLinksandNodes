@@ -155,6 +155,7 @@ export const NODE_ANIMATION_OPTIONS = [
     { value: 3, text: 'Cosmic Ripple' },
     { value: 4, text: 'Sacred Rosette' },
     { value: 5, text: 'Flower of Life' },
+    { value: 6, text: 'Jelly' },
 ] as const;
 
 const PARTICLE_COLOR_MODE_OPTIONS = [

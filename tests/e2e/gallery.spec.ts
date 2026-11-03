@@ -55,6 +55,7 @@ const NODE_SCENES: Scene[] = [
     { name: 'Cosmic Ripple', settings: { '📦 Enhanced Nodes.Animate': 3 } },
     { name: 'Sacred Rosette', settings: { '📦 Enhanced Nodes.Animate': 4 } },
     { name: 'Flower of Life', settings: { '📦 Enhanced Nodes.Animate': 5 } },
+    { name: 'Jelly', settings: { '📦 Enhanced Nodes.Animate': 6 } },
     { name: 'Gentle Pulse with particles', settings: { '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true } },
     {
         name: 'Cosmic Ripple at full energy with particles',
@@ -242,6 +243,7 @@ const NODE_EFFECTS: [number, string, string][] = [
     [3, 'Cosmic Ripple', 'Rings rippling out from the centre of each node, in a corona of motes circling it.'],
     [4, 'Sacred Rosette', "v1's Flower of Life, renamed: a rosette of circles turning on each node, each ring now closed, with dots circling its points."],
     [5, 'Flower of Life', 'New in v3: the true Flower of Life, nineteen circles drawing themselves in round each node, the Seed of Life first, then turning slowly in bloom, with sparks running round them.'],
+    [6, 'Jelly', 'New in v3: a gel tint and gloss on each node, bubbles rising through it, and the node itself wobbling as it is dragged, dropped, selected or finished by a run.'],
 ];
 
 const TITLE_NAMES = { neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal' };

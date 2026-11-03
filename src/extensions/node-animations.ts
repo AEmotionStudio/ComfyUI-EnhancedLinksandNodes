@@ -22,10 +22,11 @@
 
 import type { ComfyExtension } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { N, nodeSettings } from '@/core/settings';
+import { L, N, nodeSettings } from '@/core/settings';
 import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, effectOf, holdsStill, ownStyle, reach as effectReach, type Part } from '@/nodes/effects';
+import { JELLY, shake, shapeNode, startShaking, wobbles, wobbling } from '@/nodes/jelly';
 import { drawTitle, titleOf } from '@/nodes/text';
 import { vueNodes } from '@/nodes/vue';
 import { COMPLETION, drawBursts } from '@/fx/bursts';
@@ -137,9 +138,11 @@ function halo(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node, style: 
 
 /**
  * The under-layer, before the link motion and every node: each node's halo, and what its effect draws around its body.
- * It takes the nodes whose box, grown by their effect's reach, is on screen, and counts what moves.
+ * It takes the nodes whose box, grown by their effect's reach, is on screen, and counts what moves. Each jelly node's
+ * spring moves on first, and while one wobbles, its links are drawn again with it.
  */
 function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
+    startShaking(canvas);
     vueNodes(canvas);
     const { graph } = canvas;
     if (!graph) return;
@@ -154,6 +157,7 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     const scale = ctx.getTransform().a;
     for (const node of graph.nodes) {
         const style = styleOf(node);
+        if (style === JELLY) shake(node);
         const only = style !== undefined && (vue || particlesOnly(node, style));
         const shown = style !== undefined && !far && draws(only) && !guard.off(keyOf(style));
         const glows = !vue && lit(canvas, style);
@@ -162,7 +166,8 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
         // Where drawTitleText draws the styled title: not for a node that draws its own, nor one without a title bar.
         if (titles && node.title && !node.onDrawTitleText && node.title_mode !== NO_TITLE) live.nodes++;
         if (shown && moving) {
-            if (style) live.nodes++;
+            // Jelly moves only while it wobbles, which `wobbling` counts.
+            if (style && style !== JELLY) live.nodes++;
             if (N.particleShow) live.particles++;
         }
         if (!glows && (!shown || reach <= 0)) continue;
@@ -171,6 +176,7 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
             ctx.translate(node.pos[0], node.pos[1]);
             if (glows) halo(canvas, ctx, node, style, scale);
             if (shown && reach > 0) {
+                shapeNode(ctx, node);
                 // Around the body only: the over-layer draws what falls on it.
                 ctx.beginPath();
                 ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
@@ -183,6 +189,10 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
         } finally {
             ctx.restore();
         }
+    }
+    if (wobbling) {
+        live.nodes += wobbling;
+        if (L.enabled) canvas.setDirty(true, true);
     }
     if (live.nodes || live.particles) wake();
 }
@@ -236,8 +246,22 @@ const ext: ComfyExtension = {
             }
         };
 
-        const { drawNodeShape } = LGraphCanvas.prototype;
+        const { drawNode, drawNodeShape } = LGraphCanvas.prototype;
         const { drawTitleText } = LGraphNode.prototype;
+
+        // A jelly node, while it wobbles, in its shape: native draws it in the node's own space (FE157 LGraphCanvas.ts
+        // L5172, FE1395 L4824).
+        LGraphCanvas.prototype.drawNode = function (this: Canvas, ...args: Parameters<Canvas['drawNode']>) {
+            const [node, ctx] = args;
+            if (!wobbles(node)) return drawNode.apply(this, args);
+            ctx.save();
+            try {
+                shapeNode(ctx, node);
+                return drawNode.apply(this, args);
+            } finally {
+                ctx.restore();
+            }
+        };
 
         // The node's body, which casts no shadow where the under-layer cast its halo in native's stead. Then the over-layer:
         // what the effect draws on the body, clipped to it, under the slots and widgets; the under-layer drew the rest.

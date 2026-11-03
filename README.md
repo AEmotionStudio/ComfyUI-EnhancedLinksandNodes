@@ -54,7 +54,7 @@
 ### 💫 Nodes
 ![Node effects](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/nodes.webp)
 
-*   **5 effects**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Sacred Rosette (v1's Flower of Life, its rings now closed), drawn over the node at v1's strength, and the new **Flower of Life**: nineteen circles that draw themselves in, the Seed of Life first, then bloom and turn, with a halo and a glowing frame on selected nodes.
+*   **6 effects**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Sacred Rosette (v1's Flower of Life, its rings now closed), drawn over the node at v1's strength; the new **Flower of Life**, nineteen circles that draw themselves in, the Seed of Life first, then bloom and turn; and **Jelly**, which makes the node itself wobble like gel as you drag, drop or select it and as its run finishes, then settle still, with a halo and a glowing frame on selected nodes.
 *   **Particles** with or without an effect, in 6 color modes.
 *   **5 title styles** and a **Node FX** menu to give one node its own effect.
 

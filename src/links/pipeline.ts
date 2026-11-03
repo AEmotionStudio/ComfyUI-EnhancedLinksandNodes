@@ -34,11 +34,12 @@
  * @module links/pipeline
  */
 
-import type { CanvasColour, LLink, Point, Reroute } from '@comfyorg/comfyui-frontend-types';
+import type { CanvasColour, LLink, Reroute } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, revision, wired } from '@/core/settings';
 import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, steps, wake, zoomedOut } from '@/core/engine';
 import { HIGHLIGHT, dark, palette, type Palette } from '@/core/colors';
+import { moved, wobbling } from '@/nodes/jelly';
 import { drawFlows, flowsShown, linkPass, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { MOVING, STROKES, moving } from './animations';
@@ -569,11 +570,16 @@ const own = (canvas: Canvas, link: LLink, color: CanvasColour | null): Palette =
  */
 const keyOf = (link: LLink, extras: RenderLink[9]): number => (extras?.reroute ? 3 * extras.reroute.id + 1 : 3 * link.id + (extras?.disabled ? 2 : 0));
 
+/** Where a jelly node's wobble moves the ends of a segment of its link to. */
+const startAt = new Float64Array(2);
+const endAt = new Float64Array(2);
+
 /**
  * Records the segment of a renderLink call from the arguments native gets, along native's path where native draws it;
- * `focused` if selection focus holds it, with the run's `flow` into its node.
+ * `focused` if selection focus holds it, with the run's `flow` into its node. Its ends at the slots of a jelly node that
+ * wobbles go with the node's shape.
  */
-function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Point>, color: CanvasColour | null,
+function record(canvas: Canvas, link: LLink, a: Readonly<ArrayLike<number>>, b: Readonly<ArrayLike<number>>, color: CanvasColour | null,
     startDir: number, endDir: number, extras: RenderLink[9], focused: boolean, flow: Step | undefined): Segment {
     if (open && pool[count - 1].link !== link) close();
     if (!open) first = count;
@@ -591,8 +597,16 @@ function record(canvas: Canvas, link: LLink, a: Readonly<Point>, b: Readonly<Poi
     // The reroute the segment starts from (LinkSegment.parentId), where the segment into it ended; none where the link starts.
     const from = canvas.graph?.getReroute((reroute ?? link).parentId);
     segment.link = link;
+    let shaped = false;
+    if (wobbling) {
+        const origin = from ? undefined : canvas.graph?.getNodeById(link.origin_id);
+        const target = reroute ? undefined : canvas.graph?.getNodeById(link.target_id);
+        if (origin && moved(origin, a, startAt)) [a, shaped] = [startAt, true];
+        if (target && moved(target, b, endAt)) [b, shaped] = [endAt, true];
+    }
     segment.lay(a, b, startDir, endDir, canvas.links_render_mode, (from && ends.get(from)) || 0, !from, !reroute, extras?.startControl, extras?.endControl,
         pass.on ? L.linkStyle : NATIVE, pass.wires ? wireOf(keyOf(link, extras)) : undefined);
+    segment.custom ||= shaped;
     if (reroute) ends.set(reroute, segment.u0 + segment.len);
     // The segment into the input is the link's last.
     open = Boolean(reroute);

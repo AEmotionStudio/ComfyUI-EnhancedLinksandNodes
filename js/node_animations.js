@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, L, a8 as zoomedOut, a9 as holdsStill, aa as during, ab as nodePalette, ac as effectOf, ad as particlesOnly$1, ae as stepOf, af as BYPASS, ag as NEVER, S as SELECTION_FX, ah as nodeMenu, ai as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, aj as startSprites, ak as drawBursts, g as guard, al as COMPLETION, am as drawNodeFx, c as clock, an as OVER, ao as dummy, ap as reach, aq as UNDER, w as wake, ar as ownStyle, as as CALM_ALPHA, at as STILL_NODE, au as stopSprites } from "./chunks/menus-_nsHQFBj.js";
+import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, a8 as JELLY, a9 as kicked, L, aa as zoomedOut, ab as holdsStill, ac as during, ad as nodePalette, ae as effectOf, af as particlesOnly$1, ag as stepOf, ah as BYPASS, ai as NEVER, S as SELECTION_FX, aj as nodeMenu, ak as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, al as startSprites, am as drawBursts, g as guard, an as COMPLETION, ao as wobbles, ap as shapeNode, aq as drawNodeFx, c as clock, ar as OVER, as as dummy, at as startShaking, au as shake, av as reach, aw as UNDER, w as wake, ax as ownStyle, ay as CALM_ALPHA, az as STILL_NODE, aA as wobbling, aB as stopSprites } from "./chunks/menus-CZHMdN1T.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -138,7 +138,7 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
     ctx.restore();
   }
 }
-const FX = ["", "gentle", "neon", "cosmic", "rosette", "flower"];
+const FX = ["", "gentle", "neon", "cosmic", "rosette", "flower", "jelly"];
 const SELECTED = 8;
 const RUNNING = 16;
 const FAILED = 32;
@@ -147,7 +147,7 @@ const MUTED = 128;
 const ONLY = 256;
 const COLLAPSED = 512;
 const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
-const MOVES = [false, true, false, true, true, true];
+const MOVES = [false, true, false, true, true, true, false];
 const ATTRIBUTES = ["data-eln-fx", "data-eln-only", "data-eln-collapsed", "data-eln-sel", "data-eln-run", "data-eln-mode"];
 let observed = null;
 let observer;
@@ -163,6 +163,12 @@ function lookOf(node, selected) {
   return fx | (only ? ONLY : 0) | (fx && node.flags.collapsed ? COLLAPSED : 0) | (fx && !only && N.selectionGlow && selected.has(node) ? SELECTED : 0) | (step?.end === Infinity ? N.runRing ? RUNNING : 0 : step?.failed && N.runError ? FAILED : 0) | (node.mode === BYPASS ? BYPASSED : node.mode === NEVER ? MUTED : 0);
 }
 const put = (el, name, value) => value ? el.setAttribute(name, value) : el.removeAttribute(name);
+const BOUNCE = [1, 1.045, 0.98, 1.012, 1];
+const BOUNCE_MS = 700;
+function bounce(el, node) {
+  const origin = `${node.pos[0] + el.offsetWidth / 2}px ${node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT + el.offsetHeight / 2}px`;
+  el.animate(BOUNCE.map((scale) => ({ scale: String(scale), transformOrigin: origin })), { duration: BOUNCE_MS, easing: "ease-out" });
+}
 function mark(el, look) {
   put(el, "data-eln-fx", FX[look & 7]);
   el.toggleAttribute("data-eln-only", (look & ONLY) > 0);
@@ -207,6 +213,7 @@ function stylesheet() {
     `.lg-node[data-eln-fx=cosmic]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-ripple ${period(3)} ease-out infinite}`,
     `.lg-node[data-eln-fx=rosette]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
     `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-bloom ${period(16)} ease-in-out infinite ${N.direction < 0 ? "reverse" : "normal"}}`,
+    `.lg-node[data-eln-fx=jelly]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)}}`,
     `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
     `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo2 || "none"};animation:none}`,
     ".lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}",
@@ -267,6 +274,10 @@ function vueNodes(canvas) {
   for (const node of graph.nodes) {
     const look = lookOf(node, selected);
     if (MOVES[look & 7] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
+    if ((look & 7) === JELLY && kicked(node)) {
+      const el2 = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
+      if (el2 instanceof HTMLElement) bounce(el2, node);
+    }
     if (given.get(node) === look) continue;
     given.set(node, look);
     const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
@@ -339,6 +350,7 @@ function halo(canvas, ctx, node, style, scale) {
   ctx.fill();
 }
 function under(canvas, ctx) {
+  startShaking(canvas);
   vueNodes(canvas);
   const { graph } = canvas;
   if (!graph) return;
@@ -350,6 +362,7 @@ function under(canvas, ctx) {
   const scale = ctx.getTransform().a;
   for (const node of graph.nodes) {
     const style = styleOf(node);
+    if (style === JELLY) shake(node);
     const only = style !== void 0 && (vue || particlesOnly(node, style));
     const shown2 = style !== void 0 && !far && draws(only) && !guard.off(keyOf(style));
     const glows = !vue && lit(canvas, style);
@@ -357,7 +370,7 @@ function under(canvas, ctx) {
     if (!overlaps(node.renderArea, area, Math.max(0, reach$1))) continue;
     if (titles && node.title && !node.onDrawTitleText && node.title_mode !== NO_TITLE) live.nodes++;
     if (shown2 && moving) {
-      if (style) live.nodes++;
+      if (style && style !== JELLY) live.nodes++;
       if (N.particleShow) live.particles++;
     }
     if (!glows && (!shown2 || reach$1 <= 0)) continue;
@@ -366,6 +379,7 @@ function under(canvas, ctx) {
       ctx.translate(node.pos[0], node.pos[1]);
       if (glows) halo(canvas, ctx, node, style, scale);
       if (shown2 && reach$1 > 0) {
+        shapeNode(ctx, node);
         ctx.beginPath();
         ctx.rect(area[0] - node.pos[0], area[1] - node.pos[1], area[2], area[3]);
         body(canvas, ctx, node);
@@ -377,6 +391,10 @@ function under(canvas, ctx) {
     } finally {
       ctx.restore();
     }
+  }
+  if (wobbling) {
+    live.nodes += wobbling;
+    if (L.enabled) canvas.setDirty(true, true);
   }
   if (live.nodes || live.particles) wake();
 }
@@ -415,8 +433,19 @@ const ext = {
         stopSprites();
       }
     };
-    const { drawNodeShape } = LGraphCanvas.prototype;
+    const { drawNode, drawNodeShape } = LGraphCanvas.prototype;
     const { drawTitleText } = LGraphNode.prototype;
+    LGraphCanvas.prototype.drawNode = function(...args) {
+      const [node, ctx] = args;
+      if (!wobbles(node)) return drawNode.apply(this, args);
+      ctx.save();
+      try {
+        shapeNode(ctx, node);
+        return drawNode.apply(this, args);
+      } finally {
+        ctx.restore();
+      }
+    };
     LGraphCanvas.prototype.drawNodeShape = function(...args) {
       const [node, ctx, size] = args;
       const style = styleOf(node);

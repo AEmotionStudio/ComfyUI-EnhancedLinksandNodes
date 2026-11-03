@@ -16,7 +16,7 @@ import * as colors from '@/core/colors';
 import { OVER, UNDER, drawNodeFx } from '@/nodes/effects';
 import { app, fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
-import { FakeCanvas, FakeNode, frames, page, run, start, type GraphSpec } from '../helpers/fake-litegraph';
+import { FakeCanvas, FakeNode, frames, page, progress, run, send, start, type GraphSpec } from '../helpers/fake-litegraph';
 import { WHOLE } from './characterize/v1-inputs';
 
 /**
@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -150,7 +150,8 @@ describe('node effects', () => {
             // Around the body only where the whole effect reaches past it: within the screen, without the body.
             const whole = new CanvasRecorder();
             drawNodeFx(whole.ctx, animate, canvas.graph._nodes[0], 220, 120, clock, WHOLE, 1, animate === 0);
-            const reaches = Math.max(...overhang(whole.paints, [0, -30, 220, 120])) > 0;
+            // Jelly draws on its body alone, but for the selection frame, which reach() counts whether or not the node is selected.
+            const reaches = Math.max(...overhang(whole.paints, [0, -30, 220, 120])) > 0 || animate === 6;
             expect(under).toHaveLength(reaches ? 1 : 0);
             if (!reaches) return;
             expect(under[0].sides).toBe(UNDER);
@@ -605,11 +606,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -642,7 +643,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -766,5 +767,100 @@ describe('Flower of Life', () => {
         expect(await sparks(1.5)).toHaveLength(14);
         expect(await sparks(4)).toHaveLength(38);
         expect(await sparks(0.2)).toHaveLength(0);
+    });
+});
+
+describe('Jelly', () => {
+    const JELLY = { ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 6 };
+    /** The shape a front pass gives the node: each transform() it sets, as its numbers. */
+    const shapes = (canvas: FakeCanvas) => {
+        canvas.setDirty(true, true);
+        return frame(canvas).lines.filter((line) => line.startsWith('transform(')).map((line) => line.slice(10, -1).split(', ').map(Number));
+    };
+    /** Front passes until the node keeps still, at most `most`: how many it took, and the shapes on the way. */
+    const settle = (canvas: FakeCanvas, most = 240) => {
+        const seen: number[][] = [];
+        for (let i = 0; i < most; i++) {
+            const now = shapes(canvas);
+            if (!now.length) return { passes: i, seen };
+            seen.push(now[0]);
+        }
+        return { passes: most, seen };
+    };
+
+    it('draws the node as native does while it keeps still', async () => {
+        const canvas = await start(JELLY, { nodes: [KSAMPLER] });
+        frames(2);
+        expect(shapes(canvas)).toEqual([]);
+        expect(live.nodes).toBe(0);
+    });
+
+    it('leans against a drag, keeping its area, sways back as it is let go, and settles still within two seconds', async () => {
+        const canvas = await start(JELLY, { nodes: [KSAMPLER] });
+        const [node] = canvas.graph._nodes;
+        frames(2);
+        // Dragged right, 300 px a second: its top lags behind, to the left.
+        let shape: number[] = [];
+        for (let i = 0; i < 30; i++) {
+            node.pos[0] += 5;
+            [shape] = shapes(canvas);
+        }
+        const [a, b, c, d] = shape;
+        expect(c).toBeGreaterThan(0.02);
+        expect(b).toBe(0);
+        expect(a * d).toBeCloseTo(1, 3);
+        // Let go, it swings past upright the other way before it settles.
+        const { passes, seen } = settle(canvas);
+        expect(seen.some(([, , lean]) => lean < 0)).toBe(true);
+        expect(passes).toBeLessThan(120);
+        expect(live.nodes).toBe(0);
+    });
+
+    it("squashes as it is selected, and as this client's run finishes it, but not while node effects hold still", async () => {
+        const canvas = await start(JELLY, { nodes: [KSAMPLER] });
+        const [node] = canvas.graph._nodes;
+        frames(2);
+        node.selected = true;
+        const { seen } = settle(canvas);
+        expect(seen.length).toBeGreaterThan(10);
+        // Taller and narrower, then wider, its area kept.
+        expect(seen.some(([, , , d]) => d > 1.005)).toBe(true);
+        expect(seen.some(([, , , d]) => d < 0.995)).toBe(true);
+        for (const [a, , , d] of seen) expect(a * d).toBeCloseTo(1, 3);
+        // A run through it: kicked as it stops running.
+        send('execution_start', { prompt_id: 'jelly', timestamp: 0 });
+        progress('jelly', { [node.id]: 'running' });
+        expect(shapes(canvas)).toEqual([]);
+        progress('jelly', { [node.id]: 'finished' });
+        expect(settle(canvas).seen.length).toBeGreaterThan(10);
+        send('execution_success', { prompt_id: 'jelly', timestamp: 0 });
+        // Static.
+        preview('📦 Enhanced Nodes.Static.Mode', true);
+        node.selected = false;
+        frames(1);
+        node.selected = true;
+        expect(settle(canvas).seen).toEqual([]);
+        preview('📦 Enhanced Nodes.Static.Mode', false);
+    });
+
+    it('moves the ends of its links with it as it wobbles, and puts them back as it settles', async () => {
+        const canvas = await start({ '📦 Enhanced Nodes.Animate': 6 }, { nodes: [{ pos: [100, 100] }, { pos: [500, 100] }], links: [{ from: 0, to: 1 }] });
+        const [, target] = canvas.graph._nodes;
+        frames(2);
+        /** Where the background pass begins and ends the link's path. */
+        const ends = () => {
+            canvas.setDirty(true, true);
+            const from = canvas.back.lines.length;
+            frames(1);
+            return canvas.back.lines.slice(from).filter((line) => /^(moveTo|bezierCurveTo)\(/.test(line)).join(' ');
+        };
+        const rest = ends();
+        target.selected = true;
+        frames(1);
+        let wobbled = false;
+        for (let i = 0; i < 10; i++) wobbled ||= ends() !== rest;
+        expect(wobbled).toBe(true);
+        settle(canvas);
+        expect(ends()).toBe(rest);
     });
 });

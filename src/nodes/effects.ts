@@ -170,6 +170,7 @@ const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
 const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
+const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
@@ -917,10 +918,65 @@ function flowerOfLife(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number
     }
 }
 
+/**
+ * 6. Jelly: a gel's tint over the body, in the effect's colours, and a gloss toward its top left; with Node particles,
+ * bubbles rising through it. The wobble is nodes/jelly.ts's.
+ */
+function jelly(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const top = -LiteGraph.NODE_TITLE_HEIGHT;
+    const tall = h - top;
+    if (!only && shows(0, top, w, h)) {
+        ctx.globalAlpha = (0.6 + 0.4 * N.animationGlow) * fade;
+        ctx.fillStyle = kept<CanvasGradient>(TINT) ?? keep(TINT, tint(ctx, top, h, pal));
+        ctx.fillRect(0, top, w, tall);
+        ctx.fillStyle = kept<CanvasGradient>(GLOSS) ?? keep(GLOSS, gloss(ctx, w * 0.28, top + tall * 0.16, Math.min(w, tall) * 0.5));
+        ctx.fillRect(0, top, w, tall);
+    }
+    if (N.particleShow) {
+        const { particleSize: size, particleGlow: dotGlow } = N;
+        const count = Math.max(1, Math.floor(6 * N.particleDensity * thin));
+        const time = held ? 0 : k.particleTime;
+        const rate = held ? 0 : TURN * N.animationSpeed * N.particleSpeed;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < count; i++) {
+            // As wide as the body lets them be, inside it: Jelly draws nothing round its node.
+            const r = Math.min((1.5 + 2 * noise(i + 11)) * size, w / 4, tall / 4);
+            const [low, high] = [h - r - 1, top + r + 1];
+            // Up through the body and in again at its foot, wavering as they go, fading in and out at each end.
+            const span = low - high;
+            const y = low - ((((time * 18 + noise(i) * span) % span) + span) % span);
+            const x = Math.max(r + 1, Math.min(w - r - 1, w * (0.12 + 0.76 * noise(i + 5)) + Math.sin(time * 2 + i) * 3 * N.particleIntensity));
+            if (!circle(x, y, r + 1)) continue;
+            ctx.globalAlpha = 0.55 * dotGlow * fade * Math.min(1, (low - y) / (4 * r), (y - high) / (4 * r));
+            ctx.strokeStyle = kept<string>(BUBBLES + i) ?? keep(BUBBLES + i, particleColour(pal, i, time, rate));
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+}
+
+/** Jelly's tint from `top` down to `bottom`: its primary colour, clearer toward the foot, in its secondary. */
+function tint(ctx: CanvasRenderingContext2D, top: number, bottom: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+    gradient.addColorStop(0, translucent(pal.primary, 0.2));
+    gradient.addColorStop(1, translucent(pal.secondary, 0.08));
+    return gradient;
+}
+
+/** Jelly's gloss about (x, y), `r` out: white, fading to nothing. */
+function gloss(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): CanvasGradient {
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.28)');
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    return gradient;
+}
+
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
@@ -989,6 +1045,9 @@ export function reach(style: number, w: number, h: number, only: boolean): numbe
             const corona = 0.7 * long * (0.8 + 0.2 * motion) + 2 * (2 * dotSize + 1.5 * motion) + 1.5 * 15 * dotGlow;
             return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
         }
+        // Jelly draws on the body alone.
+        case 6:
+            return r;
         case 5: {
             const radius = short * PETAL * size;
             const pattern = (quality > 1 ? FLOWER_RINGS[quality].at(-1)! : 2) * radius + 1 + 1.5 * 12 * intensity * glow;

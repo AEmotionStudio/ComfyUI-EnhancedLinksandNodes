@@ -9,7 +9,8 @@
  * stylesheet draws them as a glow behind the node, from just outside ComfyUI's
  * own outlines: Gentle Pulse's breathes, Neon Nexus holds a neon edge, Cosmic
  * Ripple sends a ring out, Sacred Rosette's turns about the node and Flower
- * of Life's blooms and fades with its cycle, in the
+ * of Life's blooms and fades with its cycle, and Jelly bounces its node as it
+ * is dropped, selected or finished by a run, in the
  * effects' own colours, with the halo, which is all that shows with the
  * particles alone; a selected, running or failed node glows steadily, and a
  * collapsed one, which classic mode draws no effect on, only with its run. They
@@ -30,6 +31,7 @@ import { L, N, revision } from '@/core/settings';
 import { during, overlaps, transformPane, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, effectOf, holdsStill } from '@/nodes/effects';
+import { JELLY, kicked } from '@/nodes/jelly';
 import { stepOf, syncRuns } from '@/fx/execution';
 import { particlesOnly } from '@/ui/menus';
 
@@ -37,7 +39,7 @@ type Canvas = typeof app.canvas;
 type Node = InstanceType<typeof LGraphNode>;
 
 /** data-eln-fx by Animate value. */
-const FX = ['', 'gentle', 'neon', 'cosmic', 'rosette', 'flower'];
+const FX = ['', 'gentle', 'neon', 'cosmic', 'rosette', 'flower', 'jelly'];
 /** What a node's element shows, as a number: its effect in the low three bits, 0 for none, and these. */
 const SELECTED = 8;
 const RUNNING = 16;
@@ -48,7 +50,7 @@ const ONLY = 256;
 const COLLAPSED = 512;
 /** What shows a steady glow, if any, whatever its effect; and the effects whose glow moves: Gentle Pulse's, Cosmic Ripple's, Sacred Rosette's and Flower of Life's. */
 const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
-const MOVES = [false, true, false, true, true, true];
+const MOVES = [false, true, false, true, true, true, false];
 const ATTRIBUTES = ['data-eln-fx', 'data-eln-only', 'data-eln-collapsed', 'data-eln-sel', 'data-eln-run', 'data-eln-mode'];
 
 /** The pane observed, the stylesheet and the settings it was written for, and what the page's root says of the effects' pace. */
@@ -75,6 +77,21 @@ function lookOf(node: Node, selected: ReadonlySet<unknown>): number {
 }
 
 const put = (el: Element, name: string, value: string) => (value ? el.setAttribute(name, value) : el.removeAttribute(name));
+
+/** A jelly node's bounce, by the scale it is at in turn, and how long it takes, in ms. */
+const BOUNCE = [1, 1.045, 0.98, 1.012, 1];
+const BOUNCE_MS = 700;
+
+/**
+ * Bounces a jelly node's element, as one: ComfyUI measures its slots against the element's box, which a scale alike
+ * both ways leaves where they are (FE157 renderer/core/layout/slots/syncSlotOffsets.ts L23-48). The element sits where
+ * its transform translates it (FE157 LGraphNode.vue L34), so it scales about its middle there; without touching the
+ * style Vue binds.
+ */
+function bounce(el: HTMLElement, node: Node): void {
+    const origin = `${node.pos[0] + el.offsetWidth / 2}px ${node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT + el.offsetHeight / 2}px`;
+    el.animate(BOUNCE.map((scale) => ({ scale: String(scale), transformOrigin: origin })), { duration: BOUNCE_MS, easing: 'ease-out' });
+}
 
 /** Marks a node's element with `look`, never touching the class and style Vue binds (FE157 and FE1395 LGraphNode.vue). */
 function mark(el: Element, look: number): void {
@@ -138,6 +155,7 @@ function stylesheet(): string {
         `.lg-node[data-eln-fx=cosmic]::after{border:1.5px solid var(--eln-c1);box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-ripple ${period(3)} ease-out infinite}`,
         `.lg-node[data-eln-fx=rosette]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-turn ${period(12)} linear infinite ${N.direction < 0 ? 'reverse' : 'normal'}}`,
         `.lg-node[data-eln-fx=flower]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)};animation:eln-bloom ${period(16)} ease-in-out infinite ${N.direction < 0 ? 'reverse' : 'normal'}}`,
+        `.lg-node[data-eln-fx=jelly]::after{box-shadow:${withHalo(`0 0 ${bloom}px ${light}`)}}`,
         `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
         `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo || 'none'};animation:none}`,
         '.lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}',
@@ -206,6 +224,10 @@ export function vueNodes(canvas: Canvas): void {
     for (const node of graph.nodes) {
         const look = lookOf(node, selected);
         if (MOVES[look & 7] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
+        if ((look & 7) === JELLY && kicked(node)) {
+            const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
+            if (el instanceof HTMLElement) bounce(el, node);
+        }
         if (given.get(node) === look) continue;
         given.set(node, look);
         const el = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);

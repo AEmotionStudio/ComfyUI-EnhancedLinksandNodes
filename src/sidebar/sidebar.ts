@@ -718,7 +718,7 @@ const NEWS = [
     "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
     'Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.',
     'Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.',
-    "A new node effect, Flower of Life, which draws itself in and blooms; v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+    "Two new node effects: Flower of Life, which draws itself in and blooms, and Jelly, which wobbles the node itself like gel. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
     'Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.',
     'Much lighter than 2.x on big graphs.',
 ];

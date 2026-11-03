@@ -11,6 +11,7 @@
  */
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { live } from '@/core/engine';
 import { preview } from '@/core/settings';
 import { nodePalette } from '@/core/colors';
 import { fake } from '../helpers/fake-app';
@@ -316,6 +317,26 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toContain('.lg-node[data-eln-fx=flower]{--eln-c1:#ffd36b;--eln-c2:#fff3c4;--eln-c3:#b48cff}');
         expect(css).toMatch(/\.lg-node\[data-eln-fx=flower\]::after\{[^}]*animation:eln-bloom calc\(16\.00s \* var\(--eln-slow, 1\)\) ease-in-out infinite normal\}/);
         expect(css).toContain('@keyframes eln-bloom{');
+    });
+
+    it('bounces a jelly node once as it is selected, alike both ways about its middle where the canvas puts it, and shapes nothing on the canvas', async () => {
+        const canvas = await start({ '📦 Enhanced Nodes.Animate': 6 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        const els = mountNodes(mountPane(), 1, 2, 3);
+        const animate = vi.fn();
+        for (const el of els) Object.assign(el, { animate });
+        frames(2);
+        const [node] = canvas.graph._nodes;
+        node.selected = true;
+        frames(1);
+        canvas.setDirty(true, true);
+        frames(2);
+        expect(animate).toHaveBeenCalledTimes(1);
+        const [keyframes, timing] = animate.mock.calls[0];
+        expect(keyframes.map((k: { scale: string }) => k.scale)).toEqual(['1', '1.045', '0.98', '1.012', '1']);
+        expect(new Set(keyframes.map((k: { transformOrigin: string }) => k.transformOrigin))).toEqual(new Set([`${node.pos[0]}px ${node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT}px`]));
+        expect(timing).toEqual({ duration: 700, easing: 'ease-out' });
+        expect(live.nodes).toBe(0);
     });
 
     it('hides the glows but a run\'s while zoomed out below Perf.MinZoom', async () => {

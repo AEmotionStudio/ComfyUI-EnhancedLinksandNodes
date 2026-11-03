@@ -77,7 +77,8 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 2, text: "Neon Nexus" },
   { value: 3, text: "Cosmic Ripple" },
   { value: 4, text: "Sacred Rosette" },
-  { value: 5, text: "Flower of Life" }
+  { value: 5, text: "Flower of Life" },
+  { value: 6, text: "Jelly" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -963,7 +964,7 @@ function filter([r, g, b, alpha], scheme) {
       return [r, g, b, alpha];
   }
 }
-const tint$2 = (colour2) => show$1(filter(parse(colour2), L.colorScheme));
+const tint$3 = (colour2) => show$1(filter(parse(colour2), L.colorScheme));
 const palettes = /* @__PURE__ */ new Map();
 let palettesSince = -1;
 function palette(colour2) {
@@ -977,8 +978,8 @@ function palette(colour2) {
     const rgba = parse(colour2);
     if (rgba) {
       const own2 = show$1(filter(rgba, L.colorScheme));
-      const [primary, secondary, accent2] = L.colorMode === "custom" ? [tint$2(L.colorPrimary), tint$2(L.colorSecondary), tint$2(L.colorAccent)] : [own2, own2, own2];
-      const marker = L.markerColorMode === "custom" ? tint$2(L.markerColor) : L.markerColorMode === "inherit" ? primary : own2;
+      const [primary, secondary, accent2] = L.colorMode === "custom" ? [tint$3(L.colorPrimary), tint$3(L.colorSecondary), tint$3(L.colorAccent)] : [own2, own2, own2];
+      const marker = L.markerColorMode === "custom" ? tint$3(L.markerColor) : L.markerColorMode === "inherit" ? primary : own2;
       p = { native: show$1(rgba), primary, secondary, accent: accent2, marker };
     } else p = null;
     palettes.set(colour2, p);
@@ -1057,7 +1058,8 @@ const STYLE_COLOURS = [
   ["#00ff88", "#00ffcc", "#00ff44"],
   ["#ff00ff", "#aa00ff", "#ff40ff"],
   ["#ffcc00", "#ff8800", "#ffaa00"],
-  ["#ffd36b", "#fff3c4", "#b48cff"]
+  ["#ffd36b", "#fff3c4", "#b48cff"],
+  ["#7cf5a0", "#c9ffe0", "#2ad1c4"]
 ];
 const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
@@ -1684,6 +1686,7 @@ const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
 const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
 const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
+const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 let depth = 0;
 function save(ctx) {
   ctx.save();
@@ -1944,19 +1947,19 @@ function neonNexus(ctx, node2, w, h2, k2, pal, only) {
       ctx.globalAlpha = 0.2 * dotGlow * fade;
       ctx.setLineDash(DASH);
       ctx.lineDashOffset = phase * 10;
-      const middle = h2 / 5;
+      const middle2 = h2 / 5;
       const left = -grid * 0.5;
       for (let i = -1; i <= 1; i += 0.5) {
-        if (shows$1(left + i * grid - 0.5, middle - grid, left + i * grid + 0.5, middle + grid)) {
+        if (shows$1(left + i * grid - 0.5, middle2 - grid, left + i * grid + 0.5, middle2 + grid)) {
           ctx.beginPath();
-          ctx.moveTo(left + i * grid, middle - grid);
-          ctx.lineTo(left + i * grid, middle + grid);
+          ctx.moveTo(left + i * grid, middle2 - grid);
+          ctx.lineTo(left + i * grid, middle2 + grid);
           ctx.stroke();
         }
-        if (shows$1(left - grid, middle + i * grid - 0.5, left + grid, middle + i * grid + 0.5)) {
+        if (shows$1(left - grid, middle2 + i * grid - 0.5, left + grid, middle2 + i * grid + 0.5)) {
           ctx.beginPath();
-          ctx.moveTo(left - grid, middle + i * grid);
-          ctx.lineTo(left + grid, middle + i * grid);
+          ctx.moveTo(left - grid, middle2 + i * grid);
+          ctx.lineTo(left + grid, middle2 + i * grid);
           ctx.stroke();
         }
       }
@@ -2304,7 +2307,51 @@ function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
     }
   }
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife];
+function jelly(ctx, _node, w, h2, k2, pal, only) {
+  const top = -LiteGraph.NODE_TITLE_HEIGHT;
+  const tall = h2 - top;
+  if (!only && shows$1(0, top, w, h2)) {
+    ctx.globalAlpha = (0.6 + 0.4 * N.animationGlow) * fade;
+    ctx.fillStyle = kept(TINT) ?? keep$1(TINT, tint$2(ctx, top, h2, pal));
+    ctx.fillRect(0, top, w, tall);
+    ctx.fillStyle = kept(GLOSS) ?? keep$1(GLOSS, gloss(ctx, w * 0.28, top + tall * 0.16, Math.min(w, tall) * 0.5));
+    ctx.fillRect(0, top, w, tall);
+  }
+  if (N.particleShow) {
+    const { particleSize: size, particleGlow: dotGlow } = N;
+    const count2 = Math.max(1, Math.floor(6 * N.particleDensity * thin));
+    const time = held$4 ? 0 : k2.particleTime;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * N.particleSpeed;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < count2; i++) {
+      const r = Math.min((1.5 + 2 * noise(i + 11)) * size, w / 4, tall / 4);
+      const [low, high] = [h2 - r - 1, top + r + 1];
+      const span = low - high;
+      const y = low - ((time * 18 + noise(i) * span) % span + span) % span;
+      const x = Math.max(r + 1, Math.min(w - r - 1, w * (0.12 + 0.76 * noise(i + 5)) + Math.sin(time * 2 + i) * 3 * N.particleIntensity));
+      if (!circle(x, y, r + 1)) continue;
+      ctx.globalAlpha = 0.55 * dotGlow * fade * Math.min(1, (low - y) / (4 * r), (y - high) / (4 * r));
+      ctx.strokeStyle = kept(BUBBLES + i) ?? keep$1(BUBBLES + i, particleColour(pal, i, time, rate));
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+function tint$2(ctx, top, bottom, pal) {
+  const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+  gradient.addColorStop(0, translucent(pal.primary, 0.2));
+  gradient.addColorStop(1, translucent(pal.secondary, 0.08));
+  return gradient;
+}
+function gloss(ctx, x, y, r) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gradient.addColorStop(0, "rgba(255, 255, 255, 0.28)");
+  gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.08)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+  return gradient;
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -2357,6 +2404,9 @@ function reach(style, w, h2, only) {
       const corona = 0.7 * long * (0.8 + 0.2 * motion2) + 2 * (2 * dotSize + 1.5 * motion2) + 1.5 * 15 * dotGlow;
       return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
     }
+    // Jelly draws on the body alone.
+    case 6:
+      return r;
     case 5: {
       const radius = short * PETAL * size;
       const pattern = (quality2 > 1 ? FLOWER_RINGS[quality2].at(-1) : 2) * radius + 1 + 1.5 * 12 * intensity * glow2;
@@ -2650,8 +2700,8 @@ let celebrated = -Infinity;
 function anchors(canvas, graph2) {
   const area = canvas.visible_area;
   const [x, y] = [area[0] + area[2] / 2, area[1] + area[3] / 2];
-  const middle = { id: "view", pos: [x, y], graph: graph2 };
-  if (N.completionAnchor === "viewport") return [middle];
+  const middle2 = { id: "view", pos: [x, y], graph: graph2 };
+  if (N.completionAnchor === "viewport") return [middle2];
   if (!here$6()) return [];
   const choice2 = (node2) => node2.properties[OWN_COMPLETION];
   const reached = /* @__PURE__ */ new Set();
@@ -2670,7 +2720,7 @@ function anchors(canvas, graph2) {
   const outputs = [...reached].filter((node2) => choice2(node2) !== "primary" && choice2(node2) !== "exclude").sort(near);
   const list = (N.completionAnchor === "primary" && primary.length ? primary : [...primary, ...outputs]).slice(0, ANCHORS);
   const shows2 = list.filter((node2) => overlaps(node2.boundingRect, area, 0));
-  if (shows2.length < list.length || elsewhere && !list.length) shows2.push({ ...middle, small: true });
+  if (shows2.length < list.length || elsewhere && !list.length) shows2.push({ ...middle2, small: true });
   return shows2;
 }
 function complete(shows2, prompt) {
@@ -2805,6 +2855,103 @@ function installRuns(part2) {
     }
     if (edited) changed$2(true);
   });
+}
+const JELLY = 6;
+const OMEGA = 2 * Math.PI * 3;
+const DAMPING = 0.25;
+const SQUASH = 0.06;
+const LEAN = 0.1;
+const LEAN_PER_SPEED = 4e-4;
+const DROP = -0.6;
+const SELECT = 0.5;
+const FINISH = 0.8;
+const DROP_MS = 120;
+const REST = 1e-3;
+const springs = /* @__PURE__ */ new WeakMap();
+const shaking = { now: 0, dt: 0, still: false, vue: false };
+let wobbling = 0;
+function startShaking(canvas) {
+  syncRuns(canvas);
+  const now = performance.now();
+  shaking.dt = Math.min(0.05, (now - shaking.now) / 1e3);
+  shaking.now = now;
+  shaking.still = N.staticMode || env.reducedMotion || adaptive.level >= HELD || during(N.pauseDuringRender) === "pause" || zoomedOut(canvas);
+  shaking.vue = LiteGraph.vueNodesMode;
+  wobbling = 0;
+}
+function shake(node2) {
+  const { now, dt, still, vue: vue2 } = shaking;
+  const [x, y] = node2.pos;
+  const selected2 = Boolean(node2.selected);
+  const running2 = stepOf(node2)?.end === Infinity;
+  let w = springs.get(node2);
+  if (!w) {
+    springs.set(node2, { squash: 0, squashSpeed: 0, lean: 0, leanSpeed: 0, x, y, across: 0, movedAt: 0, moving: false, selected: selected2, running: running2, kicked: false });
+    return false;
+  }
+  let kick = 0;
+  if (x !== w.x || y !== w.y) {
+    w.across += ((dt ? (x - w.x) / dt : 0) - w.across) * Math.min(1, dt * 12);
+    w.movedAt = now;
+    w.moving = true;
+  } else {
+    w.across -= w.across * Math.min(1, dt * 12);
+    if (w.moving && now - w.movedAt > DROP_MS) {
+      w.moving = false;
+      kick += DROP;
+    }
+  }
+  if (selected2 && !w.selected) kick += SELECT;
+  if (w.running && !running2) kick += FINISH;
+  Object.assign(w, { x, y, selected: selected2, running: running2 });
+  if (still) {
+    Object.assign(w, { squash: 0, squashSpeed: 0, lean: 0, leanSpeed: 0, across: 0, kicked: false });
+    return false;
+  }
+  if (kick) w.kicked = true;
+  if (vue2) return false;
+  w.squashSpeed += kick + (-OMEGA * OMEGA * w.squash - 2 * DAMPING * OMEGA * w.squashSpeed) * dt;
+  w.squash = Math.max(-SQUASH, Math.min(SQUASH, w.squash + w.squashSpeed * dt));
+  const lean = Math.max(-LEAN, Math.min(LEAN, -w.across * LEAN_PER_SPEED));
+  w.leanSpeed += (OMEGA * OMEGA * (lean - w.lean) - 2 * DAMPING * OMEGA * w.leanSpeed) * dt;
+  w.lean = Math.max(-LEAN, Math.min(LEAN, w.lean + w.leanSpeed * dt));
+  if (!w.moving && Math.max(Math.abs(w.squash), Math.abs(w.squashSpeed), Math.abs(w.lean), Math.abs(w.leanSpeed)) < REST) {
+    Object.assign(w, { squash: 0, squashSpeed: 0, lean: 0, leanSpeed: 0 });
+    return false;
+  }
+  wobbling++;
+  return true;
+}
+function kicked(node2) {
+  const w = springs.get(node2);
+  if (!w?.kicked) return false;
+  w.kicked = false;
+  return true;
+}
+const middle = (node2) => [node2.size[0] / 2, (node2.size[1] - LiteGraph.NODE_TITLE_HEIGHT) / 2];
+function wobbles(node2) {
+  const w = springs.get(node2);
+  return Boolean(w && (w.squash || w.lean));
+}
+function shapeNode(ctx, node2) {
+  const w = springs.get(node2);
+  if (!w || !w.squash && !w.lean) return false;
+  const [cx, cy] = middle(node2);
+  const tall = 1 + w.squash;
+  ctx.translate(cx, cy);
+  ctx.transform(1 / tall, 0, -w.lean, tall, 0, 0);
+  ctx.translate(-cx, -cy);
+  return true;
+}
+function moved$1(node2, p, out) {
+  const w = springs.get(node2);
+  if (!w || !w.squash && !w.lean) return false;
+  const [mx, my] = middle(node2);
+  const [dx2, dy2] = [p[0] - node2.pos[0] - mx, p[1] - node2.pos[1] - my];
+  const tall = 1 + w.squash;
+  out[0] = node2.pos[0] + mx + dx2 / tall - w.lean * dy2;
+  out[1] = node2.pos[1] + my + dy2 * tall;
+  return true;
 }
 const SACRED = { TRINITY: 3, HARMONY: 7, COMPLETION: 12, QUANTUM: 5 };
 const moving = { alpha: 1, glow: 1, density: 1 };
@@ -5000,6 +5147,8 @@ function close$1() {
 }
 const own = (canvas, link2, color) => palette(color) ?? palette(LGraphCanvas.link_type_colors[String(link2.type)]) ?? palette(canvas.default_link_color) ?? palette(LINK_COLOR$1);
 const keyOf = (link2, extras) => extras?.reroute ? 3 * extras.reroute.id + 1 : 3 * link2.id + (extras?.disabled ? 2 : 0);
+const startAt = new Float64Array(2);
+const endAt = new Float64Array(2);
 function record(canvas, link2, a, b, color, startDir, endDir, extras, focused, flow) {
   if (open && pool[count - 1].link !== link2) close$1();
   if (!open) first = count;
@@ -5015,6 +5164,13 @@ function record(canvas, link2, a, b, color, startDir, endDir, extras, focused, f
   if (compared) hold(segment2);
   const from = canvas.graph?.getReroute((reroute ?? link2).parentId);
   segment2.link = link2;
+  let shaped = false;
+  if (wobbling) {
+    const origin = from ? void 0 : canvas.graph?.getNodeById(link2.origin_id);
+    const target = reroute ? void 0 : canvas.graph?.getNodeById(link2.target_id);
+    if (origin && moved$1(origin, a, startAt)) [a, shaped] = [startAt, true];
+    if (target && moved$1(target, b, endAt)) [b, shaped] = [endAt, true];
+  }
   segment2.lay(
     a,
     b,
@@ -5029,6 +5185,7 @@ function record(canvas, link2, a, b, color, startDir, endDir, extras, focused, f
     pass.on ? L.linkStyle : NATIVE,
     pass.wires ? wireOf(keyOf(link2, extras)) : void 0
   );
+  segment2.custom ||= shaped;
   if (reroute) ends.set(reroute, segment2.u0 + segment2.len);
   open = Boolean(reroute);
   if (!open) close$1();
@@ -7627,7 +7784,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
-  "A new node effect, Flower of Life, which draws itself in and blooms; v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+  "Two new node effects: Flower of Life, which draws itself in and blooms, and Jelly, which wobbles the node itself like gel. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8202,29 +8359,36 @@ export {
   transformPane as a5,
   syncRuns as a6,
   overlaps as a7,
-  zoomedOut as a8,
-  holdsStill as a9,
-  during as aa,
-  nodePalette as ab,
-  effectOf as ac,
-  particlesOnly as ad,
-  stepOf as ae,
-  BYPASS as af,
-  NEVER as ag,
-  nodeMenu as ah,
-  nodeSettings as ai,
-  startSprites as aj,
-  drawBursts as ak,
-  COMPLETION as al,
-  drawNodeFx as am,
-  OVER as an,
-  dummy as ao,
-  reach as ap,
-  UNDER as aq,
-  ownStyle as ar,
-  CALM_ALPHA as as,
-  STILL_NODE as at,
-  stopSprites as au,
+  JELLY as a8,
+  kicked as a9,
+  wobbling as aA,
+  stopSprites as aB,
+  zoomedOut as aa,
+  holdsStill as ab,
+  during as ac,
+  nodePalette as ad,
+  effectOf as ae,
+  particlesOnly as af,
+  stepOf as ag,
+  BYPASS as ah,
+  NEVER as ai,
+  nodeMenu as aj,
+  nodeSettings as ak,
+  startSprites as al,
+  drawBursts as am,
+  COMPLETION as an,
+  wobbles as ao,
+  shapeNode as ap,
+  drawNodeFx as aq,
+  OVER as ar,
+  dummy as as,
+  startShaking as at,
+  shake as au,
+  reach as av,
+  UNDER as aw,
+  ownStyle as ax,
+  CALM_ALPHA as ay,
+  STILL_NODE as az,
   dark as b,
   clock as c,
   darker as d,
@@ -8251,4 +8415,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-_nsHQFBj.js.map
+//# sourceMappingURL=menus-CZHMdN1T.js.map

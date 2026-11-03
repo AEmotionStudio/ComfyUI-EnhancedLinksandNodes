@@ -48,6 +48,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 
 ### New node effects
 - **Flower of Life**: nineteen circles, each through the middles of those beside it, draw themselves in round the node, the Seed of Life first, inside a ring; then the flower blooms and slowly turns, with a shimmer through its petals at Rich quality and sparks running round its circles, before it draws itself in again. The Sacred Geometry look uses it.
+- **Jelly**: the node itself wobbles like gel, leaning as you drag it, swaying as you let go and squashing as you select it and as your run finishes it, then settles still and is drawn as ComfyUI draws it; its links' ends follow it. A gel tint and gloss sit on the body, with bubbles as its particles. In Nodes 2.0 the node bounces instead.
 
 ### Selection focus and navigation
 - **Selection focus** (#4, #5, #45): highlight the selected nodes' links, animate only them, or dim or hide the others; color them in ComfyUI's white, the theme accent or their type color; reach direct links, everything upstream or downstream, or the whole chain, through reroutes; draw them above nodes; optionally on hover. Works with link effects off.
