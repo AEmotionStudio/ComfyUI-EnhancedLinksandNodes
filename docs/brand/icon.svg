@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- The panel's brand mark (the eln-mark in src/sidebar/sidebar.css) in the default palette's link colors. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#202027"/>
+      <stop offset="1" stop-color="#0d0d11"/>
+    </linearGradient>
+    <linearGradient id="link" gradientUnits="userSpaceOnUse" x1="3" y1="21" x2="21" y2="3">
+      <stop offset="0" stop-color="#64b5f6"/>
+      <stop offset="0.5" stop-color="#b39ddb"/>
+      <stop offset="1" stop-color="#ff9cf9"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="0.9"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" rx="88" fill="url(#bg)"/>
+  <g transform="translate(56 56) scale(12)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="url(#link)" stroke-width="2.4" opacity="0.7" filter="url(#glow)">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </g>
+    <g stroke="url(#link)" stroke-width="2">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </g>
+    <path d="M5.5 1.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" fill="#ffd36b" stroke="none"/>
+  </g>
+</svg>

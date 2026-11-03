@@ -1,14 +1,23 @@
 [project]
 name = "comfyui-enhancedlinksandnodes"
-description = "A visually stunning extension for ComfyUI that adds beautiful, customizable animations to both links and nodes in your workflow, with a focus on performance and customization. Includes an end-of-render animation and a text visibility tool for nodes. No extra packages are required, works with the latest version of ComfyUI, and should be compatible with most workflows. Larger workflows may experience performance issues, especially if you have a lot of nodes and are using a lower end system."
-version = "2.0.1"
+description = "Animated links and nodes for ComfyUI that keep every native click, reroute and subgraph, with looks, selection focus, run visuals and completion effects."
+version = "3.0.0"
 license = {file = "LICENSE"}
+classifiers = [
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+# How the Comfy Registry states the ComfyUI frontend this needs; the extension has no Python dependencies.
+dependencies = ["comfyui-frontend-package>=1.39.5"]
 
 [project.urls]
 Repository = "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes"
-#  Used by Comfy Registry https://comfyregistry.org
+Issues = "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/issues"
+Documentation = "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes#readme"
+Changelog = "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/blob/main/CHANGELOG.md"
 
 [tool.comfy]
 PublisherId = "aemotionstudio"
 DisplayName = "ComfyUI-EnhancedLinksandNodes"
-Icon = ""
+Icon = "https://raw.githubusercontent.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/main/docs/brand/icon.png"
+Banner = "https://raw.githubusercontent.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/main/docs/brand/banner.png"

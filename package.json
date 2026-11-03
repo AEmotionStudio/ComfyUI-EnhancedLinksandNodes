@@ -1,6 +1,6 @@
 {
   "name": "comfyui-enhancedlinksandnodes",
-  "version": "2.0.1",
+  "private": true,
   "description": "A visually stunning extension for ComfyUI that adds beautiful, customizable animations to both links and nodes in your workflow.",
   "type": "module",
   "scripts": {
@@ -25,7 +25,7 @@
     "nodes"
   ],
   "author": "Æmotion Studio",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes"

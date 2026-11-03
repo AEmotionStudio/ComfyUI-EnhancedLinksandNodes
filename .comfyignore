@@ -1,0 +1,10 @@
+# The Registry archive holds what ComfyUI loads, the example workflow and the user docs; the rest is for development.
+/*
+!/__init__.py
+!/pyproject.toml
+!/LICENSE
+!/README.md
+!/CHANGELOG.md
+!/js
+!/locales
+!/example_workflows

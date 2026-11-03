@@ -155,6 +155,17 @@ export function cspViolations(page: Page): Promise<CspViolation[]> {
     return page.evaluate(() => window.__elnCsp);
 }
 
+/** What the legs log as errors without us: the browser, the frontend and the looks file ask for optional files that are not there, and --offline blocks the startup template's model downloads. */
+const NOISE = [
+    /^http:\/\/127\.0\.0\.1:\d+\/(favicon\.ico|user\.css|api\/userdata\/(user\.css|comfy\.templates\.json|enhanced-links-nodes%2Flooks\.json)|api\/userdata\?dir=(workflows|subgraphs)&[^:]*): Failed to load resource: the server responded with a status of 404 /,
+    /: (Connecting to '|Fetch API cannot load )https:\/\/huggingface\.co\//,
+];
+
+/** Every error the page threw or logged, but the legs' own noise. */
+export function pageErrors(log: PageLog): string[] {
+    return [...log.errors, ...log.counts.filter((m) => m.type === 'error').map((m) => `${m.url}: ${m.text}`)].filter((e) => !NOISE.some((noise) => noise.test(e)));
+}
+
 async function installProbe(page: Page): Promise<void> {
     await page.evaluate(() => {
         if (window.__eln) return;

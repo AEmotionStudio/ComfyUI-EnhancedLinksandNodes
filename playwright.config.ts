@@ -22,13 +22,13 @@ const GPU_ARGS = ['--ignore-gpu-blocklist', '--enable-gpu', '--use-gl=angle', '-
 const gpu = process.env.ELN_GPU === '1';
 
 // The reference builds and interop only run the tests tagged for them, and only interop runs @interop tests. v1 also
-// takes the @gallery contact sheets, for which pnpm e2e:gallery names it.
+// takes the @gallery contact sheets, for which pnpm e2e:gallery names it; v2.0.1 the @rollback check.
 const projects: { name: string; leg: string; profile: string; only?: string }[] = [
     { name: 'fe157-native', leg: 'fe157', profile: 'native' },
     { name: 'fe157', leg: 'fe157', profile: 'default' },
     { name: 'fe1395-native', leg: 'fe1395', profile: 'native' },
     { name: 'fe1395', leg: 'fe1395', profile: 'default' },
-    { name: 'v2-ref', leg: 'v2-ref', profile: 'default', only: '@perf' },
+    { name: 'v2-ref', leg: 'v2-ref', profile: 'default', only: '@perf|@rollback' },
     { name: 'v1-ref', leg: 'v1-ref', profile: 'default', only: '@perf|@gallery' },
     { name: 'interop', leg: 'interop', profile: 'default', only: '@interop' },
 ];
@@ -43,10 +43,11 @@ function requestedProjects(argv: string[]): RegExp[] {
     return names.map((name) => new RegExp(`^${name.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replaceAll('*', '.*')}$`, 'i'));
 }
 
-// Without --project, the reference builds count only with ELN_PERF=1, and interop only when asked for (--project interop).
+// Without --project, v2.0.1 runs for the @rollback check, the reference builds' baselines only with ELN_PERF=1, and
+// interop only when asked for (--project interop).
 const requested = requestedProjects(process.argv);
 const selected = projects.filter((p) =>
-    requested.length ? requested.some((r) => r.test(p.name)) : !p.only || (perf && p.only.includes('@perf')),
+    requested.length ? requested.some((r) => r.test(p.name)) : !p.only || p.only.includes('@rollback') || (perf && p.only.includes('@perf')),
 );
 const chromium = '/usr/bin/chromium';
 
