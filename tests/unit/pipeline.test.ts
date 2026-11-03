@@ -146,6 +146,7 @@ describe('renderLink', () => {
     for (const [why, settings, change] of [
         ['with Animate 0', { '🔗 Enhanced Links.Animate': 0 }, () => {}],
         ['below 25% zoom', {}, (canvas: FakeCanvas) => { canvas.ds.scale = 0.2; }],
+        ['below a Perf.MinZoom of 50%', { '🔗 Enhanced Links.Perf.MinZoom': 50 }, (canvas: FakeCanvas) => { canvas.ds.scale = 0.45; }],
     ] as const) {
         it(`leaves links to native ${why}`, async () => {
             const canvas = await start(settings, PAIR);
@@ -157,6 +158,13 @@ describe('renderLink', () => {
             expect(live.links).toBe(0);
         });
     }
+
+    it('keeps the effects at every zoom with a Perf.MinZoom of 0', async () => {
+        const canvas = await start({ '🔗 Enhanced Links.Perf.MinZoom': 0 }, PAIR);
+        canvas.ds.scale = 0.1;
+        frame(canvas);
+        expect(live.links).toBe(1);
+    });
 
     it('leaves links to native with Link effects off, which keeps every link setting, and draws them again once it is on', async () => {
         const canvas = await start({ '🔗 Enhanced Links.Enabled': false }, PAIR);

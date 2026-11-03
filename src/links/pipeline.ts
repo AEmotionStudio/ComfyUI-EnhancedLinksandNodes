@@ -37,7 +37,7 @@
 import type { CanvasColour, LLink, Point, Reroute } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, revision, wired } from '@/core/settings';
-import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, steps, wake } from '@/core/engine';
+import { CALM_ALPHA, HELD, PLAIN, STILL_PHASE, THIN, adaptive, clock, dummy, during, env, guard, heldByRun, layers, live, offscreen, steps, wake, zoomedOut } from '@/core/engine';
 import { HIGHLIGHT, dark, palette, type Palette } from '@/core/colors';
 import { drawFlows, flowsShown, linkPass, stepInto, syncRuns, type Step } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
@@ -53,9 +53,6 @@ type RenderLink = Parameters<Canvas['renderLink']>;
 
 /** The guard's key, and what its toast calls the links when it turns them off. */
 const LINKS = 'Link animation';
-
-/** Below this zoom links are native: an effect's details are a few pixels across at most. Above it they keep their effects in LiteGraph's low quality too, as in v1 and v2. */
-const LOD_SCALE = 0.25;
 
 /** How far past its path an effect draws at most: Crystal Stream's crystals at the thickest setting, with their glow. */
 const REACH = 120;
@@ -385,7 +382,7 @@ let told = false;
 export const deferring = (): boolean => L.coexist === 'defer' || (L.coexist === 'auto' && foreign);
 
 /** With link effects on, the run's visuals go over the links, those native draws too, as with Animation None. */
-const drawsRuns = (canvas: Canvas): boolean => L.enabled && !defers() && canvas.ds.scale >= LOD_SCALE;
+const drawsRuns = (canvas: Canvas): boolean => L.enabled && !defers() && !zoomedOut(canvas);
 
 /** deferring(), and the first time 'auto' defers, a toast that says so. */
 function defers(): boolean {
@@ -454,7 +451,7 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     raised.length = flowing.length = 0;
     pass.ctx = ctx;
     pass.calls = pass.bases = 0;
-    pass.on = L.enabled && (L.animate !== 0 || wired()) && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
+    pass.on = L.enabled && (L.animate !== 0 || wired()) && !defers() && !guard.off(LINKS) && !zoomedOut(canvas);
     // Native's links never move. Wires swing through a run, which only holds what the user did not move.
     const held = L.staticMode || env.reducedMotion || crowded || adaptive.level >= HELD;
     pass.still = !pass.on || held || heldByRun(L.pauseDuringRender) || !moves();

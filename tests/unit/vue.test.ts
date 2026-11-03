@@ -291,6 +291,20 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toContain(':root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}');
     });
 
+    it('hides the glows but a run\'s while zoomed out below Perf.MinZoom', async () => {
+        const canvas = await start({ '📦 Enhanced Nodes.Animate': 1 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        mountNodes(mountPane(), 1);
+        canvas.ds.scale = 0.2;
+        frames(1);
+        expect(pace()).toBe('far');
+        canvas.ds.scale = 1;
+        canvas.setDirty(true, true);
+        frames(1);
+        expect(pace()).toBeNull();
+        expect(sheets()[0].textContent).toContain(':root[data-eln-pace=far] .lg-node:not([data-eln-run])::after{content:none}');
+    });
+
     it('holds the glows still while more nodes whose glow moves are on screen than a quarter of Perf.StaticAbove, but for steady glows and nodes off screen', async () => {
         const STATIC_ABOVE = '🔗 Enhanced Links.Perf.StaticAbove';
         // Twelve Gentle Pulse nodes on screen and four off it.

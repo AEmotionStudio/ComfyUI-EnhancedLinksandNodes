@@ -178,6 +178,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Adaptive quality | `🔗 Enhanced Links.Perf.Adaptive` | boolean | `true`, `false` | `true` | While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room. |
 | Keep link glow while moving | `🔗 Enhanced Links.Perf.KeepGlow` | boolean | `true`, `false` | `true` | Off lets link glows go plain while you pan, zoom, drag nodes or wires swing on a graph with many glowing links, and come back once it all keeps still: smoother on slower machines. Adaptive quality can still make them plain while frames are slow. |
 | Freeze above N visible links | `🔗 Enhanced Links.Perf.StaticAbove` | slider | 0 to 5000, step 50 | `400` | Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes. |
+| Hide effects zoomed out below | `🔗 Enhanced Links.Perf.MinZoom` | slider | 0 to 100, step 5 | `25` | The zoom, in percent, below which links and nodes are drawn as ComfyUI draws them, but for the run visuals on nodes. 0 keeps the effects at every zoom. |
 
 ## Performance · Accessibility
 

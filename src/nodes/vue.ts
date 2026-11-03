@@ -15,7 +15,8 @@
  * hold still or go calm with the canvas effects, as an attribute on the page's
  * root says, hold still while ComfyUI disables animations, and while more of
  * them move on screen than a quarter of Perf.StaticAbove, as 1.57.1 paints the
- * drop shadow under each node again for each glow that moves. The particles
+ * drop shadow under each node again for each glow that moves; zoomed out below
+ * Perf.MinZoom only a run's glows show. The particles
  * stay on the main canvas, under the DOM nodes; the patterns inside a node, the
  * hover outline and the styled titles need classic nodes.
  *
@@ -25,7 +26,7 @@
 import type { NodeId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { L, N, revision } from '@/core/settings';
-import { during, overlaps, transformPane } from '@/core/engine';
+import { during, overlaps, transformPane, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, holdsStill } from '@/nodes/effects';
 import { stepOf, syncRuns } from '@/fx/execution';
@@ -142,6 +143,7 @@ function stylesheet(): string {
         '.lg-node[data-eln-mode=muted]{--eln-mode:0.8}',
         ':root[data-eln-pace=still] .lg-node::after, .disable-animations .lg-node::after{animation:none}',
         ':root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}',
+        ':root[data-eln-pace=far] .lg-node:not([data-eln-run])::after{content:none}',
         '@keyframes eln-breathe{from{opacity:calc(var(--eln-a) * 0.35)}}',
         `@keyframes eln-ripple{0%{opacity:0;transform:scale(0.98)}20%{opacity:var(--eln-a);transform:none}100%{opacity:0;transform:scale(${(1 + 0.08 * size).toFixed(2)})}}`,
         `@keyframes eln-turn{${turn}}`,
@@ -205,7 +207,7 @@ export function vueNodes(canvas: Canvas): void {
         if (el) mark(el, look);
     }
     const crowded = L.perfStaticAbove > 0 && moving > L.perfStaticAbove / 4;
-    const now = holdsStill() || crowded ? 'still' : during(N.pauseDuringRender) === 'calm' ? 'calm' : '';
+    const now = zoomedOut(canvas) ? 'far' : holdsStill() || crowded ? 'still' : during(N.pauseDuringRender) === 'calm' ? 'calm' : '';
     if (now !== pace) {
         pace = now;
         put(document.documentElement, 'data-eln-pace', pace);

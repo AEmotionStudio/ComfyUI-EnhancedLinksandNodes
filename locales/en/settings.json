@@ -542,6 +542,10 @@
     "name": "Freeze above N visible links",
     "tooltip": "Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes."
   },
+  "🔗 Enhanced Links_Perf_MinZoom": {
+    "name": "Hide effects zoomed out below",
+    "tooltip": "The zoom, in percent, below which links and nodes are drawn as ComfyUI draws them, but for the run visuals on nodes. 0 keeps the effects at every zoom."
+  },
   "🔗 Enhanced Links_Motion": {
     "name": "Motion",
     "tooltip": "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them.",

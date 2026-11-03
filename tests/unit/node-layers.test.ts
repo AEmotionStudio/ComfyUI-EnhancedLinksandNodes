@@ -221,6 +221,17 @@ describe('node effects', () => {
         }
     });
 
+    it('cast the halo and draw the effect down to Perf.MinZoom, in low quality too, and neither below it', async () => {
+        const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 4 }, { nodes: [KSAMPLER] });
+        canvas.low_quality = true;
+        for (const [scale, drawn] of [[0.4, true], [0.2, false]] as const) {
+            canvas.ds.scale = scale;
+            const paints = canvas.front.paints.length;
+            const { calls } = frame(canvas);
+            expect([halos(canvas.front.paints.slice(paints)).length > 0, calls.length > 0], `zoom ${scale}`).toEqual([drawn, drawn]);
+        }
+    });
+
     it('draw their glows centred, whatever offset native left', async () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 3, ...PARTICLES }, { nodes: [KSAMPLER] });
         frame(canvas);

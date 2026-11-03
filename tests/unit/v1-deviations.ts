@@ -1238,7 +1238,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: "The halo and the frame keep to native's node drawing",
-        why: "v1 swapped the shadow native gives a node for its halo, but with the halo off it took that shadow away too, and it drew the halo zoomed out, where native draws no shadow; v3 leaves native's shadow alone in both. v1's selection frame and its effects' glows took native's shadow offset, 2 × the zoom, as v1 reset only the shadow's colour and blur after the body (old_node_animations.js:2084-2085), and its frame the full alpha native's selection outline leaves behind; v3 centres them all, and the frame fades with its node, as the effects do.",
+        why: "v1 swapped the shadow native gives a node for its halo, but with the halo off it took that shadow away too; v3 leaves native's shadow alone. Like v1, v3 casts the halo zoomed out too, where native draws no shadow, down to Perf.MinZoom. v1's selection frame and its effects' glows took native's shadow offset, 2 × the zoom, as v1 reset only the shadow's colour and blur after the body (old_node_animations.js:2084-2085), and its frame the full alpha native's selection outline leaves behind; v3 centres them all, and the frame fades with its node, as the effects do.",
         async proof() {
             const graph: GraphSpec = { nodes: [{ pos: [100, 100] }, { pos: [500, 100], mode: 4 }] };
             const bodies = async (settings: Record<string, unknown>, lowQuality = false) => {
@@ -1252,7 +1252,7 @@ export const DEVIATIONS: Deviation[] = [
             // The halos in Neon Nexus's primary colour, 10 × Glow (0.5), under the effects; the bodies cast none.
             expect(fills(await bodies({}))).toEqual([['#00ff88', 5], ['#00ff88', 5], ['rgba(0, 0, 0, 0)', 3], ['rgba(0, 0, 0, 0)', 3]]);
             expect(fills(await bodies({ '📦 Enhanced Nodes.Glow.Show': false }))).toEqual([['rgba(0, 0, 0, 0.5)', 3], ['rgba(0, 0, 0, 0.5)', 3]]);
-            expect(fills(await bodies({}, true)).map(([colour]) => colour)).toEqual(['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)']);
+            expect(fills(await bodies({}, true)).map(([colour]) => colour)).toEqual(['#00ff88', '#00ff88', 'rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0)']);
             // The frame: in the secondary colour, glowing 45 × Glow in the accent, centred, at each node's alpha, round each side of its edge.
             const frames_ = (await bodies({})).filter((p) => p.op === 'strokeRect').map((p) => [p.style, p.shadowColor, p.shadowBlur, p.shadowOffsetX, p.shadowOffsetY, p.globalAlpha]);
             expect(frames_).toEqual([['#00ffcc', '#00ff44', 22.5, 0, 0, 1], ['#00ffcc', '#00ff44', 22.5, 0, 0, 0.2], ['#00ffcc', '#00ff44', 22.5, 0, 0, 1], ['#00ffcc', '#00ff44', 22.5, 0, 0, 0.2]]);

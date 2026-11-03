@@ -23,7 +23,7 @@
 import type { ComfyExtension } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { N, nodeSettings } from '@/core/settings';
-import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake } from '@/core/engine';
+import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
 import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
 import { drawTitle, titleOf } from '@/nodes/text';
@@ -110,8 +110,8 @@ function partOf(canvas: Canvas, node: Node, sides: number): Part {
     return part;
 }
 
-/** Whether a node with effect `style` casts v1's halo: any with an effect, with Show base effect off too, as v1 lit them, but not in low quality, where native casts no shadow. */
-const lit = (canvas: Canvas, style: number | undefined): style is number => style !== undefined && style > 0 && N.glowShow && !canvas.low_quality && !guard.off(keyOf(style));
+/** Whether a node with effect `style` casts v1's halo: any with an effect, with Show base effect off too, as v1 lit them, but not zoomed out below Perf.MinZoom. */
+const lit = (canvas: Canvas, style: number | undefined): style is number => style !== undefined && style > 0 && N.glowShow && !zoomedOut(canvas) && !guard.off(keyOf(style));
 
 /**
  * v1's halo (old_node_animations.js:2066-2075), the shadow native's body fill casts (FE157 LGraphCanvas.ts L5669-5674,
@@ -148,13 +148,14 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     const vue = LiteGraph.vueNodesMode;
     const moving = !holdsStill();
     const titles = !vue && N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
+    const far = zoomedOut(canvas);
     const area = canvas.visible_area;
     // Canvas px to a graph unit: the canvas is only scaled and moved.
     const scale = ctx.getTransform().a;
     for (const node of graph.nodes) {
         const style = styleOf(node);
         const only = style !== undefined && (vue || particlesOnly(node, style));
-        const shown = style !== undefined && draws(only) && !guard.off(keyOf(style));
+        const shown = style !== undefined && !far && draws(only) && !guard.off(keyOf(style));
         const glows = !vue && lit(canvas, style);
         const reach = shown ? effectReach(style, node.size[0], node.size[1], only) : 0;
         if (!overlaps(node.renderArea, area, Math.max(0, reach))) continue;
@@ -244,7 +245,7 @@ const ext: ComfyExtension = {
         LGraphCanvas.prototype.drawNodeShape = function (this: Canvas, ...args: Parameters<Canvas['drawNodeShape']>) {
             const [node, ctx, size] = args;
             const style = styleOf(node);
-            const fx = style !== undefined && !guard.off(keyOf(style));
+            const fx = style !== undefined && !zoomedOut(this) && !guard.off(keyOf(style));
             if (lit(this, style)) ctx.shadowColor = 'transparent';
             shaping = node;
             titled = undefined;

@@ -307,6 +307,7 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Perf.Adaptive", key: "perfAdaptive", name: "Adaptive quality", type: "boolean", default: true, group: "Performance · Budget", look: false, tooltip: "While frames take half as long again as the frame-rate cap or the display allows, link glows go plain, then particles thin out, then effects hold still, a step a second; they come back after 5 seconds or more with room." },
   { id: "🔗 Enhanced Links.Perf.KeepGlow", key: "perfKeepGlow", name: "Keep link glow while moving", type: "boolean", default: true, group: "Performance · Budget", look: false, tooltip: "Off lets link glows go plain while you pan, zoom, drag nodes or wires swing on a graph with many glowing links, and come back once it all keeps still: smoother on slower machines. Adaptive quality can still make them plain while frames are slow." },
   { id: "🔗 Enhanced Links.Perf.StaticAbove", key: "perfStaticAbove", name: "Freeze above N visible links", type: "slider", min: 0, max: 5e3, step: 50, default: 400, group: "Performance · Budget", look: false, tooltip: "Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes." },
+  { id: "🔗 Enhanced Links.Perf.MinZoom", key: "perfMinZoom", name: "Hide effects zoomed out below", type: "slider", min: 0, max: 100, step: 5, default: 25, group: "Performance · Budget", look: false, tooltip: "The zoom, in percent, below which links and nodes are drawn as ComfyUI draws them, but for the run visuals on nodes. 0 keeps the effects at every zoom." },
   { id: "🔗 Enhanced Links.Motion", key: "motion", name: "Motion", type: "combo", options: MOTION_OPTIONS, default: "system", group: "Performance · Accessibility", look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },
   { id: "🔗 Enhanced Links.Coexist", key: "coexist", name: "Other link extensions", type: "combo", options: COEXIST_OPTIONS, default: "auto", group: "Performance · Compatibility", advanced: true, look: false, tooltip: "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working." },
   { id: LOOK, key: "look", name: "Current look", type: "hidden", default: "", tooltip: "The look last picked: empty until the first-run picker is answered, custom for settings kept as they were." },
@@ -596,6 +597,7 @@ function heldByRun(applies) {
   const mode = during(applies);
   return mode === "pause" || mode === "spotlight";
 }
+const zoomedOut = (canvas) => canvas.ds.scale * 100 < L.perfMinZoom;
 const calm$1 = () => during(L.pauseDuringRender) === "calm" || during(N.pauseDuringRender) === "calm";
 const live = { links: 0, nodes: 0, particles: 0, bursts: 0, marks: 0, flows: 0, rings: 0, wires: 0, assist: 0 };
 const layers = {};
@@ -3757,7 +3759,6 @@ function centreMarker(canvas, ctx, s, fill2 = s.pal.native) {
   ctx.fill();
 }
 const LINKS = "Link animation";
-const LOD_SCALE = 0.25;
 const REACH = 120;
 const CLASSIC$1 = 9;
 const NATIVE = "spline";
@@ -4009,7 +4010,7 @@ let warned = false;
 let foreign = false;
 let told = false;
 const deferring = () => L.coexist === "defer" || L.coexist === "auto" && foreign;
-const drawsRuns = (canvas) => L.enabled && !defers() && canvas.ds.scale >= LOD_SCALE;
+const drawsRuns = (canvas) => L.enabled && !defers() && !zoomedOut(canvas);
 function defers() {
   if (!deferring()) return false;
   if (L.coexist === "auto" && !told) {
@@ -4058,7 +4059,7 @@ function begin(canvas, ctx) {
   raised.length = flowing.length = 0;
   pass.ctx = ctx;
   pass.calls = pass.bases = 0;
-  pass.on = L.enabled && (L.animate !== 0 || wired()) && !defers() && !guard.off(LINKS) && canvas.ds.scale >= LOD_SCALE;
+  pass.on = L.enabled && (L.animate !== 0 || wired()) && !defers() && !guard.off(LINKS) && !zoomedOut(canvas);
   const held2 = L.staticMode || env.reducedMotion || crowded || adaptive.level >= HELD;
   pass.still = !pass.on || held2 || heldByRun(L.pauseDuringRender) || !moves();
   pass.wires = pass.on && wired();
@@ -7940,28 +7941,29 @@ export {
   transformPane as a3,
   syncRuns as a4,
   overlaps as a5,
-  holdsStill as a6,
-  during as a7,
-  nodePalette as a8,
-  effectOf as a9,
-  particlesOnly as aa,
-  stepOf as ab,
-  BYPASS as ac,
-  NEVER as ad,
-  nodeMenu as ae,
-  nodeSettings as af,
-  startSprites as ag,
-  drawBursts as ah,
-  COMPLETION as ai,
-  drawNodeFx as aj,
-  OVER as ak,
-  dummy as al,
-  reach as am,
-  UNDER as an,
-  ownStyle as ao,
-  CALM_ALPHA as ap,
-  STILL_NODE as aq,
-  stopSprites as ar,
+  zoomedOut as a6,
+  holdsStill as a7,
+  during as a8,
+  nodePalette as a9,
+  effectOf as aa,
+  particlesOnly as ab,
+  stepOf as ac,
+  BYPASS as ad,
+  NEVER as ae,
+  nodeMenu as af,
+  nodeSettings as ag,
+  startSprites as ah,
+  drawBursts as ai,
+  COMPLETION as aj,
+  drawNodeFx as ak,
+  OVER as al,
+  dummy as am,
+  reach as an,
+  UNDER as ao,
+  ownStyle as ap,
+  CALM_ALPHA as aq,
+  STILL_NODE as ar,
+  stopSprites as as,
   dark as b,
   clock as c,
   darker as d,
@@ -7988,4 +7990,4 @@ export {
   keyText as y,
   running as z
 };
-//# sourceMappingURL=menus-BRwptLJ3.js.map
+//# sourceMappingURL=menus-rHK7Pq7j.js.map

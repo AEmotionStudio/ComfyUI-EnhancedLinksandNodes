@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { J as N, a1 as translucent, a2 as revision, a3 as transformPane, a4 as syncRuns, a5 as overlaps, L, a6 as holdsStill, a7 as during, a8 as nodePalette, a9 as effectOf, aa as particlesOnly$1, ab as stepOf, ac as BYPASS, ad as NEVER, S as SELECTION_FX, ae as nodeMenu, af as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, ag as startSprites, ah as drawBursts, g as guard, ai as COMPLETION, aj as drawNodeFx, c as clock, ak as OVER, al as dummy, am as reach, an as UNDER, w as wake, ao as ownStyle, ap as CALM_ALPHA, aq as STILL_NODE, ar as stopSprites } from "./chunks/menus-BRwptLJ3.js";
+import { J as N, a1 as translucent, a2 as revision, a3 as transformPane, a4 as syncRuns, a5 as overlaps, L, a6 as zoomedOut, a7 as holdsStill, a8 as during, a9 as nodePalette, aa as effectOf, ab as particlesOnly$1, ac as stepOf, ad as BYPASS, ae as NEVER, S as SELECTION_FX, af as nodeMenu, ag as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, ah as startSprites, ai as drawBursts, g as guard, aj as COMPLETION, ak as drawNodeFx, c as clock, al as OVER, am as dummy, an as reach, ao as UNDER, w as wake, ap as ownStyle, aq as CALM_ALPHA, ar as STILL_NODE, as as stopSprites } from "./chunks/menus-rHK7Pq7j.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -214,6 +214,7 @@ function stylesheet() {
     ".lg-node[data-eln-mode=muted]{--eln-mode:0.8}",
     ":root[data-eln-pace=still] .lg-node::after, .disable-animations .lg-node::after{animation:none}",
     ":root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}",
+    ":root[data-eln-pace=far] .lg-node:not([data-eln-run])::after{content:none}",
     "@keyframes eln-breathe{from{opacity:calc(var(--eln-a) * 0.35)}}",
     `@keyframes eln-ripple{0%{opacity:0;transform:scale(0.98)}20%{opacity:var(--eln-a);transform:none}100%{opacity:0;transform:scale(${(1 + 0.08 * size).toFixed(2)})}}`,
     `@keyframes eln-turn{${turn}}`
@@ -269,7 +270,7 @@ function vueNodes(canvas) {
     if (el) mark(el, look);
   }
   const crowded = L.perfStaticAbove > 0 && moving > L.perfStaticAbove / 4;
-  const now = holdsStill() || crowded ? "still" : during(N.pauseDuringRender) === "calm" ? "calm" : "";
+  const now = zoomedOut(canvas) ? "far" : holdsStill() || crowded ? "still" : during(N.pauseDuringRender) === "calm" ? "calm" : "";
   if (now !== pace) {
     pace = now;
     put(document.documentElement, "data-eln-pace", pace);
@@ -319,7 +320,7 @@ function partOf(canvas, node, sides) {
   part.round = canvas.low_quality || shape !== ROUND && shape !== CARD && shape !== CIRCLE ? 0 : shape === CIRCLE ? -1 : LiteGraph.ROUND_RADIUS;
   return part;
 }
-const lit = (canvas, style) => style !== void 0 && style > 0 && N.glowShow && !canvas.low_quality && !guard.off(keyOf(style));
+const lit = (canvas, style) => style !== void 0 && style > 0 && N.glowShow && !zoomedOut(canvas) && !guard.off(keyOf(style));
 function halo(canvas, ctx, node, style, scale) {
   const shift = Math.ceil((canvas.visible_area[2] + node.boundingRect[2]) * scale) + 64;
   ctx.translate(shift / scale, 0);
@@ -341,12 +342,13 @@ function under(canvas, ctx) {
   const vue = LiteGraph.vueNodesMode;
   const moving = !holdsStill();
   const titles = !vue && N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
+  const far = zoomedOut(canvas);
   const area = canvas.visible_area;
   const scale = ctx.getTransform().a;
   for (const node of graph.nodes) {
     const style = styleOf(node);
     const only = style !== void 0 && (vue || particlesOnly(node, style));
-    const shown2 = style !== void 0 && draws(only) && !guard.off(keyOf(style));
+    const shown2 = style !== void 0 && !far && draws(only) && !guard.off(keyOf(style));
     const glows = !vue && lit(canvas, style);
     const reach$1 = shown2 ? reach(style, node.size[0], node.size[1], only) : 0;
     if (!overlaps(node.renderArea, area, Math.max(0, reach$1))) continue;
@@ -415,7 +417,7 @@ const ext = {
     LGraphCanvas.prototype.drawNodeShape = function(...args) {
       const [node, ctx, size] = args;
       const style = styleOf(node);
-      const fx = style !== void 0 && !guard.off(keyOf(style));
+      const fx = style !== void 0 && !zoomedOut(this) && !guard.off(keyOf(style));
       if (lit(this, style)) ctx.shadowColor = "transparent";
       shaping = node;
       titled = void 0;

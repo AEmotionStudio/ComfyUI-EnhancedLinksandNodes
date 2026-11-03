@@ -178,6 +178,9 @@ export function heldByRun(applies: boolean): boolean {
     return mode === 'pause' || mode === 'spotlight';
 }
 
+/** Whether `canvas` is zoomed out below Perf.MinZoom, where links and nodes are drawn as native draws them. */
+export const zoomedOut = (canvas: { ds: { scale: number } }): boolean => canvas.ds.scale * 100 < L.perfMinZoom;
+
 /** Whether a Calm run is slowing the links or the nodes. */
 const calm = () => during(L.pauseDuringRender) === 'calm' || during(N.pauseDuringRender) === 'calm';
 
