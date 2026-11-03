@@ -15,11 +15,11 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - To go back, install 2.0.1 from the Manager. ComfyUI's Settings › Extension turns either half off.
 
 ### Looks and panel
-- **New panel** (the **FX** tab in the sidebar, or **Alt+L**): Looks, Links, Nodes, Focus & Flow, Perf and About tabs, search, Advanced settings behind a switch, a reset on every changed setting, Undo, live previews, and two-way sync with ComfyUI's settings dialog, saving once per change.
+- **New panel** (the **FX** tab in the sidebar): Looks, Links, Nodes, Focus & Flow, Perf and About tabs, search, Advanced settings behind a switch, a reset on every changed setting, Undo, live previews, and two-way sync with ComfyUI's settings dialog, saving once per change.
 - **11 looks**: Off, Subtle (the defaults), Showcase, Performance, Classic v1, Neon Night, Lava Lamp, Sacred Geometry, Living Wires, Presenter and Blueprint. Hovering one previews it on the canvas; applying one changes only what differs, with Undo. Save your own, share them as JSON, or let **Surprise me** pick.
 - **Settings dialog**: every setting is under **Enhanced Links & Nodes** with a readable name, a group, its real range and a tooltip. [docs/SETTINGS.md](docs/SETTINGS.md) lists them.
 - **Link effects** and **Node effects** switches turn each half off without losing its settings.
-- **Quick toggles**: Alt+L (panel), Alt+K (all effects), Alt+J (running node, then the next error), View › Enhanced Links & Nodes, **Enhanced FX** in the canvas menu, a button on the action bar and one in the selection toolbox, and 20 commands in ComfyUI's keybinding settings. A key another command already has is left to it.
+- **Quick toggles**: **Shortcut keys** (off by default; Alt or Alt+Shift with L for the panel, K for all effects, J for the running node, then the next error), View › Enhanced Links & Nodes, **Enhanced FX** in the canvas menu, a button on the action bar and one in the selection toolbox, and 20 commands in ComfyUI's keybinding settings. A key another command already has is left to it.
 - **About**: the version, what's new, shortcuts and Copy diagnostics.
 
 ### Links

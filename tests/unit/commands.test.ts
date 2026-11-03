@@ -10,7 +10,7 @@
 
 import type { ComfyExtension, IContextMenuValue } from '@comfyorg/comfyui-frontend-types';
 import { describe, it, expect, vi } from 'vitest';
-import { L, LOOK, N, preview, restore } from '@/core/settings';
+import { L, LOOK, N, commit, preview, restore } from '@/core/settings';
 import { live } from '@/core/engine';
 import { play } from '@/fx/bursts';
 import { DISABLED, running } from '@/sidebar/sidebar';
@@ -32,11 +32,22 @@ const THICKNESS = '🔗 Enhanced Links.Thickness';
 const FOCUS_ON = '🔗 Enhanced Links.Focus.Enabled';
 const FOCUS_MODE = '🔗 Enhanced Links.Focus.Mode';
 const FOLLOW = '🔗 Enhanced Links.Navigate.Follow';
+const KEYS = '🔗 Enhanced Links.Keys';
 
 const extension = (name: string) => fake.extensions.find((e) => e.name === name) as unknown as ComfyExtension;
 const links = () => extension('enhanced.link.animations');
 const command = (name: string) => links().commands!.find((c) => c.id === `${ID}${name}`)!;
 const run = (name: string) => app.extensionManager.command.execute(`${ID}${name}`);
+/**
+ * Starts as a page loaded with Shortcut keys `set` does: the extension's keys bound as it registers, which reads the set
+ * saved then. The fake registers it once, as the first test imports it, so its keys are bound again here.
+ */
+async function startWith(set: string, settings: Record<string, unknown> = {}) {
+    await start({ [KEYS]: set, ...settings });
+    fake.keybindings = fake.keybindings.filter((k) => k.commandId !== TOGGLE && !k.commandId.startsWith(ID));
+    fake.keybindings.push(...links().keybindings!);
+}
+
 /** Lets the write queue drain: the fake store's writes finish within microtasks. */
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 const said = () => (fake.toasts.at(-1) as { summary: string } | undefined)?.summary;
@@ -98,7 +109,7 @@ describe('the commands', () => {
     });
 
     it('ToggleAll turns every effect off while any is on, else all on, with a POST for each switch it changes, and names Alt+K while it is bound', async () => {
-        await start({ [NODES_ON]: false });
+        await startWith('alt', { [NODES_ON]: false });
         const all = command('ToggleAll');
         expect(all.active!()).toBe(true);
         await run('ToggleAll');
@@ -404,8 +415,17 @@ describe('the commands', () => {
 });
 
 describe('the keys', () => {
+    it('are none until Shortcut keys is on, and say a change needs a reload', async () => {
+        await startWith('off');
+        expect(fake.keybindings.filter((k) => k.commandId === TOGGLE || k.commandId.startsWith(ID))).toEqual([]);
+        expect(links().actionBarButtons![0].tooltip).toBe('Toggle all effects');
+        commit(KEYS, 'alt');
+        await settle();
+        expect(said()).toBe('Reload the page to use the new shortcut keys');
+    });
+
     it('bind Alt+L to the panel’s toggle, Alt+K to ToggleAll and Alt+J to GoToRunning, with the characters macOS’s Option types too', async () => {
-        await start();
+        await startWith('alt');
         const ours = fake.keybindings.filter((k) => k.commandId === TOGGLE || k.commandId.startsWith(ID));
         expect(ours).toEqual([
             { commandId: TOGGLE, combo: { key: 'l', alt: true } },
@@ -417,8 +437,26 @@ describe('the keys', () => {
         ]);
     });
 
+    it('bind Alt+Shift+L, Alt+Shift+K and Alt+Shift+J with the Alt+Shift set, naming them but not the ones macOS’s Option types', async () => {
+        await startWith('alt-shift');
+        const ours = fake.keybindings.filter((k) => k.commandId === TOGGLE || k.commandId.startsWith(ID));
+        expect(ours.map((k) => [k.commandId, k.combo.key, k.combo.alt, k.combo.shift])).toEqual([
+            [TOGGLE, 'l', true, true], [TOGGLE, 'Ò', true, true],
+            [`${ID}ToggleAll`, 'k', true, true], [`${ID}ToggleAll`, '\uf8ff', true, true],
+            [`${ID}GoToRunning`, 'j', true, true], [`${ID}GoToRunning`, 'Ô', true, true],
+        ]);
+        expect(links().actionBarButtons![0].tooltip).toBe('Toggle all effects (Alt+Shift+K)');
+        const kept = fake.keybindings;
+        fake.keybindings = kept.filter((k) => k.combo.key !== 'k');
+        try {
+            expect(links().actionBarButtons![0].tooltip).toBe('Toggle all effects');
+        } finally {
+            fake.keybindings = kept;
+        }
+    });
+
     it('leave out a key that ComfyUI or an extension before them has as they register, which would be an error toast', async () => {
-        await start();
+        await start({ [KEYS]: 'alt' });
         const [kept, commands] = [fake.keybindings, fake.registeredCommands];
         // As the extension registers: a command of another extension's on Alt+K, typed as Shift would give it.
         fake.keybindings = [{ commandId: 'Other.Command', combo: { key: 'K', alt: true } }];
@@ -431,7 +469,7 @@ describe('the keys', () => {
     });
 
     it('are the ones About tells, as they are bound now, and the picker names the panel’s', async () => {
-        await start({ '🔗 Enhanced Links.Panel.State': { tab: 'about', advanced: false, search: '' } });
+        await startWith('alt', { '🔗 Enhanced Links.Panel.State': { tab: 'about', advanced: false, search: '' } });
         const about = () => {
             const slot = document.createElement('div');
             const tab = fake.tabs.find((t) => t.id === 'enhanced-links-nodes')!;
@@ -451,9 +489,9 @@ describe('the keys', () => {
         fake.keybindings = kept.filter((k) => k.combo.key === '¬' || k.combo.key === '˚' || k.combo.key === '∆');
         try {
             expect(about()).toEqual([
-                ['Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel. Give it a key in Settings › Keybinding.'],
-                ['Toggle all effects', 'Turns every effect off, or back on. Give it a key in Settings › Keybinding.'],
-                ['Go to running node (or next error)', `${RUNNING} Give it a key in Settings › Keybinding.`],
+                ['Toggle Enhanced Links & Nodes Sidebar', 'Opens and closes this panel. Turn on Shortcut keys under Perf, or give it a key in Settings › Keybinding.'],
+                ['Toggle all effects', 'Turns every effect off, or back on. Turn on Shortcut keys under Perf, or give it a key in Settings › Keybinding.'],
+                ['Go to running node (or next error)', `${RUNNING} Turn on Shortcut keys under Perf, or give it a key in Settings › Keybinding.`],
             ]);
             await run('ChooseLook');
             expect(document.querySelector('.eln-picker-foot .eln-hint')!.textContent).toBe('Change it any time in the FX panel.');
@@ -504,7 +542,7 @@ describe('the menus and buttons', () => {
     });
 
     it('the action bar’s button toggles every effect, named with Alt+K; the About page shows the project at its version, the studio’s Discord and Ko-fi', async () => {
-        await start();
+        await startWith('alt');
         const [button] = links().actionBarButtons!;
         expect([button.icon, button.tooltip]).toEqual(['eln-icon', 'Toggle all effects (Alt+K)']);
         button.onClick();

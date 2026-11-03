@@ -356,8 +356,8 @@ export const keyText = (combo: Combo): string =>
 export const commandKeys = (): Map<string, string> =>
     new Map((app.extensionManager.command.commands as { id: string; keybinding?: { combo: Combo } | null }[]).flatMap((c) => (c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : [])));
 
-/** The keys bound for macOS, whose Option types these for L, K and J: other keyboards cannot type them. */
-const MAC_ONLY = new Set(['Alt+¬', 'Alt+˚', 'Alt+∆']);
+/** The keys bound for macOS, whose Option types these for L, K and J, with Shift too: other keyboards cannot type them. */
+const MAC_ONLY = new Set(['Alt+¬', 'Alt+˚', 'Alt+∆', 'Alt+Shift+Ò', 'Alt+Shift+\uf8ff', 'Alt+Shift+Ô']);
 
 /** The key a command has now, as the texts name it: its first, unless only macOS types that one. */
 export function keyName(id: string): string | undefined {
@@ -714,8 +714,8 @@ const NEWS = [
     "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
     'This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.',
     'Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.',
-    'Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.',
-    "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
+    'Quick toggles: View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, buttons on the action bar and the selection toolbox, and keys for this panel, every effect and the running node, which Shortcut keys under Perf turns on.',
+    "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
     'Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.',
     'Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.',
     'Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.',
@@ -753,7 +753,7 @@ const KEYS = [
 function keys(): string[][] {
     return [...COMMANDS.map(([id, name, what]) => {
         const key = keyName(id);
-        return key ? [key, what] : [name, `${what} Give it a key in Settings › Keybinding.`];
+        return key ? [key, what] : [name, `${what} Turn on Shortcut keys under Perf, or give it a key in Settings › Keybinding.`];
     }), ...KEYS];
 }
 

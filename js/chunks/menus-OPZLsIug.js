@@ -188,6 +188,11 @@ const COMPLETION_ANCHOR_OPTIONS = [
   { value: "primary", text: "Primary nodes" },
   { value: "viewport", text: "Center of screen" }
 ];
+const KEY_OPTIONS = [
+  { value: "off", text: "Off" },
+  { value: "alt", text: "Alt+L, Alt+K, Alt+J" },
+  { value: "alt-shift", text: "Alt+Shift+L, Alt+Shift+K, Alt+Shift+J" }
+];
 const COEXIST_OPTIONS = [
   { value: "auto", text: "Step aside if one is found" },
   { value: "ours", text: "Keep Enhanced link effects" },
@@ -326,6 +331,7 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Perf.StaticAbove", key: "perfStaticAbove", name: "Freeze above N visible links", type: "slider", min: 0, max: 5e3, step: 50, default: 400, group: "Performance · Budget", look: false, tooltip: "Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes." },
   { id: "🔗 Enhanced Links.Perf.MinZoom", key: "perfMinZoom", name: "Hide effects zoomed out below", type: "slider", min: 0, max: 100, step: 5, default: 25, group: "Performance · Budget", look: false, tooltip: "The zoom, in percent, below which links and nodes are drawn as ComfyUI draws them, but for the run visuals on nodes. 0 keeps the effects at every zoom." },
   { id: "🔗 Enhanced Links.Motion", key: "motion", name: "Motion", type: "combo", options: MOTION_OPTIONS, default: "system", group: "Performance · Accessibility", look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },
+  { id: "🔗 Enhanced Links.Keys", key: "keys", name: "Shortcut keys", type: "combo", options: KEY_OPTIONS, default: "off", group: "Performance · Compatibility", look: false, tooltip: "L shows the panel, K toggles every effect and J goes to the running node. Takes effect when the page reloads. Where your browser or desktop already uses a key, pick the other set, or give any command a key of your own in Settings › Keybinding." },
   { id: "🔗 Enhanced Links.Coexist", key: "coexist", name: "Other link extensions", type: "combo", options: COEXIST_OPTIONS, default: "auto", group: "Performance · Compatibility", advanced: true, look: false, tooltip: "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working." },
   { id: LOOK, key: "look", name: "Current look", type: "hidden", default: "", tooltip: "The look last picked: empty until the first-run picker is answered, custom for settings kept as they were." },
   { id: "🔗 Enhanced Links.Panel.State", key: "panelState", name: "Panel state", type: "hidden", default: PANEL_STATE$1, tooltip: "The panel's tab, whether Advanced is open, and its search." },
@@ -375,6 +381,9 @@ const shown$3 = (id) => snapshotOf(id)[setting(id).key];
 function checked(id) {
   app.extensionManager.setting.get(id);
   return shown$3(id);
+}
+function savedEarly(id) {
+  return normalize(setting(id), app.extensionManager.setting.get(id));
 }
 const listeners = /* @__PURE__ */ new Set();
 function watch(listener) {
@@ -7082,7 +7091,7 @@ function resetEverything() {
 }
 const keyText = (combo) => [combo.ctrl && "Ctrl", combo.alt && "Alt", combo.shift && "Shift", combo.key.length === 1 ? combo.key.toUpperCase() : combo.key].filter(Boolean).join("+");
 const commandKeys = () => new Map(app.extensionManager.command.commands.flatMap((c) => c.keybinding ? [[c.id, keyText(c.keybinding.combo)]] : []));
-const MAC_ONLY = /* @__PURE__ */ new Set(["Alt+¬", "Alt+˚", "Alt+∆"]);
+const MAC_ONLY = /* @__PURE__ */ new Set(["Alt+¬", "Alt+˚", "Alt+∆", "Alt+Shift+Ò", "Alt+Shift+", "Alt+Shift+Ô"]);
 function keyName(id) {
   const key = commandKeys().get(id);
   return key && !MAC_ONLY.has(key) ? key : void 0;
@@ -7404,8 +7413,8 @@ const NEWS$1 = [
   "v1's look is back: Classic Flow with its halo, and the link animations on v1's clock, moving along the real path across reroutes.",
   "This panel: looks with live previews, search, undo, and two-way sync with the settings dialog, which now has readable names and groups.",
   "Link FX and Node FX switches, a frame-rate cap, a Motion setting, and an effect over your outputs when a run finishes: fireworks, confetti, a shockwave or a comet along the links it took.",
-  "Quick toggles: keys for this panel and every effect (see Keys), View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, and buttons on the action bar and the selection toolbox.",
-  "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Alt+J goes to.",
+  "Quick toggles: View ▸ Enhanced Links & Nodes, Enhanced FX in the canvas menu, buttons on the action bar and the selection toolbox, and keys for this panel, every effect and the running node, which Shortcut keys under Perf turns on.",
+  "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links sag and swing as rope, a whip or gel, with any link animation or none, as in the Living Wires look.",
   "Three new link animations: Merkaba Beads, DNA Helix 3D and Comet Trails.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
@@ -7435,7 +7444,7 @@ const KEYS = [
 function keys() {
   return [...COMMANDS.map(([id, name, what]) => {
     const key = keyName(id);
-    return key ? [key, what] : [name, `${what} Give it a key in Settings › Keybinding.`];
+    return key ? [key, what] : [name, `${what} Turn on Shortcut keys under Perf, or give it a key in Settings › Keybinding.`];
   }), ...KEYS];
 }
 const STUDIO = "Developed by Æmotion Studio, Enhanced Links & Nodes adds beautiful, customizable animations to both links and nodes in your ComfyUI workflow. Contributions are welcome!";
@@ -7945,64 +7954,66 @@ function installFollow() {
   app.canvas.canvas.addEventListener("pointermove", interrupted, { passive: true });
 }
 export {
-  nextError as $,
-  setting as A,
+  resetEverything as $,
+  TOGGLE as A,
   BADGES as B,
-  shown$3 as C,
-  DISABLED as D,
-  showPanel as E,
+  keyText as C,
+  running as D,
+  shown$3 as E,
   FROZEN as F,
-  LINKS_ON as G,
-  toggleLinks as H,
-  toggleNodes as I,
-  N as J,
-  toggleStatic as K,
+  DISABLED as G,
+  showPanel as H,
+  LINKS_ON as I,
+  toggleLinks as J,
+  toggleNodes as K,
   L,
-  toggleFocus as M,
+  N as M,
   NODES_ON as N,
-  FOCUS_ON as O,
-  commit as P,
-  showPicker as Q,
-  surpriseMe as R,
+  toggleStatic as O,
+  toggleFocus as P,
+  FOCUS_ON as Q,
+  commit as R,
   SELECTION_FX as S,
   TITLE as T,
-  goBack as U,
-  selectedNodes as V,
-  effects as W,
-  pick as X,
-  complete as Y,
-  resetEverything as Z,
-  goToRunning as _,
+  showPicker as U,
+  surpriseMe as V,
+  goBack as W,
+  selectedNodes as X,
+  effects as Y,
+  pick as Z,
+  complete as _,
   live as a,
-  goAlong as a0,
-  translucent as a1,
-  revision as a2,
-  transformPane as a3,
-  syncRuns as a4,
-  overlaps as a5,
-  zoomedOut as a6,
-  holdsStill as a7,
-  during as a8,
-  nodePalette as a9,
-  effectOf as aa,
-  particlesOnly as ab,
-  stepOf as ac,
-  BYPASS as ad,
-  NEVER as ae,
-  nodeMenu as af,
-  nodeSettings as ag,
-  startSprites as ah,
-  drawBursts as ai,
-  COMPLETION as aj,
-  drawNodeFx as ak,
-  OVER as al,
-  dummy as am,
-  reach as an,
-  UNDER as ao,
-  ownStyle as ap,
-  CALM_ALPHA as aq,
-  STILL_NODE as ar,
-  stopSprites as as,
+  goToRunning as a0,
+  nextError as a1,
+  goAlong as a2,
+  translucent as a3,
+  revision as a4,
+  transformPane as a5,
+  syncRuns as a6,
+  overlaps as a7,
+  zoomedOut as a8,
+  holdsStill as a9,
+  during as aa,
+  nodePalette as ab,
+  effectOf as ac,
+  particlesOnly as ad,
+  stepOf as ae,
+  BYPASS as af,
+  NEVER as ag,
+  nodeMenu as ah,
+  nodeSettings as ai,
+  startSprites as aj,
+  drawBursts as ak,
+  COMPLETION as al,
+  drawNodeFx as am,
+  OVER as an,
+  dummy as ao,
+  reach as ap,
+  UNDER as aq,
+  ownStyle as ar,
+  CALM_ALPHA as as,
+  STILL_NODE as at,
+  stopSprites as au,
   dark as b,
   clock as c,
   darker as d,
@@ -8020,13 +8031,13 @@ export {
   panelShown as p,
   installFollow as q,
   installLinks as r,
-  errorNodes as s,
-  currentLook as t,
-  keyName as u,
-  commandKeys as v,
+  setting as s,
+  watch as t,
+  errorNodes as u,
+  currentLook as v,
   wake as w,
-  TOGGLE as x,
-  keyText as y,
-  running as z
+  keyName as x,
+  savedEarly as y,
+  commandKeys as z
 };
-//# sourceMappingURL=menus-BXp8gltf.js.map
+//# sourceMappingURL=menus-OPZLsIug.js.map

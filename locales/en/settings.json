@@ -583,6 +583,15 @@
       "Full": "Full"
     }
   },
+  "🔗 Enhanced Links_Keys": {
+    "name": "Shortcut keys",
+    "tooltip": "L shows the panel, K toggles every effect and J goes to the running node. Takes effect when the page reloads. Where your browser or desktop already uses a key, pick the other set, or give any command a key of your own in Settings › Keybinding.",
+    "options": {
+      "Off": "Off",
+      "Alt+L, Alt+K, Alt+J": "Alt+L, Alt+K, Alt+J",
+      "Alt+Shift+L, Alt+Shift+K, Alt+Shift+J": "Alt+Shift+L, Alt+Shift+K, Alt+Shift+J"
+    }
+  },
   "🔗 Enhanced Links_Coexist": {
     "name": "Other link extensions",
     "tooltip": "When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.",

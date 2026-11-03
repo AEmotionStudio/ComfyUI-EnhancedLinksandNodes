@@ -24,6 +24,8 @@ interface Draws {
     sparks: [x: number, y: number, ms: number][];
 }
 
+test.use({ settings: { '🔗 Enhanced Links.Keys': 'alt' } });
+
 test.beforeEach(async ({ page, profile }) => {
     test.skip(profile === 'native', 'the run visuals come with the extensions');
     await openApp(page);

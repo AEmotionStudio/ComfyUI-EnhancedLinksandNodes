@@ -142,7 +142,7 @@ for (const palette of PALETTES) {
 
 for (const palette of PALETTES) {
     test.describe(`a run on the ${palette} palette`, () => {
-        test.use({ settings: { 'Comfy.VueNodes.Enabled': true, 'Comfy.ColorPalette': palette, '📦 Enhanced Nodes.Completion.Style': 'fireworks' } });
+        test.use({ settings: { 'Comfy.VueNodes.Enabled': true, 'Comfy.ColorPalette': palette, '📦 Enhanced Nodes.Completion.Style': 'fireworks', '🔗 Enhanced Links.Keys': 'alt' } });
 
         test('a run rings the running DOM node on the overlay, on its box, and the fireworks go off over the DOM nodes', async ({ page }, testInfo) => {
             const graph = await buildGraph(page, graphs.sleepChain(1.5));

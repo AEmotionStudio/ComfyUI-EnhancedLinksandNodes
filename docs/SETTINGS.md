@@ -194,6 +194,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
+| Shortcut keys | `🔗 Enhanced Links.Keys` | combo | `off` Off, `alt` Alt+L, Alt+K, Alt+J, `alt-shift` Alt+Shift+L, Alt+Shift+K, Alt+Shift+J | `off` Off | L shows the panel, K toggles every effect and J goes to the running node. Takes effect when the page reloads. Where your browser or desktop already uses a key, pick the other set, or give any command a key of your own in Settings › Keybinding. |
 | Other link extensions | `🔗 Enhanced Links.Coexist` | combo | `auto` Step aside if one is found, `ours` Keep Enhanced link effects, `defer` Always step aside | `auto` Step aside if one is found | When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working. |
 
 ## Kept by the panel

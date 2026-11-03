@@ -67,7 +67,7 @@
 ![Looks in the FX panel](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/looks.webp)
 
 *   **11 looks**: hover one to preview it on the canvas, click to apply, Undo to go back. Save your own, share them as JSON, or let **Surprise me** pick.
-*   **The FX tab** in the sidebar (**Alt+L**): Looks, Links, Nodes, Focus & Flow, Perf and About, with search, live previews and a reset on every changed setting.
+*   **The FX tab** in the sidebar: Looks, Links, Nodes, Focus & Flow, Perf and About, with search, live previews and a reset on every changed setting.
 
 </td>
 <td width="50%">
@@ -87,7 +87,7 @@
 ### 🏁 Run visuals and completion
 ![Run visuals](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/run.webp)
 
-*   **For runs you queue**: a data river into the running node, a progress ring (theme accent, effect color, custom, rainbow or amber → green), the executed path's fading trail, a red pulse on a failed node. **Alt+J** goes to the running node, then to errors.
+*   **For runs you queue**: a data river into the running node, a progress ring (theme accent, effect color, custom, rainbow or amber → green), the executed path's fading trail, a red pulse on a failed node. **Go to running node** goes there, then to errors.
 *   **When it finishes**: Fireworks (v1's), Confetti, Shockwave (default), Path trace or Surprise, over the output nodes, nodes you mark Primary, or the center of the screen.
 *   **During a run**: Spotlight (default) holds other effects still; Calm, Freeze effects or Keep animating.
 
@@ -178,11 +178,13 @@ The **showcase** example workflow (core nodes only, no models, runs in seconds o
 
 ## 🔑 Quick toggles
 
+Shortcut keys are off by default, as some browsers and desktops use the same keys. Turn them on in the FX panel under **Perf › Shortcut keys** (or the settings dialog), as Alt or Alt+Shift, and reload the page.
+
 | Key | Command | Also in |
 | :--- | :--- | :--- |
-| **Alt+L** | Show or hide the FX panel | The **FX** tab in the sidebar |
-| **Alt+K** | Toggle all effects | The action bar's button, View › Enhanced Links & Nodes |
-| **Alt+J** | Go to running node, or once a run failed, the next error | View menu, canvas menu |
+| **Alt+L** or **Alt+Shift+L** | Show or hide the FX panel | The **FX** tab in the sidebar |
+| **Alt+K** or **Alt+Shift+K** | Toggle all effects | The action bar's button, View › Enhanced Links & Nodes |
+| **Alt+J** or **Alt+Shift+J** | Go to running node, or once a run failed, the next error | View menu, canvas menu |
 
 *   **View › Enhanced Links & Nodes**: Panel, Choose look…, Surprise me, All effects, Link effects, Node effects, Freeze animation, Selection focus, Follow execution, Go to running node and Next error.
 *   **Right-click the canvas › Enhanced FX**: Link effects, Node effects, Freeze animation, Selection focus, Follow execution, Go to running node, the current look, Surprise me and Open panel.
@@ -234,7 +236,7 @@ All 96 settings are in ComfyUI's settings dialog under **Enhanced Links & Nodes*
 <details>
 <summary><b>I updated and nothing changed.</b></summary>
 
-Restart ComfyUI and reload the page. Once the page is idle, a **Choose your look** card opens at the bottom left of the canvas; until you pick, Subtle shows, or your own settings if you changed any in 2.x. Pick a look there, or any time in the FX panel (**Alt+L**).
+Restart ComfyUI and reload the page. Once the page is idle, a **Choose your look** card opens at the bottom left of the canvas; until you pick, Subtle shows, or your own settings if you changed any in 2.x. Pick a look there, or any time in the FX panel.
 
 </details>
 
@@ -255,7 +257,7 @@ Yes. With **Other link extensions** at its default, *Step aside if one is found*
 <details>
 <summary><b>How do I roll back to 2.0.1?</b></summary>
 
-In ComfyUI Manager, switch the version to 2.0.1. With git: `git checkout 852af8a` (2.0.1) in the extension's folder. 3.0 never renames or deletes a 2.x setting, so 2.0.1 reads your settings file as before and ignores what only 3.0 knows. To turn effects off without uninstalling, press **Alt+K**, or disable either extension in **Settings › Extension**.
+In ComfyUI Manager, switch the version to 2.0.1. With git: `git checkout 852af8a` (2.0.1) in the extension's folder. 3.0 never renames or deletes a 2.x setting, so 2.0.1 reads your settings file as before and ignores what only 3.0 knows. To turn effects off without uninstalling, click the extension's button on the action bar (**Toggle all effects**), or disable either extension in **Settings › Extension**.
 
 </details>
 
@@ -272,7 +274,7 @@ In ComfyUI Manager, switch the version to 2.0.1. With git: `git checkout 852af8a
 
 *   **Nodes 2.0**: Escape does not end a slot drag, so connection assist stays until you release. ComfyUI's node opacity, and 1.57's drop shadow, also fall on the glows.
 *   **Run visuals** follow the runs this page queued. A run that starts while another workflow is shown draws on the shown workflow's nodes, as ComfyUI's own progress does, and a page reloaded mid-run shows nothing until the next run.
-*   **Frontend 1.39.5**: with both extensions disabled, Alt+L logs "Command … not found" in the console.
+*   **Frontend 1.39.5**: with Shortcut keys on and both extensions disabled, Alt+L logs "Command … not found" in the console.
 
 ---
 

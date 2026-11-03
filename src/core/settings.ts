@@ -287,6 +287,12 @@ const COMPLETION_ANCHOR_OPTIONS = [
     { value: 'viewport', text: 'Center of screen' },
 ] as const;
 
+const KEY_OPTIONS = [
+    { value: 'off', text: 'Off' },
+    { value: 'alt', text: 'Alt+L, Alt+K, Alt+J' },
+    { value: 'alt-shift', text: 'Alt+Shift+L, Alt+Shift+K, Alt+Shift+J' },
+] as const;
+
 const COEXIST_OPTIONS = [
     { value: 'auto', text: 'Step aside if one is found' },
     { value: 'ours', text: 'Keep Enhanced link effects' },
@@ -460,6 +466,7 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Perf.StaticAbove', key: 'perfStaticAbove', name: 'Freeze above N visible links', type: 'slider', min: 0, max: 5000, step: 50, default: 400, group: 'Performance · Budget', look: false, tooltip: 'Link motion holds still while more animated link segments than this are on screen (a link through reroutes has one per stretch), and Nodes 2.0 glows while more than a quarter as many animated nodes are. 0 never freezes.' },
     { id: '🔗 Enhanced Links.Perf.MinZoom', key: 'perfMinZoom', name: 'Hide effects zoomed out below', type: 'slider', min: 0, max: 100, step: 5, default: 25, group: 'Performance · Budget', look: false, tooltip: 'The zoom, in percent, below which links and nodes are drawn as ComfyUI draws them, but for the run visuals on nodes. 0 keeps the effects at every zoom.' },
     { id: '🔗 Enhanced Links.Motion', key: 'motion', name: 'Motion', type: 'combo', options: MOTION_OPTIONS, default: 'system', group: 'Performance · Accessibility', look: false, tooltip: "Follow system shows effects still while the system, or ComfyUI's Disable animations, asks for less motion. Reduce always shows them still; Full always animates them." },
+    { id: '🔗 Enhanced Links.Keys', key: 'keys', name: 'Shortcut keys', type: 'combo', options: KEY_OPTIONS, default: 'off', group: 'Performance · Compatibility', look: false, tooltip: 'L shows the panel, K toggles every effect and J goes to the running node. Takes effect when the page reloads. Where your browser or desktop already uses a key, pick the other set, or give any command a key of your own in Settings › Keybinding.' },
     { id: '🔗 Enhanced Links.Coexist', key: 'coexist', name: 'Other link extensions', type: 'combo', options: COEXIST_OPTIONS, default: 'auto', group: 'Performance · Compatibility', advanced: true, look: false, tooltip: 'When another extension, such as LinkFX, draws links too. Stepping aside leaves the links to it; node effects keep working.' },
 
     { id: LOOK, key: 'look', name: 'Current look', type: 'hidden', default: '', tooltip: 'The look last picked: empty until the first-run picker is answered, custom for settings kept as they were.' },
@@ -561,6 +568,14 @@ export const shown = (id: string): unknown => snapshotOf(id)[setting(id).key];
 export function checked(id: string): boolean {
     app.extensionManager.setting.get(id);
     return shown(id) as boolean;
+}
+
+/**
+ * The value a setting was saved with, read from the settings store before its extension registers it, as the keys an
+ * extension binds must be: the store holds the saved values by then, and no onChange has handed this one yet.
+ */
+export function savedEarly(id: string): unknown {
+    return normalize(setting(id), app.extensionManager.setting.get(id));
 }
 
 const listeners = new Set<(id: string) => void>();

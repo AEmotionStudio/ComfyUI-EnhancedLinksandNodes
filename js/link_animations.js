@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { g as guard, L, l as layers, a as live, c as clock, d as darker, b as dark, e as env, w as wake, i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, f as TOGGLE_ALL, p as panelShown, h as checked, F as FROZEN, S as SELECTION_FX, j as linkSettings, k as install, m as installPanel, o as installRuns, q as installFollow, r as installLinks, s as errorNodes, t as currentLook, u as keyName, v as commandKeys, x as TOGGLE, y as keyText, z as running, A as setting, C as shown$1, D as DISABLED, E as showPanel, G as LINKS_ON, N as NODES_ON, H as toggleLinks, I as toggleNodes, J as N, K as toggleStatic, M as toggleFocus, O as FOCUS_ON, P as commit, Q as showPicker, R as surpriseMe, U as goBack, V as selectedNodes, W as effects, X as pick, Y as complete, Z as resetEverything, _ as goToRunning, $ as nextError, a0 as goAlong } from "./chunks/menus-BXp8gltf.js";
+import { g as guard, L, l as layers, a as live, c as clock, d as darker, b as dark, e as env, w as wake, s as setting, i as installStyle, n as navigateOnDoubleClick, B as BADGES, T as TITLE, f as TOGGLE_ALL, p as panelShown, h as checked, F as FROZEN, S as SELECTION_FX, j as linkSettings, k as install, m as installPanel, o as installRuns, q as installFollow, r as installLinks, t as watch, u as errorNodes, v as currentLook, x as keyName, y as savedEarly, z as commandKeys, A as TOGGLE, C as keyText, D as running, E as shown$1, G as DISABLED, H as showPanel, I as LINKS_ON, N as NODES_ON, J as toggleLinks, K as toggleNodes, M as N, O as toggleStatic, P as toggleFocus, Q as FOCUS_ON, R as commit, U as showPicker, V as surpriseMe, W as goBack, X as selectedNodes, Y as effects, Z as pick, _ as complete, $ as resetEverything, a0 as goToRunning, a1 as nextError, a2 as goAlong } from "./chunks/menus-OPZLsIug.js";
 const ASSIST = "Connection assist";
 const RANGE = 150;
 const CLASP = 75;
@@ -563,25 +563,39 @@ const commands = [
   { id: `${ID}PreviewCompletion`, label: "Preview completion effect", icon: "pi pi-play", function: needs(preview, "nodes") },
   { id: `${ID}ResetAll`, label: `Reset all ${TITLE} settings…`, icon: "pi pi-refresh", function: needs(() => void resetAll()) }
 ];
-const KEYS = [
-  { commandId: TOGGLE, combo: { key: "l", alt: true } },
-  { commandId: TOGGLE, combo: { key: "¬", alt: true } },
-  { commandId: TOGGLE_ALL, combo: { key: "k", alt: true } },
-  { commandId: TOGGLE_ALL, combo: { key: "˚", alt: true } },
-  { commandId: toRunning.id, combo: { key: "j", alt: true } },
-  { commandId: toRunning.id, combo: { key: "∆", alt: true } }
-];
+const KEYS = {
+  alt: [
+    { commandId: TOGGLE, combo: { key: "l", alt: true } },
+    { commandId: TOGGLE, combo: { key: "¬", alt: true } },
+    { commandId: TOGGLE_ALL, combo: { key: "k", alt: true } },
+    { commandId: TOGGLE_ALL, combo: { key: "˚", alt: true } },
+    { commandId: toRunning.id, combo: { key: "j", alt: true } },
+    { commandId: toRunning.id, combo: { key: "∆", alt: true } }
+  ],
+  "alt-shift": [
+    { commandId: TOGGLE, combo: { key: "l", alt: true, shift: true } },
+    { commandId: TOGGLE, combo: { key: "Ò", alt: true, shift: true } },
+    { commandId: TOGGLE_ALL, combo: { key: "k", alt: true, shift: true } },
+    { commandId: TOGGLE_ALL, combo: { key: "", alt: true, shift: true } },
+    { commandId: toRunning.id, combo: { key: "j", alt: true, shift: true } },
+    { commandId: toRunning.id, combo: { key: "Ô", alt: true, shift: true } }
+  ]
+};
+const KEY_SET = "🔗 Enhanced Links.Keys";
+let bound = setting(KEY_SET).default;
 const run = (command) => () => void app.extensionManager.command.execute(command.id);
 const ext = {
   name: "enhanced.link.animations",
   settings: linkSettings,
   commands,
   // Read once as the extension registers, after ComfyUI's own keys and those of the extensions registered before
-  // it. A key bound twice is an error toast (FE157 platform/keybindings/keybindingStore.ts L121-140, wrapped at
-  // services/extensionService.ts L42-49), so the keys a command has already are left out.
+  // it, and before its settings are: Shortcut keys is read as saved. A key bound twice is an error toast (FE157
+  // platform/keybindings/keybindingStore.ts L121-140, wrapped at services/extensionService.ts L42-49), so the keys a
+  // command has already are left out.
   get keybindings() {
+    bound = savedEarly(KEY_SET);
     const taken = new Set(commandKeys().values());
-    return KEYS.filter(({ combo }) => !taken.has(keyText(combo)));
+    return (KEYS[bound] ?? []).filter(({ combo }) => !taken.has(keyText(combo)));
   },
   // Three groups, which the menu parts with separators (FE157 stores/menuItemStore.ts L61-65); checks come from active().
   menuCommands: [
@@ -627,6 +641,9 @@ const ext = {
     installFollow();
     installLinks();
     installAssist();
+    watch((id) => {
+      if (id === KEY_SET && L.keys !== bound) say("Reload the page to use the new shortcut keys", HINT_MS);
+    });
     console.log("[EnhancedLinks] Extension registered with full batched rendering pipeline.");
   }
 };

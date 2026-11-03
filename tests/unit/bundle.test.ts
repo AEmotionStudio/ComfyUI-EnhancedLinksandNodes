@@ -21,8 +21,9 @@ const scripts = (dir: string) => readdirSync(resolve(JS, dir)).filter((f) => f.e
 const read = (file: string) => readFileSync(resolve(ROOT, file), 'utf8');
 const bundle = () => [...scripts(''), ...scripts('chunks/')].map((file) => readFileSync(resolve(JS, file), 'utf8')).join('\n');
 
-/** The checks' read, whose value they drop. */
+/** The checks' read, whose value they drop, and the one read of a value saved before its setting registers. */
 const TRACKED = /function checked\(id\) \{\s*app\.extensionManager\.setting\.get\(id\);/;
+const EARLY = /function savedEarly\(id\) \{\s*return normalize\(setting\(id\), app\.extensionManager\.setting\.get\(id\)\);/;
 
 describe('js/', () => {
     it('reads no settings and makes no deprecated settings calls', () => {
@@ -30,8 +31,9 @@ describe('js/', () => {
         expect(files).toEqual(expect.arrayContaining(['link_animations.js', 'node_animations.js']));
         const code = files.map((file) => readFileSync(resolve(JS, file), 'utf8'));
         expect(code.filter((text) => TRACKED.test(text))).toHaveLength(1);
+        expect(code.filter((text) => EARLY.test(text))).toHaveLength(1);
         for (const [i, file] of files.entries()) {
-            expect(code[i].replace(TRACKED, ''), file).not.toMatch(/getSettingValue|setSettingValue|addSetting|ui\.settings|setting\??\.get\b/);
+            expect(code[i].replace(TRACKED, '').replace(EARLY, ''), file).not.toMatch(/getSettingValue|setSettingValue|addSetting|ui\.settings|setting\??\.get\b/);
         }
     });
 });

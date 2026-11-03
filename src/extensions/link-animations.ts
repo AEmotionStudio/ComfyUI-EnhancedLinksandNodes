@@ -4,8 +4,8 @@
  *
  * Registers the link settings, and the quick toggles of both extensions, here
  * so that menus list them in one order: the EnhancedLinksNodes.* commands,
- * Alt+L for the panel, Alt+K for every effect and Alt+J for the running node
- * or the next error, View ▸ Enhanced Links & Nodes, a button on the action
+ * with Shortcut keys L for the panel, K for every effect and J for the running
+ * node or the next error, View ▸ Enhanced Links & Nodes, a button on the action
  * bar, Enhanced FX in the canvas menu, and the About page's badges. A command
  * says what it did in a short toast. setup() starts the engine, the link
  * pipeline (links/pipeline.ts) on ComfyUI's own link pass, the run visuals
@@ -17,7 +17,7 @@
 
 import type { ComfyExtension, ToastId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
-import { L, N, checked, commit, linkSettings, setting, shown, type Setting } from '@/core/settings';
+import { L, N, checked, commit, linkSettings, savedEarly, setting, shown, watch, type Setting } from '@/core/settings';
 import { env, install } from '@/core/engine';
 import { installAssist } from '@/fx/assist';
 import type { Anchor } from '@/fx/bursts';
@@ -246,15 +246,35 @@ const commands: Command[] = [
     { id: `${ID}ResetAll`, label: `Reset all ${TITLE} settings…`, icon: 'pi pi-refresh', function: needs(() => void resetAll()) },
 ];
 
-/** Alt+L opens and closes the panel, Alt+K toggles every effect and Alt+J goes to the running node, with the characters macOS's Option types for them too. */
-const KEYS = [
-    { commandId: TOGGLE, combo: { key: 'l', alt: true } },
-    { commandId: TOGGLE, combo: { key: '¬', alt: true } },
-    { commandId: TOGGLE_ALL, combo: { key: 'k', alt: true } },
-    { commandId: TOGGLE_ALL, combo: { key: '˚', alt: true } },
-    { commandId: toRunning.id, combo: { key: 'j', alt: true } },
-    { commandId: toRunning.id, combo: { key: '∆', alt: true } },
-];
+type Keybinding = NonNullable<ComfyExtension['keybindings']>[number];
+
+/**
+ * The keys of each Shortcut keys set: L opens and closes the panel, K toggles every effect and J goes to the running
+ * node, with Alt or with Alt+Shift, and with the characters macOS's Option types for them too.
+ */
+const KEYS: Record<string, Keybinding[]> = {
+    alt: [
+        { commandId: TOGGLE, combo: { key: 'l', alt: true } },
+        { commandId: TOGGLE, combo: { key: '¬', alt: true } },
+        { commandId: TOGGLE_ALL, combo: { key: 'k', alt: true } },
+        { commandId: TOGGLE_ALL, combo: { key: '˚', alt: true } },
+        { commandId: toRunning.id, combo: { key: 'j', alt: true } },
+        { commandId: toRunning.id, combo: { key: '∆', alt: true } },
+    ],
+    'alt-shift': [
+        { commandId: TOGGLE, combo: { key: 'l', alt: true, shift: true } },
+        { commandId: TOGGLE, combo: { key: 'Ò', alt: true, shift: true } },
+        { commandId: TOGGLE_ALL, combo: { key: 'k', alt: true, shift: true } },
+        { commandId: TOGGLE_ALL, combo: { key: '\uf8ff', alt: true, shift: true } },
+        { commandId: toRunning.id, combo: { key: 'j', alt: true, shift: true } },
+        { commandId: toRunning.id, combo: { key: 'Ô', alt: true, shift: true } },
+    ],
+};
+
+const KEY_SET = '🔗 Enhanced Links.Keys';
+
+/** The Shortcut keys set the keys were bound from as the extension registered. */
+let bound = setting(KEY_SET).default;
 
 /** Runs a command as ComfyUI does, which toasts what it throws. */
 const run = (command: Command) => () => void app.extensionManager.command.execute(command.id);
@@ -265,11 +285,13 @@ const ext: ComfyExtension = {
     commands,
 
     // Read once as the extension registers, after ComfyUI's own keys and those of the extensions registered before
-    // it. A key bound twice is an error toast (FE157 platform/keybindings/keybindingStore.ts L121-140, wrapped at
-    // services/extensionService.ts L42-49), so the keys a command has already are left out.
+    // it, and before its settings are: Shortcut keys is read as saved. A key bound twice is an error toast (FE157
+    // platform/keybindings/keybindingStore.ts L121-140, wrapped at services/extensionService.ts L42-49), so the keys a
+    // command has already are left out.
     get keybindings() {
+        bound = savedEarly(KEY_SET) as string;
         const taken = new Set(commandKeys().values());
-        return KEYS.filter(({ combo }) => !taken.has(keyText(combo)));
+        return (KEYS[bound] ?? []).filter(({ combo }) => !taken.has(keyText(combo)));
     },
 
     // Three groups, which the menu parts with separators (FE157 stores/menuItemStore.ts L61-65); checks come from active().
@@ -321,6 +343,9 @@ const ext: ComfyExtension = {
         installFollow();
         installLinks();
         installAssist();
+        watch((id) => {
+            if (id === KEY_SET && L.keys !== bound) say('Reload the page to use the new shortcut keys', HINT_MS);
+        });
 
         console.log('[EnhancedLinks] Extension registered with full batched rendering pipeline.');
     },

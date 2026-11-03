@@ -1,5 +1,6 @@
-// The quick toggles in ComfyUI: every command run through the command store; Alt+L and Alt+K, with a text field
-// focused too; no error toast as the page loads; View ▸ Enhanced Links & Nodes with its checks; the canvas menu's
+// The quick toggles in ComfyUI: every command run through the command store; with Shortcut keys at Alt, Alt+L and
+// Alt+K, with a text field focused too, and at Alt+Shift, Alt+Shift+L and Alt+Shift+K; off, as by default, no keys,
+// and Alt+K left to the browser; no error toast as the page loads; View ▸ Enhanced Links & Nodes with its checks; the canvas menu's
 // Enhanced FX; the node menu with a selection of nodes (ComfyUI's own menu on both frontends, and 1.57's Vue menu from
 // the selection toolbox); the toolbox's button; the action bar's button; and the About page's badges. Each menu and
 // button is attached as a screenshot. The -native projects check only that the keys register without an error toast,
@@ -18,6 +19,10 @@ const FOCUS_ON = '🔗 Enhanced Links.Focus.Enabled';
 const FOCUS_MODE = '🔗 Enhanced Links.Focus.Mode';
 const FOLLOW = '🔗 Enhanced Links.Navigate.Follow';
 const SWITCHES = [LINKS_ON, NODES_ON];
+const KEYS = '🔗 Enhanced Links.Keys';
+const KEYED = ['Workspace.ToggleSidebarTab.enhanced-links-nodes', 'EnhancedLinksNodes.ToggleAll', 'EnhancedLinksNodes.GoToRunning'];
+
+test.use({ settings: { [KEYS]: 'alt' } });
 
 /** Three nodes in a row, the last an output node. */
 const ROW: GraphSpec = {
@@ -86,6 +91,45 @@ test('registers Alt+L, Alt+K and Alt+J as the page loads without an error toast,
     expect(keys).toEqual([profile === 'native' ? undefined : 'Alt+l', 'Alt+k', 'Alt+j']);
     await expect(toasts(page)).toHaveCount(0);
     expect(log.counts.filter((m) => m.text.includes('already exists'))).toEqual([]);
+});
+
+test.describe('with Shortcut keys off, as by default', () => {
+    test.use({ settings: {} });
+
+    test('binds no keys, and leaves Alt+K to the browser', async ({ page }) => {
+        await openApp(page);
+        await page.waitForTimeout(1500);
+        const keys = await page.evaluate((ids) => ids.map((id) => window.app.extensionManager.command.commands.find((c: { id: string }) => c.id === id)?.keybinding ?? null), KEYED);
+        expect(keys).toEqual([null, null, null]);
+        // Heard after ComfyUI's own handler, on the window too, which cancels the keys it acts on.
+        await page.evaluate(() => {
+            const seen: boolean[] = [];
+            (window as unknown as { seen: boolean[] }).seen = seen;
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'k') setTimeout(() => seen.push(e.defaultPrevented));
+            });
+        });
+        await page.keyboard.press('Alt+k');
+        await expect.poll(() => page.evaluate(() => (window as unknown as { seen: boolean[] }).seen)).toEqual([false]);
+        expect(await settingValues(page, SWITCHES)).toEqual([true, true]);
+    });
+});
+
+test.describe('with Shortcut keys at Alt+Shift', () => {
+    test.use({ settings: { [KEYS]: 'alt-shift' } });
+
+    test('Alt+Shift+L opens the panel and Alt+Shift+K toggles every effect; Alt+K does nothing', async ({ page, profile }) => {
+        test.skip(profile === 'native', 'the commands act through the extensions');
+        await openApp(page);
+        await page.keyboard.press('Alt+k');
+        await page.waitForTimeout(300);
+        expect(await settingValues(page, SWITCHES)).toEqual([true, true]);
+        await page.keyboard.press('Alt+Shift+L');
+        await expect(page.locator('.eln')).toBeVisible();
+        await page.keyboard.press('Alt+Shift+K');
+        await expect.poll(() => settingValues(page, SWITCHES)).toEqual([false, false]);
+        await expect(toasts(page).filter({ hasText: 'Effects off — Alt+Shift+K to restore' })).toBeVisible();
+    });
 });
 
 test.describe('with the extensions', () => {
