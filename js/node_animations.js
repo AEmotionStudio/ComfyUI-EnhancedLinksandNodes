@@ -139,13 +139,14 @@ function drawTitle(ctx, title, x, y, colour, phase, fade) {
   }
 }
 const FX = ["", "gentle", "neon", "cosmic", "rosette", "flower", "jelly"];
-const SELECTED = 8;
-const RUNNING = 16;
-const FAILED = 32;
-const BYPASSED = 64;
-const MUTED = 128;
-const ONLY = 256;
-const COLLAPSED = 512;
+const EFFECT$1 = 15;
+const SELECTED = 16;
+const RUNNING = 32;
+const FAILED = 64;
+const BYPASSED = 128;
+const MUTED = 256;
+const ONLY = 512;
+const COLLAPSED = 1024;
 const STEADY = ONLY | COLLAPSED | SELECTED | RUNNING | FAILED;
 const MOVES = [false, true, false, true, true, true, false];
 const ATTRIBUTES = ["data-eln-fx", "data-eln-only", "data-eln-collapsed", "data-eln-sel", "data-eln-run", "data-eln-mode"];
@@ -170,7 +171,7 @@ function bounce(el, node) {
   el.animate(BOUNCE.map((scale) => ({ scale: String(scale), transformOrigin: origin })), { duration: BOUNCE_MS, easing: "ease-out" });
 }
 function mark(el, look) {
-  put(el, "data-eln-fx", FX[look & 7]);
+  put(el, "data-eln-fx", FX[look & EFFECT$1]);
   el.toggleAttribute("data-eln-only", (look & ONLY) > 0);
   el.toggleAttribute("data-eln-collapsed", (look & COLLAPSED) > 0);
   el.toggleAttribute("data-eln-sel", (look & SELECTED) > 0);
@@ -273,8 +274,8 @@ function vueNodes(canvas) {
   let moving = 0;
   for (const node of graph.nodes) {
     const look = lookOf(node, selected);
-    if (MOVES[look & 7] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
-    if ((look & 7) === JELLY && kicked(node)) {
+    if (MOVES[look & EFFECT$1] && !(look & STEADY) && overlaps(node.boundingRect, canvas.visible_area, 0)) moving++;
+    if ((look & EFFECT$1) === JELLY && kicked(node)) {
       const el2 = pane.querySelector(`.lg-node[data-node-id="${node.id}"]`);
       if (el2 instanceof HTMLElement) bounce(el2, node);
     }
