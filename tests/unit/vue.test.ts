@@ -330,6 +330,23 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toMatch(/\.lg-node\[data-eln-fx=circuit\]::after\{border:1\.5px dashed var\(--eln-c2\);[^}]*animation:eln-breathe calc\(2\.40s \* var\(--eln-slow, 1\)\) ease-in-out infinite alternate\}/);
     });
 
+    it("sways Aurora Veil's glow from side to side every 6 s, in its own colours, selected as well as not", async () => {
+        const canvas = await start({ '📦 Enhanced Nodes.Animate': 8 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        const [el] = mountNodes(mountPane(), 1);
+        frames(1);
+        expect(marks(el)).toEqual({ fx: 'aurora' });
+        const css = sheets()[0].textContent!;
+        expect(css).toContain('.lg-node[data-eln-fx=aurora]{--eln-c1:#3dffa8;--eln-c2:#38c6ff;--eln-c3:#c77dff}');
+        expect(css).toMatch(/\.lg-node\[data-eln-fx=aurora\]::after\{[^}]*animation:eln-sway calc\(6\.00s \* var\(--eln-slow, 1\)\) ease-in-out infinite alternate\}/);
+        expect(css).toContain('@keyframes eln-sway{from{transform:translateX(-4px)}to{transform:translateX(4px)}}');
+        // Its effect and its selection in their own bits, past the three bits effects once had.
+        canvas.selectItems([canvas.graph._nodes[0]]);
+        canvas.setDirty(true, true);
+        frames(1);
+        expect(marks(el)).toEqual({ fx: 'aurora', sel: '' });
+    });
+
     it('bounces a jelly node once as it is selected, alike both ways about its middle where the canvas puts it, and shapes nothing on the canvas', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 6 }, CHAIN);
         LiteGraph.vueNodesMode = true;

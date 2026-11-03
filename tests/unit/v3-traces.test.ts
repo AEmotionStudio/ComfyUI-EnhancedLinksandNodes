@@ -259,6 +259,12 @@ describe('v3 traces', () => {
         await expect(trace).toMatchFileSnapshot('__traces__/v3/nodes-circuit-trace.txt');
     });
 
+    it("Aurora Veil's curtains and rising motes, on the node sizes and clocks of the v1 traces", async () => {
+        const trace = traceNodes('Aurora Veil', (c) => c.totalTime, v3NodeEffect(8)).trace()
+            + traceNodes('Aurora Veil with other v1 settings', (c) => c.totalTime, v3NodeEffect(8, V1_NODE_RICH_SETTINGS), true).trace();
+        await expect(trace).toMatchFileSnapshot('__traces__/v3/nodes-aurora-veil.txt');
+    });
+
     it('Cosmic Ripple on a bypassed node, and on a collapsed one, which draws neither its effect nor its halo', async () => {
         const canvas = await start({ ...V1_NODE_SETTINGS, '🔗 Enhanced Links.Animate': 0, '📦 Enhanced Nodes.Animate': 3 }, {
             nodes: [{ pos: [100, 100], mode: 4, title: 'Bypassed' }, { pos: [500, 100], collapsed: true, title: 'Collapsed' }],

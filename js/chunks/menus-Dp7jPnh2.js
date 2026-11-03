@@ -79,7 +79,8 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 4, text: "Sacred Rosette" },
   { value: 5, text: "Flower of Life" },
   { value: 6, text: "Jelly" },
-  { value: 7, text: "Circuit Trace" }
+  { value: 7, text: "Circuit Trace" },
+  { value: 8, text: "Aurora Veil" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -1061,7 +1062,8 @@ const STYLE_COLOURS = [
   ["#ffcc00", "#ff8800", "#ffaa00"],
   ["#ffd36b", "#fff3c4", "#b48cff"],
   ["#7cf5a0", "#c9ffe0", "#2ad1c4"],
-  ["#00e5ff", "#2bd47d", "#ffd54f"]
+  ["#00e5ff", "#2bd47d", "#ffd54f"],
+  ["#3dffa8", "#38c6ff", "#c77dff"]
 ];
 const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
@@ -1690,6 +1692,7 @@ const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 const [CHIP_SPARKS] = [2];
+const [CURTAINS, MOTES_UP] = [2, 5];
 let depth = 0;
 function save(ctx) {
   ctx.save();
@@ -2520,7 +2523,79 @@ function circuitTrace(ctx, node2, w, h2, k2, pal, only) {
     }
   }
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace];
+const VEILS = [0, 3, 4, 5];
+const RAYS = [0, 6, 8, 10];
+const DROP$1 = 0.8;
+function veil(ctx, drop2, colour2) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, drop2);
+  gradient.addColorStop(0, translucent(colour2, 0.55));
+  gradient.addColorStop(0.08, translucent(colour2, 1));
+  gradient.addColorStop(0.6, translucent(colour2, 0.45));
+  gradient.addColorStop(1, translucent(colour2, 0));
+  return gradient;
+}
+function auroraVeil(ctx, _node, w, h2, k2, pal, only) {
+  const { quality: quality2 } = N;
+  const intensity = N.intensity * 1.5;
+  const s = held$4 ? 0 : k2.nodePhase / TURN;
+  const drop2 = DROP$1 * h2;
+  if (!only) {
+    const veils = VEILS[quality2];
+    const rays = RAYS[quality2];
+    const width = w * 0.36;
+    const ray = Math.min(width, width / rays * 2.4);
+    const colours = [pal.primary, pal.secondary, pal.accent];
+    for (let i = 0; i < veils; i++) {
+      const slot = CURTAINS + i % 3;
+      const fill2 = kept(slot) ?? keep$1(slot, veil(ctx, drop2, colours[i % 3]));
+      const middle2 = Math.max(width / 2, Math.min(w - width / 2, w * (0.12 + 0.76 * (i + 0.5) / veils) + Math.sin(s * 0.35 + i * 1.7) * w * 0.08));
+      if (shows$1(middle2 - width / 2, 0, middle2 + width / 2, 0.7 * drop2)) {
+        ctx.globalAlpha = Math.min(1, 0.1 * intensity) * fade;
+        ctx.fillStyle = fill2;
+        save(ctx);
+        ctx.translate(middle2, 0);
+        ctx.scale(1, 0.7);
+        ctx.fillRect(-width / 2, 0, width, drop2);
+        restore(ctx);
+      }
+      for (let j = 0; j < rays; j++) {
+        const x = Math.max(ray / 2, Math.min(w - ray / 2, middle2 - width / 2 + (j + 0.5) * width / rays + Math.sin(s * 0.8 + j * 0.9 + i) * width * 0.04));
+        const long = drop2 * (0.55 + 0.45 * (0.5 + 0.5 * Math.sin(x * 0.035 + s * 0.6 + i)));
+        if (!shows$1(x - ray / 2, 0, x + ray / 2, long)) continue;
+        const shimmer = 0.75 + 0.25 * Math.sin(s * 1.3 + j * 2.1 + i * 0.7);
+        ctx.globalAlpha = Math.min(1, 0.11 * intensity) * Math.sin(Math.PI * (j + 0.5) / rays) * shimmer * fade;
+        ctx.fillStyle = fill2;
+        save(ctx);
+        ctx.translate(x, 0);
+        ctx.scale(1, long / drop2);
+        ctx.fillRect(-ray / 2, 0, ray, drop2);
+        restore(ctx);
+      }
+    }
+  }
+  if (N.particleShow) {
+    const { particleSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
+    const count2 = Math.max(1, Math.floor(5 * N.particleDensity * thin));
+    const time = held$4 ? 0 : k2.particleTime;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    const r = 1.2 * size;
+    const edge = r + 1 + 1.5 * 6 * dotGlow;
+    ctx.shadowBlur = 6 * dotGlow;
+    for (let i = 0; i < count2; i++) {
+      const [low, high] = [h2 - edge, edge];
+      const span = Math.max(1, low - high);
+      const y = low - ((time * 12 + noise(i + 3) * span) % span + span) % span;
+      const x = Math.max(edge, Math.min(w - edge, w * (0.1 + 0.8 * noise(i + 7)) + Math.sin(time * 0.7 + i) * 4 * N.particleIntensity));
+      if (!circle(x, y, edge - 1)) continue;
+      ctx.globalAlpha = 0.8 * dotGlow * fade * Math.min(1, (low - y) / (6 * r), (y - high) / (6 * r));
+      ctx.fillStyle = ctx.shadowColor = kept(MOTES_UP + i) ?? keep$1(MOTES_UP + i, particleColour(pal, i, time, rate));
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -2573,8 +2648,9 @@ function reach(style, w, h2, only) {
       const corona = 0.7 * long * (0.8 + 0.2 * motion2) + 2 * (2 * dotSize + 1.5 * motion2) + 1.5 * 15 * dotGlow;
       return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
     }
-    // Jelly draws on the body alone.
+    // Jelly and Aurora Veil draw on the body alone.
     case 6:
+    case 8:
       return r;
     case 7: {
       const blur = 10 * intensity * glow2;
@@ -7958,7 +8034,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
-  "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; and Circuit Trace, pulses racing along etched traces. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+  "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; Circuit Trace, pulses racing along etched traces; and Aurora Veil, curtains of light hanging from the title bar. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8589,4 +8665,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-xV3JZlUR.js.map
+//# sourceMappingURL=menus-Dp7jPnh2.js.map

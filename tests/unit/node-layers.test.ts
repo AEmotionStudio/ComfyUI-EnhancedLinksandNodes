@@ -13,7 +13,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { clock, dummy, guard, layers, live } from '@/core/engine';
 import { N, preview } from '@/core/settings';
 import * as colors from '@/core/colors';
-import { OVER, UNDER, drawNodeFx } from '@/nodes/effects';
+import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
 import { app, fake } from '../helpers/fake-app';
 import { CanvasRecorder, fmt, parseColor } from '../helpers/recording-context';
 import { FakeCanvas, FakeNode, frames, page, progress, run, send, start, type GraphSpec } from '../helpers/fake-litegraph';
@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Circuit Trace', 7], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Circuit Trace', 7], ['Aurora Veil', 8], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -150,8 +150,8 @@ describe('node effects', () => {
             // Around the body only where the whole effect reaches past it: within the screen, without the body.
             const whole = new CanvasRecorder();
             drawNodeFx(whole.ctx, animate, canvas.graph._nodes[0], 220, 120, clock, WHOLE, 1, animate === 0);
-            // Jelly draws on its body alone, but for the selection frame, which reach() counts whether or not the node is selected.
-            const reaches = Math.max(...overhang(whole.paints, [0, -30, 220, 120])) > 0 || animate === 6;
+            // Jelly and Aurora Veil draw on their body alone, but for the selection frame, which reach() counts whether or not the node is selected.
+            const reaches = Math.max(...overhang(whole.paints, [0, -30, 220, 120])) > 0 || animate === 6 || animate === 8;
             expect(under).toHaveLength(reaches ? 1 : 0);
             if (!reaches) return;
             expect(under[0].sides).toBe(UNDER);
@@ -607,11 +607,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -644,7 +644,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -929,5 +929,54 @@ describe('Circuit Trace', () => {
         drawNodeFx(rec.ctx, CIRCUIT, canvas.graph._nodes[0], 220, 120, at(1), { sides: UNDER, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 }, 1, false);
         const pins = rec.lines.filter((line) => /^lineTo\((-5|225), /.test(line) || /^lineTo\([^,]+, 125\)$/.test(line));
         expect(pins).toHaveLength(7);
+    });
+});
+
+describe('Aurora Veil', () => {
+    const AURORA = 8;
+    /** The node clock `t` s in at speed 1. */
+    const at = (t: number) => ({ nodePhase: ((2 * Math.PI) / 15) * t, particleTime: t, nodeTime: t });
+    /** What Aurora Veil draws on a 220 × 120 node, `t` s in: whole, or one side of its edge. */
+    async function drawn(t: number, settings: Record<string, unknown> = {}, part: Part = WHOLE) {
+        await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': AURORA, ...settings }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, AURORA, { id: 1, title: 'KSampler', size: [220, 120] }, 220, 120, at(t), part, 1, false);
+        return rec;
+    }
+    /** Its curtains' washes and rays: where each hangs across the body, and how far down, × the 0.8 of the body the longest reaches. */
+    const rays = (rec: CanvasRecorder) => {
+        const out: { x: number; long: number }[] = [];
+        for (let i = 0; i < rec.lines.length; i++) {
+            const m = /^translate\(([^,]+), 0\)$/.exec(rec.lines[i]);
+            const n = /^scale\(1, ([^)]+)\)$/.exec(rec.lines[i + 1] ?? '');
+            if (m && n) out.push({ x: Number(m[1]), long: Number(n[1]) });
+        }
+        return out;
+    };
+
+    it('hangs four curtains of eight rays over a wash from the title bar at Balanced, three of six at Fast and five of ten at Rich, across the body', async () => {
+        const balanced = rays(await drawn(1));
+        expect(balanced).toHaveLength(4 + 32);
+        expect(rays(await drawn(1, { '📦 Enhanced Nodes.Quality': 1 }))).toHaveLength(3 + 18);
+        expect(rays(await drawn(1, { '📦 Enhanced Nodes.Quality': 3 }))).toHaveLength(5 + 50);
+        for (const ray of balanced) {
+            expect(ray.x).toBeGreaterThan(0);
+            expect(ray.x).toBeLessThan(220);
+            expect(ray.long).toBeGreaterThanOrEqual(0.55);
+            expect(ray.long).toBeLessThanOrEqual(1);
+        }
+        // From the top of the body, under the title bar.
+        expect((await drawn(1)).lines.filter((line) => line.startsWith('fillRect(')).every((line) => /^fillRect\([^,]+, 0, /.test(line))).toBe(true);
+    });
+
+    it('waves its hems and drifts with the clock, and holds still in one pose', async () => {
+        expect(rays(await drawn(2))).not.toEqual(rays(await drawn(1)));
+        const still = async (t: number) => (await drawn(t, { '📦 Enhanced Nodes.Static.Mode': true, [PARTICLE_SHOW]: true })).trace();
+        expect(await still(9.7)).toBe(await still(0.3));
+    });
+
+    it('draws nothing round the body', async () => {
+        const under = await drawn(1, { [PARTICLE_SHOW]: true, '📦 Enhanced Nodes.Selection.Glow': false }, { sides: UNDER, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 });
+        expect(under.paints).toEqual([]);
     });
 });

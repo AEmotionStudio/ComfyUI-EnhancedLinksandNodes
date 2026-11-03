@@ -157,6 +157,7 @@ export const NODE_ANIMATION_OPTIONS = [
     { value: 5, text: 'Flower of Life' },
     { value: 6, text: 'Jelly' },
     { value: 7, text: 'Circuit Trace' },
+    { value: 8, text: 'Aurora Veil' },
 ] as const;
 
 const PARTICLE_COLOR_MODE_OPTIONS = [

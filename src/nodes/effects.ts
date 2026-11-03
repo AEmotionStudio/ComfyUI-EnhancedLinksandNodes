@@ -172,6 +172,7 @@ const [CORE, DOTS] = [2, 3];
 const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 const [CHIP_SPARKS] = [2];
+const [CURTAINS, MOTES_UP] = [2, 5];
 
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
@@ -1184,10 +1185,97 @@ function circuitTrace(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number,
     }
 }
 
+/** Aurora Veil: its curtains at Quality 1, 2 and 3, the rays in each, and the longest a ray hangs, × the body's height. */
+const VEILS = [0, 3, 4, 5];
+const RAYS = [0, 6, 8, 10];
+const DROP = 0.8;
+
+/** A curtain's light from the top of the body down `drop` px: brightest just under the title bar, gone at its hem. */
+function veil(ctx: CanvasRenderingContext2D, drop: number, colour: string): CanvasGradient {
+    const gradient = ctx.createLinearGradient(0, 0, 0, drop);
+    gradient.addColorStop(0, translucent(colour, 0.55));
+    gradient.addColorStop(0.08, translucent(colour, 1));
+    gradient.addColorStop(0.6, translucent(colour, 0.45));
+    gradient.addColorStop(1, translucent(colour, 0));
+    return gradient;
+}
+
+/**
+ * 8. Aurora Veil: curtains of light hanging from the title bar into the body, each a row of rays in one of the effect's
+ * colours, brightest in its middle; their hems wave and the curtains drift and sway, and each ray shimmers, under a
+ * flicker a second at speed 3. Its particles are motes rising through the body. Quality hangs more curtains of more rays.
+ */
+function auroraVeil(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { quality } = N;
+    const intensity = N.intensity * 1.5;
+    const s = held ? 0 : k.nodePhase / TURN;
+    const drop = DROP * h;
+    if (!only) {
+        const veils = VEILS[quality];
+        const rays = RAYS[quality];
+        const width = w * 0.36;
+        // Each ray spans more than two rays' room, so that they blend into a curtain.
+        const ray = Math.min(width, (width / rays) * 2.4);
+        const colours = [pal.primary, pal.secondary, pal.accent];
+        for (let i = 0; i < veils; i++) {
+            const slot = CURTAINS + (i % 3);
+            const fill = kept<CanvasGradient>(slot) ?? keep(slot, veil(ctx, drop, colours[i % 3]));
+            const middle = Math.max(width / 2, Math.min(w - width / 2, w * (0.12 + (0.76 * (i + 0.5)) / veils) + Math.sin(s * 0.35 + i * 1.7) * w * 0.08));
+            // A faint wash the width of the curtain, under its rays.
+            if (shows(middle - width / 2, 0, middle + width / 2, 0.7 * drop)) {
+                ctx.globalAlpha = Math.min(1, 0.1 * intensity) * fade;
+                ctx.fillStyle = fill;
+                save(ctx);
+                ctx.translate(middle, 0);
+                ctx.scale(1, 0.7);
+                ctx.fillRect(-width / 2, 0, width, drop);
+                restore(ctx);
+            }
+            for (let j = 0; j < rays; j++) {
+                const x = Math.max(ray / 2, Math.min(w - ray / 2, middle - width / 2 + ((j + 0.5) * width) / rays + Math.sin(s * 0.8 + j * 0.9 + i) * width * 0.04));
+                // Its hem waves along the curtain and moves with the clock.
+                const long = drop * (0.55 + 0.45 * (0.5 + 0.5 * Math.sin(x * 0.035 + s * 0.6 + i)));
+                if (!shows(x - ray / 2, 0, x + ray / 2, long)) continue;
+                const shimmer = 0.75 + 0.25 * Math.sin(s * 1.3 + j * 2.1 + i * 0.7);
+                ctx.globalAlpha = Math.min(1, 0.11 * intensity) * Math.sin((Math.PI * (j + 0.5)) / rays) * shimmer * fade;
+                ctx.fillStyle = fill;
+                save(ctx);
+                ctx.translate(x, 0);
+                ctx.scale(1, long / drop);
+                ctx.fillRect(-ray / 2, 0, ray, drop);
+                restore(ctx);
+            }
+        }
+    }
+    if (N.particleShow) {
+        const { particleSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
+        const count = Math.max(1, Math.floor(5 * N.particleDensity * thin));
+        const time = held ? 0 : k.particleTime;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        const r = 1.2 * size;
+        // Their glow kept inside the body too: Aurora Veil draws nothing round it.
+        const edge = r + 1 + 1.5 * 6 * dotGlow;
+        ctx.shadowBlur = 6 * dotGlow;
+        for (let i = 0; i < count; i++) {
+            // Up through the body and in again at its foot, drifting side to side, fading in and out at each end.
+            const [low, high] = [h - edge, edge];
+            const span = Math.max(1, low - high);
+            const y = low - ((((time * 12 + noise(i + 3) * span) % span) + span) % span);
+            const x = Math.max(edge, Math.min(w - edge, w * (0.1 + 0.8 * noise(i + 7)) + Math.sin(time * 0.7 + i) * 4 * N.particleIntensity));
+            if (!circle(x, y, edge - 1)) continue;
+            ctx.globalAlpha = 0.8 * dotGlow * fade * Math.min(1, (low - y) / (6 * r), (y - high) / (6 * r));
+            ctx.fillStyle = ctx.shadowColor = kept<string>(MOTES_UP + i) ?? keep(MOTES_UP + i, particleColour(pal, i, time, rate));
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
@@ -1256,8 +1344,9 @@ export function reach(style: number, w: number, h: number, only: boolean): numbe
             const corona = 0.7 * long * (0.8 + 0.2 * motion) + 2 * (2 * dotSize + 1.5 * motion) + 1.5 * 15 * dotGlow;
             return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
         }
-        // Jelly draws on the body alone.
+        // Jelly and Aurora Veil draw on the body alone.
         case 6:
+        case 8:
             return r;
         case 7: {
             // Its pins, and its pulses' glow where their traces meet the edge.

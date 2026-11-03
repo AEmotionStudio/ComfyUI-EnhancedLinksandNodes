@@ -1,0 +1,3334 @@
+# Aurora Veil
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad1 = createLinearGradient(0, 0, 0, 36.8)
+grad1.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad1.addColorStop(0.08, #ffb300)
+grad1.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad1.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad1
+save()
+translate(34.53, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.032
+fillStyle = grad1
+save()
+translate(13.53, 0)
+scale(1, 0.88)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.113
+fillStyle = grad1
+save()
+translate(23.51, 0)
+scale(1, 0.94)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.085
+fillStyle = grad1
+save()
+translate(32.3, 0)
+scale(1, 0.98)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.12
+fillStyle = grad1
+save()
+translate(39.59, 0)
+scale(1, 1)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.112
+fillStyle = grad1
+save()
+translate(46.24, 0)
+scale(1, 1)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.023
+fillStyle = grad1
+save()
+translate(53.56, 0)
+scale(1, 0.99)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+grad2 = createLinearGradient(0, 0, 0, 36.8)
+grad2.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad2.addColorStop(0.08, #fb00ff)
+grad2.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad2.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad2
+save()
+translate(81.11, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.039
+fillStyle = grad2
+save()
+translate(61.8, 0)
+scale(1, 0.77)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.097
+fillStyle = grad2
+save()
+translate(70.41, 0)
+scale(1, 0.7)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.08
+fillStyle = grad2
+save()
+translate(77.58, 0)
+scale(1, 0.65)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.146
+fillStyle = grad2
+save()
+translate(84.24, 0)
+scale(1, 0.61)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.097
+fillStyle = grad2
+save()
+translate(91.7, 0)
+scale(1, 0.58)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.022
+fillStyle = grad2
+save()
+translate(100.68, 0)
+scale(1, 0.55)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+grad3 = createLinearGradient(0, 0, 0, 36.8)
+grad3.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad3.addColorStop(0.08, #9d00ff)
+grad3.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad3.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad3
+save()
+translate(102.6, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.043
+fillStyle = grad3
+save()
+translate(83.44, 0)
+scale(1, 0.55)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.077
+fillStyle = grad3
+save()
+translate(90.49, 0)
+scale(1, 0.57)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.094
+fillStyle = grad3
+save()
+translate(97.17, 0)
+scale(1, 0.6)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.159
+fillStyle = grad3
+save()
+translate(104.79, 0)
+scale(1, 0.65)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.077
+fillStyle = grad3
+save()
+translate(113.93, 0)
+scale(1, 0.71)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+globalAlpha = 0.025
+fillStyle = grad3
+save()
+translate(124.04, 0)
+scale(1, 0.79)
+fillRect(-10.08, 0, 20.16, 36.8)
+restore()
+shadowBlur = 6
+globalAlpha = 0.734
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(15.31, 17.8, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.2
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(34.87, 13, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=0.4s phase=0.17 particleTime=0.4 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad4 = createLinearGradient(0, 0, 0, 96)
+grad4.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad4.addColorStop(0.08, #ffb300)
+grad4.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad4.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad4
+save()
+translate(56.72, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.037
+fillStyle = grad4
+save()
+translate(24.72, 0)
+scale(1, 0.98)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.102
+fillStyle = grad4
+save()
+translate(39.9, 0)
+scale(1, 1)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.08
+fillStyle = grad4
+save()
+translate(52.82, 0)
+scale(1, 0.97)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.14
+fillStyle = grad4
+save()
+translate(63.71, 0)
+scale(1, 0.92)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.102
+fillStyle = grad4
+save()
+translate(74.3, 0)
+scale(1, 0.84)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.021
+fillStyle = grad4
+save()
+translate(86.57, 0)
+scale(1, 0.75)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+grad5 = createLinearGradient(0, 0, 0, 96)
+grad5.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad5.addColorStop(0.08, #fb00ff)
+grad5.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad5.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad5
+save()
+translate(126.97, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.042
+fillStyle = grad5
+save()
+translate(97.03, 0)
+scale(1, 0.55)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.082
+fillStyle = grad5
+save()
+translate(109.69, 0)
+scale(1, 0.56)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.089
+fillStyle = grad5
+save()
+translate(120.43, 0)
+scale(1, 0.61)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.157
+fillStyle = grad5
+save()
+translate(131.13, 0)
+scale(1, 0.68)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.082
+fillStyle = grad5
+save()
+translate(143.67, 0)
+scale(1, 0.77)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.024
+fillStyle = grad5
+save()
+translate(158.55, 0)
+scale(1, 0.88)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+grad6 = createLinearGradient(0, 0, 0, 96)
+grad6.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad6.addColorStop(0.08, #9d00ff)
+grad6.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad6.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad6
+save()
+translate(158.91, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.042
+fillStyle = grad6
+save()
+translate(128.23, 0)
+scale(1, 0.87)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.065
+fillStyle = grad6
+save()
+translate(138.86, 0)
+scale(1, 0.94)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.113
+fillStyle = grad6
+save()
+translate(149.68, 0)
+scale(1, 0.98)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.157
+fillStyle = grad6
+save()
+translate(162.49, 0)
+scale(1, 1)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.065
+fillStyle = grad6
+save()
+translate(177.58, 0)
+scale(1, 0.96)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+globalAlpha = 0.03
+fillStyle = grad6
+save()
+translate(193.53, 0)
+scale(1, 0.86)
+fillRect(-15.84, 0, 31.68, 96)
+restore()
+shadowBlur = 6
+globalAlpha = 0.8
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(25.17, 33.71, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.295
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(53.34, 13.85, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=0.9s phase=0.38 particleTime=0.9 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad7 = createLinearGradient(0, 0, 0, 208)
+grad7.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad7.addColorStop(0.08, #ffb300)
+grad7.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad7.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad7
+save()
+translate(86.86, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.042
+fillStyle = grad7
+save()
+translate(41.9, 0)
+scale(1, 0.98)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.084
+fillStyle = grad7
+save()
+translate(62.67, 0)
+scale(1, 0.86)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.088
+fillStyle = grad7
+save()
+translate(79.95, 0)
+scale(1, 0.73)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.156
+fillStyle = grad7
+save()
+translate(95.2, 0)
+scale(1, 0.62)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.083
+fillStyle = grad7
+save()
+translate(111.41, 0)
+scale(1, 0.56)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.024
+fillStyle = grad7
+save()
+translate(130.84, 0)
+scale(1, 0.57)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+grad8 = createLinearGradient(0, 0, 0, 208)
+grad8.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad8.addColorStop(0.08, #fb00ff)
+grad8.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad8.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad8
+save()
+translate(183.12, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.042
+fillStyle = grad8
+save()
+translate(139.67, 0)
+scale(1, 0.81)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.066
+fillStyle = grad8
+save()
+translate(156.61, 0)
+scale(1, 0.93)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.111
+fillStyle = grad8
+save()
+translate(171.81, 0)
+scale(1, 0.99)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.157
+fillStyle = grad8
+save()
+translate(188.3, 0)
+scale(1, 0.99)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.066
+fillStyle = grad8
+save()
+translate(208.13, 0)
+scale(1, 0.9)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.03
+fillStyle = grad8
+save()
+translate(230.82, 0)
+scale(1, 0.73)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+grad9 = createLinearGradient(0, 0, 0, 208)
+grad9.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad9.addColorStop(0.08, #9d00ff)
+grad9.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad9.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad9
+save()
+translate(227.18, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.038
+fillStyle = grad9
+save()
+translate(181.06, 0)
+scale(1, 0.89)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.058
+fillStyle = grad9
+save()
+translate(196.26, 0)
+scale(1, 0.78)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.138
+fillStyle = grad9
+save()
+translate(213.06, 0)
+scale(1, 0.65)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.141
+fillStyle = grad9
+save()
+translate(233.28, 0)
+scale(1, 0.56)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.058
+fillStyle = grad9
+save()
+translate(256.15, 0)
+scale(1, 0.58)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+globalAlpha = 0.037
+fillStyle = grad9
+save()
+translate(278.89, 0)
+scale(1, 0.72)
+fillRect(-23.04, 0, 46.08, 208)
+restore()
+shadowBlur = 6
+globalAlpha = 0.8
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(37.35, 66.87, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.8
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(76, 18.54, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=1.9s phase=0.8 particleTime=1.9 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad10 = createLinearGradient(0, 0, 0, 64)
+grad10.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad10.addColorStop(0.08, #ffb300)
+grad10.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad10.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad10
+save()
+translate(118.41, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.039
+fillStyle = grad10
+save()
+translate(64.17, 0)
+scale(1, 0.72)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.059
+fillStyle = grad10
+save()
+translate(86.22, 0)
+scale(1, 0.58)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.135
+fillStyle = grad10
+save()
+translate(105.39, 0)
+scale(1, 0.55)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.144
+fillStyle = grad10
+save()
+translate(125.34, 0)
+scale(1, 0.62)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.059
+fillStyle = grad10
+save()
+translate(149.12, 0)
+scale(1, 0.79)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.036
+fillStyle = grad10
+save()
+translate(176.91, 0)
+scale(1, 0.97)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+grad11 = createLinearGradient(0, 0, 0, 64)
+grad11.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad11.addColorStop(0.08, #fb00ff)
+grad11.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad11.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad11
+save()
+translate(222.43, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.032
+fillStyle = grad11
+save()
+translate(165.78, 0)
+scale(1, 1)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.063
+fillStyle = grad11
+save()
+translate(184.84, 0)
+scale(1, 0.94)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.155
+fillStyle = grad11
+save()
+translate(205.11, 0)
+scale(1, 0.8)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.118
+fillStyle = grad11
+save()
+translate(229.39, 0)
+scale(1, 0.62)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.063
+fillStyle = grad11
+save()
+translate(257.49, 0)
+scale(1, 0.55)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.042
+fillStyle = grad11
+save()
+translate(286.3, 0)
+scale(1, 0.69)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+grad12 = createLinearGradient(0, 0, 0, 64)
+grad12.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad12.addColorStop(0.08, #9d00ff)
+grad12.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad12.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad12
+save()
+translate(275.81, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.025
+fillStyle = grad12
+save()
+translate(213.68, 0)
+scale(1, 0.57)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.079
+fillStyle = grad12
+save()
+translate(234.29, 0)
+scale(1, 0.56)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.158
+fillStyle = grad12
+save()
+translate(259.08, 0)
+scale(1, 0.7)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.093
+fillStyle = grad12
+save()
+translate(287.44, 0)
+scale(1, 0.91)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.079
+fillStyle = grad12
+save()
+translate(316.09, 0)
+scale(1, 1)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+globalAlpha = 0.042
+fillStyle = grad12
+save()
+translate(341.49, 0)
+scale(1, 0.9)
+fillRect(-28.8, 0, 57.6, 64)
+restore()
+shadowBlur = 6
+globalAlpha = 0.743
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(47.63, 62.11, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.8
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(92.92, 50.4, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# Aurora Veil with other v1 settings
+# t=1.5s phase=0.63 particleTime=1.5 node=140x46 particles=default
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad1 = createLinearGradient(0, 0, 0, 36.8)
+grad1.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad1.addColorStop(0.08, #ffb300)
+grad1.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad1.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad1
+save()
+translate(33.05, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.025
+fillStyle = grad1
+save()
+translate(12.25, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.041
+fillStyle = grad1
+save()
+translate(17.15, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.084
+fillStyle = grad1
+save()
+translate(20.74, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.144
+fillStyle = grad1
+save()
+translate(24.11, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.09
+fillStyle = grad1
+save()
+translate(28.53, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.117
+fillStyle = grad1
+save()
+translate(34.46, 0)
+scale(1, 0.97)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.144
+fillStyle = grad1
+save()
+translate(41.24, 0)
+scale(1, 0.94)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.064
+fillStyle = grad1
+save()
+translate(47.54, 0)
+scale(1, 0.9)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.054
+fillStyle = grad1
+save()
+translate(52.42, 0)
+scale(1, 0.86)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.025
+fillStyle = grad1
+save()
+translate(55.98, 0)
+scale(1, 0.84)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+grad2 = createLinearGradient(0, 0, 0, 36.8)
+grad2.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad2.addColorStop(0.08, #fb00ff)
+grad2.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad2.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad2
+save()
+translate(57.61, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.022
+fillStyle = grad2
+save()
+translate(36.56, 0)
+scale(1, 0.77)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.037
+fillStyle = grad2
+save()
+translate(40.05, 0)
+scale(1, 0.74)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.103
+fillStyle = grad2
+save()
+translate(43.48, 0)
+scale(1, 0.71)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.127
+fillStyle = grad2
+save()
+translate(48.07, 0)
+scale(1, 0.68)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.082
+fillStyle = grad2
+save()
+translate(54.15, 0)
+scale(1, 0.64)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.145
+fillStyle = grad2
+save()
+translate(60.94, 0)
+scale(1, 0.6)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.127
+fillStyle = grad2
+save()
+translate(67.12, 0)
+scale(1, 0.57)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.058
+fillStyle = grad2
+save()
+translate(71.82, 0)
+scale(1, 0.56)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.067
+fillStyle = grad2
+save()
+translate(75.3, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.022
+fillStyle = grad2
+save()
+translate(78.74, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+grad3 = createLinearGradient(0, 0, 0, 36.8)
+grad3.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad3.addColorStop(0.08, #9d00ff)
+grad3.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad3.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad3
+save()
+translate(62.1, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.018
+fillStyle = grad3
+save()
+translate(39.3, 0)
+scale(1, 0.57)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.042
+fillStyle = grad3
+save()
+translate(42.81, 0)
+scale(1, 0.56)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.115
+fillStyle = grad3
+save()
+translate(47.56, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.102
+fillStyle = grad3
+save()
+translate(53.78, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.093
+fillStyle = grad3
+save()
+translate(60.57, 0)
+scale(1, 0.56)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.161
+fillStyle = grad3
+save()
+translate(66.61, 0)
+scale(1, 0.58)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.101
+fillStyle = grad3
+save()
+translate(71.14, 0)
+scale(1, 0.6)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.067
+fillStyle = grad3
+save()
+translate(74.54, 0)
+scale(1, 0.62)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.074
+fillStyle = grad3
+save()
+translate(78.07, 0)
+scale(1, 0.64)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.018
+fillStyle = grad3
+save()
+translate(82.85, 0)
+scale(1, 0.67)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.15
+fillStyle = grad1
+save()
+translate(84.43, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.014
+fillStyle = grad1
+save()
+translate(59.99, 0)
+scale(1, 0.71)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.054
+fillStyle = grad1
+save()
+translate(64.92, 0)
+scale(1, 0.75)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.114
+fillStyle = grad1
+save()
+translate(71.27, 0)
+scale(1, 0.8)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.081
+fillStyle = grad1
+save()
+translate(78.04, 0)
+scale(1, 0.85)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.117
+fillStyle = grad1
+save()
+translate(83.92, 0)
+scale(1, 0.89)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.16
+fillStyle = grad1
+save()
+translate(88.29, 0)
+scale(1, 0.92)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.081
+fillStyle = grad1
+save()
+translate(91.64, 0)
+scale(1, 0.94)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.085
+fillStyle = grad1
+save()
+translate(95.26, 0)
+scale(1, 0.96)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.073
+fillStyle = grad1
+save()
+translate(100.22, 0)
+scale(1, 0.98)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.014
+fillStyle = grad1
+save()
+translate(106.58, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.15
+fillStyle = grad2
+save()
+translate(114.8, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.013
+fillStyle = grad2
+save()
+translate(90.34, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.066
+fillStyle = grad2
+save()
+translate(96.79, 0)
+scale(1, 0.98)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.101
+fillStyle = grad2
+save()
+translate(103.52, 0)
+scale(1, 0.95)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.074
+fillStyle = grad2
+save()
+translate(109.25, 0)
+scale(1, 0.92)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.145
+fillStyle = grad2
+save()
+translate(113.46, 0)
+scale(1, 0.89)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.14
+fillStyle = grad2
+save()
+translate(116.77, 0)
+scale(1, 0.87)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.074
+fillStyle = grad2
+save()
+translate(120.5, 0)
+scale(1, 0.84)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.104
+fillStyle = grad2
+save()
+translate(125.64, 0)
+scale(1, 0.8)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.064
+fillStyle = grad2
+save()
+translate(132.11, 0)
+scale(1, 0.75)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.013
+fillStyle = grad2
+save()
+translate(133.95, 0)
+scale(1, 0.74)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+shadowBlur = 3
+globalAlpha = 0.4
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(18.78, 30.42, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.4
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(35.05, 23.79, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=3.7s phase=1.55 particleTime=3.7 node=220x120 selected particles=rainbow
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad4 = createLinearGradient(0, 0, 0, 96)
+grad4.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad4.addColorStop(0.08, #ffb300)
+grad4.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad4.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad4
+save()
+translate(60.05, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.013
+fillStyle = grad4
+save()
+translate(24.99, 0)
+scale(1, 0.79)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.067
+fillStyle = grad4
+save()
+translate(30.25, 0)
+scale(1, 0.74)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.099
+fillStyle = grad4
+save()
+translate(37.09, 0)
+scale(1, 0.69)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.074
+fillStyle = grad4
+save()
+translate(46.33, 0)
+scale(1, 0.63)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.147
+fillStyle = grad4
+save()
+translate(56.96, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.138
+fillStyle = grad4
+save()
+translate(66.94, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.074
+fillStyle = grad4
+save()
+translate(74.71, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.105
+fillStyle = grad4
+save()
+translate(80.37, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.063
+fillStyle = grad4
+save()
+translate(85.65, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.013
+fillStyle = grad4
+save()
+translate(92.53, 0)
+scale(1, 0.61)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+grad5 = createLinearGradient(0, 0, 0, 96)
+grad5.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad5.addColorStop(0.08, #fb00ff)
+grad5.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad5.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad5
+save()
+translate(79.13, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.015
+fillStyle = grad5
+save()
+translate(41.18, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.074
+fillStyle = grad5
+save()
+translate(48.28, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.079
+fillStyle = grad5
+save()
+translate(57.75, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.085
+fillStyle = grad5
+save()
+translate(68.42, 0)
+scale(1, 0.64)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.162
+fillStyle = grad5
+save()
+translate(78.2, 0)
+scale(1, 0.7)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.11
+fillStyle = grad5
+save()
+translate(85.69, 0)
+scale(1, 0.76)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.085
+fillStyle = grad5
+save()
+translate(91.22, 0)
+scale(1, 0.8)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.116
+fillStyle = grad5
+save()
+translate(96.58, 0)
+scale(1, 0.85)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.05
+fillStyle = grad5
+save()
+translate(103.73, 0)
+scale(1, 0.9)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.015
+fillStyle = grad5
+save()
+translate(113.23, 0)
+scale(1, 0.95)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+grad6 = createLinearGradient(0, 0, 0, 96)
+grad6.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad6.addColorStop(0.08, #9d00ff)
+grad6.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad6.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad6
+save()
+translate(92.4, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.019
+fillStyle = grad6
+save()
+translate(53.69, 0)
+scale(1, 0.73)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.073
+fillStyle = grad6
+save()
+translate(63.38, 0)
+scale(1, 0.81)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.063
+fillStyle = grad6
+save()
+translate(74.06, 0)
+scale(1, 0.89)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.108
+fillStyle = grad6
+save()
+translate(83.63, 0)
+scale(1, 0.95)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.158
+fillStyle = grad6
+save()
+translate(90.85, 0)
+scale(1, 0.98)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.088
+fillStyle = grad6
+save()
+translate(96.25, 0)
+scale(1, 0.99)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.109
+fillStyle = grad6
+save()
+translate(101.73, 0)
+scale(1, 1)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.113
+fillStyle = grad6
+save()
+translate(109.14, 0)
+scale(1, 1)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.04
+fillStyle = grad6
+save()
+translate(118.87, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.019
+fillStyle = grad6
+save()
+translate(129.54, 0)
+scale(1, 0.91)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.15
+fillStyle = grad4
+save()
+translate(145.4, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.023
+fillStyle = grad4
+save()
+translate(108.76, 0)
+scale(1, 0.86)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.064
+fillStyle = grad4
+save()
+translate(119.41, 0)
+scale(1, 0.78)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.059
+fillStyle = grad4
+save()
+translate(128.76, 0)
+scale(1, 0.71)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.132
+fillStyle = grad4
+save()
+translate(135.72, 0)
+scale(1, 0.66)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.138
+fillStyle = grad4
+save()
+translate(141.02, 0)
+scale(1, 0.62)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.082
+fillStyle = grad4
+save()
+translate(146.64, 0)
+scale(1, 0.59)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.133
+fillStyle = grad4
+save()
+translate(154.32, 0)
+scale(1, 0.57)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.098
+fillStyle = grad4
+save()
+translate(164.25, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.038
+fillStyle = grad4
+save()
+translate(174.9, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.023
+fillStyle = grad4
+save()
+translate(184.2, 0)
+scale(1, 0.6)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.15
+fillStyle = grad5
+save()
+translate(180.4, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.026
+fillStyle = grad5
+save()
+translate(146.74, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.051
+fillStyle = grad5
+save()
+translate(155.85, 0)
+scale(1, 0.6)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.067
+fillStyle = grad5
+save()
+translate(162.55, 0)
+scale(1, 0.64)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.146
+fillStyle = grad5
+save()
+translate(167.78, 0)
+scale(1, 0.67)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.11
+fillStyle = grad5
+save()
+translate(173.57, 0)
+scale(1, 0.71)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.095
+fillStyle = grad5
+save()
+translate(181.53, 0)
+scale(1, 0.78)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.146
+fillStyle = grad5
+save()
+translate(191.63, 0)
+scale(1, 0.85)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.078
+fillStyle = grad5
+save()
+translate(202.23, 0)
+scale(1, 0.93)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.044
+fillStyle = grad5
+save()
+translate(210.5, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.026
+fillStyle = grad5
+save()
+translate(210.5, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+shadowBlur = 3
+globalAlpha = 0.4
+shadowColor = #86eff9
+fillStyle = #86eff9
+beginPath()
+arc(26.16, 98.72, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.4
+shadowColor = #86b6f9
+fillStyle = #86b6f9
+beginPath()
+arc(47.77, 77.04, 1.2, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=3 shadowBlurSets=4 path2d=0
+# t=6.1s phase=2.56 particleTime=6.1 node=320x260 particles=complementary
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad7 = createLinearGradient(0, 0, 0, 208)
+grad7.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad7.addColorStop(0.08, #ffb300)
+grad7.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad7.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad7
+save()
+translate(84.35, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.026
+fillStyle = grad7
+save()
+translate(27.97, 0)
+scale(1, 0.55)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.046
+fillStyle = grad7
+save()
+translate(41.81, 0)
+scale(1, 0.57)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.075
+fillStyle = grad7
+save()
+translate(57.33, 0)
+scale(1, 0.64)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.147
+fillStyle = grad7
+save()
+translate(71.51, 0)
+scale(1, 0.75)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.098
+fillStyle = grad7
+save()
+translate(82.33, 0)
+scale(1, 0.83)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.106
+fillStyle = grad7
+save()
+translate(90.32, 0)
+scale(1, 0.89)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.147
+fillStyle = grad7
+save()
+translate(98.15, 0)
+scale(1, 0.94)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.07
+fillStyle = grad7
+save()
+translate(108.62, 0)
+scale(1, 0.98)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.049
+fillStyle = grad7
+save()
+translate(122.52, 0)
+scale(1, 1)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.026
+fillStyle = grad7
+save()
+translate(138.04, 0)
+scale(1, 0.96)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+grad8 = createLinearGradient(0, 0, 0, 208)
+grad8.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad8.addColorStop(0.08, #fb00ff)
+grad8.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad8.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad8
+save()
+translate(95, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.024
+fillStyle = grad8
+save()
+translate(41.35, 0)
+scale(1, 0.74)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.038
+fillStyle = grad8
+save()
+translate(56.87, 0)
+scale(1, 0.86)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.095
+fillStyle = grad8
+save()
+translate(70.74, 0)
+scale(1, 0.94)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.136
+fillStyle = grad8
+save()
+translate(81.16, 0)
+scale(1, 0.99)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.083
+fillStyle = grad8
+save()
+translate(88.98, 0)
+scale(1, 1)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.134
+fillStyle = grad8
+save()
+translate(97, 0)
+scale(1, 1)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.136
+fillStyle = grad8
+save()
+translate(107.85, 0)
+scale(1, 0.96)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.059
+fillStyle = grad8
+save()
+translate(122.06, 0)
+scale(1, 0.88)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.062
+fillStyle = grad8
+save()
+translate(137.58, 0)
+scale(1, 0.76)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.024
+fillStyle = grad8
+save()
+translate(151.39, 0)
+scale(1, 0.66)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+grad9 = createLinearGradient(0, 0, 0, 208)
+grad9.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad9.addColorStop(0.08, #9d00ff)
+grad9.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad9.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad9
+save()
+translate(142.58, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.02
+fillStyle = grad9
+save()
+translate(93.33, 0)
+scale(1, 0.88)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.039
+fillStyle = grad9
+save()
+translate(106.86, 0)
+scale(1, 0.78)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.111
+fillStyle = grad9
+save()
+translate(116.91, 0)
+scale(1, 0.7)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.113
+fillStyle = grad9
+save()
+translate(124.59, 0)
+scale(1, 0.65)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.086
+fillStyle = grad9
+save()
+translate(132.82, 0)
+scale(1, 0.6)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.156
+fillStyle = grad9
+save()
+translate(144.07, 0)
+scale(1, 0.56)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.113
+fillStyle = grad9
+save()
+translate(158.56, 0)
+scale(1, 0.56)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.061
+fillStyle = grad9
+save()
+translate(174.04, 0)
+scale(1, 0.61)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.072
+fillStyle = grad9
+save()
+translate(187.5, 0)
+scale(1, 0.7)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.02
+fillStyle = grad9
+save()
+translate(197.49, 0)
+scale(1, 0.78)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.15
+fillStyle = grad7
+save()
+translate(229.49, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.016
+fillStyle = grad7
+save()
+translate(182.26, 0)
+scale(1, 0.88)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.048
+fillStyle = grad7
+save()
+translate(191.94, 0)
+scale(1, 0.94)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.117
+fillStyle = grad7
+save()
+translate(199.53, 0)
+scale(1, 0.97)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.089
+fillStyle = grad7
+save()
+translate(207.99, 0)
+scale(1, 1)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.106
+fillStyle = grad7
+save()
+translate(219.65, 0)
+scale(1, 1)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.163
+fillStyle = grad7
+save()
+translate(234.4, 0)
+scale(1, 0.94)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.088
+fillStyle = grad7
+save()
+translate(249.79, 0)
+scale(1, 0.84)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.076
+fillStyle = grad7
+save()
+translate(262.89, 0)
+scale(1, 0.74)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.075
+fillStyle = grad7
+save()
+translate(272.52, 0)
+scale(1, 0.67)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.015
+fillStyle = grad7
+save()
+translate(280.09, 0)
+scale(1, 0.62)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.15
+fillStyle = grad8
+save()
+translate(262.4, 0)
+scale(1, 0.7)
+fillRect(-57.6, 0, 115.2, 208)
+restore()
+globalAlpha = 0.013
+fillStyle = grad8
+save()
+translate(212.95, 0)
+scale(1, 0.9)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.061
+fillStyle = grad8
+save()
+translate(220.48, 0)
+scale(1, 0.85)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.108
+fillStyle = grad8
+save()
+translate(229.22, 0)
+scale(1, 0.78)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.075
+fillStyle = grad8
+save()
+translate(241.28, 0)
+scale(1, 0.69)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.134
+fillStyle = grad8
+save()
+translate(256.24, 0)
+scale(1, 0.6)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.15
+fillStyle = grad8
+save()
+translate(271.51, 0)
+scale(1, 0.55)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.074
+fillStyle = grad8
+save()
+translate(284.24, 0)
+scale(1, 0.56)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.096
+fillStyle = grad8
+save()
+translate(293.52, 0)
+scale(1, 0.6)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.069
+fillStyle = grad8
+save()
+translate(301.04, 0)
+scale(1, 0.64)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+globalAlpha = 0.013
+fillStyle = grad8
+save()
+translate(306.18, 0)
+scale(1, 0.67)
+fillRect(-13.82, 0, 27.65, 208)
+restore()
+shadowBlur = 3
+globalAlpha = 0.234
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(31.38, 249.09, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.4
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(68.62, 198.93, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=8.3s phase=3.48 particleTime=8.3 node=400x80 hover particles=energy
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad10 = createLinearGradient(0, 0, 0, 64)
+grad10.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad10.addColorStop(0.08, #ffb300)
+grad10.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad10.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad10
+save()
+translate(85.9, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.013
+fillStyle = grad10
+save()
+translate(23.11, 0)
+scale(1, 0.67)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.062
+fillStyle = grad10
+save()
+translate(40.98, 0)
+scale(1, 0.8)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.107
+fillStyle = grad10
+save()
+translate(54.7, 0)
+scale(1, 0.9)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.074
+fillStyle = grad10
+save()
+translate(64.79, 0)
+scale(1, 0.96)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.136
+fillStyle = grad10
+save()
+translate(74.51, 0)
+scale(1, 0.99)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.149
+fillStyle = grad10
+save()
+translate(87.4, 0)
+scale(1, 1)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.074
+fillStyle = grad10
+save()
+translate(104.61, 0)
+scale(1, 0.93)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.098
+fillStyle = grad10
+save()
+translate(124, 0)
+scale(1, 0.8)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.068
+fillStyle = grad10
+save()
+translate(141.81, 0)
+scale(1, 0.66)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.013
+fillStyle = grad10
+save()
+translate(155.45, 0)
+scale(1, 0.59)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+grad11 = createLinearGradient(0, 0, 0, 64)
+grad11.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad11.addColorStop(0.08, #fb00ff)
+grad11.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad11.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad11
+save()
+translate(107.38, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.014
+fillStyle = grad11
+save()
+translate(48.21, 0)
+scale(1, 1)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.072
+fillStyle = grad11
+save()
+translate(61.44, 0)
+scale(1, 0.99)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.088
+fillStyle = grad11
+save()
+translate(71.3, 0)
+scale(1, 0.96)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.078
+fillStyle = grad11
+save()
+translate(81.22, 0)
+scale(1, 0.9)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.157
+fillStyle = grad11
+save()
+translate(94.6, 0)
+scale(1, 0.81)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.122
+fillStyle = grad11
+save()
+translate(112.2, 0)
+scale(1, 0.67)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.079
+fillStyle = grad11
+save()
+translate(131.61, 0)
+scale(1, 0.57)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.113
+fillStyle = grad11
+save()
+translate(149.03, 0)
+scale(1, 0.55)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.056
+fillStyle = grad11
+save()
+translate(162.18, 0)
+scale(1, 0.6)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.014
+fillStyle = grad11
+save()
+translate(172, 0)
+scale(1, 0.65)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+grad12 = createLinearGradient(0, 0, 0, 64)
+grad12.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad12.addColorStop(0.08, #9d00ff)
+grad12.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad12.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad12
+save()
+translate(200.7, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.017
+fillStyle = grad12
+save()
+translate(139.97, 0)
+scale(1, 0.63)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.075
+fillStyle = grad12
+save()
+translate(149.64, 0)
+scale(1, 0.7)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.069
+fillStyle = grad12
+save()
+translate(159.8, 0)
+scale(1, 0.78)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.097
+fillStyle = grad12
+save()
+translate(173.68, 0)
+scale(1, 0.88)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.162
+fillStyle = grad12
+save()
+translate(191.65, 0)
+scale(1, 0.98)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.096
+fillStyle = grad12
+save()
+translate(211.02, 0)
+scale(1, 0.99)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.098
+fillStyle = grad12
+save()
+translate(228.03, 0)
+scale(1, 0.93)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.116
+fillStyle = grad12
+save()
+translate(240.7, 0)
+scale(1, 0.84)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.044
+fillStyle = grad12
+save()
+translate(250.34, 0)
+scale(1, 0.77)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.017
+fillStyle = grad12
+save()
+translate(260.55, 0)
+scale(1, 0.69)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.15
+fillStyle = grad10
+save()
+translate(292.44, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.021
+fillStyle = grad10
+save()
+translate(226.41, 0)
+scale(1, 0.73)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.069
+fillStyle = grad10
+save()
+translate(236.86, 0)
+scale(1, 0.66)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.059
+fillStyle = grad10
+save()
+translate(251.24, 0)
+scale(1, 0.58)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.123
+fillStyle = grad10
+save()
+translate(269.54, 0)
+scale(1, 0.55)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.149
+fillStyle = grad10
+save()
+translate(288.83, 0)
+scale(1, 0.62)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.082
+fillStyle = grad10
+save()
+translate(305.4, 0)
+scale(1, 0.73)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.123
+fillStyle = grad10
+save()
+translate(317.6, 0)
+scale(1, 0.83)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.106
+fillStyle = grad10
+save()
+translate(327.11, 0)
+scale(1, 0.9)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.038
+fillStyle = grad10
+save()
+translate(337.62, 0)
+scale(1, 0.96)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.022
+fillStyle = grad10
+save()
+translate(352.08, 0)
+scale(1, 1)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.15
+fillStyle = grad11
+save()
+translate(312.75, 0)
+scale(1, 0.7)
+fillRect(-72, 0, 144, 64)
+restore()
+globalAlpha = 0.025
+fillStyle = grad11
+save()
+translate(242.55, 0)
+scale(1, 0.55)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.057
+fillStyle = grad11
+save()
+translate(257.42, 0)
+scale(1, 0.6)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.062
+fillStyle = grad11
+save()
+translate(276.02, 0)
+scale(1, 0.73)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.142
+fillStyle = grad11
+save()
+translate(295.17, 0)
+scale(1, 0.88)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.122
+fillStyle = grad11
+save()
+translate(311.28, 0)
+scale(1, 0.97)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.087
+fillStyle = grad11
+save()
+translate(323.05, 0)
+scale(1, 1)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.142
+fillStyle = grad11
+save()
+translate(332.47, 0)
+scale(1, 1)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.087
+fillStyle = grad11
+save()
+translate(343.32, 0)
+scale(1, 0.96)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.04
+fillStyle = grad11
+save()
+translate(358.27, 0)
+scale(1, 0.88)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+globalAlpha = 0.025
+fillStyle = grad11
+save()
+translate(376.92, 0)
+scale(1, 0.73)
+fillRect(-17.28, 0, 34.56, 64)
+restore()
+shadowBlur = 3
+globalAlpha = 0.4
+shadowColor = #99f986
+fillStyle = #99f986
+beginPath()
+arc(41.92, 58.93, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.4
+shadowColor = #86f999
+fillStyle = #86f999
+beginPath()
+arc(92.03, 45.39, 1.2, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 7.5
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 400, 80)
+restore()
+restore()
+# gradients=3 shadowBlurSets=4 path2d=0
+# t=10.9s phase=4.57 particleTime=10.9 node=140x46 particles=quantum
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad13 = createLinearGradient(0, 0, 0, 36.8)
+grad13.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad13.addColorStop(0.08, #ffb300)
+grad13.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad13.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad13
+save()
+translate(25.2, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.026
+fillStyle = grad13
+save()
+translate(6.05, 0)
+scale(1, 0.88)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.046
+fillStyle = grad13
+save()
+translate(7.17, 0)
+scale(1, 0.88)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.074
+fillStyle = grad13
+save()
+translate(10.81, 0)
+scale(1, 0.91)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.147
+fillStyle = grad13
+save()
+translate(15.8, 0)
+scale(1, 0.94)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.1
+fillStyle = grad13
+save()
+translate(22.19, 0)
+scale(1, 0.97)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.104
+fillStyle = grad13
+save()
+translate(28.95, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.147
+fillStyle = grad13
+save()
+translate(34.78, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.071
+fillStyle = grad13
+save()
+translate(39.08, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.048
+fillStyle = grad13
+save()
+translate(42.42, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.026
+fillStyle = grad13
+save()
+translate(46.07, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+grad14 = createLinearGradient(0, 0, 0, 36.8)
+grad14.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad14.addColorStop(0.08, #fb00ff)
+grad14.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad14.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad14
+save()
+translate(40.94, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.024
+fillStyle = grad14
+save()
+translate(17.67, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.038
+fillStyle = grad14
+save()
+translate(21.42, 0)
+scale(1, 0.98)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.094
+fillStyle = grad14
+save()
+translate(26.59, 0)
+scale(1, 0.96)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.137
+fillStyle = grad14
+save()
+translate(33.08, 0)
+scale(1, 0.92)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.083
+fillStyle = grad14
+save()
+translate(39.8, 0)
+scale(1, 0.88)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.132
+fillStyle = grad14
+save()
+translate(45.47, 0)
+scale(1, 0.84)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.137
+fillStyle = grad14
+save()
+translate(49.62, 0)
+scale(1, 0.81)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.059
+fillStyle = grad14
+save()
+translate(52.92, 0)
+scale(1, 0.78)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.061
+fillStyle = grad14
+save()
+translate(56.69, 0)
+scale(1, 0.75)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.024
+fillStyle = grad14
+save()
+translate(61.89, 0)
+scale(1, 0.71)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+grad15 = createLinearGradient(0, 0, 0, 36.8)
+grad15.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad15.addColorStop(0.08, #9d00ff)
+grad15.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad15.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad15
+save()
+translate(78.99, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.02
+fillStyle = grad15
+save()
+translate(54.37, 0)
+scale(1, 0.58)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.039
+fillStyle = grad15
+save()
+translate(59.71, 0)
+scale(1, 0.56)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.111
+fillStyle = grad15
+save()
+translate(66.3, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.115
+fillStyle = grad15
+save()
+translate(72.95, 0)
+scale(1, 0.55)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.085
+fillStyle = grad15
+save()
+translate(78.45, 0)
+scale(1, 0.56)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.155
+fillStyle = grad15
+save()
+translate(82.46, 0)
+scale(1, 0.57)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.114
+fillStyle = grad15
+save()
+translate(85.74, 0)
+scale(1, 0.58)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.061
+fillStyle = grad15
+save()
+translate(89.64, 0)
+scale(1, 0.6)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.071
+fillStyle = grad15
+save()
+translate(95.01, 0)
+scale(1, 0.63)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.02
+fillStyle = grad15
+save()
+translate(101.61, 0)
+scale(1, 0.67)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.15
+fillStyle = grad13
+save()
+translate(96.75, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.016
+fillStyle = grad13
+save()
+translate(72.56, 0)
+scale(1, 0.67)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.048
+fillStyle = grad13
+save()
+translate(79.21, 0)
+scale(1, 0.72)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.117
+fillStyle = grad13
+save()
+translate(85.79, 0)
+scale(1, 0.77)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.09
+fillStyle = grad13
+save()
+translate(91.12, 0)
+scale(1, 0.81)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.104
+fillStyle = grad13
+save()
+translate(94.99, 0)
+scale(1, 0.84)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.163
+fillStyle = grad13
+save()
+translate(98.28, 0)
+scale(1, 0.87)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.09
+fillStyle = grad13
+save()
+translate(102.31, 0)
+scale(1, 0.89)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.075
+fillStyle = grad13
+save()
+translate(107.86, 0)
+scale(1, 0.93)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.075
+fillStyle = grad13
+save()
+translate(114.53, 0)
+scale(1, 0.96)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.016
+fillStyle = grad13
+save()
+translate(121.09, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.15
+fillStyle = grad14
+save()
+translate(102.16, 0)
+scale(1, 0.7)
+fillRect(-25.2, 0, 50.4, 36.8)
+restore()
+globalAlpha = 0.013
+fillStyle = grad14
+save()
+translate(79.79, 0)
+scale(1, 0.93)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.06
+fillStyle = grad14
+save()
+translate(86.27, 0)
+scale(1, 0.96)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.109
+fillStyle = grad14
+save()
+translate(91.43, 0)
+scale(1, 0.98)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.075
+fillStyle = grad14
+save()
+translate(95.17, 0)
+scale(1, 0.99)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.132
+fillStyle = grad14
+save()
+translate(98.48, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.152
+fillStyle = grad14
+save()
+translate(102.67, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.075
+fillStyle = grad14
+save()
+translate(108.38, 0)
+scale(1, 1)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.095
+fillStyle = grad14
+save()
+translate(115.1, 0)
+scale(1, 0.98)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.069
+fillStyle = grad14
+save()
+translate(121.57, 0)
+scale(1, 0.95)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+globalAlpha = 0.013
+fillStyle = grad14
+save()
+translate(126.7, 0)
+scale(1, 0.93)
+fillRect(-6.05, 0, 12.1, 36.8)
+restore()
+shadowBlur = 3
+globalAlpha = 0.4
+shadowColor = #cd0b3e
+fillStyle = #cd0b3e
+beginPath()
+arc(19.21, 15.42, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.116
+shadowColor = #cd0b25
+fillStyle = #cd0b25
+beginPath()
+arc(34.36, 8.79, 1.2, 0, 6.28)
+fill()
+restore()
+# gradients=3 shadowBlurSets=3 path2d=0
+# t=13.4s phase=5.61 particleTime=13.4 node=220x120 selected particles=aurora
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad16 = createLinearGradient(0, 0, 0, 96)
+grad16.addColorStop(0, rgba(255, 179, 0, 0.55))
+grad16.addColorStop(0.08, #ffb300)
+grad16.addColorStop(0.6, rgba(255, 179, 0, 0.45))
+grad16.addColorStop(1, rgba(255, 179, 0, 0))
+globalAlpha = 0.15
+fillStyle = grad16
+save()
+translate(39.6, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.013
+fillStyle = grad16
+save()
+translate(9.5, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.068
+fillStyle = grad16
+save()
+translate(9.5, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.098
+fillStyle = grad16
+save()
+translate(19.65, 0)
+scale(1, 0.92)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.074
+fillStyle = grad16
+save()
+translate(30.11, 0)
+scale(1, 0.85)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.148
+fillStyle = grad16
+save()
+translate(38.76, 0)
+scale(1, 0.78)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.136
+fillStyle = grad16
+save()
+translate(45.05, 0)
+scale(1, 0.73)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.074
+fillStyle = grad16
+save()
+translate(50.21, 0)
+scale(1, 0.69)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.106
+fillStyle = grad16
+save()
+translate(56.34, 0)
+scale(1, 0.65)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.062
+fillStyle = grad16
+save()
+translate(64.78, 0)
+scale(1, 0.6)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.013
+fillStyle = grad16
+save()
+translate(75.15, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+grad17 = createLinearGradient(0, 0, 0, 96)
+grad17.addColorStop(0, rgba(251, 0, 255, 0.55))
+grad17.addColorStop(0.08, #fb00ff)
+grad17.addColorStop(0.6, rgba(251, 0, 255, 0.45))
+grad17.addColorStop(1, rgba(251, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad17
+save()
+translate(78.44, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.015
+fillStyle = grad17
+save()
+translate(40.42, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.075
+fillStyle = grad17
+save()
+translate(50.89, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.078
+fillStyle = grad17
+save()
+translate(61.22, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.086
+fillStyle = grad17
+save()
+translate(69.6, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.162
+fillStyle = grad17
+save()
+translate(75.67, 0)
+scale(1, 0.6)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.108
+fillStyle = grad17
+save()
+translate(80.84, 0)
+scale(1, 0.63)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.087
+fillStyle = grad17
+save()
+translate(87.19, 0)
+scale(1, 0.67)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.116
+fillStyle = grad17
+save()
+translate(95.9, 0)
+scale(1, 0.74)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.05
+fillStyle = grad17
+save()
+translate(106.38, 0)
+scale(1, 0.82)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.015
+fillStyle = grad17
+save()
+translate(116.69, 0)
+scale(1, 0.89)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+grad18 = createLinearGradient(0, 0, 0, 96)
+grad18.addColorStop(0, rgba(157, 0, 255, 0.55))
+grad18.addColorStop(0.08, #9d00ff)
+grad18.addColorStop(0.6, rgba(157, 0, 255, 0.45))
+grad18.addColorStop(1, rgba(157, 0, 255, 0))
+globalAlpha = 0.15
+fillStyle = grad18
+save()
+translate(127.11, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.019
+fillStyle = grad18
+save()
+translate(91.96, 0)
+scale(1, 0.92)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.073
+fillStyle = grad18
+save()
+translate(102.15, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.063
+fillStyle = grad18
+save()
+translate(110.25, 0)
+scale(1, 0.99)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.11
+fillStyle = grad18
+save()
+translate(116.13, 0)
+scale(1, 1)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.158
+fillStyle = grad18
+save()
+translate(121.33, 0)
+scale(1, 1)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.087
+fillStyle = grad18
+save()
+translate(127.91, 0)
+scale(1, 0.98)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.11
+fillStyle = grad18
+save()
+translate(136.88, 0)
+scale(1, 0.95)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.113
+fillStyle = grad18
+save()
+translate(147.45, 0)
+scale(1, 0.88)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.04
+fillStyle = grad18
+save()
+translate(157.61, 0)
+scale(1, 0.81)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.019
+fillStyle = grad18
+save()
+translate(165.67, 0)
+scale(1, 0.75)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.15
+fillStyle = grad16
+save()
+translate(137.15, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.023
+fillStyle = grad16
+save()
+translate(104.41, 0)
+scale(1, 0.97)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.063
+fillStyle = grad16
+save()
+translate(112.24, 0)
+scale(1, 0.93)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.059
+fillStyle = grad16
+save()
+translate(117.95, 0)
+scale(1, 0.89)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.134
+fillStyle = grad16
+save()
+translate(123.2, 0)
+scale(1, 0.85)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.136
+fillStyle = grad16
+save()
+translate(130.03, 0)
+scale(1, 0.8)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.082
+fillStyle = grad16
+save()
+translate(139.25, 0)
+scale(1, 0.73)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.134
+fillStyle = grad16
+save()
+translate(149.88, 0)
+scale(1, 0.65)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.097
+fillStyle = grad16
+save()
+translate(159.87, 0)
+scale(1, 0.59)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.038
+fillStyle = grad16
+save()
+translate(167.65, 0)
+scale(1, 0.57)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.024
+fillStyle = grad16
+save()
+translate(173.33, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.15
+fillStyle = grad17
+save()
+translate(161.39, 0)
+scale(1, 0.7)
+fillRect(-39.6, 0, 79.2, 96)
+restore()
+globalAlpha = 0.026
+fillStyle = grad17
+save()
+translate(128.39, 0)
+scale(1, 0.61)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.05
+fillStyle = grad17
+save()
+translate(133.95, 0)
+scale(1, 0.58)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.068
+fillStyle = grad17
+save()
+translate(139.29, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.146
+fillStyle = grad17
+save()
+translate(146.37, 0)
+scale(1, 0.55)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.108
+fillStyle = grad17
+save()
+translate(155.83, 0)
+scale(1, 0.56)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.096
+fillStyle = grad17
+save()
+translate(166.49, 0)
+scale(1, 0.59)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.147
+fillStyle = grad17
+save()
+translate(176.29, 0)
+scale(1, 0.64)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.077
+fillStyle = grad17
+save()
+translate(183.8, 0)
+scale(1, 0.69)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.044
+fillStyle = grad17
+save()
+translate(189.33, 0)
+scale(1, 0.73)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+globalAlpha = 0.026
+fillStyle = grad17
+save()
+translate(194.69, 0)
+scale(1, 0.78)
+fillRect(-9.5, 0, 19.01, 96)
+restore()
+shadowBlur = 3
+globalAlpha = 0.4
+shadowColor = #59f879
+fillStyle = #59f879
+beginPath()
+arc(24.24, 88.92, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.4
+shadowColor = #59f899
+fillStyle = #59f899
+beginPath()
+arc(46.24, 67.24, 1.2, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=3 shadowBlurSets=4 path2d=0

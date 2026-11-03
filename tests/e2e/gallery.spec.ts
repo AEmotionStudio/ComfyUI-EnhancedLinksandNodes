@@ -57,6 +57,7 @@ const NODE_SCENES: Scene[] = [
     { name: 'Flower of Life', settings: { '📦 Enhanced Nodes.Animate': 5 } },
     { name: 'Jelly', settings: { '📦 Enhanced Nodes.Animate': 6 } },
     { name: 'Circuit Trace', settings: { '📦 Enhanced Nodes.Animate': 7 } },
+    { name: 'Aurora Veil', settings: { '📦 Enhanced Nodes.Animate': 8 } },
     { name: 'Gentle Pulse with particles', settings: { '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Particle.Show': true } },
     {
         name: 'Cosmic Ripple at full energy with particles',
@@ -246,6 +247,7 @@ const NODE_EFFECTS: [number, string, string][] = [
     [5, 'Flower of Life', 'New in v3: the true Flower of Life, nineteen circles drawing themselves in round each node, the Seed of Life first, then turning slowly in bloom, with sparks running round them.'],
     [6, 'Jelly', 'New in v3: a gel tint and gloss on each node, bubbles rising through it, and the node itself wobbling as it is dragged, dropped, selected or finished by a run.'],
     [7, 'Circuit Trace', 'New in v3: each node a chip, pins out of its sides and foot wired in by faint traces to pads, a pulse racing along each trace and lighting its pad, with sparks trailing it.'],
+    [8, 'Aurora Veil', 'New in v3: curtains of light hanging from the title bar into each node, their hems waving as they drift and shimmer, with motes rising through the body.'],
 ];
 
 const TITLE_NAMES = { neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal' };
