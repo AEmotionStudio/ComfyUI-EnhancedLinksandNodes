@@ -151,6 +151,8 @@ const V3_DEFAULTS: Record<string, unknown> = {
     // M10a
     '🔗 Enhanced Links.Perf.KeepGlow': true,
     '🔗 Enhanced Links.Perf.MinZoom': 25,
+    '📦 Enhanced Nodes.Run.Ring.Color.Mode': 'accent',
+    '📦 Enhanced Nodes.Run.Ring.Color': '#00e5ff',
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -166,6 +168,7 @@ const V3_OPTIONS: Record<string, unknown[]> = {
     '📦 Enhanced Nodes.Completion.Style': ['fireworks', 'confetti', 'shockwave', 'trace', 'random'],
     '🔗 Enhanced Links.Physics.Profile': ['off', 'rope', 'whip', 'gel'],
     '🔗 Enhanced Links.Assist.Mode': ['off', 'line', 'hands', 'hands-eyes'],
+    '📦 Enhanced Nodes.Run.Ring.Color.Mode': ['accent', 'effect', 'custom', 'rainbow', 'status'],
 };
 const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
@@ -337,8 +340,8 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 57 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(57);
+    it('shows 59 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(59);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
@@ -346,7 +349,7 @@ describe('how the panel shows each setting', () => {
         expect(alone).toEqual([
             '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled',
             ...['Enabled', 'Mode', 'Color', 'Depth', 'OnTop', 'Hover', 'Dim'].map((key) => `🔗 Enhanced Links.Focus.${key}`),
-            '🔗 Enhanced Links.Navigate.DoubleClick', '🔗 Enhanced Links.Navigate.Follow', '🔗 Enhanced Links.Flow.Trail.Fade', '📦 Enhanced Nodes.Completion.Anchor',
+            '🔗 Enhanced Links.Navigate.DoubleClick', '🔗 Enhanced Links.Navigate.Follow', '🔗 Enhanced Links.Flow.Trail.Fade', '📦 Enhanced Nodes.Run.Ring.Color.Mode', '📦 Enhanced Nodes.Run.Ring.Color', '📦 Enhanced Nodes.Completion.Anchor',
             '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Perf.Adaptive', '🔗 Enhanced Links.Perf.KeepGlow', '🔗 Enhanced Links.Perf.StaticAbove', '🔗 Enhanced Links.Perf.MinZoom', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
             LOOK, '🔗 Enhanced Links.Panel.State', '🔗 Enhanced Links.WhatsNew.Seen',
         ]);
@@ -361,7 +364,7 @@ describe('how the panel shows each setting', () => {
             'L.Marker.Glow', 'L.Marker.Effects', 'L.Link.Shadow.Enabled', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style', 'L.Assist.Mode',
             'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
             'L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Navigate.DoubleClick', 'L.Navigate.Follow',
-            'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Error',
+            'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Ring.Color.Mode', 'N.Run.Error',
             'N.End Animation.Enabled', 'N.Completion.Style', 'N.Completion.Anchor', 'N.Completion.PerNode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.KeepGlow', 'L.Perf.StaticAbove', 'L.Perf.MinZoom', 'L.Motion', 'L.Coexist',
         ]);
         showing({

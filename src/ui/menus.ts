@@ -28,29 +28,18 @@ import { L, N, NODE_ANIMATION_OPTIONS } from '@/core/settings';
 import { PANE, clock, env, layers, live, overlaps, wake } from '@/core/engine';
 import { accent } from '@/core/colors';
 import { OWN_COMPLETION, RED, errorNodes, running, shownAs, trace } from '@/fx/execution';
+import { OWN_STYLE, ownStyle } from '@/nodes/effects';
 import { CHIP_MS, chip } from '@/sidebar/picker';
 
 type Node = InstanceType<typeof LGraphNode>;
 type Canvas = InstanceType<typeof LGraphCanvas>;
 type Graph = NonNullable<Canvas['graph']>;
 
-/** Where a node keeps what its menu set: its Node FX style and Particles only; its Completion FX is fx/execution.ts's. */
-const OWN_STYLE = 'enhanced_fx_style';
+/** Where a node keeps its Particles only, which its menu sets; its Node FX style is nodes/effects.ts's, its Completion FX fx/execution.ts's. */
 const OWN_ONLY = 'enhanced_fx_particles_only';
 
 /** The command the selection toolbox shows for nodes. */
 export const SELECTION_FX = 'EnhancedLinksNodes.SelectionNodeFX';
-
-const STYLES = new Set<unknown>(NODE_ANIMATION_OPTIONS.map((option) => option.value));
-
-/** The Node FX style a node was given, if it is one: a workflow may hold anything there. */
-export function ownStyle(node: Node): number | undefined {
-    const style = node.properties[OWN_STYLE];
-    return STYLES.has(style) ? (style as number) : undefined;
-}
-
-/** The style a node's effect takes: its own, else Animate. */
-export const effectOf = (node: Node): number => ownStyle(node) ?? N.animate;
 
 type Choices = Record<string, string | number | boolean | undefined>;
 

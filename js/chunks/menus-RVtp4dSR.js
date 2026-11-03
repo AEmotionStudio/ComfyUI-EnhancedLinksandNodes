@@ -164,6 +164,13 @@ const PAUSE_MODE_OPTIONS = [
   { value: "spotlight", text: "Spotlight" },
   { value: "ignore", text: "Keep animating" }
 ];
+const RING_COLOR_OPTIONS = [
+  { value: "accent", text: "Theme accent" },
+  { value: "effect", text: "Node effect color" },
+  { value: "custom", text: "Custom" },
+  { value: "rainbow", text: "Rainbow" },
+  { value: "status", text: "Status (amber → green)" }
+];
 const COMPLETION_STYLE_OPTIONS = [
   { value: "fireworks", text: "Fireworks" },
   { value: "confetti", text: "Confetti" },
@@ -298,6 +305,8 @@ const SETTINGS = [
   { id: "🔗 Enhanced Links.Flow.Trail", key: "flowTrail", name: "Executed-path trail", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => L.enabled, tooltip: "The run's path keeps a fading glow." },
   { id: "🔗 Enhanced Links.Flow.Trail.Fade", key: "flowTrailFade", name: "Trail fade time", type: "slider", min: 2, max: 30, step: 1, default: 8, group: "Focus & Flow · During a run", advanced: true, look: false, showIf: () => L.enabled && L.flowTrail },
   { id: "📦 Enhanced Nodes.Run.Ring", key: "runRing", name: "Progress ring", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Ring fills with the node's progress." },
+  { id: "📦 Enhanced Nodes.Run.Ring.Color.Mode", key: "runRingColorMode", name: "Progress ring color", type: "combo", options: RING_COLOR_OPTIONS, default: "accent", group: "Focus & Flow · During a run", look: false, showIf: () => N.enabled && N.runRing, tooltip: "Node effect color takes the primary color of the node's effect, the accent for a node without one; Rainbow runs the colour wheel round the ring; Status turns from amber to green as the node gets done." },
+  { id: "📦 Enhanced Nodes.Run.Ring.Color", key: "runRingColor", name: "Progress ring custom color", type: "color", default: "#00e5ff", group: "Focus & Flow · During a run", look: false, showIf: () => N.enabled && N.runRing && N.runRingColorMode === "custom", tooltip: "Used when Progress ring color is Custom." },
   { id: "📦 Enhanced Nodes.Run.Error", key: "runError", name: "Error pulse", type: "boolean", default: true, group: "Focus & Flow · During a run", showIf: () => N.enabled, tooltip: "Failed node pulses red." },
   { id: "📦 Enhanced Nodes.End Animation.Enabled", key: "endAnimationEnabled", name: "Effect when a run finishes", type: "boolean", default: true, group: "Focus & Flow · Completion", showIf: () => N.enabled, tooltip: "Plays the Completion style when your run succeeds." },
   { id: "📦 Enhanced Nodes.Completion.Style", key: "completionStyle", name: "Completion style", type: "combo", options: COMPLETION_STYLE_OPTIONS, default: "shockwave", group: "Focus & Flow · Completion", showIf: () => N.enabled && N.endAnimationEnabled, tooltip: "Path trace runs a comet along the links your run took; Surprise plays another style each time." },
@@ -1597,6 +1606,600 @@ function drawPops(canvas, ctx) {
   }
   return n;
 }
+const OWN_STYLE = "enhanced_fx_style";
+const STYLES = new Set(NODE_ANIMATION_OPTIONS.map((option) => option.value));
+function ownStyle(node2) {
+  const style = node2.properties[OWN_STYLE];
+  return STYLES.has(style) ? style : void 0;
+}
+const effectOf = (node2) => ownStyle(node2) ?? N.animate;
+const STILL_NODE = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
+const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion || adaptive.level >= HELD;
+const UNDER = 1;
+const OVER = 2;
+const [NEVER, BYPASS] = [2, 4];
+let part$1;
+let fade = 1;
+let held$4 = false;
+let outlined = false;
+let thin = 1;
+const stores = /* @__PURE__ */ new WeakMap();
+const SIZES = 256;
+let mine$2;
+function makes(ctx, pal, w, h2, k2, sides) {
+  let store2 = stores.get(ctx);
+  if (!store2) stores.set(ctx, store2 = { since: revision, sizes: 0, made: /* @__PURE__ */ new Map() });
+  if (store2.since !== revision || store2.sizes > SIZES) {
+    store2.made.clear();
+    store2.since = revision;
+    store2.sizes = 0;
+  }
+  let byWidth = store2.made.get(pal);
+  if (!byWidth) store2.made.set(pal, byWidth = /* @__PURE__ */ new Map());
+  let byHeight = byWidth.get(w);
+  if (!byHeight) byWidth.set(w, byHeight = /* @__PURE__ */ new Map());
+  let m = byHeight.get(h2);
+  if (!m) {
+    byHeight.set(h2, m = { phase: NaN, particles: NaN, time: NaN, held: false, thin: 1, slots: [[], [], [], []] });
+    store2.sizes++;
+  }
+  if (m.phase !== k2.nodePhase || m.particles !== k2.particleTime || m.time !== k2.nodeTime || m.held !== held$4 || m.thin !== thin) {
+    m.phase = k2.nodePhase;
+    m.particles = k2.particleTime;
+    m.time = k2.nodeTime;
+    m.held = held$4;
+    m.thin = thin;
+    for (const slots of m.slots) slots.fill(void 0);
+  }
+  return m.slots[sides];
+}
+const kept = (slot) => mine$2[slot];
+function keep$1(slot, value) {
+  mine$2[slot] = value;
+  return value;
+}
+const [OUTLINE_SHADOW, OUTLINE_STROKE] = [0, 1];
+const [LIGHT, HALO, FIREFLY_SHADOW, FIREFLIES] = [2, 3, 4, 5];
+const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
+const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
+const [CORE, DOTS] = [2, 3];
+let depth = 0;
+function save(ctx) {
+  ctx.save();
+  depth++;
+}
+function restore(ctx) {
+  ctx.restore();
+  depth--;
+}
+function shows$1(x0, y0, x1, y1) {
+  const p = part$1;
+  if (p.sides !== UNDER && p.sides !== OVER) return true;
+  if (p.round < 0) return true;
+  if (x1 <= p.x0 || x0 >= p.x1 || y1 <= p.y0 || y0 >= p.y1) return p.sides === UNDER;
+  const r = p.round;
+  const corner = (x0 < p.x0 + r || x1 > p.x1 - r) && (y0 < p.y0 + r || y1 > p.y1 - r);
+  const inside = x0 >= p.x0 && x1 <= p.x1 && y0 >= p.y0 && y1 <= p.y1 && !corner;
+  return !inside || p.sides === OVER;
+}
+const circle = (x, y, r) => shows$1(x - r, y - r, x + r, y + r);
+const pales = /* @__PURE__ */ new Map();
+let palesSince = -1;
+function pale(colour2, alpha) {
+  if (colour2.charCodeAt(0) !== 35) return translucent(colour2, alpha);
+  if (palesSince !== revision) {
+    pales.clear();
+    palesSince = revision;
+  }
+  let start = pales.get(colour2);
+  if (start === void 0) {
+    const pair = (i) => parseInt(colour2.slice(i, i + 2), 16) || 255;
+    pales.set(colour2, start = `rgba(${pair(1)}, ${pair(3)}, ${pair(5)}, `);
+  }
+  return `${start}${alpha})`;
+}
+function outline(ctx, x, y, w, h2, selected2, colour2) {
+  save(ctx);
+  const blur = 15 * N.animationGlow;
+  ctx.shadowColor = kept(OUTLINE_SHADOW) ?? keep$1(OUTLINE_SHADOW, colour2(N.colorHover, 0.5));
+  ctx.shadowBlur = selected2 ? blur * 1.5 : blur;
+  ctx.strokeStyle = kept(OUTLINE_STROKE) ?? keep$1(OUTLINE_STROKE, colour2(N.colorHover, 0.7));
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = fade;
+  ctx.strokeRect(x, y, w, h2);
+  restore(ctx);
+}
+function gentlePulse(ctx, node2, w, h2, k2, pal, only) {
+  const { quality: quality2, animationGlow: glow2, animationSize: size, particleSpeed: speed, particleIntensity: motion2 } = N;
+  const phase = k2.nodePhase;
+  const time = held$4 ? phase : TURN * k2.particleTime;
+  const radius = Math.max(w, h2) * (0.5 + quality2 * 0.1) * size;
+  const cx = w / 2;
+  const cy = h2 / 2;
+  save(ctx);
+  ctx.translate(cx, cy);
+  if (outlined) outline(ctx, -cx, -cy, w, h2, node2.selected, pale);
+  let blur = 0;
+  if (!only) {
+    const breathe = Math.pow(Math.sin(held$4 ? phase : phase * 0.375 * N.direction * N.animationSpeed), 2);
+    const pulse = 0.4 + 0.4 * breathe * (N.intensity * 1.5 * 0.75);
+    const inner = radius * pulse;
+    const outer = radius * (1.2 + glow2 * 0.4) * pulse;
+    if (circle(cx, cy, inner)) {
+      const alpha = 0.2 * glow2 * (0.5 + breathe * 0.5);
+      const gradient = kept(LIGHT) ?? keep$1(LIGHT, light$1(ctx, inner, alpha, pal));
+      ctx.beginPath();
+      ctx.arc(0, 0, inner, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = Math.min(0.2 + Math.abs(breathe) * 0.3 + glow2 * 0.2, 1) * fade;
+      ctx.fill();
+    }
+    if (circle(cx, cy, outer)) {
+      const alpha = 0.1 * glow2 * (0.5 + breathe * 0.5);
+      const gradient = kept(HALO) ?? keep$1(HALO, halo(ctx, radius * 0.6 * pulse, outer, alpha, pal));
+      ctx.beginPath();
+      ctx.arc(0, 0, outer, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = Math.min(0.15 + Math.abs(breathe) * 0.2 + glow2 * 0.15, 1) * fade;
+      ctx.fill();
+    }
+    if (quality2 > 1) {
+      ctx.shadowColor = kept(FIREFLY_SHADOW) ?? keep$1(FIREFLY_SHADOW, pale(pal.secondary, 0.3));
+      ctx.shadowBlur = blur = 10 * glow2 * (quality2 * 0.5);
+    }
+  }
+  if (N.particleShow) {
+    const { particleGlow: dotGlow } = N;
+    const count2 = Math.floor((8 + quality2 * 2) * N.particleDensity * thin);
+    const base = (4 + quality2) * size * N.particleSize;
+    const wobble = quality2 > 1 ? 12 : 6;
+    const rate = held$4 ? 0 : TURN * speed * speed;
+    const tick2 = Math.floor(k2.nodeTime * 30) * 4096;
+    for (let i = 0; i < count2; i++) {
+      const offset = i * (Math.PI * 2 / count2);
+      const pace = held$4 ? 1 : (0.5 + Math.sin(i) * 0.25) * motion2 * speed;
+      const turned = held$4 ? phase + offset : time * pace + offset;
+      const orbit = radius * (0.8 + Math.sin(held$4 ? phase + i : time * 0.2 * speed + i) * 0.25 + Math.cos(held$4 ? phase + i * 0.7 : time * 0.3 * speed + i * 0.7) * 0.25);
+      const angle = turned + i * Math.PI * 2 / count2;
+      const torus = Math.sin(time * 0.3 * speed + i) * (motion2 * 2);
+      const jitterX = held$4 ? 0 : Math.sin(time * 3 * speed + i) * 1.2 * motion2 + Math.cos(time * 2 * speed + i * 0.5) * 0.5 * motion2;
+      const jitterY = held$4 ? 0 : Math.cos(time * 2.5 * speed + i) * 1.2 * motion2 + Math.sin(time * 1.5 * speed + i * 0.7) * 0.5 * motion2;
+      const x = Math.cos(angle) * (orbit + torus) + Math.sin(held$4 ? phase + i : time * 0.2 * speed + i) * wobble + jitterX;
+      const y = Math.sin(angle) * (orbit + torus) - orbit * 0.3 + Math.cos(held$4 ? phase + i : time * 0.15 * speed + i) * wobble + jitterY;
+      const s = held$4 ? base : base * (0.7 + Math.sin(time * 0.5 * speed + i) * 0.4 + noise(tick2 + i) * 0.3);
+      if (!circle(cx + x, cy + y, s * 2 + 1.5 * blur)) continue;
+      const colour2 = kept(FIREFLIES + 2 * i) ?? keep$1(FIREFLIES + 2 * i, particleColour(pal, i, time * speed, rate));
+      const gradient = kept(FIREFLIES + 2 * i + 1) ?? keep$1(FIREFLIES + 2 * i + 1, firefly(ctx, x, y, s * 2, colour2, dotGlow));
+      const blinkOffset = Math.abs(Math.sin(i * 12.9898) * 43758.5453 % (2 * Math.PI));
+      const blinkSpeed = 1.2 + Math.sin(i * 0.7) * 0.6;
+      const blink = held$4 ? 0.8 : 0.4 + 0.8 * Math.pow(Math.sin(time * blinkSpeed * speed + blinkOffset), 2);
+      const alpha = Math.min(blink, 1) * dotGlow;
+      ctx.beginPath();
+      ctx.arc(x, y, s * 2, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = alpha * 0.8 * fade;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, s * 0.6, 0, Math.PI * 2);
+      ctx.fillStyle = colour2;
+      ctx.globalAlpha = Math.min(alpha * 1.5, 1) * fade;
+      ctx.fill();
+    }
+  }
+  restore(ctx);
+}
+function light$1(ctx, r, alpha, pal) {
+  const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+  gradient.addColorStop(0, pale("#ffffff", Math.min(alpha + 0.15, 1)));
+  gradient.addColorStop(0.3, pale(pal.primary, alpha));
+  gradient.addColorStop(0.7, pale(pal.secondary, alpha * 0.6));
+  gradient.addColorStop(1, pale(pal.accent, 0));
+  return gradient;
+}
+function halo(ctx, r0, r1, alpha, pal) {
+  const gradient = ctx.createRadialGradient(0, 0, r0, 0, 0, r1);
+  gradient.addColorStop(0, pale(pal.secondary, alpha));
+  gradient.addColorStop(0.6, pale(pal.accent, alpha * 0.5));
+  gradient.addColorStop(1, pale(pal.accent, 0));
+  return gradient;
+}
+function firefly(ctx, x, y, r, colour2, alpha) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gradient.addColorStop(0, pale(colour2, 0.8 * alpha));
+  gradient.addColorStop(0.4, pale(colour2, 0.4 * alpha));
+  gradient.addColorStop(1, pale(colour2, 0));
+  return gradient;
+}
+function scanLine(ctx, y) {
+  const gradient = ctx.createLinearGradient(0, y - 10, 0, y + 10);
+  gradient.addColorStop(0, "rgba(255,255,255,0)");
+  gradient.addColorStop(0.5, "rgba(255,255,255,0.5)");
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  return gradient;
+}
+function pulseLight(ctx, x, y, r, pulse) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gradient.addColorStop(0, `rgba(255,255,255,${0.15 * pulse})`);
+  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  return gradient;
+}
+const HOLOGRAM = [0, 1, 2].map((i) => `hsl(${i * 60 % 360}, 80%, 75%)`);
+const DASH = [5, 3];
+function roundedRect(ctx, x, y, w, h2, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h2 - r);
+  ctx.quadraticCurveTo(x + w, y + h2, x + w - r, y + h2);
+  ctx.lineTo(x + r, y + h2);
+  ctx.quadraticCurveTo(x, y + h2, x, y + h2 - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+function neonNexus(ctx, node2, w, h2, k2, pal, only) {
+  const { primary, secondary, accent: accent2 } = pal;
+  const { animationGlow: glow2, animationSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
+  const intensity = N.intensity * 1.5;
+  const phase = k2.nodePhase;
+  const time = held$4 ? phase : phase * speed;
+  const radius = Math.min(w, h2) * 0.08;
+  const line = Math.max(w, h2) * 75e-4 * size;
+  const grid = Math.min(w, h2) * 0.4 * size;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.shadowColor = "transparent";
+  if (!only) {
+    for (let i = 0; i < 3; i++) {
+      save(ctx);
+      ctx.globalAlpha = (0.2 - i * 0.05) * fade;
+      ctx.strokeStyle = HOLOGRAM[i];
+      ctx.lineWidth = line * 0.4;
+      roundedRect(ctx, -i * 2, -i * 2, w + i * 4, h2 + i * 4, radius + i * 1);
+      ctx.stroke();
+      restore(ctx);
+    }
+    const flicker = held$4 ? 1 : 0.95 + 0.05 * Math.sin(phase * 0.3 * N.direction);
+    for (let i = 0; i < 4; i++) {
+      save(ctx);
+      ctx.lineWidth = line * (1 + i * 0.3);
+      const colour2 = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent2 : "rgba(255, 255, 255, 0.4)";
+      ctx.strokeStyle = colour2;
+      ctx.shadowColor = colour2;
+      ctx.shadowBlur = (i + 1) * 12 * intensity * glow2;
+      const opacity2 = 0.95 - i * 0.15;
+      ctx.globalAlpha = (held$4 ? opacity2 : opacity2 * flicker) * fade;
+      roundedRect(ctx, 0, 0, w, h2, radius);
+      ctx.stroke();
+      if (i === 0) {
+        ctx.globalAlpha = (held$4 ? 0.3 : 0.3 * flicker) * fade;
+        ctx.lineWidth = line * 0.8;
+        ctx.shadowBlur = 20 * intensity * glow2;
+        roundedRect(ctx, 0, 0, w, h2, radius);
+        ctx.stroke();
+      }
+      restore(ctx);
+    }
+    const scan = h2 * (Math.sin(phase * 2) * 0.5 + 0.5);
+    if (!held$4 && shows$1(0, scan - 10, w, scan + 10)) {
+      ctx.fillStyle = kept(SCAN) ?? keep$1(SCAN, scanLine(ctx, scan));
+      ctx.fillRect(0, scan - 10, w, 20);
+    }
+  }
+  if (N.particleShow) {
+    const spacing = grid / 4;
+    const base = 2 * N.particleSize;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    for (let i = 0; i < 70; i++) {
+      const col = i % 5;
+      const row2 = Math.floor(i / 5);
+      const x = (col - 2) * spacing + Math.cos(phase + col) * 2;
+      const y = (row2 - 2) * spacing + Math.sin(phase + row2) * 2;
+      const s = base + Math.sin(phase * 2 + i) * (base * 0.3);
+      if (!circle(x, y, s + 1.5 * 5 * dotGlow)) continue;
+      const colour2 = kept(HEXAGONS + i) ?? keep$1(HEXAGONS + i, particleColour(pal, i, time, rate));
+      save(ctx);
+      ctx.translate(x, y);
+      ctx.rotate(phase + i * Math.PI / 8);
+      ctx.fillStyle = colour2;
+      ctx.globalAlpha = (0.4 + Math.sin(phase * 3 + i) * 0.2) * dotGlow * fade;
+      ctx.shadowColor = colour2;
+      ctx.shadowBlur = 5 * dotGlow;
+      ctx.beginPath();
+      for (let side = 0; side < 6; side++) {
+        const angle = side * Math.PI / 3 + phase;
+        const corner = s * (0.8 + Math.sin(phase * 5 + side) * 0.2);
+        ctx.lineTo(Math.cos(angle) * corner, Math.sin(angle) * corner);
+      }
+      ctx.closePath();
+      ctx.fill();
+      restore(ctx);
+    }
+    if (!only) {
+      save(ctx);
+      ctx.strokeStyle = primary;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.2 * dotGlow * fade;
+      ctx.setLineDash(DASH);
+      ctx.lineDashOffset = phase * 10;
+      const middle = h2 / 5;
+      const left = -grid * 0.5;
+      for (let i = -1; i <= 1; i += 0.5) {
+        if (shows$1(left + i * grid - 0.5, middle - grid, left + i * grid + 0.5, middle + grid)) {
+          ctx.beginPath();
+          ctx.moveTo(left + i * grid, middle - grid);
+          ctx.lineTo(left + i * grid, middle + grid);
+          ctx.stroke();
+        }
+        if (shows$1(left - grid, middle + i * grid - 0.5, left + grid, middle + i * grid + 0.5)) {
+          ctx.beginPath();
+          ctx.moveTo(left - grid, middle + i * grid);
+          ctx.lineTo(left + grid, middle + i * grid);
+          ctx.stroke();
+        }
+      }
+      restore(ctx);
+    }
+  }
+  if ((node2.selected || node2.mouseOver) && !only) {
+    save(ctx);
+    ctx.globalCompositeOperation = "lighter";
+    const pulse = 0.5 + 0.5 * Math.sin(phase * 3);
+    ctx.fillStyle = kept(PULSE) ?? keep$1(PULSE, pulseLight(ctx, w / 2, h2 / 2, Math.max(w, h2) * 0.7, pulse));
+    roundedRect(ctx, 0, 0, w, h2, radius);
+    ctx.fill();
+    ctx.strokeStyle = kept(PULSE_STROKE) ?? keep$1(PULSE_STROKE, `rgba(255,255,255,${0.7 * pulse})`);
+    ctx.lineWidth = line * 2;
+    ctx.shadowColor = kept(PULSE_SHADOW) ?? keep$1(PULSE_SHADOW, `rgba(255,255,255,${0.5 * pulse})`);
+    ctx.shadowBlur = 15 * intensity;
+    roundedRect(ctx, 0, 0, w, h2, radius);
+    ctx.stroke();
+    restore(ctx);
+  }
+}
+function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
+  const { animationGlow: glow2, particleGlow: dotGlow, particleIntensity: motion2 } = N;
+  const cx = w / 2;
+  const cy = h2 / 2;
+  if (!only) {
+    const most = Math.max(1, Math.min(w, h2) * 0.7 * N.animationSize);
+    const intensity = N.intensity * 1.5;
+    const ripple = Math.abs(k2.nodePhase) * 0.8;
+    for (let i = 0; i < 5; i++) {
+      const at = (ripple - i * 0.2) % 1;
+      const r = Math.max(5, most * at);
+      if (!(r > 5 && r < most)) continue;
+      const blur = Math.max(2, 15 * (1 - at) * glow2);
+      const line = Math.max(1, 3 * intensity * (1 - at));
+      if (!circle(cx, cy, r + line / 2 + 1.5 * blur)) continue;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = kept(RINGS + i) ?? keep$1(RINGS + i, ring$1(ctx, cx, cy, r, Math.max(0, 1 - at), pal));
+      ctx.lineWidth = line;
+      ctx.shadowColor = kept(RING_SHADOW) ?? keep$1(RING_SHADOW, translucent(pal.secondary, 0.5));
+      ctx.shadowBlur = blur;
+      ctx.stroke();
+    }
+  }
+  if (N.particleShow) {
+    const count2 = Math.floor(Math.min(100, 30 + Math.floor(motion2 * 20)) * N.particleDensity * thin);
+    const corona = Math.max(1, Math.max(w, h2) * 0.7);
+    const time = k2.nodeTime;
+    for (let i = 0; i < count2; i++) {
+      const angle = i / count2 * Math.PI * 2 + k2.particleTime;
+      const spread2 = Math.max(0.1, 0.8 + Math.sin(time * 0.5 + i) * 0.2 * motion2);
+      const x = Math.cos(angle) * corona * spread2 + cx;
+      const y = Math.sin(angle) * corona * spread2 + cy;
+      const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion2);
+      const trail2 = Math.max(1, s * 2);
+      if (!circle(x, y, trail2 + 1.5 * 15 * dotGlow)) continue;
+      const slot = MOTES + 5 * i;
+      const colour2 = kept(slot) ?? keep$1(slot, particleColour(pal, i, time, 1));
+      ctx.fillStyle = kept(slot + 1) ?? keep$1(slot + 1, mote(ctx, x, y, trail2, colour2, dotGlow));
+      ctx.shadowColor = kept(slot + 2) ?? keep$1(slot + 2, translucent(colour2, dotGlow * 0.5));
+      ctx.shadowBlur = 10 * dotGlow;
+      ctx.beginPath();
+      ctx.arc(x, y, trail2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = kept(slot + 3) ?? keep$1(slot + 3, translucent(colour2, 0.7));
+      ctx.shadowColor = kept(slot + 4) ?? keep$1(slot + 4, translucent(colour2, dotGlow));
+      ctx.shadowBlur = 15 * dotGlow;
+      ctx.beginPath();
+      ctx.arc(x, y, s, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+function ring$1(ctx, x, y, r, alpha, pal) {
+  const gradient = ctx.createLinearGradient(x - r, y, x + r, y);
+  gradient.addColorStop(0, translucent(pal.secondary, alpha * 0.8));
+  gradient.addColorStop(0.5, translucent(pal.primary, alpha));
+  gradient.addColorStop(1, translucent(pal.accent, alpha * 0.8));
+  return gradient;
+}
+function mote(ctx, x, y, r, colour2, alpha) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gradient.addColorStop(0, translucent(colour2, 0.7 * alpha));
+  gradient.addColorStop(1, translucent(colour2, 0));
+  return gradient;
+}
+function core(ctx, x, y, r, pulse) {
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
+  gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.2 * pulse})`);
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+  return gradient;
+}
+const xs = new Float64Array(127);
+const ys = new Float64Array(127);
+function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
+  const { primary, secondary, accent: accent2 } = pal;
+  const { quality: quality2, particleGlow: dotGlow, particleIntensity: motion2, particleSpeed: speed } = N;
+  const intensity = N.intensity * 1.5;
+  const cx = w / 2;
+  const cy = h2 / 2;
+  const phase = k2.nodePhase;
+  const time = held$4 ? phase : phase * speed;
+  const radius = Math.min(w, h2) * 0.056 * intensity * N.animationSize;
+  const layers2 = Math.max(2, Math.floor(quality2 * 2));
+  const rotation = phase * 0.2;
+  const pulse = 0.8 + Math.sin(phase * 1.5) * 0.2;
+  xs[0] = cx;
+  ys[0] = cy;
+  let n = 1;
+  for (let layer2 = 1; layer2 <= layers2; layer2++) {
+    const circles = layer2 * 6;
+    for (let i = 0; i < circles; i++, n++) {
+      const angle = i / circles * Math.PI * 2 + rotation;
+      xs[n] = cx + Math.cos(angle) * (radius * 2) * layer2;
+      ys[n] = cy + Math.sin(angle) * (radius * 2) * layer2;
+    }
+  }
+  if (!only) {
+    const blur = 15 * intensity * N.animationGlow;
+    const reach2 = 1 + 1.5 * blur;
+    ctx.strokeStyle = primary;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = primary;
+    ctx.shadowBlur = blur;
+    if (circle(cx, cy, radius * pulse + reach2)) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    for (let layer2 = 1, j = 1; layer2 <= layers2; layer2++) {
+      for (let index = 0; index < layer2 * 6; index++, j++) {
+        if (j > 1 && index > 0 && shows$1(Math.min(xs[j - 1], xs[j]) - reach2, Math.min(ys[j - 1], ys[j]) - reach2, Math.max(xs[j - 1], xs[j]) + reach2, Math.max(ys[j - 1], ys[j]) + reach2)) {
+          ctx.beginPath();
+          ctx.moveTo(xs[j - 1], ys[j - 1]);
+          ctx.lineTo(xs[j], ys[j]);
+          ctx.strokeStyle = secondary;
+          ctx.globalAlpha = 0.3 * pulse * fade;
+          ctx.stroke();
+        }
+        if (circle(xs[j], ys[j], radius * pulse + reach2)) {
+          ctx.beginPath();
+          ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
+          ctx.strokeStyle = index % 2 === 0 ? secondary : accent2;
+          ctx.globalAlpha = (1 - layer2 / (layers2 + 1)) * fade;
+          ctx.stroke();
+        }
+      }
+    }
+    if (circle(cx, cy, radius * layers2 * 2 + reach2)) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = i / 6 * Math.PI * 2 + rotation;
+        const x = cx + Math.cos(angle) * radius * layers2 * 2;
+        const y = cy + Math.sin(angle) * radius * layers2 * 2;
+        if (i) ctx.lineTo(x, y);
+        else ctx.moveTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = primary;
+      ctx.globalAlpha = 0.3 * fade;
+      ctx.stroke();
+    }
+    if (circle(cx, cy, radius * 2 + 1.5 * blur)) {
+      ctx.fillStyle = kept(CORE) ?? keep$1(CORE, core(ctx, cx, cy, radius * 2, pulse));
+      ctx.globalAlpha = 0.3 * fade;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  if (N.particleShow) {
+    const count2 = Math.floor(5 * N.particleDensity * motion2 * thin);
+    const dot = 2 * quality2 * N.particleSize;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    for (let j = 0; j < n; j++) {
+      for (let p = 0; p < count2; p++) {
+        const angle = p / count2 * Math.PI * 2 + time * 2 * motion2;
+        const x = xs[j] + Math.cos(angle) * (radius * 0.5 * motion2);
+        const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion2);
+        if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
+        const colour2 = kept(DOTS + j * count2 + p) ?? keep$1(DOTS + j * count2 + p, particleColour(pal, j * count2 + p, time, rate));
+        ctx.beginPath();
+        ctx.arc(x, y, dot, 0, Math.PI * 2);
+        ctx.fillStyle = colour2;
+        ctx.shadowColor = colour2;
+        ctx.shadowBlur = 10 * dotGlow;
+        ctx.globalAlpha = 0.7 * dotGlow * fade;
+        ctx.fill();
+      }
+    }
+  }
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, flowerOfLife];
+function frame$1(ctx, w, h2, pal) {
+  const blur = 15 * (N.glow * 2);
+  ctx.shadowColor = pal.accent;
+  ctx.shadowBlur = blur * 1.5;
+  ctx.strokeStyle = pal.secondary;
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = fade;
+  ctx.strokeRect(0, 0, w, h2);
+}
+function drawNodeFx(ctx, style, node2, w, h2, k2, p, alpha, only) {
+  part$1 = p;
+  fade = alpha;
+  held$4 = holdsStill();
+  thin = adaptive.level >= THIN ? 0.5 : 1;
+  outlined = style > 0 && N.colorHoverShow && !LiteGraph.vueNodesMode && Boolean(node2.selected || node2.mouseOver);
+  const pal = nodePalette(style);
+  mine$2 = makes(ctx, pal, w, h2, held$4 ? STILL_NODE : k2, p.sides);
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  ctx.lineCap = "butt";
+  ctx.lineJoin = "miter";
+  ctx.globalAlpha = fade;
+  const saves = depth;
+  try {
+    EFFECTS[style](ctx, node2, w, h2, held$4 ? STILL_NODE : k2, pal, only);
+    if (outlined && style > 1) outline(ctx, 0, 0, w, h2, node2.selected, translucent);
+    if (style > 0 && !only && N.selectionGlow && node2.selected) frame$1(ctx, w, h2, pal);
+  } finally {
+    while (depth > saves) restore(ctx);
+  }
+}
+function reach(style, w, h2, only) {
+  const { quality: quality2, animationGlow: glow2, animationSize: size, particleShow: dots, particleSize: dotSize, particleGlow: dotGlow, particleIntensity: motion2 } = N;
+  const intensity = N.intensity * 1.5;
+  const long = Math.max(w, h2);
+  const short = Math.min(w, h2);
+  let r = 0;
+  if (style > 0 && N.colorHoverShow) r = 1 + 1.5 * 15 * glow2 * 1.5;
+  if (style > 0 && !only && N.selectionGlow) r = Math.max(r, 1 + 1.5 * 45 * N.glow);
+  switch (style) {
+    case 2: {
+      const line = long * 75e-4 * size;
+      if (!only) r = Math.max(r, 4 + line, line + 1.5 * 48 * intensity * glow2, line + 1.5 * 15 * intensity, 0.6 * short * size + 0.5);
+      if (dots) r = Math.max(r, 1.1 * short * size + 2 + 2.6 * dotSize + 7.5 * dotGlow);
+      return r;
+    }
+    case 3: {
+      const rings = 0.7 * short * size + 1.5 * intensity + 1.5 * Math.max(2, 15 * glow2);
+      const corona = 0.7 * long * (0.8 + 0.2 * motion2) + 2 * (2 * dotSize + 1.5 * motion2) + 1.5 * 15 * dotGlow;
+      return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
+    }
+    case 4: {
+      const radius = short * 0.056 * intensity * size;
+      const rings = 2 * radius * Math.max(2, Math.floor(quality2 * 2));
+      const pattern = rings + radius + 1 + 1.5 * 15 * intensity * glow2;
+      const circling = rings + 0.5 * radius * motion2 + 2 * quality2 * dotSize + 1.5 * 10 * dotGlow;
+      return Math.max(r, (only ? 0 : pattern) - short / 2, (dots ? circling : 0) - short / 2);
+    }
+    default: {
+      const radius = long * (0.5 + quality2 * 0.1) * size;
+      const light2 = radius * (1.2 + 0.4 * glow2) * (0.4 + 0.3 * intensity);
+      const blur = !only && quality2 > 1 ? 1.5 * 10 * glow2 * quality2 * 0.5 : 0;
+      const fireflies = 1.7 * radius + 4.5 * motion2 + 12 + 2.8 * (4 + quality2) * size * dotSize + blur;
+      return Math.max(r, (only ? 0 : light2) - short / 2, (dots ? fireflies : 0) - short / 2);
+    }
+  }
+}
 const RUNS = "Run visuals";
 const RIVER_DELAY = 0.15;
 const RIVER_IN = 0.15;
@@ -1608,6 +2211,8 @@ const TRAIL = 0.35;
 const TRAIL_WIDTH = 3;
 const RING_WIDTH = 3;
 const RING_OUT = 9;
+const AMBER = 40;
+const GREEN = 130;
 const COMET = 0.2;
 const COMET_HZ = 0.5;
 const PULSE_HZ = 1;
@@ -1629,7 +2234,7 @@ const run = { prompt: "", workflow: void 0, end: -Infinity };
 const steps = /* @__PURE__ */ new Map();
 const cached = /* @__PURE__ */ new Set();
 let tint$1 = "";
-const held$4 = /* @__PURE__ */ new Map();
+const held$3 = /* @__PURE__ */ new Map();
 let changes = 0;
 let celebrating = false;
 let listening = false;
@@ -1783,9 +2388,29 @@ function stretch(ctx, from, length) {
   ctx.lineDashOffset = round.length - round.top - from;
   ctx.stroke();
 }
-function ring$1(ctx, node2, step2, t, still) {
+function ringColour(ctx, node2, step2) {
+  switch (N.runRingColorMode) {
+    case "custom":
+      return N.runRingColor;
+    case "effect": {
+      const style = effectOf(node2);
+      return style > 0 ? nodePalette(style).primary : tint$1;
+    }
+    case "rainbow": {
+      const [x, y, w, h2] = node2.boundingRect;
+      const gradient = ctx.createConicGradient(-Math.PI / 2, x + w / 2, y + h2 / 2);
+      for (let i = 0; i <= 6; i++) gradient.addColorStop(i / 6, `hsl(${60 * i}, 100%, 60%)`);
+      return gradient;
+    }
+    case "status":
+      return `hsl(${AMBER + (GREEN - AMBER) * (Number.isNaN(step2.progress) ? 0 : step2.progress)}, 100%, 50%)`;
+    default:
+      return tint$1;
+  }
+}
+function ring(ctx, node2, step2, t, still) {
   ctx.globalAlpha = 1;
-  ctx.strokeStyle = tint$1;
+  ctx.strokeStyle = ringColour(ctx, node2, step2);
   ctx.lineWidth = RING_WIDTH;
   trace(ctx, node2, RING_OUT + RING_WIDTH / 2);
   if (!Number.isNaN(step2.progress)) {
@@ -1827,7 +2452,7 @@ function drawSteps(canvas, ctx) {
     if (!overlaps(node2.boundingRect, area, RING_OUT + RING_WIDTH)) continue;
     ctx.save();
     try {
-      const moves2 = step2.end === Infinity ? N.runRing && ring$1(ctx, node2, step2, t, still) : step2.failed && N.runError && failure(ctx, node2, step2, t);
+      const moves2 = step2.end === Infinity ? N.runRing && ring(ctx, node2, step2, t, still) : step2.failed && N.runError && failure(ctx, node2, step2, t);
       if (moves2) live.rings++;
     } catch (error) {
       guard.fail(RUNS, error);
@@ -1935,7 +2560,7 @@ function installRuns(part2) {
     Object.assign(run, { prompt: detail.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
     steps.clear();
     cached.clear();
-    held$4.clear();
+    held$3.clear();
     tint$1 = accent();
     env.running = true;
     changed$2(true);
@@ -1981,7 +2606,7 @@ function installRuns(part2) {
     }
     finish();
     const node2 = id === void 0 ? void 0 : path(id).at(-1);
-    if (node2) held$4.set(id, signature(node2));
+    if (node2) held$3.set(id, signature(node2));
   });
   api.addEventListener("execution_interrupted", ({ detail }) => {
     if (ours2(detail)) finish();
@@ -1991,10 +2616,10 @@ function installRuns(part2) {
   });
   api.addEventListener("graphChanged", () => {
     let edited = false;
-    for (const [id, before2] of held$4) {
+    for (const [id, before2] of held$3) {
       const node2 = path(id).at(-1);
       if (node2 && signature(node2) === before2) continue;
-      held$4.delete(id);
+      held$3.delete(id);
       const step2 = steps.get(id);
       if (step2) step2.failed = false;
       edited = true;
@@ -2998,14 +3623,14 @@ const wires = /* @__PURE__ */ new Map();
 let pass$1 = 0;
 let graph;
 let workflow;
-let held$3 = false;
+let held$2 = false;
 const laid = [];
 let due = 0;
 function startWires(shown2, still) {
   pass$1 += shown2 === graph && shown2?.id === workflow ? 1 : MISSED + 2;
   graph = shown2;
   workflow = shown2?.id;
-  held$3 = still;
+  held$2 = still;
   laid.length = 0;
 }
 function wireOf(key) {
@@ -3159,7 +3784,7 @@ function hang(wire2, path2) {
   laid.push(wire2);
   if (fresh) return rest(wire2, path2);
   const moved2 = pin(wire2, path2) > WAKE;
-  if (held$3 && (moved2 || wire2.awake)) return rest(wire2, path2);
+  if (held$2 && (moved2 || wire2.awake)) return rest(wire2, path2);
   if (moved2 && !wire2.awake) {
     wire2.awake = true;
     wire2.still = 0;
@@ -3365,11 +3990,11 @@ function stellarPlasma(ctx, s, phase) {
     ctx.fill();
   });
 }
-const held$2 = { linkPhase: 0, quantumPhase: 0, linkFlow: 0, linkDir: 1 };
+const held$1 = { linkPhase: 0, quantumPhase: 0, linkFlow: 0, linkDir: 1 };
 const posed = (animate) => (ctx, s, phase) => {
-  held$2.linkPhase = held$2.quantumPhase = phase;
-  held$2.linkDir = L.direction;
-  MOVING[animate](ctx, s, held$2);
+  held$1.linkPhase = held$1.quantumPhase = phase;
+  held$1.linkDir = L.direction;
+  MOVING[animate](ctx, s, held$1);
 };
 const STILL = {
   1: sacredFlow,
@@ -3910,12 +4535,12 @@ function paintWhole(canvas, ctx) {
     background: canvas.clear_background_color
   });
 }
-function shows$1(canvas, ctx, refocused) {
+function shows(canvas, ctx, refocused) {
   const own2 = layer.ctx;
   return own2 !== void 0 && layer.pass === passes - 1 && own2.canvas.width === ctx.canvas.width && own2.canvas.height === ctx.canvas.height && canvas.ds.scale === layer.scale && !canvas.isDragging && !live.wires && !refocused && layer.graph === canvas.graph && layer.version === canvas.graph?._version && layer.revision === revision && layer.highlighted === canvas.highlighted_links && layer.background === canvas.clear_background_color;
 }
 function pan$1(canvas, ctx, refocused) {
-  if (!shows$1(canvas, ctx, refocused)) return false;
+  if (!shows(canvas, ctx, refocused)) return false;
   const own2 = layer.ctx;
   const at = layer.at;
   const { width, height } = ctx.canvas;
@@ -3982,16 +4607,16 @@ function mend(canvas, gone) {
   own2.clearRect(mended[0], mended[1], mended[2] - mended[0], mended[3] - mended[1]);
   for (let i = 0; i < count; i++) if (reaches(pool[i], mended)) draw(canvas, own2, pool[i], false, mended);
 }
-const held$1 = new Float64Array(7);
+const held = new Float64Array(7);
 function hold(s) {
-  held$1.set(s.path.box);
-  held$1[4] = s.path.length;
-  held$1[5] = s.u0;
-  held$1[6] = s.width;
+  held.set(s.path.box);
+  held[4] = s.path.length;
+  held[5] = s.u0;
+  held[6] = s.width;
 }
 const holds = (s) => {
   const { box: box2, length } = s.path;
-  return held$1[0] === box2[0] && held$1[1] === box2[1] && held$1[2] === box2[2] && held$1[3] === box2[3] && held$1[4] === length && held$1[5] === s.u0 && held$1[6] === s.width;
+  return held[0] === box2[0] && held[1] === box2[1] && held[2] === box2[2] && held[3] === box2[3] && held[4] === length && held[5] === s.u0 && held[6] === s.width;
 };
 function blit(canvas, ctx) {
   ctx.save();
@@ -4089,7 +4714,7 @@ function begin(canvas, ctx) {
     glows.timer = window.setTimeout(settle, SETTLE_MS);
   } else {
     pass.layered = layered;
-    pass.kept = layered && !moving2 && !glows.due && layer.x === offset[0] && layer.y === offset[1] && shows$1(canvas, ctx, refocused);
+    pass.kept = layered && !moving2 && !glows.due && layer.x === offset[0] && layer.y === offset[1] && shows(canvas, ctx, refocused);
     if (layered && !pass.kept) paintWhole(canvas, ctx);
   }
   glows.due = false;
@@ -4705,12 +5330,12 @@ function keepShown() {
 function currentLook() {
   const id = L.look || "subtle";
   if (id.startsWith(SURPRISE)) return mix(Number(id.slice(SURPRISE.length)));
-  return LOOKS.find((look) => look.id === id) ?? mine$2?.find((look) => look.id === id);
+  return LOOKS.find((look) => look.id === id) ?? mine$1?.find((look) => look.id === id);
 }
 const FILE = "enhanced-links-nodes/looks.json";
 const APP = "comfyui-enhancedlinksandnodes";
 const COLOUR = /^#[0-9a-f]{6}([0-9a-f]{2})?$/;
-let mine$2;
+let mine$1;
 let reading;
 let storing = Promise.resolve();
 const isObject = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -4745,7 +5370,7 @@ async function userLooks() {
     reading = void 0;
     throw error;
   });
-  return mine$2 ??= await reading;
+  return mine$1 ??= await reading;
 }
 function store(looks) {
   const write2 = storing.then(() => api.storeUserData(FILE, { schema: 1, looks }, { overwrite: true, stringify: true, throwOnError: true }));
@@ -4807,7 +5432,7 @@ const optionsOf = (id) => {
   return s.type === "combo" ? s.options : [];
 };
 const hex = (rgb) => `#${rgb.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
-const light$1 = () => !document.documentElement.classList.contains("dark-theme") && !document.body.classList.contains("dark-theme");
+const light = () => !document.documentElement.classList.contains("dark-theme") && !document.body.classList.contains("dark-theme");
 function mix(seed) {
   const random = rng(seed);
   const pick2 = (items) => items[Math.floor(random() * items.length)];
@@ -4846,595 +5471,8 @@ function surprise() {
     return looks[Math.floor(Math.random() * looks.length)];
   }
   for (; ; ) {
-    const look = mix(Math.floor(Math.random() * 2 ** 30) * 2 | (light$1() ? 1 : 0));
+    const look = mix(Math.floor(Math.random() * 2 ** 30) * 2 | (light() ? 1 : 0));
     if (look.values[LINK_ANIMATE] !== L.animate) return look;
-  }
-}
-const STILL_NODE = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
-const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion || adaptive.level >= HELD;
-const UNDER = 1;
-const OVER = 2;
-const [NEVER, BYPASS] = [2, 4];
-let part$1;
-let fade = 1;
-let held = false;
-let outlined = false;
-let thin = 1;
-const stores = /* @__PURE__ */ new WeakMap();
-const SIZES = 256;
-let mine$1;
-function makes(ctx, pal, w, h2, k2, sides) {
-  let store2 = stores.get(ctx);
-  if (!store2) stores.set(ctx, store2 = { since: revision, sizes: 0, made: /* @__PURE__ */ new Map() });
-  if (store2.since !== revision || store2.sizes > SIZES) {
-    store2.made.clear();
-    store2.since = revision;
-    store2.sizes = 0;
-  }
-  let byWidth = store2.made.get(pal);
-  if (!byWidth) store2.made.set(pal, byWidth = /* @__PURE__ */ new Map());
-  let byHeight = byWidth.get(w);
-  if (!byHeight) byWidth.set(w, byHeight = /* @__PURE__ */ new Map());
-  let m = byHeight.get(h2);
-  if (!m) {
-    byHeight.set(h2, m = { phase: NaN, particles: NaN, time: NaN, held: false, thin: 1, slots: [[], [], [], []] });
-    store2.sizes++;
-  }
-  if (m.phase !== k2.nodePhase || m.particles !== k2.particleTime || m.time !== k2.nodeTime || m.held !== held || m.thin !== thin) {
-    m.phase = k2.nodePhase;
-    m.particles = k2.particleTime;
-    m.time = k2.nodeTime;
-    m.held = held;
-    m.thin = thin;
-    for (const slots of m.slots) slots.fill(void 0);
-  }
-  return m.slots[sides];
-}
-const kept = (slot) => mine$1[slot];
-function keep$1(slot, value) {
-  mine$1[slot] = value;
-  return value;
-}
-const [OUTLINE_SHADOW, OUTLINE_STROKE] = [0, 1];
-const [LIGHT, HALO, FIREFLY_SHADOW, FIREFLIES] = [2, 3, 4, 5];
-const [SCAN, PULSE, PULSE_STROKE, PULSE_SHADOW, HEXAGONS] = [2, 3, 4, 5, 6];
-const [RING_SHADOW, RINGS, MOTES] = [2, 3, 8];
-const [CORE, DOTS] = [2, 3];
-let depth = 0;
-function save(ctx) {
-  ctx.save();
-  depth++;
-}
-function restore(ctx) {
-  ctx.restore();
-  depth--;
-}
-function shows(x0, y0, x1, y1) {
-  const p = part$1;
-  if (p.sides !== UNDER && p.sides !== OVER) return true;
-  if (p.round < 0) return true;
-  if (x1 <= p.x0 || x0 >= p.x1 || y1 <= p.y0 || y0 >= p.y1) return p.sides === UNDER;
-  const r = p.round;
-  const corner = (x0 < p.x0 + r || x1 > p.x1 - r) && (y0 < p.y0 + r || y1 > p.y1 - r);
-  const inside = x0 >= p.x0 && x1 <= p.x1 && y0 >= p.y0 && y1 <= p.y1 && !corner;
-  return !inside || p.sides === OVER;
-}
-const circle = (x, y, r) => shows(x - r, y - r, x + r, y + r);
-const pales = /* @__PURE__ */ new Map();
-let palesSince = -1;
-function pale(colour2, alpha) {
-  if (colour2.charCodeAt(0) !== 35) return translucent(colour2, alpha);
-  if (palesSince !== revision) {
-    pales.clear();
-    palesSince = revision;
-  }
-  let start = pales.get(colour2);
-  if (start === void 0) {
-    const pair = (i) => parseInt(colour2.slice(i, i + 2), 16) || 255;
-    pales.set(colour2, start = `rgba(${pair(1)}, ${pair(3)}, ${pair(5)}, `);
-  }
-  return `${start}${alpha})`;
-}
-function outline(ctx, x, y, w, h2, selected2, colour2) {
-  save(ctx);
-  const blur = 15 * N.animationGlow;
-  ctx.shadowColor = kept(OUTLINE_SHADOW) ?? keep$1(OUTLINE_SHADOW, colour2(N.colorHover, 0.5));
-  ctx.shadowBlur = selected2 ? blur * 1.5 : blur;
-  ctx.strokeStyle = kept(OUTLINE_STROKE) ?? keep$1(OUTLINE_STROKE, colour2(N.colorHover, 0.7));
-  ctx.lineWidth = 2;
-  ctx.globalAlpha = fade;
-  ctx.strokeRect(x, y, w, h2);
-  restore(ctx);
-}
-function gentlePulse(ctx, node2, w, h2, k2, pal, only) {
-  const { quality: quality2, animationGlow: glow2, animationSize: size, particleSpeed: speed, particleIntensity: motion2 } = N;
-  const phase = k2.nodePhase;
-  const time = held ? phase : TURN * k2.particleTime;
-  const radius = Math.max(w, h2) * (0.5 + quality2 * 0.1) * size;
-  const cx = w / 2;
-  const cy = h2 / 2;
-  save(ctx);
-  ctx.translate(cx, cy);
-  if (outlined) outline(ctx, -cx, -cy, w, h2, node2.selected, pale);
-  let blur = 0;
-  if (!only) {
-    const breathe = Math.pow(Math.sin(held ? phase : phase * 0.375 * N.direction * N.animationSpeed), 2);
-    const pulse = 0.4 + 0.4 * breathe * (N.intensity * 1.5 * 0.75);
-    const inner = radius * pulse;
-    const outer = radius * (1.2 + glow2 * 0.4) * pulse;
-    if (circle(cx, cy, inner)) {
-      const alpha = 0.2 * glow2 * (0.5 + breathe * 0.5);
-      const gradient = kept(LIGHT) ?? keep$1(LIGHT, light(ctx, inner, alpha, pal));
-      ctx.beginPath();
-      ctx.arc(0, 0, inner, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.globalAlpha = Math.min(0.2 + Math.abs(breathe) * 0.3 + glow2 * 0.2, 1) * fade;
-      ctx.fill();
-    }
-    if (circle(cx, cy, outer)) {
-      const alpha = 0.1 * glow2 * (0.5 + breathe * 0.5);
-      const gradient = kept(HALO) ?? keep$1(HALO, halo(ctx, radius * 0.6 * pulse, outer, alpha, pal));
-      ctx.beginPath();
-      ctx.arc(0, 0, outer, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.globalAlpha = Math.min(0.15 + Math.abs(breathe) * 0.2 + glow2 * 0.15, 1) * fade;
-      ctx.fill();
-    }
-    if (quality2 > 1) {
-      ctx.shadowColor = kept(FIREFLY_SHADOW) ?? keep$1(FIREFLY_SHADOW, pale(pal.secondary, 0.3));
-      ctx.shadowBlur = blur = 10 * glow2 * (quality2 * 0.5);
-    }
-  }
-  if (N.particleShow) {
-    const { particleGlow: dotGlow } = N;
-    const count2 = Math.floor((8 + quality2 * 2) * N.particleDensity * thin);
-    const base = (4 + quality2) * size * N.particleSize;
-    const wobble = quality2 > 1 ? 12 : 6;
-    const rate = held ? 0 : TURN * speed * speed;
-    const tick2 = Math.floor(k2.nodeTime * 30) * 4096;
-    for (let i = 0; i < count2; i++) {
-      const offset = i * (Math.PI * 2 / count2);
-      const pace = held ? 1 : (0.5 + Math.sin(i) * 0.25) * motion2 * speed;
-      const turned = held ? phase + offset : time * pace + offset;
-      const orbit = radius * (0.8 + Math.sin(held ? phase + i : time * 0.2 * speed + i) * 0.25 + Math.cos(held ? phase + i * 0.7 : time * 0.3 * speed + i * 0.7) * 0.25);
-      const angle = turned + i * Math.PI * 2 / count2;
-      const torus = Math.sin(time * 0.3 * speed + i) * (motion2 * 2);
-      const jitterX = held ? 0 : Math.sin(time * 3 * speed + i) * 1.2 * motion2 + Math.cos(time * 2 * speed + i * 0.5) * 0.5 * motion2;
-      const jitterY = held ? 0 : Math.cos(time * 2.5 * speed + i) * 1.2 * motion2 + Math.sin(time * 1.5 * speed + i * 0.7) * 0.5 * motion2;
-      const x = Math.cos(angle) * (orbit + torus) + Math.sin(held ? phase + i : time * 0.2 * speed + i) * wobble + jitterX;
-      const y = Math.sin(angle) * (orbit + torus) - orbit * 0.3 + Math.cos(held ? phase + i : time * 0.15 * speed + i) * wobble + jitterY;
-      const s = held ? base : base * (0.7 + Math.sin(time * 0.5 * speed + i) * 0.4 + noise(tick2 + i) * 0.3);
-      if (!circle(cx + x, cy + y, s * 2 + 1.5 * blur)) continue;
-      const colour2 = kept(FIREFLIES + 2 * i) ?? keep$1(FIREFLIES + 2 * i, particleColour(pal, i, time * speed, rate));
-      const gradient = kept(FIREFLIES + 2 * i + 1) ?? keep$1(FIREFLIES + 2 * i + 1, firefly(ctx, x, y, s * 2, colour2, dotGlow));
-      const blinkOffset = Math.abs(Math.sin(i * 12.9898) * 43758.5453 % (2 * Math.PI));
-      const blinkSpeed = 1.2 + Math.sin(i * 0.7) * 0.6;
-      const blink = held ? 0.8 : 0.4 + 0.8 * Math.pow(Math.sin(time * blinkSpeed * speed + blinkOffset), 2);
-      const alpha = Math.min(blink, 1) * dotGlow;
-      ctx.beginPath();
-      ctx.arc(x, y, s * 2, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.globalAlpha = alpha * 0.8 * fade;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(x, y, s * 0.6, 0, Math.PI * 2);
-      ctx.fillStyle = colour2;
-      ctx.globalAlpha = Math.min(alpha * 1.5, 1) * fade;
-      ctx.fill();
-    }
-  }
-  restore(ctx);
-}
-function light(ctx, r, alpha, pal) {
-  const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-  gradient.addColorStop(0, pale("#ffffff", Math.min(alpha + 0.15, 1)));
-  gradient.addColorStop(0.3, pale(pal.primary, alpha));
-  gradient.addColorStop(0.7, pale(pal.secondary, alpha * 0.6));
-  gradient.addColorStop(1, pale(pal.accent, 0));
-  return gradient;
-}
-function halo(ctx, r0, r1, alpha, pal) {
-  const gradient = ctx.createRadialGradient(0, 0, r0, 0, 0, r1);
-  gradient.addColorStop(0, pale(pal.secondary, alpha));
-  gradient.addColorStop(0.6, pale(pal.accent, alpha * 0.5));
-  gradient.addColorStop(1, pale(pal.accent, 0));
-  return gradient;
-}
-function firefly(ctx, x, y, r, colour2, alpha) {
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
-  gradient.addColorStop(0, pale(colour2, 0.8 * alpha));
-  gradient.addColorStop(0.4, pale(colour2, 0.4 * alpha));
-  gradient.addColorStop(1, pale(colour2, 0));
-  return gradient;
-}
-function scanLine(ctx, y) {
-  const gradient = ctx.createLinearGradient(0, y - 10, 0, y + 10);
-  gradient.addColorStop(0, "rgba(255,255,255,0)");
-  gradient.addColorStop(0.5, "rgba(255,255,255,0.5)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  return gradient;
-}
-function pulseLight(ctx, x, y, r, pulse) {
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
-  gradient.addColorStop(0, `rgba(255,255,255,${0.15 * pulse})`);
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  return gradient;
-}
-const HOLOGRAM = [0, 1, 2].map((i) => `hsl(${i * 60 % 360}, 80%, 75%)`);
-const DASH = [5, 3];
-function roundedRect(ctx, x, y, w, h2, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h2 - r);
-  ctx.quadraticCurveTo(x + w, y + h2, x + w - r, y + h2);
-  ctx.lineTo(x + r, y + h2);
-  ctx.quadraticCurveTo(x, y + h2, x, y + h2 - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-function neonNexus(ctx, node2, w, h2, k2, pal, only) {
-  const { primary, secondary, accent: accent2 } = pal;
-  const { animationGlow: glow2, animationSize: size, particleGlow: dotGlow, particleSpeed: speed } = N;
-  const intensity = N.intensity * 1.5;
-  const phase = k2.nodePhase;
-  const time = held ? phase : phase * speed;
-  const radius = Math.min(w, h2) * 0.08;
-  const line = Math.max(w, h2) * 75e-4 * size;
-  const grid = Math.min(w, h2) * 0.4 * size;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.shadowColor = "transparent";
-  if (!only) {
-    for (let i = 0; i < 3; i++) {
-      save(ctx);
-      ctx.globalAlpha = (0.2 - i * 0.05) * fade;
-      ctx.strokeStyle = HOLOGRAM[i];
-      ctx.lineWidth = line * 0.4;
-      roundedRect(ctx, -i * 2, -i * 2, w + i * 4, h2 + i * 4, radius + i * 1);
-      ctx.stroke();
-      restore(ctx);
-    }
-    const flicker = held ? 1 : 0.95 + 0.05 * Math.sin(phase * 0.3 * N.direction);
-    for (let i = 0; i < 4; i++) {
-      save(ctx);
-      ctx.lineWidth = line * (1 + i * 0.3);
-      const colour2 = i === 0 ? primary : i === 1 ? secondary : i === 2 ? accent2 : "rgba(255, 255, 255, 0.4)";
-      ctx.strokeStyle = colour2;
-      ctx.shadowColor = colour2;
-      ctx.shadowBlur = (i + 1) * 12 * intensity * glow2;
-      const opacity2 = 0.95 - i * 0.15;
-      ctx.globalAlpha = (held ? opacity2 : opacity2 * flicker) * fade;
-      roundedRect(ctx, 0, 0, w, h2, radius);
-      ctx.stroke();
-      if (i === 0) {
-        ctx.globalAlpha = (held ? 0.3 : 0.3 * flicker) * fade;
-        ctx.lineWidth = line * 0.8;
-        ctx.shadowBlur = 20 * intensity * glow2;
-        roundedRect(ctx, 0, 0, w, h2, radius);
-        ctx.stroke();
-      }
-      restore(ctx);
-    }
-    const scan = h2 * (Math.sin(phase * 2) * 0.5 + 0.5);
-    if (!held && shows(0, scan - 10, w, scan + 10)) {
-      ctx.fillStyle = kept(SCAN) ?? keep$1(SCAN, scanLine(ctx, scan));
-      ctx.fillRect(0, scan - 10, w, 20);
-    }
-  }
-  if (N.particleShow) {
-    const spacing = grid / 4;
-    const base = 2 * N.particleSize;
-    const rate = held ? 0 : TURN * N.animationSpeed * speed;
-    for (let i = 0; i < 70; i++) {
-      const col = i % 5;
-      const row2 = Math.floor(i / 5);
-      const x = (col - 2) * spacing + Math.cos(phase + col) * 2;
-      const y = (row2 - 2) * spacing + Math.sin(phase + row2) * 2;
-      const s = base + Math.sin(phase * 2 + i) * (base * 0.3);
-      if (!circle(x, y, s + 1.5 * 5 * dotGlow)) continue;
-      const colour2 = kept(HEXAGONS + i) ?? keep$1(HEXAGONS + i, particleColour(pal, i, time, rate));
-      save(ctx);
-      ctx.translate(x, y);
-      ctx.rotate(phase + i * Math.PI / 8);
-      ctx.fillStyle = colour2;
-      ctx.globalAlpha = (0.4 + Math.sin(phase * 3 + i) * 0.2) * dotGlow * fade;
-      ctx.shadowColor = colour2;
-      ctx.shadowBlur = 5 * dotGlow;
-      ctx.beginPath();
-      for (let side = 0; side < 6; side++) {
-        const angle = side * Math.PI / 3 + phase;
-        const corner = s * (0.8 + Math.sin(phase * 5 + side) * 0.2);
-        ctx.lineTo(Math.cos(angle) * corner, Math.sin(angle) * corner);
-      }
-      ctx.closePath();
-      ctx.fill();
-      restore(ctx);
-    }
-    if (!only) {
-      save(ctx);
-      ctx.strokeStyle = primary;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.2 * dotGlow * fade;
-      ctx.setLineDash(DASH);
-      ctx.lineDashOffset = phase * 10;
-      const middle = h2 / 5;
-      const left = -grid * 0.5;
-      for (let i = -1; i <= 1; i += 0.5) {
-        if (shows(left + i * grid - 0.5, middle - grid, left + i * grid + 0.5, middle + grid)) {
-          ctx.beginPath();
-          ctx.moveTo(left + i * grid, middle - grid);
-          ctx.lineTo(left + i * grid, middle + grid);
-          ctx.stroke();
-        }
-        if (shows(left - grid, middle + i * grid - 0.5, left + grid, middle + i * grid + 0.5)) {
-          ctx.beginPath();
-          ctx.moveTo(left - grid, middle + i * grid);
-          ctx.lineTo(left + grid, middle + i * grid);
-          ctx.stroke();
-        }
-      }
-      restore(ctx);
-    }
-  }
-  if ((node2.selected || node2.mouseOver) && !only) {
-    save(ctx);
-    ctx.globalCompositeOperation = "lighter";
-    const pulse = 0.5 + 0.5 * Math.sin(phase * 3);
-    ctx.fillStyle = kept(PULSE) ?? keep$1(PULSE, pulseLight(ctx, w / 2, h2 / 2, Math.max(w, h2) * 0.7, pulse));
-    roundedRect(ctx, 0, 0, w, h2, radius);
-    ctx.fill();
-    ctx.strokeStyle = kept(PULSE_STROKE) ?? keep$1(PULSE_STROKE, `rgba(255,255,255,${0.7 * pulse})`);
-    ctx.lineWidth = line * 2;
-    ctx.shadowColor = kept(PULSE_SHADOW) ?? keep$1(PULSE_SHADOW, `rgba(255,255,255,${0.5 * pulse})`);
-    ctx.shadowBlur = 15 * intensity;
-    roundedRect(ctx, 0, 0, w, h2, radius);
-    ctx.stroke();
-    restore(ctx);
-  }
-}
-function cosmicRipple(ctx, _node, w, h2, k2, pal, only) {
-  const { animationGlow: glow2, particleGlow: dotGlow, particleIntensity: motion2 } = N;
-  const cx = w / 2;
-  const cy = h2 / 2;
-  if (!only) {
-    const most = Math.max(1, Math.min(w, h2) * 0.7 * N.animationSize);
-    const intensity = N.intensity * 1.5;
-    const ripple = Math.abs(k2.nodePhase) * 0.8;
-    for (let i = 0; i < 5; i++) {
-      const at = (ripple - i * 0.2) % 1;
-      const r = Math.max(5, most * at);
-      if (!(r > 5 && r < most)) continue;
-      const blur = Math.max(2, 15 * (1 - at) * glow2);
-      const line = Math.max(1, 3 * intensity * (1 - at));
-      if (!circle(cx, cy, r + line / 2 + 1.5 * blur)) continue;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = kept(RINGS + i) ?? keep$1(RINGS + i, ring(ctx, cx, cy, r, Math.max(0, 1 - at), pal));
-      ctx.lineWidth = line;
-      ctx.shadowColor = kept(RING_SHADOW) ?? keep$1(RING_SHADOW, translucent(pal.secondary, 0.5));
-      ctx.shadowBlur = blur;
-      ctx.stroke();
-    }
-  }
-  if (N.particleShow) {
-    const count2 = Math.floor(Math.min(100, 30 + Math.floor(motion2 * 20)) * N.particleDensity * thin);
-    const corona = Math.max(1, Math.max(w, h2) * 0.7);
-    const time = k2.nodeTime;
-    for (let i = 0; i < count2; i++) {
-      const angle = i / count2 * Math.PI * 2 + k2.particleTime;
-      const spread2 = Math.max(0.1, 0.8 + Math.sin(time * 0.5 + i) * 0.2 * motion2);
-      const x = Math.cos(angle) * corona * spread2 + cx;
-      const y = Math.sin(angle) * corona * spread2 + cy;
-      const s = Math.max(1, 2 * N.particleSize + Math.sin(time * 1.5 + i) * 1.5 * motion2);
-      const trail2 = Math.max(1, s * 2);
-      if (!circle(x, y, trail2 + 1.5 * 15 * dotGlow)) continue;
-      const slot = MOTES + 5 * i;
-      const colour2 = kept(slot) ?? keep$1(slot, particleColour(pal, i, time, 1));
-      ctx.fillStyle = kept(slot + 1) ?? keep$1(slot + 1, mote(ctx, x, y, trail2, colour2, dotGlow));
-      ctx.shadowColor = kept(slot + 2) ?? keep$1(slot + 2, translucent(colour2, dotGlow * 0.5));
-      ctx.shadowBlur = 10 * dotGlow;
-      ctx.beginPath();
-      ctx.arc(x, y, trail2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = kept(slot + 3) ?? keep$1(slot + 3, translucent(colour2, 0.7));
-      ctx.shadowColor = kept(slot + 4) ?? keep$1(slot + 4, translucent(colour2, dotGlow));
-      ctx.shadowBlur = 15 * dotGlow;
-      ctx.beginPath();
-      ctx.arc(x, y, s, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-}
-function ring(ctx, x, y, r, alpha, pal) {
-  const gradient = ctx.createLinearGradient(x - r, y, x + r, y);
-  gradient.addColorStop(0, translucent(pal.secondary, alpha * 0.8));
-  gradient.addColorStop(0.5, translucent(pal.primary, alpha));
-  gradient.addColorStop(1, translucent(pal.accent, alpha * 0.8));
-  return gradient;
-}
-function mote(ctx, x, y, r, colour2, alpha) {
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
-  gradient.addColorStop(0, translucent(colour2, 0.7 * alpha));
-  gradient.addColorStop(1, translucent(colour2, 0));
-  return gradient;
-}
-function core(ctx, x, y, r, pulse) {
-  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
-  gradient.addColorStop(0, `rgba(255, 255, 255, ${0.5 * pulse})`);
-  gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.2 * pulse})`);
-  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-  return gradient;
-}
-const xs = new Float64Array(127);
-const ys = new Float64Array(127);
-function flowerOfLife(ctx, _node, w, h2, k2, pal, only) {
-  const { primary, secondary, accent: accent2 } = pal;
-  const { quality: quality2, particleGlow: dotGlow, particleIntensity: motion2, particleSpeed: speed } = N;
-  const intensity = N.intensity * 1.5;
-  const cx = w / 2;
-  const cy = h2 / 2;
-  const phase = k2.nodePhase;
-  const time = held ? phase : phase * speed;
-  const radius = Math.min(w, h2) * 0.056 * intensity * N.animationSize;
-  const layers2 = Math.max(2, Math.floor(quality2 * 2));
-  const rotation = phase * 0.2;
-  const pulse = 0.8 + Math.sin(phase * 1.5) * 0.2;
-  xs[0] = cx;
-  ys[0] = cy;
-  let n = 1;
-  for (let layer2 = 1; layer2 <= layers2; layer2++) {
-    const circles = layer2 * 6;
-    for (let i = 0; i < circles; i++, n++) {
-      const angle = i / circles * Math.PI * 2 + rotation;
-      xs[n] = cx + Math.cos(angle) * (radius * 2) * layer2;
-      ys[n] = cy + Math.sin(angle) * (radius * 2) * layer2;
-    }
-  }
-  if (!only) {
-    const blur = 15 * intensity * N.animationGlow;
-    const reach2 = 1 + 1.5 * blur;
-    ctx.strokeStyle = primary;
-    ctx.lineWidth = 2;
-    ctx.shadowColor = primary;
-    ctx.shadowBlur = blur;
-    if (circle(cx, cy, radius * pulse + reach2)) {
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius * pulse, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    for (let layer2 = 1, j = 1; layer2 <= layers2; layer2++) {
-      for (let index = 0; index < layer2 * 6; index++, j++) {
-        if (j > 1 && index > 0 && shows(Math.min(xs[j - 1], xs[j]) - reach2, Math.min(ys[j - 1], ys[j]) - reach2, Math.max(xs[j - 1], xs[j]) + reach2, Math.max(ys[j - 1], ys[j]) + reach2)) {
-          ctx.beginPath();
-          ctx.moveTo(xs[j - 1], ys[j - 1]);
-          ctx.lineTo(xs[j], ys[j]);
-          ctx.strokeStyle = secondary;
-          ctx.globalAlpha = 0.3 * pulse * fade;
-          ctx.stroke();
-        }
-        if (circle(xs[j], ys[j], radius * pulse + reach2)) {
-          ctx.beginPath();
-          ctx.arc(xs[j], ys[j], radius * pulse, 0, Math.PI * 2);
-          ctx.strokeStyle = index % 2 === 0 ? secondary : accent2;
-          ctx.globalAlpha = (1 - layer2 / (layers2 + 1)) * fade;
-          ctx.stroke();
-        }
-      }
-    }
-    if (circle(cx, cy, radius * layers2 * 2 + reach2)) {
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = i / 6 * Math.PI * 2 + rotation;
-        const x = cx + Math.cos(angle) * radius * layers2 * 2;
-        const y = cy + Math.sin(angle) * radius * layers2 * 2;
-        if (i) ctx.lineTo(x, y);
-        else ctx.moveTo(x, y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = primary;
-      ctx.globalAlpha = 0.3 * fade;
-      ctx.stroke();
-    }
-    if (circle(cx, cy, radius * 2 + 1.5 * blur)) {
-      ctx.fillStyle = kept(CORE) ?? keep$1(CORE, core(ctx, cx, cy, radius * 2, pulse));
-      ctx.globalAlpha = 0.3 * fade;
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius * 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  if (N.particleShow) {
-    const count2 = Math.floor(5 * N.particleDensity * motion2 * thin);
-    const dot = 2 * quality2 * N.particleSize;
-    const rate = held ? 0 : TURN * N.animationSpeed * speed;
-    for (let j = 0; j < n; j++) {
-      for (let p = 0; p < count2; p++) {
-        const angle = p / count2 * Math.PI * 2 + time * 2 * motion2;
-        const x = xs[j] + Math.cos(angle) * (radius * 0.5 * motion2);
-        const y = ys[j] + Math.sin(angle) * (radius * 0.5 * motion2);
-        if (!circle(x, y, dot + 1.5 * 10 * dotGlow)) continue;
-        const colour2 = kept(DOTS + j * count2 + p) ?? keep$1(DOTS + j * count2 + p, particleColour(pal, j * count2 + p, time, rate));
-        ctx.beginPath();
-        ctx.arc(x, y, dot, 0, Math.PI * 2);
-        ctx.fillStyle = colour2;
-        ctx.shadowColor = colour2;
-        ctx.shadowBlur = 10 * dotGlow;
-        ctx.globalAlpha = 0.7 * dotGlow * fade;
-        ctx.fill();
-      }
-    }
-  }
-}
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, flowerOfLife];
-function frame$1(ctx, w, h2, pal) {
-  const blur = 15 * (N.glow * 2);
-  ctx.shadowColor = pal.accent;
-  ctx.shadowBlur = blur * 1.5;
-  ctx.strokeStyle = pal.secondary;
-  ctx.lineWidth = 2;
-  ctx.globalAlpha = fade;
-  ctx.strokeRect(0, 0, w, h2);
-}
-function drawNodeFx(ctx, style, node2, w, h2, k2, p, alpha, only) {
-  part$1 = p;
-  fade = alpha;
-  held = holdsStill();
-  thin = adaptive.level >= THIN ? 0.5 : 1;
-  outlined = style > 0 && N.colorHoverShow && !LiteGraph.vueNodesMode && Boolean(node2.selected || node2.mouseOver);
-  const pal = nodePalette(style);
-  mine$1 = makes(ctx, pal, w, h2, held ? STILL_NODE : k2, p.sides);
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
-  ctx.lineCap = "butt";
-  ctx.lineJoin = "miter";
-  ctx.globalAlpha = fade;
-  const saves = depth;
-  try {
-    EFFECTS[style](ctx, node2, w, h2, held ? STILL_NODE : k2, pal, only);
-    if (outlined && style > 1) outline(ctx, 0, 0, w, h2, node2.selected, translucent);
-    if (style > 0 && !only && N.selectionGlow && node2.selected) frame$1(ctx, w, h2, pal);
-  } finally {
-    while (depth > saves) restore(ctx);
-  }
-}
-function reach(style, w, h2, only) {
-  const { quality: quality2, animationGlow: glow2, animationSize: size, particleShow: dots, particleSize: dotSize, particleGlow: dotGlow, particleIntensity: motion2 } = N;
-  const intensity = N.intensity * 1.5;
-  const long = Math.max(w, h2);
-  const short = Math.min(w, h2);
-  let r = 0;
-  if (style > 0 && N.colorHoverShow) r = 1 + 1.5 * 15 * glow2 * 1.5;
-  if (style > 0 && !only && N.selectionGlow) r = Math.max(r, 1 + 1.5 * 45 * N.glow);
-  switch (style) {
-    case 2: {
-      const line = long * 75e-4 * size;
-      if (!only) r = Math.max(r, 4 + line, line + 1.5 * 48 * intensity * glow2, line + 1.5 * 15 * intensity, 0.6 * short * size + 0.5);
-      if (dots) r = Math.max(r, 1.1 * short * size + 2 + 2.6 * dotSize + 7.5 * dotGlow);
-      return r;
-    }
-    case 3: {
-      const rings = 0.7 * short * size + 1.5 * intensity + 1.5 * Math.max(2, 15 * glow2);
-      const corona = 0.7 * long * (0.8 + 0.2 * motion2) + 2 * (2 * dotSize + 1.5 * motion2) + 1.5 * 15 * dotGlow;
-      return Math.max(r, (only ? 0 : rings) - short / 2, (dots ? corona : 0) - short / 2);
-    }
-    case 4: {
-      const radius = short * 0.056 * intensity * size;
-      const rings = 2 * radius * Math.max(2, Math.floor(quality2 * 2));
-      const pattern = rings + radius + 1 + 1.5 * 15 * intensity * glow2;
-      const circling = rings + 0.5 * radius * motion2 + 2 * quality2 * dotSize + 1.5 * 10 * dotGlow;
-      return Math.max(r, (only ? 0 : pattern) - short / 2, (dots ? circling : 0) - short / 2);
-    }
-    default: {
-      const radius = long * (0.5 + quality2 * 0.1) * size;
-      const light2 = radius * (1.2 + 0.4 * glow2) * (0.4 + 0.3 * intensity);
-      const blur = !only && quality2 > 1 ? 1.5 * 10 * glow2 * quality2 * 0.5 : 0;
-      const fireflies = 1.7 * radius + 4.5 * motion2 + 12 + 2.8 * (4 + quality2) * size * dotSize + blur;
-      return Math.max(r, (only ? 0 : light2) - short / 2, (dots ? fireflies : 0) - short / 2);
-    }
   }
 }
 const WIDTH = 320;
@@ -7466,7 +7504,7 @@ function diagnostics() {
   return [
     `${TITLE} ${"3.0.0"}, ComfyUI frontend ${window.__COMFYUI_FRONTEND_VERSION__}`,
     `Browser: ${navigator.userAgent}; language ${navigator.language}`,
-    `Palette: ${light$1() ? "light" : "dark"}, canvas ${app.canvas.clear_background_color}`,
+    `Palette: ${light() ? "light" : "dark"}, canvas ${app.canvas.clear_background_color}`,
     `Nodes 2.0: ${LiteGraph.vueNodesMode ? "on" : "off"}`,
     `Workflow: ${app.rootGraph.nodes.length} nodes, ${app.rootGraph.links.size} links`,
     `Look: ${L.look || "not chosen yet"}${look && changed(look) ? ", changed since it was applied" : ""}`,
@@ -7637,15 +7675,8 @@ function whatsNew() {
   }
   app.extensionManager.toast.add({ severity: "info", summary: title, detail: `${text2} About, in the FX panel, tells more.`, life: NEWS_MS });
 }
-const OWN_STYLE = "enhanced_fx_style";
 const OWN_ONLY = "enhanced_fx_particles_only";
 const SELECTION_FX = "EnhancedLinksNodes.SelectionNodeFX";
-const STYLES = new Set(NODE_ANIMATION_OPTIONS.map((option) => option.value));
-function ownStyle(node2) {
-  const style = node2.properties[OWN_STYLE];
-  return STYLES.has(style) ? style : void 0;
-}
-const effectOf = (node2) => ownStyle(node2) ?? N.animate;
 function pick(nodes, choices) {
   app.canvas.emitBeforeChange();
   for (const node2 of nodes) {
@@ -7990,4 +8021,4 @@ export {
   keyText as y,
   running as z
 };
-//# sourceMappingURL=menus-rHK7Pq7j.js.map
+//# sourceMappingURL=menus-RVtp4dSR.js.map

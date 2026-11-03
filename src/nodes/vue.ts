@@ -28,9 +28,9 @@ import { app } from '/scripts/app.js';
 import { L, N, revision } from '@/core/settings';
 import { during, overlaps, transformPane, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
-import { BYPASS, NEVER, holdsStill } from '@/nodes/effects';
+import { BYPASS, NEVER, effectOf, holdsStill } from '@/nodes/effects';
 import { stepOf, syncRuns } from '@/fx/execution';
-import { effectOf, particlesOnly } from '@/ui/menus';
+import { particlesOnly } from '@/ui/menus';
 
 type Canvas = typeof app.canvas;
 type Node = InstanceType<typeof LGraphNode>;
@@ -122,6 +122,8 @@ function stylesheet(): string {
     const halo = N.glowShow && glow > 0 ? `0 0 ${Math.round(36 * glow)}px color-mix(in srgb, var(--eln-c1) 60%, transparent)` : '';
     const withHalo = (shadows: string) => (halo ? `${halo}, ${shadows}` : shadows);
     const r = Math.round(4 * size);
+    // The running glow in the ring's colour where that holds still: Rainbow's and Status's are the canvas ring's own.
+    const running = N.runRingColorMode === 'custom' ? N.runRingColor : N.runRingColorMode === 'effect' ? 'var(--eln-c1, var(--primary-background))' : 'var(--primary-background)';
     const turn = Array.from({ length: 9 }, (_, i) => `${i * 12.5}%{transform:translate(${(r * Math.cos((i * Math.PI) / 4)).toFixed(1)}px,${(r * Math.sin((i * Math.PI) / 4)).toFixed(1)}px)}`).join('');
     const colours = FX.slice(1).map((fx, i) => {
         const { primary, secondary, accent } = nodePalette(i + 1);
@@ -137,7 +139,7 @@ function stylesheet(): string {
         `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
         `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo || 'none'};animation:none}`,
         '.lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}',
-        '.lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, var(--primary-background) 60%, transparent);animation:none;opacity:1}',
+        `.lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, ${running} 60%, transparent);animation:none;opacity:1}`,
         '.lg-node[data-eln-run=failed]::after{border:0;box-shadow:0 0 16px 2px rgb(255 59 48 / 55%);animation:none;opacity:1}',
         '.lg-node[data-eln-mode=bypass]{--eln-mode:0.4}',
         '.lg-node[data-eln-mode=muted]{--eln-mode:0.8}',

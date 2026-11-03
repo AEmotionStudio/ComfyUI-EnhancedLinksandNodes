@@ -291,6 +291,21 @@ describe('node effects in Nodes 2.0', () => {
         expect(css).toContain(':root[data-eln-pace=calm]{--eln-calm:0.5;--eln-slow:4}');
     });
 
+    it('glows a running node in the ring\'s colour where it holds still: the accent, a custom colour, or the node\'s effect colour', async () => {
+        const css = async (mode: string) => {
+            await start({ '📦 Enhanced Nodes.Animate': 1, '📦 Enhanced Nodes.Run.Ring.Color.Mode': mode, '📦 Enhanced Nodes.Run.Ring.Color': '#ff0000' }, CHAIN);
+            LiteGraph.vueNodesMode = true;
+            mountNodes(mountPane(), 1);
+            frames(1);
+            return sheets()[0].textContent!.split('\n').find((rule) => rule.startsWith('.lg-node[data-eln-run=running]'));
+        };
+        const glow = (colour: string) => `.lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, ${colour} 60%, transparent);animation:none;opacity:1}`;
+        expect(await css('accent')).toBe(glow('var(--primary-background)'));
+        expect(await css('rainbow')).toBe(glow('var(--primary-background)'));
+        expect(await css('custom')).toBe(glow('#ff0000'));
+        expect(await css('effect')).toBe(glow('var(--eln-c1, var(--primary-background))'));
+    });
+
     it('hides the glows but a run\'s while zoomed out below Perf.MinZoom', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 1 }, CHAIN);
         LiteGraph.vueNodesMode = true;

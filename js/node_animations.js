@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { J as N, a1 as translucent, a2 as revision, a3 as transformPane, a4 as syncRuns, a5 as overlaps, L, a6 as zoomedOut, a7 as holdsStill, a8 as during, a9 as nodePalette, aa as effectOf, ab as particlesOnly$1, ac as stepOf, ad as BYPASS, ae as NEVER, S as SELECTION_FX, af as nodeMenu, ag as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, ah as startSprites, ai as drawBursts, g as guard, aj as COMPLETION, ak as drawNodeFx, c as clock, al as OVER, am as dummy, an as reach, ao as UNDER, w as wake, ap as ownStyle, aq as CALM_ALPHA, ar as STILL_NODE, as as stopSprites } from "./chunks/menus-rHK7Pq7j.js";
+import { J as N, a1 as translucent, a2 as revision, a3 as transformPane, a4 as syncRuns, a5 as overlaps, L, a6 as zoomedOut, a7 as holdsStill, a8 as during, a9 as nodePalette, aa as effectOf, ab as particlesOnly$1, ac as stepOf, ad as BYPASS, ae as NEVER, S as SELECTION_FX, af as nodeMenu, ag as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, ah as startSprites, ai as drawBursts, g as guard, aj as COMPLETION, ak as drawNodeFx, c as clock, al as OVER, am as dummy, an as reach, ao as UNDER, w as wake, ap as ownStyle, aq as CALM_ALPHA, ar as STILL_NODE, as as stopSprites } from "./chunks/menus-RVtp4dSR.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -193,6 +193,7 @@ function stylesheet() {
   const halo2 = N.glowShow && glow > 0 ? `0 0 ${Math.round(36 * glow)}px color-mix(in srgb, var(--eln-c1) 60%, transparent)` : "";
   const withHalo = (shadows) => halo2 ? `${halo2}, ${shadows}` : shadows;
   const r = Math.round(4 * size);
+  const running = N.runRingColorMode === "custom" ? N.runRingColor : N.runRingColorMode === "effect" ? "var(--eln-c1, var(--primary-background))" : "var(--primary-background)";
   const turn = Array.from({ length: 9 }, (_, i) => `${i * 12.5}%{transform:translate(${(r * Math.cos(i * Math.PI / 4)).toFixed(1)}px,${(r * Math.sin(i * Math.PI / 4)).toFixed(1)}px)}`).join("");
   const colours = FX.slice(1).map((fx, i) => {
     const { primary, secondary, accent } = nodePalette(i + 1);
@@ -208,7 +209,7 @@ function stylesheet() {
     `.lg-node[data-eln-sel]::after{border:0;box-shadow:${withHalo(`0 0 ${Math.round(12 + 36 * glow)}px 2px color-mix(in srgb, var(--eln-c3) 75%, transparent)`)};animation:none}`,
     `.lg-node[data-eln-only]::after{border:0;box-shadow:${halo2 || "none"};animation:none}`,
     ".lg-node[data-eln-collapsed]:not([data-eln-run])::after{content:none}",
-    ".lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, var(--primary-background) 60%, transparent);animation:none;opacity:1}",
+    `.lg-node[data-eln-run=running]::after{border:0;box-shadow:0 0 16px 2px color-mix(in srgb, ${running} 60%, transparent);animation:none;opacity:1}`,
     ".lg-node[data-eln-run=failed]::after{border:0;box-shadow:0 0 16px 2px rgb(255 59 48 / 55%);animation:none;opacity:1}",
     ".lg-node[data-eln-mode=bypass]{--eln-mode:0.4}",
     ".lg-node[data-eln-mode=muted]{--eln-mode:0.8}",

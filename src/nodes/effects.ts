@@ -30,11 +30,25 @@
  * @module nodes/effects
  */
 
-import { N, revision } from '@/core/settings';
+import { N, NODE_ANIMATION_OPTIONS, revision } from '@/core/settings';
 import { HELD, THIN, TURN, adaptive, env, heldByRun } from '@/core/engine';
 import { nodePalette, particleColour, translucent, type NodePalette } from '@/core/colors';
 import { noise } from '@/fx/particles';
 import type { ComfyNode } from '@/core/types';
+
+/** Where a node keeps the Node FX style its menu gave it (ui/menus.ts). */
+export const OWN_STYLE = 'enhanced_fx_style';
+
+const STYLES = new Set<unknown>(NODE_ANIMATION_OPTIONS.map((option) => option.value));
+
+/** The Node FX style a node was given, if it is one: a workflow may hold anything there. */
+export function ownStyle(node: { properties: Record<string, unknown> }): number | undefined {
+    const style = node.properties[OWN_STYLE];
+    return STYLES.has(style) ? (style as number) : undefined;
+}
+
+/** The style a node's effect takes: its own, else Animate. */
+export const effectOf = (node: { properties: Record<string, unknown> }): number => ownStyle(node) ?? N.animate;
 
 /** The node clock an effect is drawn at (core/engine.ts). */
 interface NodeMoment {

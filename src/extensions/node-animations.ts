@@ -25,14 +25,14 @@ import { app } from '/scripts/app.js';
 import { N, nodeSettings } from '@/core/settings';
 import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
-import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, holdsStill, reach as effectReach, type Part } from '@/nodes/effects';
+import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, effectOf, holdsStill, ownStyle, reach as effectReach, type Part } from '@/nodes/effects';
 import { drawTitle, titleOf } from '@/nodes/text';
 import { vueNodes } from '@/nodes/vue';
 import { COMPLETION, drawBursts } from '@/fx/bursts';
 import { installRuns } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
 import { installPanel } from '@/sidebar/sidebar';
-import { SELECTION_FX, effectOf, nodeMenu, ownStyle, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
+import { SELECTION_FX, nodeMenu, particlesOnly as chosenParticlesOnly } from '@/ui/menus';
 
 /** The guard's keys, which its toast names when it turns one off. */
 const EFFECT = 'Node effect';

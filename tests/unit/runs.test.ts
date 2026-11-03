@@ -13,7 +13,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { L, preview } from '@/core/settings';
 import { clock, env, live } from '@/core/engine';
-import { lighter } from '@/core/colors';
+import { lighter, nodePalette } from '@/core/colors';
 import { RED } from '@/fx/execution';
 import { endBursts, play, type Anchor } from '@/fx/bursts';
 import * as particles from '@/fx/particles';
@@ -272,6 +272,32 @@ describe("this client's run", () => {
         const later = head();
         const comet = ring(collapsed);
         expect((((at - later) % comet.length) + comet.length) % comet.length).toBeCloseTo(comet.length / 4, 0);
+    });
+
+    it('colours the ring as Run.Ring.Color.Mode says: the accent, the node effect colour, a custom colour, the colour wheel round it, or amber to green with the progress', async () => {
+        const RING_MODE = '📦 Enhanced Nodes.Run.Ring.Color.Mode';
+        // Neon Nexus's halo alone, so that the ring is the one 3 px stroke.
+        const ringOf = async (settings: Record<string, unknown>, done: number) => {
+            const canvas = await start({ '📦 Enhanced Nodes.Animations.Enabled': false, '📦 Enhanced Nodes.Run.Ring.Color': '#ff0000', ...settings }, { nodes: [{ pos: [100, 200] }] });
+            frames(1);
+            begin('colour');
+            progress('colour', { 1: [done, 20] });
+            const { paints, lines } = frame(canvas);
+            return { style: paints.find((p) => p.op === 'stroke' && p.lineWidth === 3)!.style, lines };
+        };
+        expect((await ringOf({ [RING_MODE]: 'accent', '📦 Enhanced Nodes.Animate': 2 }, 5)).style).toBe(ACCENT);
+        expect((await ringOf({ [RING_MODE]: 'effect', '📦 Enhanced Nodes.Animate': 2 }, 5)).style).toBe(nodePalette(2).primary);
+        expect((await ringOf({ [RING_MODE]: 'effect', '📦 Enhanced Nodes.Animate': 0 }, 5)).style).toBe(ACCENT);
+        expect((await ringOf({ [RING_MODE]: 'custom' }, 5)).style).toBe('#ff0000');
+        // hsl(40, 100%, 50%) and hsl(130, 100%, 50%), as a canvas gives them back.
+        expect((await ringOf({ [RING_MODE]: 'status' }, 0)).style).toBe('#ffaa00');
+        expect((await ringOf({ [RING_MODE]: 'status' }, 20)).style).toBe('#00ff2a');
+        const rainbow = await ringOf({ [RING_MODE]: 'rainbow' }, 5);
+        expect(rainbow.style).toMatch(/^grad\d+$/);
+        // Seven stops round the wheel, red at 12 o'clock and again back at it.
+        const stops = rainbow.lines.filter((line) => line.startsWith(`${rainbow.style}.addColorStop(`));
+        expect(stops).toHaveLength(7);
+        expect([stops[0], stops[6]]).toEqual([`${rainbow.style}.addColorStop(0, #ff3333)`, `${rainbow.style}.addColorStop(1, #ff3333)`]);
     });
 
     it('holds the comet as a whole ring with reduced motion, and the river’s sparks where they are as it comes in', async () => {

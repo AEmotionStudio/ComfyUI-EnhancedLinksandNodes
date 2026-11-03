@@ -26,10 +26,11 @@ import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
 import { L, N } from '@/core/settings';
 import { clock, during, env, guard, layers, live, overlaps, wake } from '@/core/engine';
-import { accent, lighter } from '@/core/colors';
+import { accent, lighter, nodePalette } from '@/core/colors';
 import { COMPLETION, STYLES, drawPops, endBursts, play, pop, surprise, tracing, type Anchor, type Style } from '@/fx/bursts';
 import { disc, startSprites, stopSprites } from '@/fx/particles';
 import type { Segment } from '@/links/pipeline';
+import { effectOf } from '@/nodes/effects';
 
 type Canvas = typeof app.canvas;
 type Graph = NonNullable<Canvas['graph']>;
@@ -60,6 +61,9 @@ const TRAIL_WIDTH = 3;
  */
 const RING_WIDTH = 3;
 const RING_OUT = 9;
+/** Status's hues, amber at no progress and green once done. */
+const AMBER = 40;
+const GREEN = 130;
 const COMET = 0.2;
 const COMET_HZ = 0.5;
 /** The error outline's pulses, how many a second and how many, and its shake: how far and how long. */
@@ -319,13 +323,36 @@ function stretch(ctx: CanvasRenderingContext2D, from: number, length: number): v
     ctx.stroke();
 }
 
+/** The colour Run.Ring.Color.Mode gives the ring of `node`, at `step`'s progress. */
+function ringColour(ctx: CanvasRenderingContext2D, node: Node, step: Step): string | CanvasGradient {
+    switch (N.runRingColorMode) {
+        case 'custom':
+            return N.runRingColor;
+        case 'effect': {
+            const style = effectOf(node);
+            return style > 0 ? nodePalette(style).primary : tint;
+        }
+        case 'rainbow': {
+            // Red at 12 o'clock, round the colour wheel clockwise, as the ring fills.
+            const [x, y, w, h] = node.boundingRect;
+            const gradient = ctx.createConicGradient(-Math.PI / 2, x + w / 2, y + h / 2);
+            for (let i = 0; i <= 6; i++) gradient.addColorStop(i / 6, `hsl(${60 * i}, 100%, 60%)`);
+            return gradient;
+        }
+        case 'status':
+            return `hsl(${AMBER + (GREEN - AMBER) * (Number.isNaN(step.progress) ? 0 : step.progress)}, 100%, 50%)`;
+        default:
+            return tint;
+    }
+}
+
 /**
- * A running node's ring, in the accent, filling clockwise from 12 o'clock as its progress says, or else a comet going
- * round; `still` holds the comet as a whole ring. Whether it moves.
+ * A running node's ring, in Run.Ring.Color.Mode's colour, filling clockwise from 12 o'clock as its progress says, or
+ * else a comet going round; `still` holds the comet as a whole ring. Whether it moves.
  */
 function ring(ctx: CanvasRenderingContext2D, node: Node, step: Step, t: number, still: boolean): boolean {
     ctx.globalAlpha = 1;
-    ctx.strokeStyle = tint;
+    ctx.strokeStyle = ringColour(ctx, node, step);
     ctx.lineWidth = RING_WIDTH;
     trace(ctx, node, RING_OUT + RING_WIDTH / 2);
     if (!Number.isNaN(step.progress)) {

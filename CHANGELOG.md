@@ -49,7 +49,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - **Go to connected node** in the node menu, a double-click on a slot to fly to the other end (again to cycle), and Go back. **Follow execution** pans to the running node when it is off screen.
 
 ### Run visuals
-- For runs you queue: light flowing into the running node, a fading trail along the path the run took, a progress ring, and a red pulse and shake on a failed node.
+- For runs you queue: light flowing into the running node, a fading trail along the path the run took, a progress ring (in the theme accent, the node's effect color, a custom color, a rainbow, or amber turning green), and a red pulse and shake on a failed node.
 - **During a run**: Freeze effects, Calm, Spotlight (the default: other effects hold still while the run visuals play) or Keep animating, and links or nodes can each ignore runs.
 
 ### Completion

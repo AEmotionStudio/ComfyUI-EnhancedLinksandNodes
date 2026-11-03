@@ -159,6 +159,8 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Executed-path trail | `🔗 Enhanced Links.Flow.Trail` | boolean | `true`, `false` | `true` | The run's path keeps a fading glow. |
 | Trail fade time | `🔗 Enhanced Links.Flow.Trail.Fade` | slider | 2 to 30, step 1 | `8` |  |
 | Progress ring | `📦 Enhanced Nodes.Run.Ring` | boolean | `true`, `false` | `true` | Ring fills with the node's progress. |
+| Progress ring color | `📦 Enhanced Nodes.Run.Ring.Color.Mode` | combo | `accent` Theme accent, `effect` Node effect color, `custom` Custom, `rainbow` Rainbow, `status` Status (amber → green) | `accent` Theme accent | Node effect color takes the primary color of the node's effect, the accent for a node without one; Rainbow runs the colour wheel round the ring; Status turns from amber to green as the node gets done. |
+| Progress ring custom color | `📦 Enhanced Nodes.Run.Ring.Color` | color | `#rrggbb` | `#00e5ff` | Used when Progress ring color is Custom. |
 | Error pulse | `📦 Enhanced Nodes.Run.Error` | boolean | `true`, `false` | `true` | Failed node pulses red. |
 
 ## Focus & Flow · Completion

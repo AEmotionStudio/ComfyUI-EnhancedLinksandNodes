@@ -87,7 +87,7 @@
 ### 🏁 Run visuals and completion
 ![Run visuals](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/run.webp)
 
-*   **For runs you queue**: a data river into the running node, a progress ring, the executed path's fading trail, a red pulse on a failed node. **Alt+J** goes to the running node, then to errors.
+*   **For runs you queue**: a data river into the running node, a progress ring (theme accent, effect color, custom, rainbow or amber → green), the executed path's fading trail, a red pulse on a failed node. **Alt+J** goes to the running node, then to errors.
 *   **When it finishes**: Fireworks (v1's), Confetti, Shockwave (default), Path trace or Surprise, over the output nodes, nodes you mark Primary, or the center of the screen.
 *   **During a run**: Spotlight (default) holds other effects still; Calm, Freeze effects or Keep animating.
 

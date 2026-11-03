@@ -489,6 +489,21 @@
     "name": "Progress ring",
     "tooltip": "Ring fills with the node's progress."
   },
+  "📦 Enhanced Nodes_Run_Ring_Color_Mode": {
+    "name": "Progress ring color",
+    "tooltip": "Node effect color takes the primary color of the node's effect, the accent for a node without one; Rainbow runs the colour wheel round the ring; Status turns from amber to green as the node gets done.",
+    "options": {
+      "Theme accent": "Theme accent",
+      "Node effect color": "Node effect color",
+      "Custom": "Custom",
+      "Rainbow": "Rainbow",
+      "Status (amber → green)": "Status (amber → green)"
+    }
+  },
+  "📦 Enhanced Nodes_Run_Ring_Color": {
+    "name": "Progress ring custom color",
+    "tooltip": "Used when Progress ring color is Custom."
+  },
   "📦 Enhanced Nodes_Run_Error": {
     "name": "Error pulse",
     "tooltip": "Failed node pulses red."

@@ -259,6 +259,14 @@ const PAUSE_MODE_OPTIONS = [
     { value: 'ignore', text: 'Keep animating' },
 ] as const;
 
+const RING_COLOR_OPTIONS = [
+    { value: 'accent', text: 'Theme accent' },
+    { value: 'effect', text: 'Node effect color' },
+    { value: 'custom', text: 'Custom' },
+    { value: 'rainbow', text: 'Rainbow' },
+    { value: 'status', text: 'Status (amber → green)' },
+] as const;
+
 const COMPLETION_STYLE_OPTIONS = [
     { value: 'fireworks', text: 'Fireworks' },
     { value: 'confetti', text: 'Confetti' },
@@ -429,6 +437,8 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Flow.Trail', key: 'flowTrail', name: 'Executed-path trail', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => L.enabled, tooltip: "The run's path keeps a fading glow." },
     { id: '🔗 Enhanced Links.Flow.Trail.Fade', key: 'flowTrailFade', name: 'Trail fade time', type: 'slider', min: 2, max: 30, step: 1, default: 8, group: 'Focus & Flow · During a run', advanced: true, look: false, showIf: (): boolean => L.enabled && L.flowTrail },
     { id: '📦 Enhanced Nodes.Run.Ring', key: 'runRing', name: 'Progress ring', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: "Ring fills with the node's progress." },
+    { id: '📦 Enhanced Nodes.Run.Ring.Color.Mode', key: 'runRingColorMode', name: 'Progress ring color', type: 'combo', options: RING_COLOR_OPTIONS, default: 'accent', group: 'Focus & Flow · During a run', look: false, showIf: (): boolean => N.enabled && N.runRing, tooltip: "Node effect color takes the primary color of the node's effect, the accent for a node without one; Rainbow runs the colour wheel round the ring; Status turns from amber to green as the node gets done." },
+    { id: '📦 Enhanced Nodes.Run.Ring.Color', key: 'runRingColor', name: 'Progress ring custom color', type: 'color', default: '#00e5ff', group: 'Focus & Flow · During a run', look: false, showIf: (): boolean => N.enabled && N.runRing && N.runRingColorMode === 'custom', tooltip: 'Used when Progress ring color is Custom.' },
     { id: '📦 Enhanced Nodes.Run.Error', key: 'runError', name: 'Error pulse', type: 'boolean', default: true, group: 'Focus & Flow · During a run', showIf: (): boolean => N.enabled, tooltip: 'Failed node pulses red.' },
     { id: '📦 Enhanced Nodes.End Animation.Enabled', key: 'endAnimationEnabled', name: 'Effect when a run finishes', type: 'boolean', default: true, group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled, tooltip: 'Plays the Completion style when your run succeeds.' },
     { id: '📦 Enhanced Nodes.Completion.Style', key: 'completionStyle', name: 'Completion style', type: 'combo', options: COMPLETION_STYLE_OPTIONS, default: 'shockwave', group: 'Focus & Flow · Completion', showIf: (): boolean => N.enabled && N.endAnimationEnabled, tooltip: 'Path trace runs a comet along the links your run took; Surprise plays another style each time.' },
