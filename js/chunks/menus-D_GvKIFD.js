@@ -80,7 +80,8 @@ const NODE_ANIMATION_OPTIONS = [
   { value: 5, text: "Flower of Life" },
   { value: 6, text: "Jelly" },
   { value: 7, text: "Circuit Trace" },
-  { value: 8, text: "Aurora Veil" }
+  { value: 8, text: "Aurora Veil" },
+  { value: 9, text: "Ember Crown" }
 ];
 const PARTICLE_COLOR_MODE_OPTIONS = [
   { value: "default", text: "Particle color" },
@@ -1063,7 +1064,8 @@ const STYLE_COLOURS = [
   ["#ffd36b", "#fff3c4", "#b48cff"],
   ["#7cf5a0", "#c9ffe0", "#2ad1c4"],
   ["#00e5ff", "#2bd47d", "#ffd54f"],
-  ["#3dffa8", "#38c6ff", "#c77dff"]
+  ["#3dffa8", "#38c6ff", "#c77dff"],
+  ["#ff7a1a", "#ff3d00", "#ffd166"]
 ];
 const nodeTint = (colour2) => show$1(filter(parse(colour2), N.colorScheme));
 const nodePalettes = [];
@@ -1693,6 +1695,7 @@ const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 const [CHIP_SPARKS] = [2];
 const [CURTAINS, MOTES_UP] = [2, 5];
+const [FLAMES, WARMTH, EMBERS] = [2, 3, 4];
 let depth = 0;
 function save(ctx) {
   ctx.save();
@@ -2595,7 +2598,83 @@ function auroraVeil(ctx, _node, w, h2, k2, pal, only) {
     }
   }
 }
-const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil];
+const TONGUE = 18;
+const BLAZE = 22;
+const RISE = 45;
+function flame(ctx, base, top, pal) {
+  const gradient = ctx.createLinearGradient(0, base, 0, top);
+  gradient.addColorStop(0, translucent(pal.accent, 0.95));
+  gradient.addColorStop(0.35, translucent(pal.primary, 0.85));
+  gradient.addColorStop(0.75, translucent(pal.secondary, 0.5));
+  gradient.addColorStop(1, translucent(pal.secondary, 0));
+  return gradient;
+}
+function warmth(ctx, depth2, pal) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, depth2);
+  gradient.addColorStop(0, translucent(pal.primary, 0.22));
+  gradient.addColorStop(1, translucent(pal.primary, 0));
+  return gradient;
+}
+function emberCrown(ctx, _node, w, h2, k2, pal, only) {
+  const { quality: quality2, animationGlow: glow2, animationSize: size } = N;
+  const intensity = N.intensity * 1.5;
+  const base = -LiteGraph.NODE_TITLE_HEIGHT;
+  const s = held$4 ? 0 : k2.nodePhase / TURN;
+  const tall = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity);
+  const blur = 10 * intensity * glow2;
+  if (!only) {
+    const count2 = Math.max(3, Math.min(24, Math.round(w / (TONGUE * size) * (0.6 + 0.2 * quality2))));
+    const spacing = w / count2;
+    const wide = spacing * 1.3;
+    ctx.fillStyle = kept(FLAMES) ?? keep$1(FLAMES, flame(ctx, base, base - tall, pal));
+    ctx.shadowColor = pal.primary;
+    ctx.shadowBlur = blur;
+    ctx.globalAlpha = fade;
+    let drawn = false;
+    ctx.beginPath();
+    for (let i = 0; i < count2; i++) {
+      const x = (i + 0.5 + 0.4 * (noise(i + 13) - 0.5)) * spacing;
+      const flicker = 0.8 + 0.2 * (0.6 * Math.sin(s * 2.1 + i * 1.7) + 0.4 * Math.sin(s * 3.3 + i * 0.9));
+      const high = tall * (0.6 + 0.4 * noise(i + 9)) * flicker;
+      const tip = x + Math.sin(s * 1.4 + i) * wide * 0.25;
+      if (!shows$1(Math.min(x - wide / 2, tip) - 1.5 * blur, base - high - 1.5 * blur, Math.max(x + wide / 2, tip) + 1.5 * blur, base + 1.5 * blur)) continue;
+      ctx.moveTo(x - wide / 2, base);
+      ctx.bezierCurveTo(x - wide / 2, base - high * 0.45, tip - wide * 0.15, base - high * 0.7, tip, base - high);
+      ctx.bezierCurveTo(tip + wide * 0.15, base - high * 0.7, x + wide / 2, base - high * 0.45, x + wide / 2, base);
+      ctx.closePath();
+      drawn = true;
+    }
+    if (drawn) ctx.fill();
+    ctx.shadowBlur = 0;
+    const depth2 = 0.4 * h2;
+    if (shows$1(0, 0, w, depth2)) {
+      ctx.fillStyle = kept(WARMTH) ?? keep$1(WARMTH, warmth(ctx, depth2, pal));
+      ctx.fillRect(0, 0, w, depth2);
+    }
+  }
+  if (N.particleShow) {
+    const { particleSize: dot, particleGlow: dotGlow, particleSpeed: speed } = N;
+    const count2 = Math.max(1, Math.round(w / 40 * N.particleDensity * thin));
+    const time = held$4 ? 0 : k2.particleTime;
+    const rate = held$4 ? 0 : TURN * N.animationSpeed * speed;
+    const rise = RISE * size;
+    ctx.shadowBlur = 8 * dotGlow;
+    for (let i = 0; i < count2; i++) {
+      const age = time * 0.35 + noise(i + 5);
+      const life = age - Math.floor(age);
+      const x = w * (0.05 + 0.9 * noise(i + 17)) + Math.sin(time * 1.7 + i) * 6 * N.particleIntensity * life;
+      const y = base - 4 - life * rise;
+      const r = dot * (2.2 - 1.2 * life);
+      if (!circle(x, y, r + 1.5 * 8 * dotGlow)) continue;
+      ctx.globalAlpha = dotGlow * Math.min(1, life / 0.1) * (1 - life) * fade;
+      ctx.fillStyle = ctx.shadowColor = kept(EMBERS + i) ?? keep$1(EMBERS + i, particleColour(pal, i, time, rate));
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+const EFFECTS = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil, emberCrown];
 function frame$1(ctx, w, h2, pal) {
   const blur = 15 * (N.glow * 2);
   ctx.shadowColor = pal.accent;
@@ -2652,6 +2731,11 @@ function reach(style, w, h2, only) {
     case 6:
     case 8:
       return r;
+    case 9: {
+      const flames = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity) + 1.5 * 10 * intensity * glow2;
+      const embers = 4 + RISE * size + 2.2 * dotSize + 1.5 * 8 * dotGlow;
+      return Math.max(r, only ? 0 : flames, dots ? embers : 0);
+    }
     case 7: {
       const blur = 10 * intensity * glow2;
       const sparks = dots ? 1.2 * dotSize + 1.5 * 6 * dotGlow : 0;
@@ -8034,7 +8118,7 @@ const NEWS$1 = [
   "Selection focus makes the selected nodes' links stand out, or alone animate, with the rest dimmed or hidden if you like; Go to connected node in the node menu, a double-click on a slot and Back take you along the links; your own runs show light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, which Go to running node goes to.",
   "Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
-  "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; Circuit Trace, pulses racing along etched traces; and Aurora Veil, curtains of light hanging from the title bar. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+  "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; Circuit Trace, pulses racing along etched traces; Aurora Veil, curtains of light hanging from the title bar; and Ember Crown, flames licking up from it. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8665,4 +8749,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-Dp7jPnh2.js.map
+//# sourceMappingURL=menus-D_GvKIFD.js.map

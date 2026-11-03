@@ -173,6 +173,7 @@ const [SPARKS] = [2];
 const [TINT, GLOSS, BUBBLES] = [2, 3, 4];
 const [CHIP_SPARKS] = [2];
 const [CURTAINS, MOTES_UP] = [2, 5];
+const [FLAMES, WARMTH, EMBERS] = [2, 3, 4];
 
 /** The saves an effect has not restored yet, which a failure leaves to drawNodeFx to restore. */
 let depth = 0;
@@ -1272,10 +1273,102 @@ function auroraVeil(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, 
     }
 }
 
+/**
+ * Ember Crown, in px at Animation.Size 1: about how far apart its flames stand, how tall the tallest is at Intensity 1,
+ * and how far its embers rise above the title bar before they die out.
+ */
+const TONGUE = 18;
+const BLAZE = 22;
+const RISE = 45;
+
+/** Ember Crown's flame, from the top of the title bar at `base` up to `top`: gold at its root, then its orange, then red, gone at its tip. */
+function flame(ctx: CanvasRenderingContext2D, base: number, top: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createLinearGradient(0, base, 0, top);
+    gradient.addColorStop(0, translucent(pal.accent, 0.95));
+    gradient.addColorStop(0.35, translucent(pal.primary, 0.85));
+    gradient.addColorStop(0.75, translucent(pal.secondary, 0.5));
+    gradient.addColorStop(1, translucent(pal.secondary, 0));
+    return gradient;
+}
+
+/** Ember Crown's warmth on the body, from under its title bar down `depth` px. */
+function warmth(ctx: CanvasRenderingContext2D, depth: number, pal: NodePalette): CanvasGradient {
+    const gradient = ctx.createLinearGradient(0, 0, 0, depth);
+    gradient.addColorStop(0, translucent(pal.primary, 0.22));
+    gradient.addColorStop(1, translucent(pal.primary, 0));
+    return gradient;
+}
+
+/**
+ * 9. Ember Crown: a crown of flames licking up from the top of the title bar, each swaying and flickering on its own
+ * under twice a second at speed 3, gold at the root and red at the tip, glowing; and a warmth on the body under the
+ * title bar. Its particles are embers rising from the flames and dying out. Quality stands its flames closer.
+ */
+function emberCrown(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+    const { quality, animationGlow: glow, animationSize: size } = N;
+    const intensity = N.intensity * 1.5;
+    const base = -LiteGraph.NODE_TITLE_HEIGHT;
+    const s = held ? 0 : k.nodePhase / TURN;
+    const tall = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity);
+    const blur = 10 * intensity * glow;
+    if (!only) {
+        const count = Math.max(3, Math.min(24, Math.round((w / (TONGUE * size)) * (0.6 + 0.2 * quality))));
+        const spacing = w / count;
+        const wide = spacing * 1.3;
+        ctx.fillStyle = kept<CanvasGradient>(FLAMES) ?? keep(FLAMES, flame(ctx, base, base - tall, pal));
+        ctx.shadowColor = pal.primary;
+        ctx.shadowBlur = blur;
+        ctx.globalAlpha = fade;
+        let drawn = false;
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const x = (i + 0.5 + 0.4 * (noise(i + 13) - 0.5)) * spacing;
+            const flicker = 0.8 + 0.2 * (0.6 * Math.sin(s * 2.1 + i * 1.7) + 0.4 * Math.sin(s * 3.3 + i * 0.9));
+            const high = tall * (0.6 + 0.4 * noise(i + 9)) * flicker;
+            const tip = x + Math.sin(s * 1.4 + i) * wide * 0.25;
+            if (!shows(Math.min(x - wide / 2, tip) - 1.5 * blur, base - high - 1.5 * blur, Math.max(x + wide / 2, tip) + 1.5 * blur, base + 1.5 * blur)) continue;
+            ctx.moveTo(x - wide / 2, base);
+            ctx.bezierCurveTo(x - wide / 2, base - high * 0.45, tip - wide * 0.15, base - high * 0.7, tip, base - high);
+            ctx.bezierCurveTo(tip + wide * 0.15, base - high * 0.7, x + wide / 2, base - high * 0.45, x + wide / 2, base);
+            ctx.closePath();
+            drawn = true;
+        }
+        if (drawn) ctx.fill();
+        ctx.shadowBlur = 0;
+        const depth = 0.4 * h;
+        if (shows(0, 0, w, depth)) {
+            ctx.fillStyle = kept<CanvasGradient>(WARMTH) ?? keep(WARMTH, warmth(ctx, depth, pal));
+            ctx.fillRect(0, 0, w, depth);
+        }
+    }
+    if (N.particleShow) {
+        const { particleSize: dot, particleGlow: dotGlow, particleSpeed: speed } = N;
+        const count = Math.max(1, Math.round((w / 40) * N.particleDensity * thin));
+        const time = held ? 0 : k.particleTime;
+        const rate = held ? 0 : TURN * N.animationSpeed * speed;
+        const rise = RISE * size;
+        ctx.shadowBlur = 8 * dotGlow;
+        for (let i = 0; i < count; i++) {
+            // Up from the flames, swaying more as it goes, fading in at once and out as it dies.
+            const age = time * 0.35 + noise(i + 5);
+            const life = age - Math.floor(age);
+            const x = w * (0.05 + 0.9 * noise(i + 17)) + Math.sin(time * 1.7 + i) * 6 * N.particleIntensity * life;
+            const y = base - 4 - life * rise;
+            const r = dot * (2.2 - 1.2 * life);
+            if (!circle(x, y, r + 1.5 * 8 * dotGlow)) continue;
+            ctx.globalAlpha = dotGlow * Math.min(1, life / 0.1) * (1 - life) * fade;
+            ctx.fillStyle = ctx.shadowColor = kept<string>(EMBERS + i) ?? keep(EMBERS + i, particleColour(pal, i, time, rate));
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
 type Effect = (ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean) => void;
 
 /** By Animate value; 0 stands for the fireflies a node with no effect but particles gets, Gentle Pulse's. */
-const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil];
+const EFFECTS: Effect[] = [gentlePulse, gentlePulse, neonNexus, cosmicRipple, sacredRosette, flowerOfLife, jelly, circuitTrace, auroraVeil, emberCrown];
 
 /** v1's frame round a selected node's body (old_node_animations.js:2104-2113): a line in its secondary colour, glowing in its accent. */
 function frame(ctx: CanvasRenderingContext2D, w: number, h: number, pal: NodePalette): void {
@@ -1348,6 +1441,12 @@ export function reach(style: number, w: number, h: number, only: boolean): numbe
         case 6:
         case 8:
             return r;
+        case 9: {
+            // Its flames over the title bar, and the embers that rise from them.
+            const flames = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity) + 1.5 * 10 * intensity * glow;
+            const embers = 4 + RISE * size + 2.2 * dotSize + 1.5 * 8 * dotGlow;
+            return Math.max(r, only ? 0 : flames, dots ? embers : 0);
+        }
         case 7: {
             // Its pins, and its pulses' glow where their traces meet the edge.
             const blur = 10 * intensity * glow;

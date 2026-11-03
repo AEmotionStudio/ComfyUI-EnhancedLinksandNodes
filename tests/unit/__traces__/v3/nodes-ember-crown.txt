@@ -1,0 +1,1098 @@
+# Ember Crown
+# t=0s phase=0 particleTime=0 node=140x46
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad1 = createLinearGradient(0, -30, 0, -57.5)
+grad1.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad1.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad1.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad1.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad1
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-2.88, -30)
+bezierCurveTo(-2.88, -36.73, 7.74, -40.46, 12.29, -44.95)
+bezierCurveTo(16.84, -40.46, 27.45, -36.73, 27.45, -30)
+closePath()
+moveTo(19.35, -30)
+bezierCurveTo(19.35, -39.73, 36.35, -45.13, 40.9, -51.62)
+bezierCurveTo(45.45, -45.13, 49.68, -39.73, 49.68, -30)
+closePath()
+moveTo(40.72, -30)
+bezierCurveTo(40.72, -38.44, 58.23, -43.12, 62.78, -48.75)
+bezierCurveTo(67.33, -43.12, 71.05, -38.44, 71.05, -30)
+closePath()
+moveTo(67.73, -30)
+bezierCurveTo(67.73, -36.4, 79.41, -39.96, 83.96, -44.22)
+bezierCurveTo(88.51, -39.96, 98.06, -36.4, 98.06, -30)
+closePath()
+moveTo(91.49, -30)
+bezierCurveTo(91.49, -38.43, 96.36, -43.11, 100.91, -48.73)
+bezierCurveTo(105.46, -43.11, 121.82, -38.43, 121.82, -30)
+closePath()
+moveTo(112.22, -30)
+bezierCurveTo(112.22, -37.88, 115.56, -42.26, 120.11, -47.52)
+bezierCurveTo(124.66, -42.26, 142.55, -37.88, 142.55, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad2 = createLinearGradient(0, 0, 0, 18.4)
+grad2.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad2.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad2
+fillRect(0, 0, 140, 18.4)
+shadowBlur = 8
+globalAlpha = 0.31
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(92.32, -65.04, 1.37, 0, 6.28)
+fill()
+globalAlpha = 0.474
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(59.82, -57.66, 1.57, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=0.4s phase=0.17 particleTime=0.4 node=220x120 selected
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad3 = createLinearGradient(0, -30, 0, -57.5)
+grad3.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad3.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad3.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad3.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad3
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-2.72, -30)
+bezierCurveTo(-2.72, -38.13, 11.09, -42.65, 15.38, -48.07)
+bezierCurveTo(19.67, -42.65, 25.88, -38.13, 25.88, -30)
+closePath()
+moveTo(18.24, -30)
+bezierCurveTo(18.24, -39.23, 35.4, -44.36, 39.69, -50.52)
+bezierCurveTo(43.98, -44.36, 46.84, -39.23, 46.84, -30)
+closePath()
+moveTo(38.39, -30)
+bezierCurveTo(38.39, -36.92, 52.33, -40.76, 56.62, -45.38)
+bezierCurveTo(60.91, -40.76, 66.99, -36.92, 66.99, -30)
+closePath()
+moveTo(63.86, -30)
+bezierCurveTo(63.86, -36.18, 70.96, -39.61, 75.25, -43.73)
+bezierCurveTo(79.54, -39.61, 92.46, -36.18, 92.46, -30)
+closePath()
+moveTo(86.26, -30)
+bezierCurveTo(86.26, -38.58, 89.2, -43.35, 93.49, -49.07)
+bezierCurveTo(97.78, -43.35, 114.86, -38.58, 114.86, -30)
+closePath()
+moveTo(105.8, -30)
+bezierCurveTo(105.8, -37.47, 111.08, -41.62, 115.37, -46.59)
+bezierCurveTo(119.66, -41.62, 134.4, -37.47, 134.4, -30)
+closePath()
+moveTo(124.82, -30)
+bezierCurveTo(124.82, -36.14, 136.78, -39.55, 141.07, -43.65)
+bezierCurveTo(145.36, -39.55, 153.42, -36.14, 153.42, -30)
+closePath()
+moveTo(152.92, -30)
+bezierCurveTo(152.92, -39.48, 169.78, -44.75, 174.07, -51.07)
+bezierCurveTo(178.36, -44.75, 181.52, -39.48, 181.52, -30)
+closePath()
+moveTo(172.1, -30)
+bezierCurveTo(172.1, -40.53, 187.55, -46.39, 191.84, -53.41)
+bezierCurveTo(196.13, -46.39, 200.7, -40.53, 200.7, -30)
+closePath()
+moveTo(195.77, -30)
+bezierCurveTo(195.77, -37.05, 204.82, -40.96, 209.11, -45.66)
+bezierCurveTo(213.4, -40.96, 224.37, -37.05, 224.37, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad4 = createLinearGradient(0, 0, 0, 48)
+grad4.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad4.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad4
+fillRect(0, 0, 220, 48)
+shadowBlur = 8
+globalAlpha = 0.17
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(148.21, -71.34, 1.2, 0, 6.28)
+fill()
+globalAlpha = 0.334
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(93.81, -63.96, 1.4, 0, 6.28)
+fill()
+globalAlpha = 0.848
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(23, -40.83, 2.02, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=0.9s phase=0.38 particleTime=0.9 node=320x260
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad5 = createLinearGradient(0, -30, 0, -57.5)
+grad5.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad5.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad5.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad5.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad5
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-2.82, -30)
+bezierCurveTo(-2.82, -37.8, 14.65, -42.13, 19.11, -47.33)
+bezierCurveTo(23.56, -42.13, 26.89, -37.8, 26.89, -30)
+closePath()
+moveTo(18.95, -30)
+bezierCurveTo(18.95, -36.88, 35.09, -40.71, 39.54, -45.3)
+bezierCurveTo(44, -40.71, 48.67, -36.88, 48.67, -30)
+closePath()
+moveTo(39.89, -30)
+bezierCurveTo(39.89, -36.17, 49.41, -39.6, 53.87, -43.71)
+bezierCurveTo(58.33, -39.6, 69.6, -36.17, 69.6, -30)
+closePath()
+moveTo(66.34, -30)
+bezierCurveTo(66.34, -37.36, 70.06, -41.45, 74.52, -46.36)
+bezierCurveTo(78.98, -41.45, 96.06, -37.36, 96.06, -30)
+closePath()
+moveTo(89.62, -30)
+bezierCurveTo(89.62, -39.24, 93.68, -44.37, 98.13, -50.53)
+bezierCurveTo(102.59, -44.37, 119.33, -39.24, 119.33, -30)
+closePath()
+moveTo(109.93, -30)
+bezierCurveTo(109.93, -37.48, 120.15, -41.63, 124.61, -46.62)
+bezierCurveTo(129.07, -41.63, 139.64, -37.48, 139.64, -30)
+closePath()
+moveTo(129.68, -30)
+bezierCurveTo(129.68, -37.01, 146.23, -40.9, 150.69, -45.57)
+bezierCurveTo(155.15, -40.9, 159.39, -37.01, 159.39, -30)
+closePath()
+moveTo(158.88, -30)
+bezierCurveTo(158.88, -39.76, 176.11, -45.18, 180.56, -51.69)
+bezierCurveTo(185.02, -45.18, 188.6, -39.76, 188.6, -30)
+closePath()
+moveTo(178.81, -30)
+bezierCurveTo(178.81, -38.32, 190.43, -42.94, 194.89, -48.48)
+bezierCurveTo(199.34, -42.94, 208.52, -38.32, 208.52, -30)
+closePath()
+moveTo(203.4, -30)
+bezierCurveTo(203.4, -35.64, 208.29, -38.78, 212.75, -42.54)
+bezierCurveTo(217.21, -38.78, 233.11, -35.64, 233.11, -30)
+closePath()
+moveTo(221.42, -30)
+bezierCurveTo(221.42, -35.86, 224.65, -39.12, 229.11, -43.03)
+bezierCurveTo(233.56, -39.12, 251.13, -35.86, 251.13, -30)
+closePath()
+moveTo(246.46, -30)
+bezierCurveTo(246.46, -40.51, 254.62, -46.34, 259.08, -53.35)
+bezierCurveTo(263.54, -46.34, 276.18, -40.51, 276.18, -30)
+closePath()
+moveTo(271.75, -30)
+bezierCurveTo(271.75, -38.03, 286.9, -42.49, 291.36, -47.84)
+bezierCurveTo(295.82, -42.49, 301.47, -38.03, 301.47, -30)
+closePath()
+moveTo(293.82, -30)
+bezierCurveTo(293.82, -37.98, 311.59, -42.41, 316.05, -47.73)
+bezierCurveTo(320.51, -42.41, 323.53, -37.98, 323.53, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad6 = createLinearGradient(0, 0, 0, 104)
+grad6.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad6.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad6
+fillRect(0, 0, 320, 104)
+shadowBlur = 8
+globalAlpha = 0.048
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(211.05, -34.21, 2.19, 0, 6.28)
+fill()
+globalAlpha = 0.159
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(133.57, -71.83, 1.19, 0, 6.28)
+fill()
+globalAlpha = 0.673
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(32.12, -48.7, 1.81, 0, 6.28)
+fill()
+globalAlpha = 0.529
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(229.97, -55.21, 1.63, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=1.9s phase=0.8 particleTime=1.9 node=400x80 hover
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad7 = createLinearGradient(0, -30, 0, -57.5)
+grad7.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad7.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad7.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad7.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad7
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-2.74, -30)
+bezierCurveTo(-2.74, -35.96, 10.71, -39.27, 15.05, -43.25)
+bezierCurveTo(19.38, -39.27, 26.15, -35.96, 26.15, -30)
+closePath()
+moveTo(18.43, -30)
+bezierCurveTo(18.43, -37.88, 24.96, -42.25, 29.29, -47.51)
+bezierCurveTo(33.63, -42.25, 47.32, -37.88, 47.32, -30)
+closePath()
+moveTo(38.78, -30)
+bezierCurveTo(38.78, -39.81, 41.68, -45.26, 46.01, -51.81)
+bezierCurveTo(50.35, -45.26, 67.67, -39.81, 67.67, -30)
+closePath()
+moveTo(64.5, -30)
+bezierCurveTo(64.5, -37.74, 70.4, -42.04, 74.73, -47.2)
+bezierCurveTo(79.06, -42.04, 93.39, -37.74, 93.39, -30)
+closePath()
+moveTo(87.13, -30)
+bezierCurveTo(87.13, -36.63, 99.9, -40.31, 104.23, -44.73)
+bezierCurveTo(108.57, -40.31, 116.02, -36.63, 116.02, -30)
+closePath()
+moveTo(106.87, -30)
+bezierCurveTo(106.87, -36.87, 124.07, -40.69, 128.4, -45.28)
+bezierCurveTo(132.74, -40.69, 135.76, -36.87, 135.76, -30)
+closePath()
+moveTo(126.08, -30)
+bezierCurveTo(126.08, -37.38, 141.19, -41.47, 145.52, -46.39)
+bezierCurveTo(149.85, -41.47, 154.96, -37.38, 154.96, -30)
+closePath()
+moveTo(154.47, -30)
+bezierCurveTo(154.47, -38.21, 162.9, -42.78, 167.23, -48.25)
+bezierCurveTo(171.56, -42.78, 183.36, -38.21, 183.36, -30)
+closePath()
+moveTo(173.84, -30)
+bezierCurveTo(173.84, -38.07, 177.13, -42.55, 181.47, -47.93)
+bezierCurveTo(185.8, -42.55, 202.73, -38.07, 202.73, -30)
+closePath()
+moveTo(197.75, -30)
+bezierCurveTo(197.75, -38.73, 202.18, -43.58, 206.51, -49.4)
+bezierCurveTo(210.84, -43.58, 226.64, -38.73, 226.64, -30)
+closePath()
+moveTo(215.27, -30)
+bezierCurveTo(215.27, -37.21, 226.05, -41.22, 230.39, -46.03)
+bezierCurveTo(234.72, -41.22, 244.16, -37.21, 244.16, -30)
+closePath()
+moveTo(239.62, -30)
+bezierCurveTo(239.62, -37.66, 256.14, -41.92, 260.48, -47.03)
+bezierCurveTo(264.81, -41.92, 268.51, -37.66, 268.51, -30)
+closePath()
+moveTo(264.2, -30)
+bezierCurveTo(264.2, -36.13, 280.57, -39.53, 284.91, -43.62)
+bezierCurveTo(289.24, -39.53, 293.09, -36.13, 293.09, -30)
+closePath()
+moveTo(285.66, -30)
+bezierCurveTo(285.66, -38.79, 296.11, -43.67, 300.45, -49.52)
+bezierCurveTo(304.78, -43.67, 314.55, -38.79, 314.55, -30)
+closePath()
+moveTo(306.92, -30)
+bezierCurveTo(306.92, -36.76, 311.15, -40.52, 315.48, -45.02)
+bezierCurveTo(319.81, -40.52, 335.81, -36.76, 335.81, -30)
+closePath()
+moveTo(329.36, -30)
+bezierCurveTo(329.36, -36.81, 332.77, -40.6, 337.11, -45.14)
+bezierCurveTo(341.44, -40.6, 358.25, -36.81, 358.25, -30)
+closePath()
+moveTo(349.65, -30)
+bezierCurveTo(349.65, -38.83, 358.4, -43.74, 362.73, -49.63)
+bezierCurveTo(367.07, -43.74, 378.54, -38.83, 378.54, -30)
+closePath()
+moveTo(377.66, -30)
+bezierCurveTo(377.66, -39.48, 393, -44.75, 397.33, -51.07)
+bezierCurveTo(401.67, -44.75, 406.55, -39.48, 406.55, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad8 = createLinearGradient(0, 0, 0, 32)
+grad8.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad8.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad8
+fillRect(0, 0, 400, 32)
+shadowBlur = 8
+globalAlpha = 0.645
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(263.59, -49.96, 1.77, 0, 6.28)
+fill()
+globalAlpha = 0.809
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(162.32, -42.58, 1.97, 0, 6.28)
+fill()
+globalAlpha = 0.323
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(37.55, -64.45, 1.39, 0, 6.28)
+fill()
+globalAlpha = 0.179
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(290.68, -70.96, 1.21, 0, 6.28)
+fill()
+globalAlpha = 0.136
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(179.83, -72.87, 1.16, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# Ember Crown with other v1 settings
+# t=1.5s phase=0.63 particleTime=1.5 node=140x46 particles=default
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad1 = createLinearGradient(0, -30, 0, -57.5)
+grad1.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad1.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad1.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad1.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad1
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-1.92, -30)
+bezierCurveTo(-1.92, -36.06, 9.52, -39.43, 12.55, -43.48)
+bezierCurveTo(15.59, -39.43, 18.3, -36.06, 18.3, -30)
+closePath()
+moveTo(12.9, -30)
+bezierCurveTo(12.9, -36.42, 20.19, -39.98, 23.22, -44.26)
+bezierCurveTo(26.25, -39.98, 33.12, -36.42, 33.12, -30)
+closePath()
+moveTo(27.15, -30)
+bezierCurveTo(27.15, -38.64, 30.09, -43.44, 33.12, -49.2)
+bezierCurveTo(36.15, -43.44, 47.37, -38.64, 47.37, -30)
+closePath()
+moveTo(45.15, -30)
+bezierCurveTo(45.15, -38.75, 47.55, -43.62, 50.58, -49.45)
+bezierCurveTo(53.61, -43.62, 65.37, -38.75, 65.37, -30)
+closePath()
+moveTo(60.99, -30)
+bezierCurveTo(60.99, -38.2, 67.15, -42.75, 70.18, -48.21)
+bezierCurveTo(73.21, -42.75, 81.21, -38.2, 81.21, -30)
+closePath()
+moveTo(74.81, -30)
+bezierCurveTo(74.81, -36.78, 85.57, -40.54, 88.61, -45.06)
+bezierCurveTo(91.64, -40.54, 95.03, -36.78, 95.03, -30)
+closePath()
+moveTo(88.25, -30)
+bezierCurveTo(88.25, -37.06, 100.23, -40.98, 103.27, -45.69)
+bezierCurveTo(106.3, -40.98, 108.48, -37.06, 108.48, -30)
+closePath()
+moveTo(108.13, -30)
+bezierCurveTo(108.13, -38.4, 116.82, -43.06, 119.85, -48.66)
+bezierCurveTo(122.89, -43.06, 128.35, -38.4, 128.35, -30)
+closePath()
+moveTo(121.69, -30)
+bezierCurveTo(121.69, -37.16, 125.61, -41.13, 128.64, -45.9)
+bezierCurveTo(131.67, -41.13, 141.91, -37.16, 141.91, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad2 = createLinearGradient(0, 0, 0, 18.4)
+grad2.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad2.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad2
+fillRect(0, 0, 140, 18.4)
+shadowBlur = 4
+globalAlpha = 0.393
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(93.04, -43.66, 1.94, 0, 6.28)
+fill()
+globalAlpha = 0.241
+shadowColor = #ffb300
+fillStyle = #ffb300
+beginPath()
+arc(57.05, -36.28, 2.14, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=3.7s phase=1.55 particleTime=3.7 node=220x120 selected particles=rainbow
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad3 = createLinearGradient(0, -30, 0, -57.5)
+grad3.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad3.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad3.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad3.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad3
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-1.81, -30)
+bezierCurveTo(-1.81, -37.5, 0.61, -41.66, 3.47, -46.66)
+bezierCurveTo(6.33, -41.66, 17.26, -37.5, 17.26, -30)
+closePath()
+moveTo(12.16, -30)
+bezierCurveTo(12.16, -38.28, 18.34, -42.89, 21.2, -48.41)
+bezierCurveTo(24.06, -42.89, 31.23, -38.28, 31.23, -30)
+closePath()
+moveTo(25.6, -30)
+bezierCurveTo(25.6, -37.58, 35.99, -41.79, 38.85, -46.84)
+bezierCurveTo(41.71, -41.79, 44.66, -37.58, 44.66, -30)
+closePath()
+moveTo(42.57, -30)
+bezierCurveTo(42.57, -37.91, 53.76, -42.3, 56.62, -47.57)
+bezierCurveTo(59.48, -42.3, 61.64, -37.91, 61.64, -30)
+closePath()
+moveTo(57.51, -30)
+bezierCurveTo(57.51, -39.21, 65.33, -44.33, 68.19, -50.47)
+bezierCurveTo(71.05, -44.33, 76.57, -39.21, 76.57, -30)
+closePath()
+moveTo(70.54, -30)
+bezierCurveTo(70.54, -36.45, 73.94, -40.03, 76.8, -44.33)
+bezierCurveTo(79.66, -40.03, 89.6, -36.45, 89.6, -30)
+closePath()
+moveTo(83.21, -30)
+bezierCurveTo(83.21, -35.44, 85.2, -38.46, 88.06, -42.08)
+bezierCurveTo(90.92, -38.46, 102.28, -35.44, 102.28, -30)
+closePath()
+moveTo(101.95, -30)
+bezierCurveTo(101.95, -39.09, 106.83, -44.13, 109.69, -50.19)
+bezierCurveTo(112.55, -44.13, 121.02, -39.09, 121.02, -30)
+closePath()
+moveTo(114.74, -30)
+bezierCurveTo(114.74, -39.83, 124.15, -45.29, 127.01, -51.85)
+bezierCurveTo(129.87, -45.29, 133.8, -39.83, 133.8, -30)
+closePath()
+moveTo(130.51, -30)
+bezierCurveTo(130.51, -37.27, 141.95, -41.31, 144.81, -46.16)
+bezierCurveTo(147.67, -41.31, 149.58, -37.27, 149.58, -30)
+closePath()
+moveTo(142.08, -30)
+bezierCurveTo(142.08, -36.28, 151.15, -39.77, 154.01, -43.95)
+bezierCurveTo(156.87, -39.77, 161.14, -36.28, 161.14, -30)
+closePath()
+moveTo(158.15, -30)
+bezierCurveTo(158.15, -40.12, 162.65, -45.74, 165.51, -52.48)
+bezierCurveTo(168.37, -45.74, 177.21, -40.12, 177.21, -30)
+closePath()
+moveTo(174.37, -30)
+bezierCurveTo(174.37, -37.12, 176.3, -41.08, 179.16, -45.82)
+bezierCurveTo(182.02, -41.08, 193.44, -37.12, 193.44, -30)
+closePath()
+moveTo(188.53, -30)
+bezierCurveTo(188.53, -36.35, 192.25, -39.88, 195.11, -44.12)
+bezierCurveTo(197.97, -39.88, 207.6, -36.35, 207.6, -30)
+closePath()
+moveTo(202.57, -30)
+bezierCurveTo(202.57, -36.25, 210.79, -39.73, 213.65, -43.89)
+bezierCurveTo(216.51, -39.73, 221.63, -36.25, 221.63, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad4 = createLinearGradient(0, 0, 0, 48)
+grad4.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad4.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad4
+fillRect(0, 0, 220, 48)
+shadowBlur = 4
+globalAlpha = 0.008
+shadowColor = #86eff9
+fillStyle = #86eff9
+beginPath()
+arc(145.12, -78.31, 1.02, 0, 6.28)
+fill()
+globalAlpha = 0.09
+shadowColor = #86b6f9
+fillStyle = #86b6f9
+beginPath()
+arc(94, -70.93, 1.22, 0, 6.28)
+fill()
+globalAlpha = 0.347
+shadowColor = #8f86f9
+fillStyle = #8f86f9
+beginPath()
+arc(24.26, -47.8, 1.83, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=2 shadowBlurSets=6 path2d=0
+# t=6.1s phase=2.56 particleTime=6.1 node=320x260 particles=complementary
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad5 = createLinearGradient(0, -30, 0, -57.5)
+grad5.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad5.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad5.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad5.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad5
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-1.88, -30)
+bezierCurveTo(-1.88, -37.61, 8.88, -41.85, 11.86, -46.92)
+bezierCurveTo(14.83, -41.85, 17.93, -37.61, 17.93, -30)
+closePath()
+moveTo(12.64, -30)
+bezierCurveTo(12.64, -39.69, 19, -45.07, 21.97, -51.52)
+bezierCurveTo(24.94, -45.07, 32.44, -39.69, 32.44, -30)
+closePath()
+moveTo(26.59, -30)
+bezierCurveTo(26.59, -37.44, 29.08, -41.57, 32.05, -46.53)
+bezierCurveTo(35.02, -41.57, 46.4, -37.44, 46.4, -30)
+closePath()
+moveTo(44.23, -30)
+bezierCurveTo(44.23, -35.7, 46.93, -38.86, 49.9, -42.66)
+bezierCurveTo(52.87, -38.86, 64.04, -35.7, 64.04, -30)
+closePath()
+moveTo(59.75, -30)
+bezierCurveTo(59.75, -38.22, 66.55, -42.79, 69.52, -48.27)
+bezierCurveTo(72.49, -42.79, 79.56, -38.22, 79.56, -30)
+closePath()
+moveTo(73.28, -30)
+bezierCurveTo(73.28, -38.07, 84.31, -42.55, 87.28, -47.94)
+bezierCurveTo(90.26, -42.55, 93.09, -38.07, 93.09, -30)
+closePath()
+moveTo(86.45, -30)
+bezierCurveTo(86.45, -36.27, 97.94, -39.75, 100.91, -43.93)
+bezierCurveTo(103.88, -39.75, 106.26, -36.27, 106.26, -30)
+closePath()
+moveTo(105.92, -30)
+bezierCurveTo(105.92, -38.73, 113.68, -43.59, 116.65, -49.41)
+bezierCurveTo(119.62, -43.59, 125.73, -38.73, 125.73, -30)
+closePath()
+moveTo(119.21, -30)
+bezierCurveTo(119.21, -40.56, 122.48, -46.42, 125.45, -53.46)
+bezierCurveTo(128.42, -46.42, 139.02, -40.56, 139.02, -30)
+closePath()
+moveTo(135.6, -30)
+bezierCurveTo(135.6, -37.73, 137.75, -42.03, 140.72, -47.19)
+bezierCurveTo(143.69, -42.03, 155.41, -37.73, 155.41, -30)
+closePath()
+moveTo(147.61, -30)
+bezierCurveTo(147.61, -34.78, 153.04, -37.44, 156.01, -40.62)
+bezierCurveTo(158.98, -37.44, 167.42, -34.78, 167.42, -30)
+closePath()
+moveTo(164.31, -30)
+bezierCurveTo(164.31, -38.17, 174.4, -42.71, 177.37, -48.15)
+bezierCurveTo(180.34, -42.71, 184.12, -38.17, 184.12, -30)
+closePath()
+moveTo(181.17, -30)
+bezierCurveTo(181.17, -38.41, 193.02, -43.09, 195.99, -48.7)
+bezierCurveTo(198.96, -43.09, 200.98, -38.41, 200.98, -30)
+closePath()
+moveTo(195.88, -30)
+bezierCurveTo(195.88, -38.31, 204.97, -42.92, 207.94, -48.46)
+bezierCurveTo(210.91, -42.92, 215.69, -38.31, 215.69, -30)
+closePath()
+moveTo(210.46, -30)
+bezierCurveTo(210.46, -36.08, 214.81, -39.46, 217.78, -43.51)
+bezierCurveTo(220.75, -39.46, 230.27, -36.08, 230.27, -30)
+closePath()
+moveTo(225.85, -30)
+bezierCurveTo(225.85, -38.46, 227.83, -43.16, 230.8, -48.8)
+bezierCurveTo(233.77, -43.16, 245.66, -38.46, 245.66, -30)
+closePath()
+moveTo(239.76, -30)
+bezierCurveTo(239.76, -39.25, 243.93, -44.39, 246.9, -50.56)
+bezierCurveTo(249.87, -44.39, 259.57, -39.25, 259.57, -30)
+closePath()
+moveTo(258.97, -30)
+bezierCurveTo(258.97, -36.44, 267.86, -40.02, 270.83, -44.32)
+bezierCurveTo(273.8, -40.02, 278.77, -36.44, 278.77, -30)
+closePath()
+moveTo(273.05, -30)
+bezierCurveTo(273.05, -36.19, 284.87, -39.62, 287.84, -43.75)
+bezierCurveTo(290.81, -39.62, 292.86, -36.19, 292.86, -30)
+closePath()
+moveTo(286.55, -30)
+bezierCurveTo(286.55, -38.33, 296.81, -42.95, 299.78, -48.5)
+bezierCurveTo(302.75, -42.95, 306.36, -38.33, 306.36, -30)
+closePath()
+moveTo(302.79, -30)
+bezierCurveTo(302.79, -37.37, 308.42, -41.47, 311.39, -46.38)
+bezierCurveTo(314.36, -41.47, 322.6, -37.37, 322.6, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad6 = createLinearGradient(0, 0, 0, 104)
+grad6.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad6.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad6
+fillRect(0, 0, 320, 104)
+shadowBlur = 4
+globalAlpha = 0.088
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(207.01, -71.11, 1.21, 0, 6.28)
+fill()
+globalAlpha = 0.17
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(126.98, -63.73, 1.41, 0, 6.28)
+fill()
+globalAlpha = 0.427
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(32.69, -40.6, 2.02, 0, 6.28)
+fill()
+globalAlpha = 0.354
+shadowColor = #004cff
+fillStyle = #004cff
+beginPath()
+arc(234.01, -47.11, 1.85, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=8.3s phase=3.48 particleTime=8.3 node=400x80 hover particles=energy
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad7 = createLinearGradient(0, -30, 0, -57.5)
+grad7.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad7.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad7.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad7.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad7
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-2.06, -30)
+bezierCurveTo(-2.06, -36.25, 1.13, -39.72, 4.38, -43.89)
+bezierCurveTo(7.63, -39.72, 19.61, -36.25, 19.61, -30)
+closePath()
+moveTo(13.82, -30)
+bezierCurveTo(13.82, -38.24, 21.69, -42.82, 24.94, -48.32)
+bezierCurveTo(28.19, -42.82, 35.49, -38.24, 35.49, -30)
+closePath()
+moveTo(29.09, -30)
+bezierCurveTo(29.09, -38.43, 41.38, -43.11, 44.63, -48.73)
+bezierCurveTo(47.88, -43.11, 50.75, -38.43, 50.75, -30)
+closePath()
+moveTo(48.38, -30)
+bezierCurveTo(48.38, -35.85, 60.76, -39.1, 64.01, -43)
+bezierCurveTo(67.26, -39.1, 70.04, -35.85, 70.04, -30)
+closePath()
+moveTo(65.35, -30)
+bezierCurveTo(65.35, -36.88, 73.41, -40.7, 76.66, -45.29)
+bezierCurveTo(79.91, -40.7, 87.01, -36.88, 87.01, -30)
+closePath()
+moveTo(80.15, -30)
+bezierCurveTo(80.15, -38.89, 83.45, -43.83, 86.7, -49.76)
+bezierCurveTo(89.95, -43.83, 101.82, -38.89, 101.82, -30)
+closePath()
+moveTo(94.56, -30)
+bezierCurveTo(94.56, -38.18, 97.04, -42.72, 100.29, -48.17)
+bezierCurveTo(103.54, -42.72, 116.22, -38.18, 116.22, -30)
+closePath()
+moveTo(115.85, -30)
+bezierCurveTo(115.85, -37.98, 122.2, -42.42, 125.45, -47.74)
+bezierCurveTo(128.7, -42.42, 137.52, -37.98, 137.52, -30)
+closePath()
+moveTo(130.38, -30)
+bezierCurveTo(130.38, -38.11, 141.74, -42.61, 144.99, -48.01)
+bezierCurveTo(148.24, -42.61, 152.05, -38.11, 152.05, -30)
+closePath()
+moveTo(148.31, -30)
+bezierCurveTo(148.31, -38, 161.2, -42.45, 164.45, -47.79)
+bezierCurveTo(167.7, -42.45, 169.98, -38, 169.98, -30)
+closePath()
+moveTo(161.45, -30)
+bezierCurveTo(161.45, -35.69, 171, -38.86, 174.25, -42.65)
+bezierCurveTo(177.5, -38.86, 183.12, -35.69, 183.12, -30)
+closePath()
+moveTo(179.71, -30)
+bezierCurveTo(179.71, -37.23, 184.11, -41.24, 187.36, -46.06)
+bezierCurveTo(190.61, -41.24, 201.38, -37.23, 201.38, -30)
+closePath()
+moveTo(198.15, -30)
+bezierCurveTo(198.15, -38.16, 200.33, -42.7, 203.58, -48.14)
+bezierCurveTo(206.83, -42.7, 219.82, -38.16, 219.82, -30)
+closePath()
+moveTo(214.24, -30)
+bezierCurveTo(214.24, -40.45, 219.17, -46.25, 222.42, -53.22)
+bezierCurveTo(225.67, -46.25, 235.91, -40.45, 235.91, -30)
+closePath()
+moveTo(230.19, -30)
+bezierCurveTo(230.19, -36.42, 240.31, -39.99, 243.56, -44.27)
+bezierCurveTo(246.81, -39.99, 251.86, -36.42, 251.86, -30)
+closePath()
+moveTo(247.02, -30)
+bezierCurveTo(247.02, -36.27, 260, -39.76, 263.25, -43.94)
+bezierCurveTo(266.5, -39.76, 268.69, -36.27, 268.69, -30)
+closePath()
+moveTo(262.24, -30)
+bezierCurveTo(262.24, -38.38, 273.12, -43.04, 276.37, -48.63)
+bezierCurveTo(279.62, -43.04, 283.9, -38.38, 283.9, -30)
+closePath()
+moveTo(283.24, -30)
+bezierCurveTo(283.24, -38.05, 288.99, -42.52, 292.24, -47.89)
+bezierCurveTo(295.49, -42.52, 304.91, -38.05, 304.91, -30)
+closePath()
+moveTo(298.65, -30)
+bezierCurveTo(298.65, -36.36, 300.95, -39.89, 304.2, -44.13)
+bezierCurveTo(307.45, -39.89, 320.32, -36.36, 320.32, -30)
+closePath()
+moveTo(313.42, -30)
+bezierCurveTo(313.42, -37.42, 317.13, -41.55, 320.38, -46.5)
+bezierCurveTo(323.63, -41.55, 335.08, -37.42, 335.08, -30)
+closePath()
+moveTo(331.17, -30)
+bezierCurveTo(331.17, -38.38, 339.85, -43.03, 343.1, -48.61)
+bezierCurveTo(346.35, -43.03, 352.84, -38.38, 352.84, -30)
+closePath()
+moveTo(348.21, -30)
+bezierCurveTo(348.21, -40.43, 360.85, -46.22, 364.1, -53.17)
+bezierCurveTo(367.35, -46.22, 369.88, -40.43, 369.88, -30)
+closePath()
+moveTo(360.88, -30)
+bezierCurveTo(360.88, -37.27, 372.83, -41.31, 376.08, -46.15)
+bezierCurveTo(379.33, -41.31, 382.55, -37.27, 382.55, -30)
+closePath()
+moveTo(383.87, -30)
+bezierCurveTo(383.87, -36.84, 391.12, -40.64, 394.37, -45.2)
+bezierCurveTo(397.62, -40.64, 405.54, -36.84, 405.54, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad8 = createLinearGradient(0, 0, 0, 32)
+grad8.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad8.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad8
+fillRect(0, 0, 400, 32)
+shadowBlur = 4
+globalAlpha = 0.203
+shadowColor = #99f986
+fillStyle = #99f986
+beginPath()
+arc(267.34, -60.76, 1.49, 0, 6.28)
+fill()
+globalAlpha = 0.285
+shadowColor = #86f999
+fillStyle = #86f999
+beginPath()
+arc(164.79, -53.38, 1.68, 0, 6.28)
+fill()
+globalAlpha = 0.042
+shadowColor = #86f9bf
+fillStyle = #86f9bf
+beginPath()
+arc(38.92, -75.25, 1.1, 0, 6.28)
+fill()
+globalAlpha = 0.288
+shadowColor = #86f9e6
+fillStyle = #86f9e6
+beginPath()
+arc(290.58, -36.76, 2.13, 0, 6.28)
+fill()
+globalAlpha = 0.448
+shadowColor = #86e5f9
+fillStyle = #86e5f9
+beginPath()
+arc(175.21, -38.67, 2.08, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 7.5
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 400, 80)
+restore()
+restore()
+# gradients=2 shadowBlurSets=6 path2d=0
+# t=10.9s phase=4.57 particleTime=10.9 node=140x46 particles=quantum
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad9 = createLinearGradient(0, -30, 0, -57.5)
+grad9.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad9.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad9.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad9.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad9
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-1.92, -30)
+bezierCurveTo(-1.92, -35.27, 7.35, -38.2, 10.38, -41.72)
+bezierCurveTo(13.41, -38.2, 18.3, -35.27, 18.3, -30)
+closePath()
+moveTo(12.9, -30)
+bezierCurveTo(12.9, -36.73, 17.32, -40.47, 20.36, -44.95)
+bezierCurveTo(23.39, -40.47, 33.12, -36.73, 33.12, -30)
+closePath()
+moveTo(27.15, -30)
+bezierCurveTo(27.15, -39.12, 29.17, -44.18, 32.2, -50.26)
+bezierCurveTo(35.24, -44.18, 47.37, -39.12, 47.37, -30)
+closePath()
+moveTo(45.15, -30)
+bezierCurveTo(45.15, -37.96, 49.42, -42.39, 52.45, -47.7)
+bezierCurveTo(55.48, -42.39, 65.37, -37.96, 65.37, -30)
+closePath()
+moveTo(60.99, -30)
+bezierCurveTo(60.99, -37.75, 70.09, -42.06, 73.12, -47.23)
+bezierCurveTo(76.15, -42.06, 81.21, -37.75, 81.21, -30)
+closePath()
+moveTo(74.81, -30)
+bezierCurveTo(74.81, -37.96, 86.88, -42.39, 89.91, -47.7)
+bezierCurveTo(92.95, -42.39, 95.03, -37.96, 95.03, -30)
+closePath()
+moveTo(88.25, -30)
+bezierCurveTo(88.25, -37.56, 98.71, -41.76, 101.74, -46.8)
+bezierCurveTo(104.77, -41.76, 108.48, -37.56, 108.48, -30)
+closePath()
+moveTo(108.13, -30)
+bezierCurveTo(108.13, -37.31, 113.86, -41.38, 116.9, -46.25)
+bezierCurveTo(119.93, -41.38, 128.35, -37.31, 128.35, -30)
+closePath()
+moveTo(121.69, -30)
+bezierCurveTo(121.69, -36.79, 123.94, -40.56, 126.97, -45.08)
+bezierCurveTo(130.01, -40.56, 141.91, -36.79, 141.91, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad10 = createLinearGradient(0, 0, 0, 18.4)
+grad10.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad10.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad10
+fillRect(0, 0, 140, 18.4)
+shadowBlur = 4
+globalAlpha = 0.248
+shadowColor = #cd0b3e
+fillStyle = #cd0b3e
+beginPath()
+arc(91.37, -56.71, 1.59, 0, 6.28)
+fill()
+globalAlpha = 0.33
+shadowColor = #cd0b25
+fillStyle = #cd0b25
+beginPath()
+arc(58.45, -49.33, 1.79, 0, 6.28)
+fill()
+restore()
+# gradients=2 shadowBlurSets=5 path2d=0
+# t=13.4s phase=5.61 particleTime=13.4 node=220x120 selected particles=aurora
+save()
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowColor = rgba(0, 0, 0, 0)
+shadowBlur = 0
+shadowOffsetY = 0
+shadowOffsetX = 0
+lineCap = butt
+lineJoin = miter
+globalAlpha = 1
+grad11 = createLinearGradient(0, -30, 0, -57.5)
+grad11.addColorStop(0, rgba(157, 0, 255, 0.95))
+grad11.addColorStop(0.35, rgba(255, 179, 0, 0.85))
+grad11.addColorStop(0.75, rgba(251, 0, 255, 0.5))
+grad11.addColorStop(1, rgba(251, 0, 255, 0))
+fillStyle = grad11
+shadowColor = #ffb300
+shadowBlur = 7.5
+globalAlpha = 1
+beginPath()
+moveTo(-1.81, -30)
+bezierCurveTo(-1.81, -37.02, 4.44, -40.92, 7.3, -45.6)
+bezierCurveTo(10.16, -40.92, 17.26, -37.02, 17.26, -30)
+closePath()
+moveTo(12.16, -30)
+bezierCurveTo(12.16, -37.46, 22.6, -41.6, 25.46, -46.57)
+bezierCurveTo(28.32, -41.6, 31.23, -37.46, 31.23, -30)
+closePath()
+moveTo(25.6, -30)
+bezierCurveTo(25.6, -38.83, 36.76, -43.73, 39.62, -49.61)
+bezierCurveTo(42.48, -43.73, 44.66, -38.83, 44.66, -30)
+closePath()
+moveTo(42.57, -30)
+bezierCurveTo(42.57, -38.25, 50.34, -42.84, 53.2, -48.34)
+bezierCurveTo(56.06, -42.84, 61.64, -38.25, 61.64, -30)
+closePath()
+moveTo(57.51, -30)
+bezierCurveTo(57.51, -37.2, 60.86, -41.2, 63.72, -46)
+bezierCurveTo(66.58, -41.2, 76.57, -37.2, 76.57, -30)
+closePath()
+moveTo(70.54, -30)
+bezierCurveTo(70.54, -35.93, 72.54, -39.23, 75.4, -43.19)
+bezierCurveTo(78.26, -39.23, 89.6, -35.93, 89.6, -30)
+closePath()
+moveTo(83.21, -30)
+bezierCurveTo(83.21, -37.09, 88.15, -41.02, 91.01, -45.74)
+bezierCurveTo(93.87, -41.02, 102.28, -37.09, 102.28, -30)
+closePath()
+moveTo(101.95, -30)
+bezierCurveTo(101.95, -39.56, 111.42, -44.87, 114.28, -51.25)
+bezierCurveTo(117.14, -44.87, 121.02, -39.56, 121.02, -30)
+closePath()
+moveTo(114.74, -30)
+bezierCurveTo(114.74, -38.4, 126.17, -43.06, 129.03, -48.66)
+bezierCurveTo(131.89, -43.06, 133.8, -38.4, 133.8, -30)
+closePath()
+moveTo(130.51, -30)
+bezierCurveTo(130.51, -37.6, 139.53, -41.82, 142.39, -46.89)
+bezierCurveTo(145.25, -41.82, 149.58, -37.6, 149.58, -30)
+closePath()
+moveTo(142.08, -30)
+bezierCurveTo(142.08, -37.13, 146.53, -41.1, 149.39, -45.85)
+bezierCurveTo(152.25, -41.1, 161.14, -37.13, 161.14, -30)
+closePath()
+moveTo(158.15, -30)
+bezierCurveTo(158.15, -38.71, 160.07, -43.55, 162.93, -49.36)
+bezierCurveTo(165.79, -43.55, 177.21, -38.71, 177.21, -30)
+closePath()
+moveTo(174.37, -30)
+bezierCurveTo(174.37, -35.75, 178.14, -38.95, 181, -42.79)
+bezierCurveTo(183.86, -38.95, 193.44, -35.75, 193.44, -30)
+closePath()
+moveTo(188.53, -30)
+bezierCurveTo(188.53, -37.88, 196.82, -42.25, 199.68, -47.5)
+bezierCurveTo(202.54, -42.25, 207.6, -37.88, 207.6, -30)
+closePath()
+moveTo(202.57, -30)
+bezierCurveTo(202.57, -37.42, 213.88, -41.54, 216.74, -46.48)
+bezierCurveTo(219.6, -41.54, 221.63, -37.42, 221.63, -30)
+closePath()
+fill()
+shadowBlur = 0
+grad12 = createLinearGradient(0, 0, 0, 48)
+grad12.addColorStop(0, rgba(255, 179, 0, 0.22))
+grad12.addColorStop(1, rgba(255, 179, 0, 0))
+fillStyle = grad12
+fillRect(0, 0, 220, 48)
+shadowBlur = 4
+globalAlpha = 0.31
+shadowColor = #59f879
+fillStyle = #59f879
+beginPath()
+arc(143.46, -51.09, 1.74, 0, 6.28)
+fill()
+globalAlpha = 0.392
+shadowColor = #59f899
+fillStyle = #59f899
+beginPath()
+arc(88.57, -43.71, 1.94, 0, 6.28)
+fill()
+globalAlpha = 0.149
+shadowColor = #59f8b9
+fillStyle = #59f8b9
+beginPath()
+arc(21.14, -65.58, 1.36, 0, 6.28)
+fill()
+save()
+shadowColor = rgba(0, 255, 21, 0.5)
+shadowBlur = 11.25
+strokeStyle = rgba(0, 255, 21, 0.7)
+lineWidth = 2
+globalAlpha = 1
+strokeRect(0, 0, 220, 120)
+restore()
+restore()
+# gradients=2 shadowBlurSets=6 path2d=0

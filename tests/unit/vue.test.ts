@@ -347,6 +347,18 @@ describe('node effects in Nodes 2.0', () => {
         expect(marks(el)).toEqual({ fx: 'aurora', sel: '' });
     });
 
+    it("flickers Ember Crown's glow up from the title once every 1.6 s, in its own colours", async () => {
+        await start({ '📦 Enhanced Nodes.Animate': 9 }, CHAIN);
+        LiteGraph.vueNodesMode = true;
+        const [el] = mountNodes(mountPane(), 1);
+        frames(1);
+        expect(marks(el)).toEqual({ fx: 'ember' });
+        const css = sheets()[0].textContent!;
+        expect(css).toContain('.lg-node[data-eln-fx=ember]{--eln-c1:#ff7a1a;--eln-c2:#ff3d00;--eln-c3:#ffd166}');
+        expect(css).toMatch(/\.lg-node\[data-eln-fx=ember\]::after\{[^}]*animation:eln-flicker calc\(1\.60s \* var\(--eln-slow, 1\)\) ease-in-out infinite\}/);
+        expect(css).toContain('@keyframes eln-flicker{50%{opacity:calc(var(--eln-a) * 0.7)}}');
+    });
+
     it('bounces a jelly node once as it is selected, alike both ways about its middle where the canvas puts it, and shapes nothing on the canvas', async () => {
         const canvas = await start({ '📦 Enhanced Nodes.Animate': 6 }, CHAIN);
         LiteGraph.vueNodesMode = true;

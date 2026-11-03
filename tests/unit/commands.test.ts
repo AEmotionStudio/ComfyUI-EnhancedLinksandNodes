@@ -166,7 +166,7 @@ describe('the commands', () => {
     });
 
     it('NextLinkStyle and NextNodeStyle step Animate through its options in the panel’s order, the last on to the first, one POST each', async () => {
-        await start({ '📦 Enhanced Nodes.Animate': 8 });
+        await start({ '📦 Enhanced Nodes.Animate': 9 });
         const step = async (name: string) => {
             await run(name);
             await settle();
@@ -352,12 +352,12 @@ describe('the commands', () => {
         // The selected nodes only.
         expect([said(), first.properties, second.properties, other.properties]).toEqual(['2 nodes: Off', { enhanced_fx_style: 0 }, { enhanced_fx_style: 0 }, {}]);
         const steps: string[] = [];
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < 10; i++) {
             await run('SelectionNodeFX');
             steps.push(said()!);
         }
-        expect(steps).toEqual(['2 nodes: Gentle Pulse', '2 nodes: Neon Nexus', '2 nodes: Cosmic Ripple', '2 nodes: Sacred Rosette', '2 nodes: Flower of Life', '2 nodes: Jelly', '2 nodes: Circuit Trace', '2 nodes: Aurora Veil', '2 nodes: Use global (Neon Nexus)']);
-        expect([first.properties, second.properties, other.properties, changes(canvas)]).toEqual([{}, {}, {}, 10]);
+        expect(steps).toEqual(['2 nodes: Gentle Pulse', '2 nodes: Neon Nexus', '2 nodes: Cosmic Ripple', '2 nodes: Sacred Rosette', '2 nodes: Flower of Life', '2 nodes: Jelly', '2 nodes: Circuit Trace', '2 nodes: Aurora Veil', '2 nodes: Ember Crown', '2 nodes: Use global (Neon Nexus)']);
+        expect([first.properties, second.properties, other.properties, changes(canvas)]).toEqual([{}, {}, {}, 11]);
 
         first.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true };
         await run('SelectionNodeFX');

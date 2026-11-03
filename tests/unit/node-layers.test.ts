@@ -59,7 +59,7 @@ const TITLES = { '📦 Enhanced Nodes.Text.Animation.Enabled': true };
 const KSAMPLER: GraphSpec['nodes'][number] = { pos: [300, 300], size: [220, 120], title: 'KSampler' };
 
 /** Each node effect by its Animate value, and the particles of a node without one. */
-const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Circuit Trace', 7], ['Aurora Veil', 8], ['Particles alone', 0]];
+const EFFECTS: [name: string, animate: number][] = [['Gentle Pulse', 1], ['Neon Nexus', 2], ['Cosmic Ripple', 3], ['Sacred Rosette', 4], ['Flower of Life', 5], ['Jelly', 6], ['Circuit Trace', 7], ['Aurora Veil', 8], ['Ember Crown', 9], ['Particles alone', 0]];
 
 /** One frame on the front canvas: its lines, and the effect calls it made, with their lines' indexes among those. */
 function frame(canvas: FakeCanvas) {
@@ -174,15 +174,15 @@ describe('node effects', () => {
                 // A gradient's label counts the gradients made before it, which a part makes fewer of.
                 return rec.paints.map((p) => JSON.stringify({ ...p, style: p.style.replace(/^grad\d+$/, 'gradient') }));
             };
-            if (animate === 4 || animate === 5 || animate === 7) {
+            if (animate === 4 || animate === 5 || animate === 7 || animate === 9) {
                 // Sacred Rosette strokes its chords, and each layer's circles of a colour, as one path, Flower of Life
-                // its circles and its rings, and Circuit Trace its pins, traces and pulses: the parts draw the pieces of
-                // those paths that reach them.
+                // its circles and its rings, Circuit Trace its pins, traces and pulses, and Ember Crown fills its
+                // flames: the parts draw the pieces of those paths that reach them.
                 const pieces = (sides: number) => {
                     const rec = new CanvasRecorder();
                     const part = { sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 };
                     drawNodeFx(rec.ctx, animate, node, 220, 120, clock, sides === (UNDER | OVER) ? WHOLE : part, 1, false);
-                    return new Set(rec.lines.filter((line) => /^(arc|lineTo)\(/.test(line)));
+                    return new Set(rec.lines.filter((line) => /^(arc|lineTo|bezierCurveTo)\(/.test(line)));
                 };
                 const [whole, under, over] = [UNDER | OVER, UNDER, OVER].map(pieces);
                 for (const piece of [...under, ...over]) expect(whole.has(piece), `${name}: ${piece}`).toBe(true);
@@ -607,11 +607,11 @@ describe('the node menu', () => {
         const items = menu(node);
         // Go to connected node comes third (tests/unit/navigation.test.ts).
         expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
-        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, 'Particles only']);
+        expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', 'Ember Crown', null, 'Particles only']);
         expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
         node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
-        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, '✓ Particles only']);
+        expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', 'Ember Crown', null, '✓ Particles only']);
         expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
@@ -644,7 +644,7 @@ describe('the node menu', () => {
         pick(first, 'Node FX (2 selected)', 'Particles only');
         expect([first.properties, second.properties, other.properties]).toEqual([{ enhanced_fx_style: 3, enhanced_fx_particles_only: true }, { enhanced_fx_style: 3, enhanced_fx_particles_only: true }, {}]);
         expect(canvas.calls.filter((call) => call.startsWith('emit'))).toEqual(Array(2).fill(['emitBeforeChange', 'emitAfterChange']).flat());
-        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', null, '✓ Particles only']);
+        expect(labels(menu(second)[0])).toEqual(['Use global (Off)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', 'Ember Crown', null, '✓ Particles only']);
         // Completion FX is the node's own, and a node outside the selection gets a menu of its own.
         completion.submenu!.options.find((option) => option?.content === 'Exclude')!.callback!();
         expect([first.properties.enhanced_fx_completion, second.properties.enhanced_fx_completion]).toEqual(['exclude', undefined]);
@@ -978,5 +978,61 @@ describe('Aurora Veil', () => {
     it('draws nothing round the body', async () => {
         const under = await drawn(1, { [PARTICLE_SHOW]: true, '📦 Enhanced Nodes.Selection.Glow': false }, { sides: UNDER, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 });
         expect(under.paints).toEqual([]);
+    });
+});
+
+describe('Ember Crown', () => {
+    const EMBER = 9;
+    /** The node clock `t` s in at speed 1. */
+    const at = (t: number) => ({ nodePhase: ((2 * Math.PI) / 15) * t, particleTime: t, nodeTime: t });
+    /** What Ember Crown draws on a 220 × 120 node, `t` s in: whole, or one side of its edge. */
+    async function drawn(t: number, settings: Record<string, unknown> = {}, part: Part = WHOLE) {
+        await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': EMBER, ...settings }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, EMBER, { id: 1, title: 'KSampler', size: [220, 120] }, 220, 120, at(t), part, 1, false);
+        return rec;
+    }
+    /** Its flames: each one's root, from moveTo(), and its tip, where its first curve ends. */
+    const flames = (rec: CanvasRecorder) => {
+        const out: { root: number; tipX: number; tipY: number }[] = [];
+        for (let i = 0; i < rec.lines.length; i++) {
+            const m = /^moveTo\(([^,]+), -30\)$/.exec(rec.lines[i]);
+            const c = /^bezierCurveTo\(.*, ([^,]+), ([^,)]+)\)$/.exec(rec.lines[i + 1] ?? '');
+            if (m && c) out.push({ root: Number(m[1]), tipX: Number(c[1]), tipY: Number(c[2]) });
+        }
+        return out;
+    };
+    const SHORT = { [PARTICLE_SHOW]: false };
+
+    it('stands a crown of flames on the top of the title bar, about one each 18 px at Balanced, closer at Rich, rising no more than 27.5 px', async () => {
+        // 220 / 18 × (0.6 + 0.2 × Quality).
+        expect(flames(await drawn(1, SHORT))).toHaveLength(12);
+        expect(flames(await drawn(1, { ...SHORT, '📦 Enhanced Nodes.Quality': 3 }))).toHaveLength(15);
+        expect(flames(await drawn(1, { ...SHORT, '📦 Enhanced Nodes.Quality': 1 }))).toHaveLength(10);
+        for (const f of flames(await drawn(1, SHORT))) {
+            expect(f.tipY).toBeLessThan(-30);
+            expect(f.tipY).toBeGreaterThanOrEqual(-30 - 27.5);
+        }
+    });
+
+    it('flickers and sways with the clock, holds still in one pose, and draws its flames round the body and its warmth on it', async () => {
+        expect(flames(await drawn(1.3, SHORT))).not.toEqual(flames(await drawn(1, SHORT)));
+        const still = async (t: number) => (await drawn(t, { '📦 Enhanced Nodes.Static.Mode': true, [PARTICLE_SHOW]: true })).trace();
+        expect(await still(9.7)).toBe(await still(0.3));
+        const side = (sides: number) => ({ sides, x0: 0, y0: -30, x1: 220, y1: 120, round: 8 });
+        const [under, over] = await Promise.all([drawn(1, SHORT, side(UNDER)), drawn(1, SHORT, side(OVER))]);
+        expect(flames(under)).toHaveLength(12);
+        expect(under.lines.some((line) => line.startsWith('fillRect('))).toBe(false);
+        expect(over.lines.filter((line) => line.startsWith('fillRect('))).toEqual(['fillRect(0, 0, 220, 48)']);
+    });
+
+    it('sends embers up from the flames, rising up to 45 px over the title bar and fading out as they go', async () => {
+        const embers = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && !p.style.startsWith('grad'));
+        const rec = await drawn(1, { [PARTICLE_SHOW]: true });
+        expect(embers(rec).length).toBeGreaterThan(0);
+        for (const e of embers(rec)) {
+            expect(e.box![3]).toBeLessThan(-30);
+            expect(e.box![1]).toBeGreaterThan(-30 - 4 - 45 - 2.2);
+        }
     });
 });

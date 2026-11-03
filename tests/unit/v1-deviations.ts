@@ -831,7 +831,7 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: 'Nothing flashes more than three times a second',
-        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, a DNA Helix 3D strand turns from back to front 1.25 times a second, and Stardust's motes twinkle 2.5 times a second. Circuit Trace lights each of its pads once a pulse, 1.25 times a second at speed 3, and Aurora Veil's rays shimmer at most 0.62 times a second.",
+        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, a DNA Helix 3D strand turns from back to front 1.25 times a second, and Stardust's motes twinkle 2.5 times a second. Circuit Trace lights each of its pads once a pulse, 1.25 times a second at speed 3, Aurora Veil's rays shimmer at most 0.62 times a second, and Ember Crown's flames flicker at most 1.6 times a second and each ember lights once a rise, 1.75 times a second at Particle.Speed 5.",
         async proof() {
             // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the glow it breathes or where it shakes its copies.
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Animation.Speed': 3 });
@@ -1055,6 +1055,19 @@ export const DEVIATIONS: Deviation[] = [
             for (let j = 0; j < 55; j++) {
                 const alphas = veil.map((frame) => frame[j]);
                 for (let second = 0; second < 2; second++) expect(swings(alphas.slice(second * 30, second * 30 + 31)) / 2).toBeLessThanOrEqual(3);
+            }
+            // Ember Crown at speed 3 and Particle.Speed 5, over two seconds at 30 Hz: how far its flames rise over the title
+            // bar, the top of their path, and how brightly its first ember glows.
+            const crown = Array.from({ length: 61 }, (_, i) => {
+                const t = i / 30;
+                const rec = nodeFx(9, { '📦 Enhanced Nodes.Animation.Speed': 3, '📦 Enhanced Nodes.Particle.Show': true, '📦 Enhanced Nodes.Particle.Speed': 5 }, { k: { nodePhase: TURN * 3 * t, particleTime: 5 * t, nodeTime: t } });
+                const flames = rec.paints.find((p) => p.op === 'fill' && p.shadowBlur > 0 && p.style.startsWith('grad'))!;
+                const ember = rec.paints.filter((p) => p.op === 'fill' && p.style === '#ffb300');
+                return [-30 - flames.box![1], ember[0]?.globalAlpha ?? 0];
+            });
+            for (const signal of [crown.map((c) => c[0]), crown.map((c) => c[1])]) {
+                expect(swings(signal)).toBeGreaterThan(0);
+                for (let second = 0; second < 2; second++) expect(swings(signal.slice(second * 30, second * 30 + 31)) / 2).toBeLessThanOrEqual(3);
             }
         },
     },
