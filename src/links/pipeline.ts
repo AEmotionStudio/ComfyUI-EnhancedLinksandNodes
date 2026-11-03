@@ -10,10 +10,11 @@
  * screen than Perf.StaticAbove, or a look with nothing that moves). Where many
  * glow, the bases go on a layer of their own, kept while nothing changes and
  * moved along as the view pans, so only what comes into view is drawn again;
- * while the view zooms, nodes are dragged or still links pan, they go without
- * their glow. What moves is drawn over the background in every front pass,
- * under the nodes, adding up where it crosses with Blend's additive glow on a
- * dark palette. A shape of our own takes the segment's hit data with it, so
+ * where the layer cannot move along, as the view zooms or nodes are dragged,
+ * they are drawn again in place, or with Perf.KeepGlow off go without their
+ * glow until it all keeps still. What moves is drawn over the background in
+ * every front pass, under the nodes, adding up where it crosses with Blend's
+ * additive glow on a dark palette. A shape of our own takes the segment's hit data with it, so
  * clicks and the link menu follow what is drawn. With Physics.Profile on, each
  * segment hangs as a wire (links/physics.ts) whatever its Link.Style's shape,
  * and everything is drawn along the wire: with Animation None, the body native
@@ -466,8 +467,9 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     pass.focus = focusIn();
     pass.tinted = (pass.focus === 'highlight' || pass.focus === 'dim' || pass.focus === 'hide') && !deferring();
     // A graph with many glowing links on screen draws them on the glow layer, which a pan moves along. While it is
-    // zoomed, has nodes dragged or wires swinging, or otherwise cannot pan the layer, the bases go plain, as they do
-    // while Perf.Adaptive draws glows plain. A pass drawn whole follows once the view and the graph keep still.
+    // zoomed, has nodes dragged or wires swinging, or otherwise cannot pan the layer, the bases are drawn in place, and
+    // with Perf.KeepGlow off go plain, as they do while Perf.Adaptive draws glows plain. A pass drawn on the layer
+    // follows once the view and the graph keep still.
     const { scale, offset } = canvas.ds;
     const moving = scale !== glows.scale || offset[0] !== glows.x || offset[1] !== glows.y || canvas.isDragging || live.wires > 0;
     glows.scale = scale;
@@ -484,7 +486,7 @@ function begin(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     pass.kept = pass.changed = false;
     if (busy && moving && !glows.due) {
         pass.layered = layered && pan(canvas, ctx, refocused);
-        pass.plain ||= !pass.layered;
+        pass.plain ||= !pass.layered && !L.perfKeepGlow;
         clearTimeout(glows.timer);
         glows.timer = window.setTimeout(settle, SETTLE_MS);
     } else {

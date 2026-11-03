@@ -221,6 +221,7 @@ All 96 settings are in ComfyUI's settings dialog under **Enhanced Links & Nodes*
 *   **Adaptive quality** (on by default): when frames run long, link glows go plain, then particles thin out, then effects hold still; they come back when there is room.
 *   **Freeze above N visible links** (400 by default) holds link motion still on crowded screens, and Nodes 2.0 glows above a quarter as many animated nodes.
 *   Glow is the biggest cost: lower **Link glow** and **Marker glow**, or turn the shadows off. Sacred Flow, DNA Helix, DNA Helix 3D and Lava Flow are the heaviest animations.
+*   **Keep link glow while moving** (on by default) redraws busy graphs' glows as you zoom or drag nodes; turn it off for smoother zooming on slower machines.
 *   The **Performance** look, **Freeze link animation**, or an **Effect frame-rate cap** of 30 fps.
 *   In Nodes 2.0, an effect on every node costs the most: give effects to a few nodes with **Node FX** instead.
 

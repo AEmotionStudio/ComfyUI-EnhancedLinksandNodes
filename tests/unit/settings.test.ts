@@ -148,6 +148,8 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Physics.Amount': 1,
     // M9e
     '🔗 Enhanced Links.Assist.Mode': 'off',
+    // M10a
+    '🔗 Enhanced Links.Perf.KeepGlow': true,
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -333,8 +335,8 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 55 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(55);
+    it('shows 56 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(56);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
@@ -343,7 +345,7 @@ describe('how the panel shows each setting', () => {
             '🔗 Enhanced Links.Enabled', '📦 Enhanced Nodes.Enabled',
             ...['Enabled', 'Mode', 'Color', 'Depth', 'OnTop', 'Hover', 'Dim'].map((key) => `🔗 Enhanced Links.Focus.${key}`),
             '🔗 Enhanced Links.Navigate.DoubleClick', '🔗 Enhanced Links.Navigate.Follow', '🔗 Enhanced Links.Flow.Trail.Fade', '📦 Enhanced Nodes.Completion.Anchor',
-            '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Perf.Adaptive', '🔗 Enhanced Links.Perf.StaticAbove', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
+            '🔗 Enhanced Links.Perf.MaxFps', '🔗 Enhanced Links.Perf.Adaptive', '🔗 Enhanced Links.Perf.KeepGlow', '🔗 Enhanced Links.Perf.StaticAbove', '🔗 Enhanced Links.Motion', '🔗 Enhanced Links.Coexist',
             LOOK, '🔗 Enhanced Links.Panel.State', '🔗 Enhanced Links.WhatsNew.Seen',
         ]);
     });
@@ -358,7 +360,7 @@ describe('how the panel shows each setting', () => {
             'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
             'L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Navigate.DoubleClick', 'L.Navigate.Follow',
             'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Error',
-            'N.End Animation.Enabled', 'N.Completion.Style', 'N.Completion.Anchor', 'N.Completion.PerNode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist',
+            'N.End Animation.Enabled', 'N.Completion.Style', 'N.Completion.Anchor', 'N.Completion.PerNode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.KeepGlow', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist',
         ]);
         showing({
             '🔗 Enhanced Links.Animate': 6, '🔗 Enhanced Links.Static.Mode': true, '🔗 Enhanced Links.Color.Mode': 'custom',
@@ -386,10 +388,10 @@ describe('how the panel shows each setting', () => {
         // Selection focus, navigation and what a run does to the effects work with the effects off; the run's own visuals need them.
         const focus = ['L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Focus.Dim', 'L.Navigate.DoubleClick', 'L.Navigate.Follow'];
         const during = ['L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render'];
-        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', ...focus, ...during, 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist']);
+        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', ...focus, ...during, 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.KeepGlow', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist']);
         preview('🔗 Enhanced Links.Focus.Enabled', false);
         preview('🔗 Enhanced Links.Pause.Mode', 'ignore');
-        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', 'L.Focus.Enabled', 'L.Navigate.DoubleClick', 'L.Navigate.Follow', 'L.Pause.Mode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist']);
+        expect(visible()).toEqual(['L.Enabled', 'N.Enabled', 'L.Focus.Enabled', 'L.Navigate.DoubleClick', 'L.Navigate.Follow', 'L.Pause.Mode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.KeepGlow', 'L.Perf.StaticAbove', 'L.Motion', 'L.Coexist']);
     });
 
     it('points the title and particle colours at Custom node colours, which they need, until it is set', () => {

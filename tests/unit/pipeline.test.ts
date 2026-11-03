@@ -734,9 +734,12 @@ describe('a graph with many glowing links on screen', () => {
         return bake(canvas);
     }
 
-    /** A canvas for `spec` whose last background pass drew its glows, whatever the tests before it left the view at. */
+    /**
+     * A canvas for `spec` whose last background pass drew its glows, whatever the tests before it left the view at. With
+     * Perf.KeepGlow off unless `settings` say otherwise, so that what cannot move the layer along shows as plain bases.
+     */
     async function settled(spec: GraphSpec, settings = {}): Promise<FakeCanvas> {
-        const canvas = await start(settings, spec);
+        const canvas = await start({ '🔗 Enhanced Links.Perf.KeepGlow': false, ...settings }, spec);
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
         bake(canvas);
         vi.advanceTimersByTime(150);
@@ -815,6 +818,17 @@ describe('a graph with many glowing links on screen', () => {
         expect(bake(canvas), 'let go').toEqual(expect.objectContaining({ back: [], layer: [] }));
         vi.advanceTimersByTime(1000);
         expect(canvas.dirty_bgcanvas).toBe(false);
+    });
+
+    it('keeps the glows with Perf.KeepGlow, drawing the bases again in place where the layer cannot move along', async () => {
+        const canvas = await settled(rows(13, -200), { '🔗 Enhanced Links.Perf.KeepGlow': true });
+        for (const [i, move] of [() => { canvas.ds.offset = [0.5, 0]; }, () => { canvas.ds.scale = 0.9; }, () => { canvas.isDragging = true; }].entries()) {
+            move();
+            expect(bake(canvas), `move ${i}`).toEqual(expect.objectContaining({ back: GLOWING, layer: [] }));
+        }
+        canvas.isDragging = false;
+        vi.advanceTimersByTime(150);
+        expect(bake(canvas), 'settled').toEqual(expect.objectContaining({ back: [], layer: GLOWING }));
     });
 
     it('bakes the bases plain while a physics wire swings, panned or not, and whole on the layer as it falls asleep', async () => {

@@ -60,7 +60,7 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 
 ### Performance
 - Nothing redraws while nothing moves. Settings are read when they change, never per frame (2.x read them for every link and node, every frame). Off-screen links are skipped, and animation stops in a hidden tab.
-- **Effect frame-rate cap** (30, 60 or the display's rate), **Adaptive quality**, **Freeze above N visible links**, and glows kept while you pan.
+- **Effect frame-rate cap** (30, 60 or the display's rate), **Adaptive quality**, **Freeze above N visible links**, and **Keep link glow while moving**: glows stay while you pan, zoom or drag nodes, or turn it off to let busy graphs drop them until you stop.
 - **Motion** (Follow system, Reduce or Full): effects hold still when the system or ComfyUI's Disable animations asks for less motion. Flashing is kept to 3 a second or less.
 
 ### Compatibility

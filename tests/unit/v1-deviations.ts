@@ -668,8 +668,8 @@ export const DEVIATIONS: Deviation[] = [
         },
     },
     {
-        title: "A busy graph's links zoom without their glow",
-        why: "v1 drew every link, with its glow and shadow, in every frame. v3 draws what does not move into the background, where native draws the links; where more than 12 of the links on screen have a glowing base, it draws them on a layer of their own, copied onto the background. While the view pans, the layer moves along and only what comes into view is drawn, glows and all; while the view zooms or nodes are dragged, the background is drawn without the bases' glows and Classic Flow's shadow, and with them 150 ms after the last of it.",
+        title: "A busy graph's links can zoom without their glow",
+        why: "v1 drew every link, with its glow and shadow, in every frame. v3 draws what does not move into the background, where native draws the links; where more than 12 of the links on screen have a glowing base, it draws them on a layer of their own, copied onto the background. While the view pans, the layer moves along and only what comes into view is drawn, glows and all; while the view zooms or nodes are dragged, the bases are drawn again in place with their glows, as v1 drew them, or with Perf.KeepGlow off without the bases' glows and Classic Flow's shadow, and with them 150 ms after the last of it.",
         async proof() {
             const canvas = await start({}, {
                 nodes: Array.from({ length: 13 }, (_, i) => [{ pos: [-200, 50 + 60 * i] as [number, number] }, { pos: [600, 50 + 60 * i] as [number, number] }]).flat(),
@@ -696,6 +696,9 @@ export const DEVIATIONS: Deviation[] = [
                 canvas.ds.offset = [40, 0];
                 expect(bake()).toEqual(glowing);
                 canvas.ds.scale = 0.9;
+                expect(bake()).toEqual(glowing);
+                preview('🔗 Enhanced Links.Perf.KeepGlow', false);
+                canvas.ds.scale = 0.8;
                 expect(bake()).toEqual([['#99aa99', 0]]);
                 vi.advanceTimersByTime(150);
                 expect(bake()).toEqual(glowing);
