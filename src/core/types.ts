@@ -15,6 +15,8 @@ export interface ComfyNode {
     title: string;
     size: [number, number];
     selected?: boolean;
+    /** TitleMode: NO_TITLE (1) for a node without a title bar. */
+    title_mode?: number;
     /** LiteGraph's hover data; the test fixtures set true. */
     mouseOver?: LGraphNode['mouseOver'] | boolean;
 }

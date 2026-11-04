@@ -10,6 +10,12 @@
  * which in v1 only Gentle Pulse drew, frames the others too. With Show base effect off a style draws its own
  * particles alone, as v1's Particles Only did.
  *
+ * And v3's own five: Flower of Life draws its nineteen circles in and blooms;
+ * Jelly tints the body like gel (its wobble is nodes/jelly.ts's); Circuit Trace
+ * makes the node a chip whose pulses run from its pins to light its pads; Aurora
+ * Veil hangs curtains of light from the title bar; and Ember Crown stands flames
+ * on the title bar, with embers rising from them.
+ *
  * An effect is drawn in two parts, one each side of the node's edge: what falls
  * around the body goes under every node, and what falls on it over its fill.
  * Each element is drawn in the parts it reaches, so most are drawn once; both
@@ -1307,10 +1313,11 @@ function warmth(ctx: CanvasRenderingContext2D, depth: number, pal: NodePalette):
  * under twice a second at speed 3, gold at the root and red at the tip, glowing; and a warmth on the body under the
  * title bar. Its particles are embers rising from the flames and dying out. Quality stands its flames closer.
  */
-function emberCrown(ctx: CanvasRenderingContext2D, _node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
+function emberCrown(ctx: CanvasRenderingContext2D, node: ComfyNode, w: number, h: number, k: NodeMoment, pal: NodePalette, only: boolean): void {
     const { quality, animationGlow: glow, animationSize: size } = N;
     const intensity = N.intensity * 1.5;
-    const base = -LiteGraph.NODE_TITLE_HEIGHT;
+    // On the top of the title bar, or of the body where there is none.
+    const base = node.title_mode === NO_TITLE ? 0 : -LiteGraph.NODE_TITLE_HEIGHT;
     const s = held ? 0 : k.nodePhase / TURN;
     const tall = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity);
     const blur = 10 * intensity * glow;

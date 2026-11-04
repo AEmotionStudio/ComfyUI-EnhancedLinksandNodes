@@ -2649,10 +2649,10 @@ function warmth(ctx, depth2, pal) {
   gradient.addColorStop(1, translucent(pal.primary, 0));
   return gradient;
 }
-function emberCrown(ctx, _node, w, h2, k2, pal, only) {
+function emberCrown(ctx, node2, w, h2, k2, pal, only) {
   const { quality: quality2, animationGlow: glow2, animationSize: size } = N;
   const intensity = N.intensity * 1.5;
-  const base = -LiteGraph.NODE_TITLE_HEIGHT;
+  const base = node2.title_mode === NO_TITLE ? 0 : -LiteGraph.NODE_TITLE_HEIGHT;
   const s = held$4 ? 0 : k2.nodePhase / TURN;
   const tall = BLAZE * size * Math.min(1.6, 0.5 + 0.5 * intensity);
   const blur = 10 * intensity * glow2;
@@ -9255,4 +9255,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-D9ziS-YA.js.map
+//# sourceMappingURL=menus-LPn-y7mR.js.map

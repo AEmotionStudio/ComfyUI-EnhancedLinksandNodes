@@ -1038,3 +1038,14 @@ describe('Ember Crown', () => {
         }
     });
 });
+
+describe('Ember Crown on a node without a title bar', () => {
+    it('stands its flames on the top of the body', async () => {
+        await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 9 }, { nodes: [KSAMPLER] });
+        const rec = new CanvasRecorder();
+        drawNodeFx(rec.ctx, 9, { id: 1, title: '', size: [75, 26], title_mode: 1 }, 75, 26, { nodePhase: 1, particleTime: 1, nodeTime: 1 }, WHOLE, 1, false);
+        const roots = rec.lines.filter((line) => line.startsWith('moveTo(')).map((line) => Number(line.slice(0, -1).split(', ')[1]));
+        expect(roots.length).toBeGreaterThan(0);
+        expect(roots.every((y) => y === 0)).toBe(true);
+    });
+});
