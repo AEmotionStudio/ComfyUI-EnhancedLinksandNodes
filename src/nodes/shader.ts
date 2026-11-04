@@ -420,13 +420,13 @@ export function available(): boolean {
 }
 
 /** The time the patterns are drawn at: the clock's, or STILL_TIME while they hold still. Each pattern swings at most `hz` times a second at speed 1, so Background.Speed's 3 keeps them within MAX_FLASH_HZ. */
-const timeOf = (time: number) => (holdsStill() ? STILL_TIME : time);
+export const timeOf = (time: number) => (holdsStill() ? STILL_TIME : time);
 
 /** Each colour mode's colours for a node, by revision. */
 const coloursSince = { revision: -1, custom: [] as [number, number, number][], own: new Map<string, [number, number, number][]>(), effect: new Map<number, [number, number, number][]>() };
 
 /** The colours node `node` draws pattern `name` in, as Background.Color.Mode says. */
-function coloursOf(node: Node, name: string): [number, number, number][] {
+function coloursOf(node: { properties: Record<string, unknown> }, name: string): [number, number, number][] {
     if (coloursSince.revision !== revision) {
         coloursSince.revision = revision;
         coloursSince.custom = [N.backgroundColorPrimary, N.backgroundColorSecondary, N.backgroundColorAccent].map(rgb);
@@ -553,4 +553,41 @@ export function drawBackground(ctx: CanvasRenderingContext2D, node: Node, w: num
         ctx.restore();
     }
     return true;
+}
+
+// =============================================================================
+// Gallery tiles
+// =============================================================================
+
+/** The gallery tiles' target, apart from the canvas's, which a tile's copy would take whole: made as a tile first draws, released once none shows. */
+let gallery: Target | undefined;
+/** A tile's node, which takes Animate's effect, for Node effect colors. */
+const TILE_NODE = { properties: {} };
+
+/**
+ * Draws pattern `name` on a body w × h from (0, 0) in `ctx`'s space, at the context's scale and `time`, within the
+ * caller's clip and alpha: a gallery tile's node. False without WebGL on a GPU.
+ */
+export function drawTile(ctx: CanvasRenderingContext2D, name: string, w: number, h: number, time: number): boolean {
+    if (failed) return false;
+    gallery ??= target();
+    if (!gallery) {
+        failed = true;
+        return false;
+    }
+    const t = gallery;
+    const scale = ctx.getTransform().a;
+    const place = { x: 0, y: 0, w: Math.max(1, Math.ceil(w * scale)), h: Math.max(1, Math.ceil(h * scale)) };
+    if (t.canvas.width < place.w || t.canvas.height < place.h) [t.canvas.width, t.canvas.height] = [Math.max(place.w, t.canvas.width), Math.max(place.h, t.canvas.height)];
+    render(t, [{ name, w, h, x0: 0, y0: 0, x1: w, y1: h, seed: 0, colours: coloursOf(TILE_NODE, name), px: 1 / scale }], [place], t.gl.drawingBufferHeight, time);
+    const image = t.canvas.transferToImageBitmap();
+    ctx.drawImage(image, 0, 0, place.w, place.h, 0, 0, w, h);
+    image.close();
+    return true;
+}
+
+/** Lets the tiles' WebGL context go: no tile shows. */
+export function releaseTiles(): void {
+    gallery?.gl.getExtension('WEBGL_lose_context')?.loseContext();
+    gallery = undefined;
 }

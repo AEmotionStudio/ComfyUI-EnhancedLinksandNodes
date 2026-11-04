@@ -6226,343 +6226,6 @@ function surprise() {
     if (look.values[LINK_ANIMATE] !== L.animate) return look;
   }
 }
-const WIDTH = 320;
-const HEIGHT = 200;
-const FRAME_MS = 1e3 / 30;
-const LOOK_MS = 1e3 / 15;
-const SPLINE = 2;
-const RIGHT = 4;
-const LEFT = 3;
-const CLASSIC = 9;
-const LINK_COLOR = "#9A9";
-const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, assist: 0 };
-const k = { ...clock };
-const segment = new Segment();
-const wire = new Wire();
-const linksStill = () => L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion;
-function link(ctx, animate, a, b, k2) {
-  segment.pal = palette(LGraphCanvas.link_type_colors.IMAGE) ?? palette(app.canvas.default_link_color) ?? palette(LINK_COLOR);
-  ctx.save();
-  if (!animate) {
-    segment.path.set(a, b, RIGHT, LEFT, app.canvas.links_render_mode);
-    if (wired()) rest(wire, segment.path);
-    segment.path.draw(ctx, segment.pal.native, app.canvas.connections_width);
-  } else {
-    segment.lay(a, b, RIGHT, LEFT, SPLINE);
-    if (wired()) {
-      segment.path.set(a, b, RIGHT, LEFT, SPLINE);
-      rest(wire, segment.path);
-      segment.len = segment.path.length;
-    }
-    segment.chain = segment.len;
-    const still = linksStill();
-    segment.isStatic = still;
-    drawBase(ctx, segment, animate, still);
-    if (still) STILL[animate]?.(ctx, segment, STILL_PHASE);
-    else MOVING[animate]?.(ctx, segment, k2);
-    if (animate === CLASSIC || L.markerAll) drawMarkers(ctx, segment, still ? STILL_PHASE : k2.linkPhase, still ? void 0 : k2.linkFlow);
-  }
-  ctx.restore();
-}
-const part = { sides: UNDER | OVER, x0: 0, y0: 0, x1: 0, y1: 0, round: 0 };
-const node = { id: 0, title: "", size: [0, 0], selected: false };
-function box(ctx, style, x, y, w, h2, k2) {
-  const title = LiteGraph.NODE_TITLE_HEIGHT;
-  const round2 = LiteGraph.ROUND_RADIUS;
-  ctx.save();
-  ctx.translate(x, y);
-  if (style && N.glowShow) {
-    ctx.shadowColor = nodePalette(style).primary;
-    ctx.shadowBlur = 10 * N.glow;
-    ctx.shadowOffsetX = ctx.shadowOffsetY = 2;
-  }
-  ctx.beginPath();
-  ctx.roundRect(0, -title, w, h2 + title, round2);
-  ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
-  ctx.fill();
-  ctx.shadowColor = "transparent";
-  ctx.beginPath();
-  ctx.roundRect(0, -title, w, title, [round2, round2, 0, 0]);
-  ctx.fillStyle = LiteGraph.NODE_DEFAULT_COLOR;
-  ctx.fill();
-  const only = !style || !N.animationsEnabled;
-  if (N.particleShow || !only) {
-    node.size[0] = w;
-    node.size[1] = h2;
-    Object.assign(part, { x0: 0, y0: -title, x1: w, y1: h2, round: round2 });
-    drawNodeFx(ctx, style, node, w, h2, k2, part, 1, only);
-  }
-  ctx.restore();
-}
-const linkScene = (animate) => (ctx, k2) => link(ctx, animate, [24, 150], [296, 50], k2);
-const nodeScene = (style) => (ctx, k2) => box(ctx, style, 70, 75, 180, 100, k2);
-const lookScene = (look) => (ctx, k2) => drawLook(look, () => {
-  link(ctx, L.animate, [104, 70], [216, 130], k2);
-  box(ctx, N.animate, 20, 55, 84, 90, k2);
-  box(ctx, N.animate, 216, 115, 84, 70, k2);
-});
-const tiles = /* @__PURE__ */ new WeakMap();
-const shown = /* @__PURE__ */ new Set();
-const observer = new IntersectionObserver(seen);
-let frame = 0;
-let last = 0;
-function tile(scene, ms = FRAME_MS) {
-  const canvas = document.createElement("canvas");
-  canvas.className = "eln-tile-canvas";
-  tiles.set(canvas, { canvas, scene, ms, drawn: 0 });
-  observer.observe(canvas);
-  return canvas;
-}
-const lookTile = (look) => tile(lookScene(look), LOOK_MS);
-function seen(entries) {
-  for (const entry2 of entries) {
-    const t = tiles.get(entry2.target);
-    if (!entry2.isIntersecting || !entry2.target.isConnected) shown.delete(t);
-    else if (!shown.has(t)) {
-      shown.add(t);
-      paint(t);
-    }
-  }
-  frame ||= requestAnimationFrame(tick);
-}
-function repaint() {
-  frame ||= requestAnimationFrame(tick);
-}
-function stopTiles(within) {
-  for (const canvas of within.querySelectorAll(".eln-tile-canvas")) {
-    observer.unobserve(canvas);
-    shown.delete(tiles.get(canvas));
-  }
-}
-function tick(now) {
-  frame = 0;
-  if (!shown.size) {
-    last = 0;
-    return;
-  }
-  if (env.reducedMotion) {
-    last = 0;
-    for (const t of shown) paint(t);
-    return;
-  }
-  if (now - last >= FRAME_MS - 1) {
-    advance(k, last ? Math.min((now - last) / 1e3, 0.1) : 0, MOVING_ALL);
-    last = now;
-    for (const t of shown) {
-      if (now - t.drawn < t.ms - 1) continue;
-      t.drawn = now;
-      paint(t);
-    }
-  }
-  frame = requestAnimationFrame(tick);
-}
-function paint(t) {
-  const { canvas, scene } = t;
-  const width = Math.round(canvas.clientWidth * devicePixelRatio);
-  const height = Math.round(canvas.clientHeight * devicePixelRatio);
-  if (!width || !height) return;
-  if (canvas.width !== width || canvas.height !== height) Object.assign(canvas, { width, height });
-  const ctx = canvas.getContext("2d");
-  ctx.setTransform(width / WIDTH, 0, 0, height / HEIGHT, 0, 0);
-  ctx.fillStyle = app.canvas.clear_background_color;
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
-  ctx.save();
-  try {
-    scene(ctx, k);
-  } catch (error) {
-    shown.delete(t);
-    console.warn("[Enhanced Links & Nodes] A gallery tile failed:", error);
-  } finally {
-    ctx.restore();
-  }
-}
-function h(tag, attrs = {}, ...children) {
-  const el = document.createElement(tag);
-  for (const [name, value] of Object.entries(attrs)) {
-    if (value !== void 0 && value !== false) el.setAttribute(name, value === true ? "" : String(value));
-  }
-  el.append(...children);
-  return el;
-}
-function iconButton(icon, label, onClick, attrs = {}) {
-  const button2 = h("button", { type: "button", class: "eln-tool", "aria-label": label, title: label, ...attrs }, h("i", { class: `pi ${icon}`, "aria-hidden": "true" }));
-  button2.addEventListener("click", onClick);
-  return button2;
-}
-function button(label, onClick, attrs = {}) {
-  const el = h("button", { type: "button", class: "eln-button", ...attrs }, label);
-  el.addEventListener("click", onClick);
-  return el;
-}
-const STEP = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-function roving(group, items, move) {
-  group.addEventListener("keydown", (event) => {
-    const at = items.indexOf(event.target);
-    if (at < 0) return;
-    const to = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key in STEP ? (at + STEP[event.key] + items.length) % items.length : -1;
-    if (to < 0) return;
-    event.preventDefault();
-    for (const item of items) item.tabIndex = item === items[to] ? 0 : -1;
-    items[to].focus();
-    move?.(items[to]);
-  });
-}
-function check(items, at) {
-  items.forEach((item, i) => {
-    item.setAttribute("aria-checked", String(i === at));
-    item.tabIndex = i === at || at < 0 && i === 0 ? 0 : -1;
-  });
-}
-let unhover;
-const hovering = () => unhover !== void 0;
-function hover(el, start) {
-  el.addEventListener("pointerenter", (event) => {
-    if (event.pointerType !== "mouse") return;
-    endHover();
-    unhover = () => {
-    };
-    unhover = start();
-  });
-  el.addEventListener("pointerleave", endHover);
-  el.addEventListener("click", endHover);
-}
-function endHover() {
-  const end2 = unhover;
-  unhover = void 0;
-  end2?.();
-}
-const GALLERIES = {
-  "🔗 Enhanced Links.Animate": linkScene,
-  "📦 Enhanced Nodes.Animate": nodeScene
-};
-function toggle(s, id) {
-  const el = h("button", { type: "button", role: "switch", id, class: "eln-switch" });
-  el.addEventListener("click", () => commit(s.id, !shown$3(s.id)));
-  return { el, update: (value) => el.setAttribute("aria-checked", String(value)) };
-}
-function slider(s, id) {
-  const range = h("input", { type: "range", id, min: s.min, max: s.max, step: s.step, class: "eln-range" });
-  const number = h("input", { type: "number", min: s.min, max: s.max, step: s.step, class: "eln-number", "aria-label": `${s.name}, value` });
-  range.addEventListener("input", () => {
-    number.value = range.value;
-    preview(s.id, Number(range.value));
-  });
-  range.addEventListener("change", () => commit(s.id, Number(range.value)));
-  number.addEventListener("change", () => {
-    if (number.value === "") number.value = String(shown$3(s.id));
-    else commit(s.id, Number(number.value));
-  });
-  return {
-    el: h("div", { class: "eln-slider" }, range, number),
-    wide: true,
-    update(value) {
-      range.value = number.value = String(value);
-    }
-  };
-}
-const fits = (s) => s.options.length <= 3 && s.options.reduce((n, o) => n + o.text.length, 0) <= 28;
-function choice(s, id, label) {
-  const index = (value) => s.options.findIndex((o) => o.value === value);
-  const scene = GALLERIES[s.id];
-  if (scene || fits(s)) {
-    const items = s.options.map((o) => {
-      const item = scene ? h("button", { type: "button", role: "radio", class: "eln-tile" }, tile(scene(Number(o.value))), h("span", { class: "eln-tile-name" }, o.text)) : h("button", { type: "button", role: "radio", class: "eln-segment" }, o.text);
-      if (scene) hover(item, () => {
-        preview(s.id, o.value);
-        return () => restore$1([s.id]);
-      });
-      item.addEventListener("click", () => commit(s.id, o.value));
-      return item;
-    });
-    const el = h("div", { role: "radiogroup", id, class: scene ? "eln-gallery" : "eln-segments", "aria-labelledby": label }, ...items);
-    roving(el, items, scene ? void 0 : (item) => item.click());
-    return { el, wide: true, update: (value) => check(items, index(value)) };
-  }
-  const select = h("select", { id, class: "eln-select" }, ...s.options.map((o, i) => h("option", { value: i }, o.text)));
-  select.addEventListener("change", () => commit(s.id, s.options[select.selectedIndex].value));
-  return {
-    el: select,
-    // Choices too long to share a line with the name at the panel's default width take one of their own.
-    wide: s.options.some((o) => o.text.length > 20),
-    update(value) {
-      select.selectedIndex = index(value);
-    }
-  };
-}
-function colour(s, id) {
-  const well = h("input", { type: "color", id, class: "eln-well" });
-  const hex2 = h("input", { type: "text", class: "eln-hex", maxlength: 9, spellcheck: "false", "aria-label": `${s.name}, hex code` });
-  well.addEventListener("input", () => {
-    hex2.value = well.value;
-    preview(s.id, well.value);
-  });
-  well.addEventListener("change", () => commit(s.id, well.value));
-  hex2.addEventListener("change", () => {
-    if (HEX$1.test(hex2.value)) commit(s.id, hex2.value);
-    else hex2.value = String(shown$3(s.id));
-  });
-  return {
-    el: h("div", { class: "eln-colour" }, well, hex2),
-    update(value) {
-      hex2.value = String(value);
-      well.value = String(value).slice(0, 7);
-    }
-  };
-}
-function text(s, value) {
-  if (s.type === "combo") return s.options.find((o) => o.value === value)?.text ?? String(value);
-  if (s.type === "boolean") return value ? "On" : "Off";
-  return String(value);
-}
-let ids$1 = 0;
-function row(s, found2 = false) {
-  const id = `eln-${++ids$1}`;
-  const label = `${id}-label`;
-  const control = s.type === "boolean" ? toggle(s, id) : s.type === "slider" ? slider(s, id) : s.type === "combo" ? choice(s, id, label) : colour(s, id);
-  const modified = h("span", { class: "eln-sr" }, " (modified)");
-  const name = h(control.el.getAttribute("role") === "radiogroup" ? "span" : "label", { id: label, class: "eln-name", for: id, title: s.tooltip }, s.name, modified);
-  const reset2 = h(
-    "button",
-    { type: "button", class: "eln-reset", "aria-label": `Reset ${s.name} to ${text(s, s.default)}`, title: `Reset to ${text(s, s.default)}` },
-    h("i", { class: "pi pi-undo", "aria-hidden": "true" })
-  );
-  reset2.addEventListener("click", () => {
-    commit(s.id, s.default);
-    (control.el.querySelector('input, [tabindex="0"]') ?? control.el).focus();
-  });
-  const reason = h("span");
-  const fix = h("button", { type: "button", class: "eln-link" });
-  const need2 = h("p", { class: "eln-need" }, reason, " ", fix);
-  const head = h("div", { class: "eln-row-head" }, h("span", { class: "eln-dot", "aria-hidden": "true" }), name);
-  if (found2 && "advanced" in s) head.append(h("span", { class: "eln-tag" }, "Advanced"));
-  head.append(reset2);
-  if (!control.wide) head.append(control.el);
-  const el = h("div", { class: "eln-row", "data-setting": s.id }, head);
-  if (control.wide) el.append(control.el);
-  el.append(need2);
-  return {
-    setting: s,
-    el,
-    update() {
-      const value = shown$3(s.id);
-      control.update(value);
-      const changed2 = value !== s.default;
-      el.classList.toggle("eln-row--modified", changed2);
-      modified.hidden = reset2.hidden = !changed2;
-      el.hidden = !found2 && !(s.showIf?.() ?? true);
-      const needs = s.needs?.();
-      need2.hidden = !needs;
-      control.el.toggleAttribute("inert", Boolean(needs));
-      control.el.classList.toggle("eln-off", Boolean(needs));
-      if (needs) {
-        const ours2 = setting(needs.id);
-        reason.textContent = needs.reason;
-        fix.textContent = needs.label ?? `Use ${text(ours2, needs.value)}`;
-        fix.onclick = () => ours2 ? commit(needs.id, needs.value) : void app.extensionManager.setting.set(needs.id, needs.value);
-      }
-    }
-  };
-}
 const BACKGROUND = "Node background";
 const OWN_BACKGROUND = "enhanced_fx_background";
 const NAMES = new Set(BACKGROUND_OPTIONS.map((option) => option.value));
@@ -6957,6 +6620,378 @@ function drawBackground(ctx, node2, w, h2, alpha) {
     ctx.restore();
   }
   return true;
+}
+let gallery;
+const TILE_NODE = { properties: {} };
+function drawTile(ctx, name, w, h2, time) {
+  if (failed) return false;
+  gallery ??= target();
+  if (!gallery) {
+    failed = true;
+    return false;
+  }
+  const t = gallery;
+  const scale2 = ctx.getTransform().a;
+  const place2 = { x: 0, y: 0, w: Math.max(1, Math.ceil(w * scale2)), h: Math.max(1, Math.ceil(h2 * scale2)) };
+  if (t.canvas.width < place2.w || t.canvas.height < place2.h) [t.canvas.width, t.canvas.height] = [Math.max(place2.w, t.canvas.width), Math.max(place2.h, t.canvas.height)];
+  render$1(t, [{ name, w, h: h2, x0: 0, y0: 0, x1: w, y1: h2, seed: 0, colours: coloursOf(TILE_NODE, name), px: 1 / scale2 }], [place2], t.gl.drawingBufferHeight, time);
+  const image = t.canvas.transferToImageBitmap();
+  ctx.drawImage(image, 0, 0, place2.w, place2.h, 0, 0, w, h2);
+  image.close();
+  return true;
+}
+function releaseTiles() {
+  gallery?.gl.getExtension("WEBGL_lose_context")?.loseContext();
+  gallery = void 0;
+}
+const WIDTH = 320;
+const HEIGHT = 200;
+const FRAME_MS = 1e3 / 30;
+const LOOK_MS = 1e3 / 15;
+const SPLINE = 2;
+const RIGHT = 4;
+const LEFT = 3;
+const CLASSIC = 9;
+const LINK_COLOR = "#9A9";
+const MOVING_ALL = { links: 1, nodes: 1, particles: 1, bursts: 0, marks: 0, flows: 0, rings: 0, assist: 0 };
+const k = { ...clock };
+const segment = new Segment();
+const wire = new Wire();
+const linksStill = () => L.staticMode || heldByRun(L.pauseDuringRender) || env.reducedMotion;
+function link(ctx, animate, a, b, k2) {
+  segment.pal = palette(LGraphCanvas.link_type_colors.IMAGE) ?? palette(app.canvas.default_link_color) ?? palette(LINK_COLOR);
+  ctx.save();
+  if (!animate) {
+    segment.path.set(a, b, RIGHT, LEFT, app.canvas.links_render_mode);
+    if (wired()) rest(wire, segment.path);
+    segment.path.draw(ctx, segment.pal.native, app.canvas.connections_width);
+  } else {
+    segment.lay(a, b, RIGHT, LEFT, SPLINE);
+    if (wired()) {
+      segment.path.set(a, b, RIGHT, LEFT, SPLINE);
+      rest(wire, segment.path);
+      segment.len = segment.path.length;
+    }
+    segment.chain = segment.len;
+    const still = linksStill();
+    segment.isStatic = still;
+    drawBase(ctx, segment, animate, still);
+    if (still) STILL[animate]?.(ctx, segment, STILL_PHASE);
+    else MOVING[animate]?.(ctx, segment, k2);
+    if (animate === CLASSIC || L.markerAll) drawMarkers(ctx, segment, still ? STILL_PHASE : k2.linkPhase, still ? void 0 : k2.linkFlow);
+  }
+  ctx.restore();
+}
+const part = { sides: UNDER | OVER, x0: 0, y0: 0, x1: 0, y1: 0, round: 0 };
+const node = { id: 0, title: "", size: [0, 0], selected: false };
+function box(ctx, style, x, y, w, h2, k2, background2 = "none") {
+  const title = LiteGraph.NODE_TITLE_HEIGHT;
+  const round2 = LiteGraph.ROUND_RADIUS;
+  ctx.save();
+  ctx.translate(x, y);
+  if (style && N.glowShow) {
+    ctx.shadowColor = nodePalette(style).primary;
+    ctx.shadowBlur = 10 * N.glow;
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 2;
+  }
+  ctx.beginPath();
+  ctx.roundRect(0, -title, w, h2 + title, round2);
+  ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+  if (background2 !== "none") {
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(0, 0, w, h2, [0, 0, round2, round2]);
+    ctx.clip();
+    ctx.globalAlpha = N.backgroundStrength;
+    drawTile(ctx, background2, w, h2, timeOf(k2.backgroundTime));
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.roundRect(0, -title, w, title, [round2, round2, 0, 0]);
+  ctx.fillStyle = LiteGraph.NODE_DEFAULT_COLOR;
+  ctx.fill();
+  const only = !style || !N.animationsEnabled;
+  if (N.particleShow || !only) {
+    node.size[0] = w;
+    node.size[1] = h2;
+    Object.assign(part, { x0: 0, y0: -title, x1: w, y1: h2, round: round2 });
+    drawNodeFx(ctx, style, node, w, h2, k2, part, 1, only);
+  }
+  ctx.restore();
+}
+const linkScene = (animate) => (ctx, k2) => link(ctx, animate, [24, 150], [296, 50], k2);
+const backgroundScene = (name) => (ctx, k2) => box(ctx, 0, 70, 75, 180, 100, k2, name);
+const nodeScene = (style) => (ctx, k2) => box(ctx, style, 70, 75, 180, 100, k2);
+const lookScene = (look) => (ctx, k2) => drawLook(look, () => {
+  link(ctx, L.animate, [104, 70], [216, 130], k2);
+  box(ctx, N.animate, 20, 55, 84, 90, k2, N.background);
+  box(ctx, N.animate, 216, 115, 84, 70, k2, N.background);
+});
+const tiles = /* @__PURE__ */ new WeakMap();
+const shown = /* @__PURE__ */ new Set();
+const observer = new IntersectionObserver(seen);
+let frame = 0;
+let last = 0;
+function tile(scene, ms = FRAME_MS) {
+  const canvas = document.createElement("canvas");
+  canvas.className = "eln-tile-canvas";
+  tiles.set(canvas, { canvas, scene, ms, drawn: 0 });
+  observer.observe(canvas);
+  return canvas;
+}
+const lookTile = (look) => tile(lookScene(look), LOOK_MS);
+function seen(entries) {
+  for (const entry2 of entries) {
+    const t = tiles.get(entry2.target);
+    if (!entry2.isIntersecting || !entry2.target.isConnected) shown.delete(t);
+    else if (!shown.has(t)) {
+      shown.add(t);
+      paint(t);
+    }
+  }
+  frame ||= requestAnimationFrame(tick);
+}
+function repaint() {
+  frame ||= requestAnimationFrame(tick);
+}
+function stopTiles(within) {
+  for (const canvas of within.querySelectorAll(".eln-tile-canvas")) {
+    observer.unobserve(canvas);
+    shown.delete(tiles.get(canvas));
+  }
+}
+function tick(now) {
+  frame = 0;
+  if (!shown.size) {
+    last = 0;
+    releaseTiles();
+    return;
+  }
+  if (env.reducedMotion) {
+    last = 0;
+    for (const t of shown) paint(t);
+    return;
+  }
+  if (now - last >= FRAME_MS - 1) {
+    advance(k, last ? Math.min((now - last) / 1e3, 0.1) : 0, MOVING_ALL);
+    last = now;
+    for (const t of shown) {
+      if (now - t.drawn < t.ms - 1) continue;
+      t.drawn = now;
+      paint(t);
+    }
+  }
+  frame = requestAnimationFrame(tick);
+}
+function paint(t) {
+  const { canvas, scene } = t;
+  const width = Math.round(canvas.clientWidth * devicePixelRatio);
+  const height = Math.round(canvas.clientHeight * devicePixelRatio);
+  if (!width || !height) return;
+  if (canvas.width !== width || canvas.height !== height) Object.assign(canvas, { width, height });
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(width / WIDTH, 0, 0, height / HEIGHT, 0, 0);
+  ctx.fillStyle = app.canvas.clear_background_color;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.save();
+  try {
+    scene(ctx, k);
+  } catch (error) {
+    shown.delete(t);
+    console.warn("[Enhanced Links & Nodes] A gallery tile failed:", error);
+  } finally {
+    ctx.restore();
+  }
+}
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [name, value] of Object.entries(attrs)) {
+    if (value !== void 0 && value !== false) el.setAttribute(name, value === true ? "" : String(value));
+  }
+  el.append(...children);
+  return el;
+}
+function iconButton(icon, label, onClick, attrs = {}) {
+  const button2 = h("button", { type: "button", class: "eln-tool", "aria-label": label, title: label, ...attrs }, h("i", { class: `pi ${icon}`, "aria-hidden": "true" }));
+  button2.addEventListener("click", onClick);
+  return button2;
+}
+function button(label, onClick, attrs = {}) {
+  const el = h("button", { type: "button", class: "eln-button", ...attrs }, label);
+  el.addEventListener("click", onClick);
+  return el;
+}
+const STEP = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+function roving(group, items, move) {
+  group.addEventListener("keydown", (event) => {
+    const at = items.indexOf(event.target);
+    if (at < 0) return;
+    const to = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : event.key in STEP ? (at + STEP[event.key] + items.length) % items.length : -1;
+    if (to < 0) return;
+    event.preventDefault();
+    for (const item of items) item.tabIndex = item === items[to] ? 0 : -1;
+    items[to].focus();
+    move?.(items[to]);
+  });
+}
+function check(items, at) {
+  items.forEach((item, i) => {
+    item.setAttribute("aria-checked", String(i === at));
+    item.tabIndex = i === at || at < 0 && i === 0 ? 0 : -1;
+  });
+}
+let unhover;
+const hovering = () => unhover !== void 0;
+function hover(el, start) {
+  el.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "mouse") return;
+    endHover();
+    unhover = () => {
+    };
+    unhover = start();
+  });
+  el.addEventListener("pointerleave", endHover);
+  el.addEventListener("click", endHover);
+}
+function endHover() {
+  const end2 = unhover;
+  unhover = void 0;
+  end2?.();
+}
+const GALLERIES = {
+  "🔗 Enhanced Links.Animate": (value) => linkScene(Number(value)),
+  "📦 Enhanced Nodes.Animate": (value) => nodeScene(Number(value)),
+  "📦 Enhanced Nodes.Background": (value) => backgroundScene(String(value))
+};
+function toggle(s, id) {
+  const el = h("button", { type: "button", role: "switch", id, class: "eln-switch" });
+  el.addEventListener("click", () => commit(s.id, !shown$3(s.id)));
+  return { el, update: (value) => el.setAttribute("aria-checked", String(value)) };
+}
+function slider(s, id) {
+  const range = h("input", { type: "range", id, min: s.min, max: s.max, step: s.step, class: "eln-range" });
+  const number = h("input", { type: "number", min: s.min, max: s.max, step: s.step, class: "eln-number", "aria-label": `${s.name}, value` });
+  range.addEventListener("input", () => {
+    number.value = range.value;
+    preview(s.id, Number(range.value));
+  });
+  range.addEventListener("change", () => commit(s.id, Number(range.value)));
+  number.addEventListener("change", () => {
+    if (number.value === "") number.value = String(shown$3(s.id));
+    else commit(s.id, Number(number.value));
+  });
+  return {
+    el: h("div", { class: "eln-slider" }, range, number),
+    wide: true,
+    update(value) {
+      range.value = number.value = String(value);
+    }
+  };
+}
+const fits = (s) => s.options.length <= 3 && s.options.reduce((n, o) => n + o.text.length, 0) <= 28;
+function choice(s, id, label) {
+  const index = (value) => s.options.findIndex((o) => o.value === value);
+  const scene = GALLERIES[s.id];
+  if (scene || fits(s)) {
+    const items = s.options.map((o) => {
+      const item = scene ? h("button", { type: "button", role: "radio", class: "eln-tile" }, tile(scene(o.value)), h("span", { class: "eln-tile-name" }, o.text)) : h("button", { type: "button", role: "radio", class: "eln-segment" }, o.text);
+      if (scene) hover(item, () => {
+        preview(s.id, o.value);
+        return () => restore$1([s.id]);
+      });
+      item.addEventListener("click", () => commit(s.id, o.value));
+      return item;
+    });
+    const el = h("div", { role: "radiogroup", id, class: scene ? "eln-gallery" : "eln-segments", "aria-labelledby": label }, ...items);
+    roving(el, items, scene ? void 0 : (item) => item.click());
+    return { el, wide: true, update: (value) => check(items, index(value)) };
+  }
+  const select = h("select", { id, class: "eln-select" }, ...s.options.map((o, i) => h("option", { value: i }, o.text)));
+  select.addEventListener("change", () => commit(s.id, s.options[select.selectedIndex].value));
+  return {
+    el: select,
+    // Choices too long to share a line with the name at the panel's default width take one of their own.
+    wide: s.options.some((o) => o.text.length > 20),
+    update(value) {
+      select.selectedIndex = index(value);
+    }
+  };
+}
+function colour(s, id) {
+  const well = h("input", { type: "color", id, class: "eln-well" });
+  const hex2 = h("input", { type: "text", class: "eln-hex", maxlength: 9, spellcheck: "false", "aria-label": `${s.name}, hex code` });
+  well.addEventListener("input", () => {
+    hex2.value = well.value;
+    preview(s.id, well.value);
+  });
+  well.addEventListener("change", () => commit(s.id, well.value));
+  hex2.addEventListener("change", () => {
+    if (HEX$1.test(hex2.value)) commit(s.id, hex2.value);
+    else hex2.value = String(shown$3(s.id));
+  });
+  return {
+    el: h("div", { class: "eln-colour" }, well, hex2),
+    update(value) {
+      hex2.value = String(value);
+      well.value = String(value).slice(0, 7);
+    }
+  };
+}
+function text(s, value) {
+  if (s.type === "combo") return s.options.find((o) => o.value === value)?.text ?? String(value);
+  if (s.type === "boolean") return value ? "On" : "Off";
+  return String(value);
+}
+let ids$1 = 0;
+function row(s, found2 = false) {
+  const id = `eln-${++ids$1}`;
+  const label = `${id}-label`;
+  const control = s.type === "boolean" ? toggle(s, id) : s.type === "slider" ? slider(s, id) : s.type === "combo" ? choice(s, id, label) : colour(s, id);
+  const modified = h("span", { class: "eln-sr" }, " (modified)");
+  const name = h(control.el.getAttribute("role") === "radiogroup" ? "span" : "label", { id: label, class: "eln-name", for: id, title: s.tooltip }, s.name, modified);
+  const reset2 = h(
+    "button",
+    { type: "button", class: "eln-reset", "aria-label": `Reset ${s.name} to ${text(s, s.default)}`, title: `Reset to ${text(s, s.default)}` },
+    h("i", { class: "pi pi-undo", "aria-hidden": "true" })
+  );
+  reset2.addEventListener("click", () => {
+    commit(s.id, s.default);
+    (control.el.querySelector('input, [tabindex="0"]') ?? control.el).focus();
+  });
+  const reason = h("span");
+  const fix = h("button", { type: "button", class: "eln-link" });
+  const need2 = h("p", { class: "eln-need" }, reason, " ", fix);
+  const head = h("div", { class: "eln-row-head" }, h("span", { class: "eln-dot", "aria-hidden": "true" }), name);
+  if (found2 && "advanced" in s) head.append(h("span", { class: "eln-tag" }, "Advanced"));
+  head.append(reset2);
+  if (!control.wide) head.append(control.el);
+  const el = h("div", { class: "eln-row", "data-setting": s.id }, head);
+  if (control.wide) el.append(control.el);
+  el.append(need2);
+  return {
+    setting: s,
+    el,
+    update() {
+      const value = shown$3(s.id);
+      control.update(value);
+      const changed2 = value !== s.default;
+      el.classList.toggle("eln-row--modified", changed2);
+      modified.hidden = reset2.hidden = !changed2;
+      el.hidden = !found2 && !(s.showIf?.() ?? true);
+      const needs = s.needs?.();
+      need2.hidden = !needs;
+      control.el.toggleAttribute("inert", Boolean(needs));
+      control.el.classList.toggle("eln-off", Boolean(needs));
+      if (needs) {
+        const ours2 = setting(needs.id);
+        reason.textContent = needs.reason;
+        fix.textContent = needs.label ?? `Use ${text(ours2, needs.value)}`;
+        fix.onclick = () => ours2 ? commit(needs.id, needs.value) : void app.extensionManager.setting.set(needs.id, needs.value);
+      }
+    }
+  };
 }
 const css = `/*
  * The panel, on ComfyUI's own tokens so it follows the palette: the palette's
@@ -9197,4 +9232,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-Cx0tk3FA.js.map
+//# sourceMappingURL=menus-naSYj1UC.js.map

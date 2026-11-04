@@ -1,7 +1,7 @@
 // Node backgrounds in ComfyUI: a pattern from the GPU on each node's body below its title bar, under what native draws
 // there, left off a node given None, a collapsed one and a node too far zoomed out; dimmed with a bypassed node;
 // never flashing more than three times a second; back after a lost WebGL context; and none at all, with the panel
-// saying why, where the browser has no WebGL. The e2e browser draws on the CPU, whose WebGL the backgrounds would turn
+// saying why, where the browser has no WebGL; and in the panel's gallery. The e2e browser draws on the CPU, whose WebGL the backgrounds would turn
 // down as slow, so these tests let it count. They come with the extensions, so the -native projects skip them.
 import type { Page } from '@playwright/test';
 import * as graphs from './fixtures/graphs';
@@ -162,6 +162,30 @@ test.describe('with WebGL', () => {
         await redraw(page);
         expect(apart(await pixelAt(page, body), native)).toBeGreaterThan(0);
         expect(await page.evaluate(() => window.__elnGl?.length)).toBe(2);
+        expect(pageErrors(log)).toEqual([]);
+    });
+});
+
+test.describe('the panel', () => {
+    test.use({ settings: { '🔗 Enhanced Links.Animate': 0, '🔗 Enhanced Links.Panel.State': { tab: 'nodes', advanced: false, search: '' } } });
+
+    test("shows each background on a gallery tile's node, and lets the tiles' WebGL go once it closes", async ({ page, log }) => {
+        await page.addInitScript(softwareGl);
+        await openApp(page);
+        const rail = page.getByRole('button', { name: /^Enhanced Links & Nodes/ }).first();
+        await rail.click();
+        await page.locator('.eln .eln-section-toggle', { hasText: /^Background$/ }).click();
+        const gallery = page.locator('.eln [data-setting="📦 Enhanced Nodes.Background"] .eln-gallery');
+        await gallery.scrollIntoViewIfNeeded();
+        const tiles = gallery.locator('.eln-tile-canvas');
+        await expect(tiles).toHaveCount(9);
+        // Low on the body of each tile's node, which spans (70, 75) to (250, 175) of the tile's 320 × 200.
+        const low = (i: number) => tiles.nth(i).evaluate((c: HTMLCanvasElement) => [...c.getContext('2d')!.getImageData(Math.round((c.width * 240) / 320), Math.round((c.height * 165) / 200), 1, 1).data]);
+        await expect.poll(async () => apart(await low(1), await low(0))).toBeGreaterThan(20);
+        expect(await page.evaluate(() => window.__elnGl?.length)).toBe(1);
+        await rail.click();
+        await expect(page.locator('.eln')).toBeHidden();
+        await expect.poll(() => page.evaluate(() => window.__elnGl![0].isContextLost())).toBe(true);
         expect(pageErrors(log)).toEqual([]);
     });
 });

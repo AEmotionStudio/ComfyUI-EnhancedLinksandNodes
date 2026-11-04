@@ -1,8 +1,9 @@
 /**
  * The panel's controls: a row per setting, of the kind its schema entry asks
  * for. A switch; a slider with its number; a few choices as buttons, more as a
- * list; a colour with its hex code; and for the link animation and the node
- * effect, a gallery of live tiles that preview on the canvas while hovered.
+ * list; a colour with its hex code; and for the link animation, the node
+ * effect and the node background, a gallery of live tiles that preview on the
+ * canvas while hovered.
  * Each row marks a value that is not the default and offers to reset it, hides
  * while the setting cannot apply, and says what it needs from another section,
  * or classic nodes, with a button that sets it. Sliders and colour wells
@@ -14,7 +15,7 @@
 
 import { app } from '/scripts/app.js';
 import { HEX, commit, preview, restore, setting, shown, type Setting } from '@/core/settings';
-import { linkScene, nodeScene, tile, type Scene } from './tiles';
+import { backgroundScene, linkScene, nodeScene, tile, type Scene } from './tiles';
 
 export type Visible = Exclude<Setting, { type: 'hidden' }>;
 type Of<T extends Visible['type']> = Extract<Visible, { type: T }>;
@@ -106,9 +107,10 @@ interface Control {
     update(value: unknown): void;
 }
 
-const GALLERIES: Partial<Record<string, (value: number) => Scene>> = {
-    '🔗 Enhanced Links.Animate': linkScene,
-    '📦 Enhanced Nodes.Animate': nodeScene,
+const GALLERIES: Partial<Record<string, (value: unknown) => Scene>> = {
+    '🔗 Enhanced Links.Animate': (value) => linkScene(Number(value)),
+    '📦 Enhanced Nodes.Animate': (value) => nodeScene(Number(value)),
+    '📦 Enhanced Nodes.Background': (value) => backgroundScene(String(value)),
 };
 
 function toggle(s: Of<'boolean'>, id: string): Control {
@@ -147,7 +149,7 @@ function choice(s: Of<'combo'>, id: string, label: string): Control {
     if (scene || fits(s)) {
         const items = s.options.map((o) => {
             const item = scene
-                ? h('button', { type: 'button', role: 'radio', class: 'eln-tile' }, tile(scene(Number(o.value))), h('span', { class: 'eln-tile-name' }, o.text))
+                ? h('button', { type: 'button', role: 'radio', class: 'eln-tile' }, tile(scene(o.value)), h('span', { class: 'eln-tile-name' }, o.text))
                 : h('button', { type: 'button', role: 'radio', class: 'eln-segment' }, o.text);
             if (scene) hover(item, () => {
                 preview(s.id, o.value);

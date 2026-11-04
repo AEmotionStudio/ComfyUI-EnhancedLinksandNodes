@@ -20,6 +20,7 @@ import { MOVING } from '@/links/animations';
 import { STILL } from '@/links/stills';
 import { drawBase, drawMarkers } from '@/links/styles';
 import { OVER, UNDER, drawNodeFx, type Part } from '@/nodes/effects';
+import { drawTile, releaseTiles, timeOf } from '@/nodes/shader';
 import { drawLook, type Look } from '@/ui/looks';
 
 type Clock = typeof clock;
@@ -88,8 +89,8 @@ function link(ctx: CanvasRenderingContext2D, animate: number, a: Point, b: Point
 const part: Part = { sides: UNDER | OVER, x0: 0, y0: 0, x1: 0, y1: 0, round: 0 };
 const node = { id: 0, title: '', size: [0, 0] as [number, number], selected: false };
 
-/** A node with its title bar above (x, y), w × h below it, with node effect `style` and its halo, as the node layers draw them. */
-function box(ctx: CanvasRenderingContext2D, style: number, x: number, y: number, w: number, h: number, k: Clock): void {
+/** A node with its title bar above (x, y), w × h below it, with `background` and node effect `style` and its halo, as the node layers draw them. */
+function box(ctx: CanvasRenderingContext2D, style: number, x: number, y: number, w: number, h: number, k: Clock, background = 'none'): void {
     const title = LiteGraph.NODE_TITLE_HEIGHT;
     const round = LiteGraph.ROUND_RADIUS;
     ctx.save();
@@ -104,6 +105,15 @@ function box(ctx: CanvasRenderingContext2D, style: number, x: number, y: number,
     ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
     ctx.fill();
     ctx.shadowColor = 'transparent';
+    if (background !== 'none') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(0, 0, w, h, [0, 0, round, round]);
+        ctx.clip();
+        ctx.globalAlpha = N.backgroundStrength;
+        drawTile(ctx, background, w, h, timeOf(k.backgroundTime));
+        ctx.restore();
+    }
     ctx.beginPath();
     ctx.roundRect(0, -title, w, title, [round, round, 0, 0]);
     ctx.fillStyle = LiteGraph.NODE_DEFAULT_COLOR;
@@ -122,6 +132,9 @@ function box(ctx: CanvasRenderingContext2D, style: number, x: number, y: number,
 /** Link animation `animate` along a link across the tile. */
 export const linkScene = (animate: number): Scene => (ctx, k) => link(ctx, animate, [24, 150], [296, 50], k);
 
+/** Node background `name` on a node in the middle of the tile, with no effect. */
+export const backgroundScene = (name: string): Scene => (ctx, k) => box(ctx, 0, 70, 75, 180, 100, k, name);
+
 /** Node effect `style` on a node in the middle of the tile. */
 export const nodeScene = (style: number): Scene => (ctx, k) => box(ctx, style, 70, 75, 180, 100, k);
 
@@ -129,8 +142,8 @@ export const nodeScene = (style: number): Scene => (ctx, k) => box(ctx, style, 7
 const lookScene = (look: Look): Scene => (ctx, k) =>
     drawLook(look, () => {
         link(ctx, L.animate, [104, 70], [216, 130], k);
-        box(ctx, N.animate, 20, 55, 84, 90, k);
-        box(ctx, N.animate, 216, 115, 84, 70, k);
+        box(ctx, N.animate, 20, 55, 84, 90, k, N.background);
+        box(ctx, N.animate, 216, 115, 84, 70, k, N.background);
     });
 
 // =============================================================================
@@ -195,6 +208,7 @@ function tick(now: number): void {
     frame = 0;
     if (!shown.size) {
         last = 0;
+        releaseTiles();
         return;
     }
     // With reduced motion each tile shows its still frame, drawn again only when something changes.
