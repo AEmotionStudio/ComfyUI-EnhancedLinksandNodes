@@ -10,7 +10,7 @@ Open an issue on the [GitHub issue tracker](https://github.com/AEmotionStudio/Co
 
 - A clear title, and the steps that show the bug.
 - What **Copy diagnostics** puts on your clipboard (the panel's **About** tab): the extension and frontend versions, Nodes 2.0, your palette and look.
-- Whether it happens with the extension's effects off (**Alt+K**), and any errors from the browser console.
+- Whether it happens with the extension's effects off (the **Toggle all effects** button on the action bar), and any errors from the browser console.
 
 ### Pull Requests
 
