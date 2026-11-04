@@ -3,9 +3,6 @@ node_modules/
 
 # Build outputs
 # Note: js/ is NOT ignored because it contains the runtime files for ComfyUI
-dist/
-js/backup/
-images/
 
 # Test artifacts
 coverage/
@@ -51,7 +48,3 @@ pnpm-debug.log*
 docs/Browser_Console_Errors.md
 docs/DEVELOPMENT.md
 errors.md
-
-# Legacy source files
-old_link_animations.js
-old_node_animations.js
