@@ -18,7 +18,7 @@
 import { BACKGROUND_OPTIONS, N, revision } from '@/core/settings';
 import { PLAIN, THIN, adaptive, clock, guard, zoomedOut } from '@/core/engine';
 import { nodePalette, rgb } from '@/core/colors';
-import { effectOf, holdsStill } from '@/nodes/effects';
+import { NO_TITLE, effectOf, holdsStill } from '@/nodes/effects';
 import { hash } from '@/fx/particles';
 
 type Canvas = InstanceType<typeof LGraphCanvas>;
@@ -41,23 +41,17 @@ export function ownBackground(node: { properties: Record<string, unknown> }): st
 /** The background a node shows: its own, else Background. */
 const backgroundOf = (node: { properties: Record<string, unknown> }): string => ownBackground(node) ?? N.background;
 
-/** TitleMode.NO_TITLE: reroutes and label nodes, which have no body to speak of. */
-const NO_TITLE = 1;
-
-/** Whether a node shows a background, wherever it is: one not collapsed, with a title bar, given one or under Background. */
+/** Whether a node shows a background, wherever it is: one not collapsed, with a title bar (not a reroute or a label), given one or under Background. */
 const backed = (node: Node): boolean => !node.flags.collapsed && node.title_mode !== NO_TITLE && backgroundOf(node) !== 'none';
 
 /** The time still backgrounds show. */
 const STILL_TIME = 7.3;
 
-/** Background.Detail's share of the canvas's pixels, by its value. */
+/** Background.Detail's share of the canvas's resolution, across and down, by its value. */
 const DETAIL = [0, 0.35, 0.5, 1];
 
 /** How far past the view a slot reaches, in canvas px, so a jelly node's wobble shows no edge. */
 const MARGIN = 16;
-
-/** The most of the atlas the slots may take before they shrink: shelves seldom pack it tighter. */
-const PACKED = 0.8;
 
 // =============================================================================
 // The patterns
@@ -183,7 +177,7 @@ export const PATTERNS: Record<string, Pattern> = {
     if (uv.y > horizon) {
         float d = uv.y - horizon;
         float z = 0.3 / d;
-        vec2 g = vec2((uv.x - 0.5) * (u_size.x / u_size.y) * z, z + t * 0.4) * 2.0 / u_scale;
+        vec2 g = vec2((uv.x - 0.5) * (u_size.x / u_size.y) * z, z) * 2.0 / u_scale + vec2(0.0, t * 0.8);
         vec2 cell = abs(fract(g) - 0.5);
         float px = u_px * 100.0 * u_scale / u_size.y;
         float fz = 0.3 / (d * d) * px * 2.0 / u_scale;
@@ -263,28 +257,40 @@ export interface Placed {
 
 /**
  * Lays slots of `sizes` px out in shelves, tallest first, on an atlas `width` × `height`, after shrinking them all alike
- * by the share it returns where together they would take more than PACKED of it. What still does not fit is left out.
+ * by the share it returns: so that the largest fits and together they take no more than the atlas, then by 0.85 each
+ * time the shelves leave one out, four times at most. What still does not fit is left out.
  */
 export function pack(sizes: readonly { w: number; h: number }[], width: number, height: number, out: Placed[]): number {
-    let total = 0;
-    for (const { w, h } of sizes) total += w * h;
-    const shrink = total > PACKED * width * height ? Math.sqrt((PACKED * width * height) / total) : 1;
+    let [total, wide, tall] = [0, 0, 0];
+    for (const { w, h } of sizes) {
+        total += w * h;
+        wide = Math.max(wide, w);
+        tall = Math.max(tall, h);
+    }
+    let shrink = Math.min(1, Math.sqrt((width * height) / total), width / wide, height / tall);
     const order = sizes.map((_, i) => i).sort((a, b) => sizes[b].h - sizes[a].h);
-    let [x, y, shelf] = [0, 0, 0];
     out.length = sizes.length;
+    for (let tries = 0; !shelve(sizes, order, shrink, width, height, out) && tries < 4; tries++) shrink *= 0.85;
+    return shrink;
+}
+
+/** Shelves the slots in `order` at `shrink` into `out`; true if all of them fit. */
+function shelve(sizes: readonly { w: number; h: number }[], order: readonly number[], shrink: number, width: number, height: number, out: Placed[]): boolean {
+    let [x, y, shelf, all] = [0, 0, 0, true];
     for (const i of order) {
-        const w = Math.max(1, Math.ceil(sizes[i].w * shrink));
-        const h = Math.max(1, Math.ceil(sizes[i].h * shrink));
+        const w = Math.min(width, Math.max(1, Math.ceil(sizes[i].w * shrink)));
+        const h = Math.min(height, Math.max(1, Math.ceil(sizes[i].h * shrink)));
         if (x + w > width) [x, y, shelf] = [0, y + shelf, 0];
-        if (x + w > width || y + h > height) {
+        if (y + h > height) {
             out[i] = { x: -1, y: 0, w, h };
+            all = false;
             continue;
         }
         out[i] = { x, y, w, h };
         x += w;
         shelf = Math.max(shelf, h);
     }
-    return shrink;
+    return all;
 }
 
 // =============================================================================
@@ -471,36 +477,46 @@ export function prepareBackgrounds(canvas: Canvas, ctx: CanvasRenderingContext2D
     placed.clear();
     draws.length = sizes.length = 0;
     const { graph } = canvas;
-    if (!graph || guard.off(BACKGROUND) || zoomedOut(canvas) || !N.enabled || LiteGraph.vueNodesMode) return 0;
+    if (failed || !graph || guard.off(BACKGROUND) || zoomedOut(canvas) || !N.enabled || LiteGraph.vueNodesMode) return 0;
     const share = detail();
-    const [vx, vy, vw, vh] = canvas.visible_area;
-    // Canvas px to a graph unit, read once a node needs it.
-    let scale = 0;
-    let margin = 0;
+    // The view, MARGIN px wider each way, from the context's own transform (1.39.5's visible_area takes device px for CSS
+    // px), and canvas px to a graph unit, read once a node needs them.
+    let [scale, vx, vy, vx1, vy1] = [0, 0, 0, 0, 0];
     const nodes: Node[] = [];
     for (const node of graph.nodes) {
         if (!backed(node)) continue;
         if (!scale) {
-            scale = ctx.getTransform().a;
-            margin = MARGIN / scale;
+            const at = ctx.getTransform();
+            scale = at.a;
+            [vx, vy] = [-(at.e + MARGIN) / scale, -(at.f + MARGIN) / scale];
+            [vx1, vy1] = [(ctx.canvas.width - at.e + MARGIN) / scale, (ctx.canvas.height - at.f + MARGIN) / scale];
         }
         const [x, y] = node.pos;
         const [w, h] = node.size;
-        const x0 = Math.max(x, vx - margin);
-        const y0 = Math.max(y, vy - margin);
-        const x1 = Math.min(x + w, vx + vw + margin);
-        const y1 = Math.min(y + h, vy + vh + margin);
+        const x0 = Math.max(x, vx);
+        const y0 = Math.max(y, vy);
+        const x1 = Math.min(x + w, vx1);
+        const y1 = Math.min(y + h, vy1);
         if (x1 <= x0 || y1 <= y0) continue;
         const name = backgroundOf(node);
         nodes.push(node);
         draws.push({ name, w, h, x0: x0 - x, y0: y0 - y, x1: x1 - x, y1: y1 - y, seed: (hash(String(node.id)) >>> 0) % 640 / 10, colours: coloursOf(node, name), px: 0 });
         sizes.push({ w: (x1 - x0) * scale * share, h: (y1 - y0) * scale * share });
     }
-    if (!nodes.length || !available()) return 0;
+    if (!nodes.length) {
+        // None to draw: let the bitmap and the atlas's pixels go.
+        bitmap?.close();
+        bitmap = undefined;
+        if (main && main.canvas.width > 1) [main.canvas.width, main.canvas.height] = [1, 1];
+        return 0;
+    }
+    if (!available()) return 0;
     try {
         if (main!.gl.isContextLost()) {
             main = undefined;
-            failed = false;
+            bitmap?.close();
+            bitmap = undefined;
+            drawnFor = '';
             throw new Error('Node background: the WebGL context was lost');
         }
         const t = main!;
@@ -559,8 +575,9 @@ export function drawBackground(ctx: CanvasRenderingContext2D, node: Node, w: num
 // Gallery tiles
 // =============================================================================
 
-/** The gallery tiles' target, apart from the canvas's, which a tile's copy would take whole: made as a tile first draws, released once none shows. */
+/** The gallery tiles' target, apart from the canvas's, which a tile's copy would take whole: made as a tile first draws, released once none shows; and whether making it failed. */
 let gallery: Target | undefined;
+let galleryFailed = false;
 /** A tile's node, which takes Animate's effect, for Node effect colors. */
 const TILE_NODE = { properties: {} };
 
@@ -569,10 +586,11 @@ const TILE_NODE = { properties: {} };
  * caller's clip and alpha: a gallery tile's node. False without WebGL on a GPU.
  */
 export function drawTile(ctx: CanvasRenderingContext2D, name: string, w: number, h: number, time: number): boolean {
-    if (failed) return false;
+    if (galleryFailed) return false;
+    if (gallery?.gl.isContextLost()) gallery = undefined;
     gallery ??= target();
     if (!gallery) {
-        failed = true;
+        galleryFailed = true;
         return false;
     }
     const t = gallery;

@@ -26,7 +26,7 @@ import { app } from '/scripts/app.js';
 import { L, N, nodeSettings } from '@/core/settings';
 import { CALM_ALPHA, clock, dummy, during, guard, install, layers, live, overlaps, wake, zoomedOut } from '@/core/engine';
 import { nodePalette } from '@/core/colors';
-import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, effectOf, holdsStill, ownStyle, reach as effectReach, type Part } from '@/nodes/effects';
+import { BYPASS, NEVER, NO_TITLE, OVER, STILL_NODE, UNDER, drawNodeFx, effectOf, holdsStill, ownStyle, reach as effectReach, type Part } from '@/nodes/effects';
 import { JELLY, shake, shapeNode, startShaking, wobbles, wobbling } from '@/nodes/jelly';
 import { drawTitle, titleOf } from '@/nodes/text';
 import { vueNodes } from '@/nodes/vue';
@@ -48,8 +48,6 @@ type TitleOptions = Parameters<Node['drawTitleText']>[1];
 
 /** RenderShape.ROUND, CIRCLE and CARD (litegraph types/globalEnums.ts); a node of any other shape is a box. */
 const [ROUND, CIRCLE, CARD] = [2, 3, 4];
-/** TitleMode.NO_TITLE, for which drawNodeShape draws no title (FE157 LGraphCanvas.ts L5917, FE1395 L5537). */
-const NO_TITLE = 1;
 
 /**
  * The effect a node shows: its style, 0 for the fireflies of a node with particles and no effect, or none. A node given

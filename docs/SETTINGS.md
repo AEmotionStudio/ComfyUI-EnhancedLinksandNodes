@@ -95,7 +95,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Background primary color | `📦 Enhanced Nodes.Background.Color.Primary` | color | `#rrggbb` | `#00e5ff` |  |
 | Background secondary color | `📦 Enhanced Nodes.Background.Color.Secondary` | color | `#rrggbb` | `#7c4dff` |  |
 | Background accent color | `📦 Enhanced Nodes.Background.Color.Accent` | color | `#rrggbb` | `#ff2bd6` |  |
-| Background detail | `📦 Enhanced Nodes.Background.Detail` | combo | `1` Fast, `2` Balanced, `3` Rich | `2` Balanced | How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all. |
+| Background detail | `📦 Enhanced Nodes.Background.Detail` | combo | `1` Fast, `2` Balanced, `3` Rich | `2` Balanced | How sharp it is drawn: Fast at a third of the screen's resolution, Balanced at half, Rich at full. |
 
 ## Nodes · Glow & hover
 

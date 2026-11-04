@@ -202,6 +202,8 @@ export function stopTiles(within: Element): void {
         observer.unobserve(canvas);
         shown.delete(tiles.get(canvas)!);
     }
+    // The ticker lets it go too, but with reduced motion it no longer runs.
+    if (!shown.size) releaseTiles();
 }
 
 function tick(now: number): void {

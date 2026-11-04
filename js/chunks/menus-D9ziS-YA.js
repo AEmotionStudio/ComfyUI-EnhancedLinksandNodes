@@ -305,7 +305,7 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Background.Color.Primary", key: "backgroundColorPrimary", name: "Background primary color", type: "color", default: "#00e5ff", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
   { id: "📦 Enhanced Nodes.Background.Color.Secondary", key: "backgroundColorSecondary", name: "Background secondary color", type: "color", default: "#7c4dff", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
   { id: "📦 Enhanced Nodes.Background.Color.Accent", key: "backgroundColorAccent", name: "Background accent color", type: "color", default: "#ff2bd6", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
-  { id: "📦 Enhanced Nodes.Background.Detail", key: "backgroundDetail", name: "Background detail", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Background", advanced: true, showIf: backgrounds$1, needs: classicNodes, tooltip: "How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all." },
+  { id: "📦 Enhanced Nodes.Background.Detail", key: "backgroundDetail", name: "Background detail", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Background", advanced: true, showIf: backgrounds$1, needs: classicNodes, tooltip: "How sharp it is drawn: Fast at a third of the screen's resolution, Balanced at half, Rich at full." },
   { id: "📦 Enhanced Nodes.Glow.Show", key: "glowShow", name: "Node effect glow", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "A halo in the effect's primary color around each node with an effect." },
   { id: "📦 Enhanced Nodes.Glow", key: "glow", name: "Node glow strength", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Glow & hover", showIf: () => effects$1() && (N.glowShow || N.selectionGlow), tooltip: "How far the halo and the selection frame glow." },
   { id: "📦 Enhanced Nodes.Selection.Glow", key: "selectionGlow", name: "Glowing frame around selected nodes", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "On nodes with an effect." },
@@ -1678,6 +1678,7 @@ const STILL_NODE = { nodePhase: Math.PI / 4, particleTime: 0, nodeTime: 0 };
 const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) || env.reducedMotion || adaptive.level >= HELD;
 const UNDER = 1;
 const OVER = 2;
+const NO_TITLE = 1;
 const [NEVER, BYPASS] = [2, 4];
 let part$1;
 let fade = 1;
@@ -6237,12 +6238,10 @@ function ownBackground(node2) {
   return NAMES.has(own2) ? own2 : void 0;
 }
 const backgroundOf = (node2) => ownBackground(node2) ?? N.background;
-const NO_TITLE = 1;
 const backed = (node2) => !node2.flags.collapsed && node2.title_mode !== NO_TITLE && backgroundOf(node2) !== "none";
 const STILL_TIME = 7.3;
 const DETAIL = [0, 0.35, 0.5, 1];
 const MARGIN = 16;
-const PACKED = 0.8;
 const COMMON = `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -6347,7 +6346,7 @@ const PATTERNS = {
     if (uv.y > horizon) {
         float d = uv.y - horizon;
         float z = 0.3 / d;
-        vec2 g = vec2((uv.x - 0.5) * (u_size.x / u_size.y) * z, z + t * 0.4) * 2.0 / u_scale;
+        vec2 g = vec2((uv.x - 0.5) * (u_size.x / u_size.y) * z, z) * 2.0 / u_scale + vec2(0.0, t * 0.8);
         vec2 cell = abs(fract(g) - 0.5);
         float px = u_px * 100.0 * u_scale / u_size.y;
         float fz = 0.3 / (d * d) * px * 2.0 / u_scale;
@@ -6409,25 +6408,34 @@ ${pattern.main}
 }
 `;
 function pack(sizes2, width, height, out) {
-  let total = 0;
-  for (const { w, h: h2 } of sizes2) total += w * h2;
-  const shrink = total > PACKED * width * height ? Math.sqrt(PACKED * width * height / total) : 1;
+  let [total, wide, tall] = [0, 0, 0];
+  for (const { w, h: h2 } of sizes2) {
+    total += w * h2;
+    wide = Math.max(wide, w);
+    tall = Math.max(tall, h2);
+  }
+  let shrink = Math.min(1, Math.sqrt(width * height / total), width / wide, height / tall);
   const order = sizes2.map((_, i) => i).sort((a, b) => sizes2[b].h - sizes2[a].h);
-  let [x, y, shelf] = [0, 0, 0];
   out.length = sizes2.length;
+  for (let tries = 0; !shelve(sizes2, order, shrink, width, height, out) && tries < 4; tries++) shrink *= 0.85;
+  return shrink;
+}
+function shelve(sizes2, order, shrink, width, height, out) {
+  let [x, y, shelf, all2] = [0, 0, 0, true];
   for (const i of order) {
-    const w = Math.max(1, Math.ceil(sizes2[i].w * shrink));
-    const h2 = Math.max(1, Math.ceil(sizes2[i].h * shrink));
+    const w = Math.min(width, Math.max(1, Math.ceil(sizes2[i].w * shrink)));
+    const h2 = Math.min(height, Math.max(1, Math.ceil(sizes2[i].h * shrink)));
     if (x + w > width) [x, y, shelf] = [0, y + shelf, 0];
-    if (x + w > width || y + h2 > height) {
+    if (y + h2 > height) {
       out[i] = { x: -1, y: 0, w, h: h2 };
+      all2 = false;
       continue;
     }
     out[i] = { x, y, w, h: h2 };
     x += w;
     shelf = Math.max(shelf, h2);
   }
-  return shrink;
+  return all2;
 }
 const ATTRIBUTES = { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "low-power", failIfMajorPerformanceCaveat: true };
 function target() {
@@ -6549,35 +6557,43 @@ function prepareBackgrounds(canvas, ctx) {
   placed.clear();
   draws.length = sizes.length = 0;
   const { graph: graph2 } = canvas;
-  if (!graph2 || guard.off(BACKGROUND) || zoomedOut(canvas) || !N.enabled || LiteGraph.vueNodesMode) return 0;
+  if (failed || !graph2 || guard.off(BACKGROUND) || zoomedOut(canvas) || !N.enabled || LiteGraph.vueNodesMode) return 0;
   const share = detail();
-  const [vx, vy, vw, vh] = canvas.visible_area;
-  let scale2 = 0;
-  let margin = 0;
+  let [scale2, vx, vy, vx1, vy1] = [0, 0, 0, 0, 0];
   const nodes = [];
   for (const node2 of graph2.nodes) {
     if (!backed(node2)) continue;
     if (!scale2) {
-      scale2 = ctx.getTransform().a;
-      margin = MARGIN / scale2;
+      const at = ctx.getTransform();
+      scale2 = at.a;
+      [vx, vy] = [-(at.e + MARGIN) / scale2, -(at.f + MARGIN) / scale2];
+      [vx1, vy1] = [(ctx.canvas.width - at.e + MARGIN) / scale2, (ctx.canvas.height - at.f + MARGIN) / scale2];
     }
     const [x, y] = node2.pos;
     const [w, h2] = node2.size;
-    const x0 = Math.max(x, vx - margin);
-    const y0 = Math.max(y, vy - margin);
-    const x1 = Math.min(x + w, vx + vw + margin);
-    const y1 = Math.min(y + h2, vy + vh + margin);
+    const x0 = Math.max(x, vx);
+    const y0 = Math.max(y, vy);
+    const x1 = Math.min(x + w, vx1);
+    const y1 = Math.min(y + h2, vy1);
     if (x1 <= x0 || y1 <= y0) continue;
     const name = backgroundOf(node2);
     nodes.push(node2);
     draws.push({ name, w, h: h2, x0: x0 - x, y0: y0 - y, x1: x1 - x, y1: y1 - y, seed: (hash(String(node2.id)) >>> 0) % 640 / 10, colours: coloursOf(node2, name), px: 0 });
     sizes.push({ w: (x1 - x0) * scale2 * share, h: (y1 - y0) * scale2 * share });
   }
-  if (!nodes.length || !available()) return 0;
+  if (!nodes.length) {
+    bitmap?.close();
+    bitmap = void 0;
+    if (main && main.canvas.width > 1) [main.canvas.width, main.canvas.height] = [1, 1];
+    return 0;
+  }
+  if (!available()) return 0;
   try {
     if (main.gl.isContextLost()) {
       main = void 0;
-      failed = false;
+      bitmap?.close();
+      bitmap = void 0;
+      drawnFor = "";
       throw new Error("Node background: the WebGL context was lost");
     }
     const t = main;
@@ -6625,12 +6641,14 @@ function drawBackground(ctx, node2, w, h2, alpha) {
   return true;
 }
 let gallery;
+let galleryFailed = false;
 const TILE_NODE = { properties: {} };
 function drawTile(ctx, name, w, h2, time) {
-  if (failed) return false;
+  if (galleryFailed) return false;
+  if (gallery?.gl.isContextLost()) gallery = void 0;
   gallery ??= target();
   if (!gallery) {
-    failed = true;
+    galleryFailed = true;
     return false;
   }
   const t = gallery;
@@ -6764,6 +6782,7 @@ function stopTiles(within) {
     observer.unobserve(canvas);
     shown.delete(tiles.get(canvas));
   }
+  if (!shown.size) releaseTiles();
 }
 function tick(now) {
   frame = 0;
@@ -9177,12 +9196,13 @@ export {
   overlaps as a7,
   JELLY as a8,
   kicked as a9,
-  STILL_NODE as aA,
-  wobbling as aB,
-  hasBackground as aC,
-  drawBackground as aD,
-  BACKGROUND as aE,
-  stopSprites as aF,
+  CALM_ALPHA as aA,
+  STILL_NODE as aB,
+  wobbling as aC,
+  hasBackground as aD,
+  drawBackground as aE,
+  BACKGROUND as aF,
+  stopSprites as aG,
   zoomedOut as aa,
   holdsStill as ab,
   during as ac,
@@ -9206,9 +9226,9 @@ export {
   prepareBackgrounds as au,
   shake as av,
   reach as aw,
-  UNDER as ax,
-  ownStyle as ay,
-  CALM_ALPHA as az,
+  NO_TITLE as ax,
+  UNDER as ay,
+  ownStyle as az,
   dark as b,
   clock as c,
   darker as d,
@@ -9235,4 +9255,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-DKkY7HuN.js.map
+//# sourceMappingURL=menus-D9ziS-YA.js.map

@@ -43,16 +43,19 @@ describe('the atlas', () => {
         expect(out).toEqual([{ x: 0, y: 80, w: 100, h: 50 }, { x: 0, y: 0, w: 120, h: 80 }, { x: 120, y: 0, w: 90, h: 60 }]);
     });
 
-    it('shrinks them all alike once together they would take more than 0.8 of it, and leaves out what still does not fit', () => {
+    it('shrinks them all alike so that together they take no more than it, and by 0.85 until the shelves hold them all', () => {
         const out: Placed[] = [];
-        const sizes = Array.from({ length: 8 }, () => ({ w: 200, h: 100 }));
-        const shrink = pack(sizes, 400, 400, out);
-        expect(shrink).toBeCloseTo(Math.sqrt((0.8 * 400 * 400) / (8 * 200 * 100)), 6);
-        for (const p of out) expect([p.w, p.h]).toEqual([Math.ceil(200 * shrink), Math.ceil(100 * shrink)]);
-        expect(out.filter((p) => p.x >= 0).length).toBeGreaterThan(4);
-        // One wider than the atlas, shrunk, still is.
-        expect(pack([{ w: 900, h: 10 }], 400, 400, out)).toBe(1);
-        expect(out[0].x).toBe(-1);
+        // Five 150 px squares fit 400 × 300 by area, but two to a shelf need three shelves: at 0.85, three to a shelf need two.
+        const shrink = pack(Array.from({ length: 5 }, () => ({ w: 150, h: 150 })), 400, 300, out);
+        expect(shrink).toBeCloseTo(0.85, 9);
+        expect(out.map((p) => [p.x, p.y, p.w, p.h])).toEqual([[0, 0, 128, 128], [128, 0, 128, 128], [256, 0, 128, 128], [0, 128, 128, 128], [128, 128, 128, 128]]);
+    });
+
+    it('shrinks one larger than the atlas, as a node filling the view makes, until it fits', () => {
+        const out: Placed[] = [];
+        // The view and its margin, 1600 + 32 by 900 + 32 at Balanced, on an atlas half the view.
+        expect(pack([{ w: 816, h: 466 }], 800, 450, out)).toBeCloseTo(450 / 466, 9);
+        expect(out[0]).toEqual({ x: 0, y: 0, w: Math.ceil((816 * 450) / 466), h: 450 });
     });
 });
 

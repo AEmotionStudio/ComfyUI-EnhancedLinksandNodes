@@ -341,7 +341,7 @@
   },
   "📦 Enhanced Nodes_Background_Detail": {
     "name": "Background detail",
-    "tooltip": "How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all.",
+    "tooltip": "How sharp it is drawn: Fast at a third of the screen's resolution, Balanced at half, Rich at full.",
     "options": {
       "Fast": "Fast",
       "Balanced": "Balanced",

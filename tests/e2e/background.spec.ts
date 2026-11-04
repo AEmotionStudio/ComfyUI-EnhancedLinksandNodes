@@ -116,7 +116,9 @@ test.describe('with WebGL', () => {
             const [x1, y1] = canvas.ds.convertOffsetToCanvas([node.pos[0] + node.size[0], node.pos[1] + node.size[1]]);
             return [x0, y0, x1, y1].map(Math.round);
         }, graph.nodes.string);
-        for (const name of ['plasma', 'aurora', 'starfield', 'liquid', 'smoke', 'grid', 'lava', 'caustics']) {
+        // At the smallest Scale too, where the patterns are finest.
+        for (const [name, scale] of [...['plasma', 'aurora', 'starfield', 'liquid', 'smoke', 'grid', 'lava', 'caustics'].map((n) => [n, 1] as const), ['grid', 0.25] as const, ['caustics', 0.25] as const]) {
+            await setSetting(page, '📦 Enhanced Nodes.Background.Scale', scale);
             await setSetting(page, BACKGROUND, name);
             const light: number[] = [];
             for (let i = 0; i <= 60; i++) {
@@ -143,7 +145,7 @@ test.describe('with WebGL', () => {
                         extreme = value;
                     }
                 }
-                expect(turns / 2, `${name}, second ${second + 1}`).toBeLessThanOrEqual(3);
+                expect(turns / 2, `${name} at Scale ${scale}, second ${second + 1}`).toBeLessThanOrEqual(3);
             }
         }
     });
@@ -163,6 +165,32 @@ test.describe('with WebGL', () => {
         expect(apart(await pixelAt(page, body), native)).toBeGreaterThan(0);
         expect(await page.evaluate(() => window.__elnGl?.length)).toBe(2);
         expect(pageErrors(log)).toEqual([]);
+    });
+});
+
+test.describe('at twice the pixels', () => {
+    test.use({ settings: STILL, deviceScaleFactor: 2 });
+
+    test('a node zoomed in past the edges of the view keeps its background', async ({ page }) => {
+        await page.addInitScript(softwareGl);
+        await openApp(page);
+        const graph = await buildGraph(page, graphs.nodeStates);
+        // The string node four times its size, its body's middle in the middle of the view, past its edges both ways.
+        const middle = await page.evaluate((id) => {
+            const { canvas } = window.app;
+            const node = canvas.graph.getNodeById(id);
+            const rect = canvas.canvas.getBoundingClientRect();
+            const at: Point = [node.pos[0] + node.size[0] / 2, node.pos[1] + node.size[1] / 2];
+            canvas.ds.scale = Math.max(rect.width / node.size[0], rect.height / node.size[1]) * 1.6;
+            canvas.ds.offset = [rect.width / 2 / canvas.ds.scale - at[0], rect.height / 2 / canvas.ds.scale - at[1]];
+            canvas.setDirty(true, true);
+            return at;
+        }, graph.nodes.string);
+        await redraw(page);
+        const native = await pixelAt(page, middle);
+        await setSetting(page, BACKGROUND, 'plasma');
+        await redraw(page);
+        expect(apart(await pixelAt(page, middle), native)).toBeGreaterThan(20);
     });
 });
 

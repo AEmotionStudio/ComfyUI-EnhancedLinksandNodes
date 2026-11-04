@@ -69,6 +69,9 @@ export const holdsStill = () => N.staticMode || heldByRun(N.pauseDuringRender) |
 export const UNDER = 1;
 export const OVER = 2;
 
+/** TitleMode.NO_TITLE, a node without a title bar, such as a legacy Reroute (FE157 LGraphCanvas.ts L5917, FE1395 L5537). */
+export const NO_TITLE = 1;
+
 /** LGraphEventMode.NEVER (muted) and BYPASS, which fade a node and its effect. */
 export const [NEVER, BYPASS] = [2, 4];
 
