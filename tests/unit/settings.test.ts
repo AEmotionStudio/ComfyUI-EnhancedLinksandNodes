@@ -156,6 +156,16 @@ const V3_DEFAULTS: Record<string, unknown> = {
     '🔗 Enhanced Links.Assist.AutoConnect': true,
     '🔗 Enhanced Links.Assist.SnapKey': 'ctrl',
     '🔗 Enhanced Links.Keys': 'off',
+    // M10b
+    '📦 Enhanced Nodes.Background': 'none',
+    '📦 Enhanced Nodes.Background.Strength': 0.45,
+    '📦 Enhanced Nodes.Background.Speed': 1,
+    '📦 Enhanced Nodes.Background.Scale': 1,
+    '📦 Enhanced Nodes.Background.Color.Mode': 'preset',
+    '📦 Enhanced Nodes.Background.Color.Primary': '#00e5ff',
+    '📦 Enhanced Nodes.Background.Color.Secondary': '#7c4dff',
+    '📦 Enhanced Nodes.Background.Color.Accent': '#ff2bd6',
+    '📦 Enhanced Nodes.Background.Detail': 2,
 };
 const V3_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Coexist': ['auto', 'ours', 'defer'],
@@ -174,6 +184,9 @@ const V3_OPTIONS: Record<string, unknown[]> = {
     '📦 Enhanced Nodes.Run.Ring.Color.Mode': ['accent', 'effect', 'custom', 'rainbow', 'status'],
     '🔗 Enhanced Links.Assist.SnapKey': ['ctrl', 'alt', 'off'],
     '🔗 Enhanced Links.Keys': ['off', 'alt', 'alt-shift'],
+    '📦 Enhanced Nodes.Background': ['none', 'plasma', 'aurora', 'starfield', 'liquid', 'smoke', 'grid', 'lava', 'caustics'],
+    '📦 Enhanced Nodes.Background.Color.Mode': ['preset', 'effect', 'custom'],
+    '📦 Enhanced Nodes.Background.Detail': [1, 2, 3],
 };
 const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Focus.Dim': [5, 60, 5],
@@ -181,6 +194,9 @@ const V3_RANGES: Record<string, [min: number, max: number, step: number]> = {
     '🔗 Enhanced Links.Perf.StaticAbove': [0, 5000, 50],
     '🔗 Enhanced Links.Physics.Amount': [0, 2, 0.1],
     '🔗 Enhanced Links.Perf.MinZoom': [0, 100, 5],
+    '📦 Enhanced Nodes.Background.Strength': [0.1, 1, 0.05],
+    '📦 Enhanced Nodes.Background.Speed': [0, 3, 0.1],
+    '📦 Enhanced Nodes.Background.Scale': [0.25, 4, 0.05],
 };
 
 /** The v2.0.1 defaults v3 changes, by the milestone that changes them. */
@@ -347,8 +363,8 @@ describe('how the panel shows each setting', () => {
         showing();
     });
 
-    it('shows 62 settings before Advanced opens', () => {
-        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(62);
+    it('shows 70 settings before Advanced opens', () => {
+        expect(shownSettings().filter((s) => !('advanced' in s))).toHaveLength(70);
     });
 
     it('lets looks set every setting but the master switches, selection focus, navigation, Perf, Motion, Coexist and the hidden ones', () => {
@@ -369,7 +385,7 @@ describe('how the panel shows each setting', () => {
             'L.Enabled', 'L.Animate', 'L.Animation.Speed', 'L.Direction', 'L.Static.Mode', 'L.Link.Style', 'L.Thickness', 'L.Physics.Profile', 'L.Quality', 'L.Particle.Density',
             'L.Color.Mode', 'L.Color.Scheme', 'L.Glow.Intensity', 'L.Blend', 'L.Marker.Enabled', 'L.Marker.Shape', 'L.Marker.Size', 'L.Marker.Color.Mode',
             'L.Marker.Glow', 'L.Marker.Effects', 'L.Link.Shadow.Enabled', 'L.Marker.Shadow.Enabled', 'L.Shadow.Style', 'L.Assist.Mode',
-            'N.Enabled', 'N.Animate', 'N.Particle.Show', 'N.Text.Animation.Enabled',
+            'N.Enabled', 'N.Animate', 'N.Background', 'N.Particle.Show', 'N.Text.Animation.Enabled',
             'L.Focus.Enabled', 'L.Focus.Mode', 'L.Focus.Color', 'L.Focus.Depth', 'L.Focus.OnTop', 'L.Focus.Hover', 'L.Navigate.DoubleClick', 'L.Navigate.Follow',
             'L.Pause.Mode', 'L.Pause.During.Render', 'N.Pause.During.Render', 'L.Flow.River', 'L.Flow.Trail', 'L.Flow.Trail.Fade', 'N.Run.Ring', 'N.Run.Ring.Color.Mode', 'N.Run.Error',
             'N.End Animation.Enabled', 'N.Completion.Style', 'N.Completion.Anchor', 'N.Completion.PerNode', 'L.Perf.MaxFps', 'L.Perf.Adaptive', 'L.Perf.KeepGlow', 'L.Perf.StaticAbove', 'L.Perf.MinZoom', 'L.Motion', 'L.Keys', 'L.Coexist',
@@ -443,14 +459,15 @@ describe('how the panel shows each setting', () => {
         expect(needs()).toBeUndefined();
     });
 
-    it('disables the titles, the hover outline, focus on hover and double-click jumps in Nodes 2.0, with a fix that turns classic nodes back on, ahead of the colours they need', () => {
+    it('disables node backgrounds, the titles, the hover outline, focus on hover and double-click jumps in Nodes 2.0, with a fix that turns classic nodes back on, ahead of the colours they need', () => {
         showing({ '📦 Enhanced Nodes.Text.Animation.Enabled': true });
         const needing = () => SETTINGS.flatMap((s) => ('needs' in s && s.needs() ? [s.id.slice(s.id.indexOf('.') + 1)] : []));
         expect(needing()).toEqual(['Color.Particle', 'Text.Color']);
         LiteGraph.vueNodesMode = true;
         try {
             const titles = ['Text.Animation.Enabled', 'Text.Style', 'Text.Color', 'Text.Size', 'Text.Glow', 'Text.Letter.Spacing', 'Text.Position.X', 'Text.Position.Y', 'Text.Rotation.Radius', 'Text.Rotation.Angle'];
-            expect(needing()).toEqual(['Color.Hover.Show', 'Color.Hover', 'Color.Particle', ...titles, 'Focus.Hover', 'Navigate.DoubleClick']);
+            const backgrounds = ['Background', 'Background.Strength', 'Background.Speed', 'Background.Scale', 'Background.Color.Mode', 'Background.Color.Primary', 'Background.Color.Secondary', 'Background.Color.Accent', 'Background.Detail'];
+            expect(needing()).toEqual([...backgrounds, 'Color.Hover.Show', 'Color.Hover', 'Color.Particle', ...titles, 'Focus.Hover', 'Navigate.DoubleClick']);
             const color = SETTINGS.find((s) => s.id === '📦 Enhanced Nodes.Text.Color')!;
             expect('needs' in color && color.needs()).toEqual({ reason: 'Classic nodes only.', id: 'Comfy.VueNodes.Enabled', value: false, label: 'Use classic nodes' });
         } finally {

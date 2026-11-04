@@ -1,5 +1,5 @@
 import { app } from "/scripts/app.js";
-import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, a8 as JELLY, a9 as kicked, L, aa as zoomedOut, ab as holdsStill, ac as during, ad as nodePalette, ae as effectOf, af as particlesOnly$1, ag as stepOf, ah as BYPASS, ai as NEVER, S as SELECTION_FX, aj as nodeMenu, ak as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, al as startSprites, am as drawBursts, g as guard, an as COMPLETION, ao as wobbles, ap as shapeNode, aq as drawNodeFx, c as clock, ar as OVER, as as dummy, at as startShaking, au as shake, av as reach, aw as UNDER, w as wake, ax as ownStyle, ay as CALM_ALPHA, az as STILL_NODE, aA as wobbling, aB as stopSprites } from "./chunks/menus-D_GvKIFD.js";
+import { M as N, a3 as translucent, a4 as revision, a5 as transformPane, a6 as syncRuns, a7 as overlaps, a8 as JELLY, a9 as kicked, L, aa as zoomedOut, ab as holdsStill, ac as during, ad as nodePalette, ae as effectOf, af as particlesOnly$1, ag as stepOf, ah as BYPASS, ai as NEVER, S as SELECTION_FX, aj as nodeMenu, ak as nodeSettings, k as install, m as installPanel, o as installRuns, l as layers, a as live, al as startSprites, am as drawBursts, g as guard, an as COMPLETION, ao as wobbles, ap as shapeNode, aq as drawNodeFx, c as clock, ar as OVER, as as dummy, at as startShaking, au as prepareBackgrounds, av as shake, aw as reach, ax as UNDER, w as wake, ay as ownStyle, az as CALM_ALPHA, aA as STILL_NODE, aB as wobbling, aC as hasBackground, aD as drawBackground, aE as BACKGROUND, aF as stopSprites } from "./chunks/menus-Cx0tk3FA.js";
 const GLITCH = [["#ff0080", 0.7], ["#00ffff", 0.7], ["#ffff00", 0.5]];
 let fontSince = -1;
 let family = "";
@@ -360,6 +360,7 @@ function under(canvas, ctx) {
   vueNodes(canvas);
   const { graph } = canvas;
   if (!graph) return;
+  live.nodes += prepareBackgrounds(canvas, ctx);
   const vue = LiteGraph.vueNodesMode;
   const moving = !holdsStill();
   const titles = !vue && N.enabled && N.textAnimationEnabled && moving && !canvas.low_quality && !guard.off(TITLES);
@@ -418,6 +419,25 @@ function styledTitle(canvas, ctx, node) {
     ctx.restore();
   }
 }
+function backdrop(canvas, ctx, node, size, fill2) {
+  if (!hasBackground(node)) return false;
+  ctx.fillStyle = fill2;
+  ctx.beginPath();
+  body(canvas, ctx, node);
+  ctx.fill();
+  ctx.save();
+  try {
+    ctx.beginPath();
+    body(canvas, ctx, node);
+    ctx.clip();
+    drawBackground(ctx, node, size[0], size[1], fxAlpha(canvas, node));
+  } catch (error) {
+    guard.fail(BACKGROUND, error);
+  } finally {
+    ctx.restore();
+  }
+  return true;
+}
 let shaping;
 let titled;
 const ext = {
@@ -457,6 +477,7 @@ const ext = {
       const style = styleOf(node);
       const fx = style !== void 0 && !zoomedOut(this) && !guard.off(keyOf(style));
       if (lit(this, style)) ctx.shadowColor = "transparent";
+      if (backdrop(this, ctx, node, size, args[4])) args[4] = "transparent";
       shaping = node;
       titled = void 0;
       try {

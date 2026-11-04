@@ -58,6 +58,16 @@ const ANIMATED: Record<string, Record<string, unknown>> = {
 
 /** v3's own animations, measured too but on v1 and v2.0.1 (the -ref projects), which do not have them. */
 const OWN: Record<string, number> = { 'Merkaba Beads': 10, 'DNA Helix 3D': 11, 'Comet Trails': 12, Stardust: 13 };
+/**
+ * v3's own node effects and a node background on every node, measured as those are. The background needs WebGL on a
+ * GPU, so without ELN_GPU=1 its row may measure the nodes without it.
+ */
+const OWN_NODES: Record<string, Record<string, unknown>> = {
+    'Circuit Trace on every node': { '📦 Enhanced Nodes.Animate': 7 },
+    'Aurora Veil on every node': { '📦 Enhanced Nodes.Animate': 8 },
+    'Ember Crown on every node': { '📦 Enhanced Nodes.Animate': 9 },
+    'Plasma background on every node': { '📦 Enhanced Nodes.Background': 'plasma' },
+};
 const own = (testInfo: TestInfo) => !testInfo.project.name.endsWith('-ref');
 
 /** The looks measured in Nodes 2.0: the default, and Gentle Pulse on every node, whose glows breathe in CSS. */
@@ -226,7 +236,10 @@ test.describe('baselines', { tag: '@perf' }, () => {
         });
         const rows: FrameRateRow[] = [];
         const looks = { ...ANIMATED };
-        if (own(testInfo)) for (const [look, animate] of Object.entries(OWN)) looks[look] = { '🔗 Enhanced Links.Animate': animate };
+        if (own(testInfo)) {
+            for (const [look, animate] of Object.entries(OWN)) looks[look] = { '🔗 Enhanced Links.Animate': animate };
+            Object.assign(looks, OWN_NODES);
+        }
         for (const [look, settings] of Object.entries(looks)) {
             const ids = Object.keys(settings);
             const before = await page.evaluate((ids) => ids.map((id) => window.app.extensionManager.setting.get(id)), ids);

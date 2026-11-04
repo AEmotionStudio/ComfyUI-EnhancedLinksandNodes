@@ -8,7 +8,8 @@
  * LiteGraph's own node pass. The halo, and what an effect
  * draws around a node over it, go under every node, in onRender before the link
  * motion; what falls on the node goes over its body, from drawNodeShape, under
- * its slots and widgets.
+ * its slots and widgets. A node's background (nodes/shader.ts) goes on its body
+ * under all of that, its atlas drawn in onRender too.
  * The styled title takes the native title's place, over the effect. Effects
  * fade with the node's mode, as native draws the node; collapsed nodes, and
  * every node with Node effects off, get none; a Calm run halves them. In Nodes
@@ -29,6 +30,7 @@ import { BYPASS, NEVER, OVER, STILL_NODE, UNDER, drawNodeFx, effectOf, holdsStil
 import { JELLY, shake, shapeNode, startShaking, wobbles, wobbling } from '@/nodes/jelly';
 import { drawTitle, titleOf } from '@/nodes/text';
 import { vueNodes } from '@/nodes/vue';
+import { BACKGROUND, drawBackground, hasBackground, prepareBackgrounds } from '@/nodes/shader';
 import { COMPLETION, drawBursts } from '@/fx/bursts';
 import { installRuns } from '@/fx/execution';
 import { startSprites, stopSprites } from '@/fx/particles';
@@ -146,6 +148,7 @@ function under(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     vueNodes(canvas);
     const { graph } = canvas;
     if (!graph) return;
+    live.nodes += prepareBackgrounds(canvas, ctx);
     // In Nodes 2.0 the DOM draws the nodes and none of the node hooks run: the halo and the effects are nodes/vue.ts's
     // stylesheet's, and this layer draws the particles alone, under the DOM nodes.
     const vue = LiteGraph.vueNodesMode;
@@ -217,6 +220,30 @@ function styledTitle(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node):
     }
 }
 
+/**
+ * A node's background on its body, under what native draws on it: the body filled first as native fills it, in `fill`
+ * and with the shadow native would cast, then the background over it. False if it has none this pass.
+ */
+function backdrop(canvas: Canvas, ctx: CanvasRenderingContext2D, node: Node, size: Parameters<Canvas['drawNodeShape']>[2], fill: Parameters<Canvas['drawNodeShape']>[4]): boolean {
+    if (!hasBackground(node)) return false;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    body(canvas, ctx, node);
+    ctx.fill();
+    ctx.save();
+    try {
+        ctx.beginPath();
+        body(canvas, ctx, node);
+        ctx.clip();
+        drawBackground(ctx, node, size[0], size[1], fxAlpha(canvas, node));
+    } catch (error) {
+        guard.fail(BACKGROUND, error);
+    } finally {
+        ctx.restore();
+    }
+    return true;
+}
+
 /** The node whose shape the drawNodeShape wrapper is drawing, and the options native's title had, once it went to the dummy for the styled one. */
 let shaping: Node | undefined;
 let titled: TitleOptions | undefined;
@@ -263,7 +290,8 @@ const ext: ComfyExtension = {
             }
         };
 
-        // The node's body, which casts no shadow where the under-layer cast its halo in native's stead. Then the over-layer:
+        // The node's body, which casts no shadow where the under-layer cast its halo in native's stead, and with a
+        // background, its fill ours and native's see-through, so the background lies under all native draws. Then the over-layer:
         // what the effect draws on the body, clipped to it, under the slots and widgets; the under-layer drew the rest.
         // Then the styled title, over the effect as v1 drew it (old_node_animations.js:2116-2121).
         LGraphCanvas.prototype.drawNodeShape = function (this: Canvas, ...args: Parameters<Canvas['drawNodeShape']>) {
@@ -271,6 +299,7 @@ const ext: ComfyExtension = {
             const style = styleOf(node);
             const fx = style !== undefined && !zoomedOut(this) && !guard.off(keyOf(style));
             if (lit(this, style)) ctx.shadowColor = 'transparent';
+            if (backdrop(this, ctx, node, size, args[4])) args[4] = 'transparent';
             shaping = node;
             titled = undefined;
             try {

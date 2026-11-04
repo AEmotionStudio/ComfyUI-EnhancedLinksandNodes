@@ -295,6 +295,59 @@
       "Rich": "Rich"
     }
   },
+  "📦 Enhanced Nodes_Background": {
+    "name": "Node background",
+    "tooltip": "An animated pattern on each node's body, under its slots and widgets, drawn on the GPU. Node background in the node menu picks one for a node.",
+    "options": {
+      "None": "None",
+      "Plasma": "Plasma",
+      "Aurora": "Aurora",
+      "Starfield": "Starfield",
+      "Liquid": "Liquid",
+      "Smoke": "Smoke",
+      "Grid": "Grid",
+      "Lava": "Lava",
+      "Caustics": "Caustics"
+    }
+  },
+  "📦 Enhanced Nodes_Background_Strength": {
+    "name": "Background strength",
+    "tooltip": "How much of the node's own fill it covers: less keeps slot names easier to read."
+  },
+  "📦 Enhanced Nodes_Background_Speed": {
+    "name": "Background speed",
+    "tooltip": "0 holds it still."
+  },
+  "📦 Enhanced Nodes_Background_Scale": {
+    "name": "Background scale",
+    "tooltip": "How large its pattern is."
+  },
+  "📦 Enhanced Nodes_Background_Color_Mode": {
+    "name": "Background colors",
+    "options": {
+      "Pattern colors": "Pattern colors",
+      "Node effect colors": "Node effect colors",
+      "Custom": "Custom"
+    }
+  },
+  "📦 Enhanced Nodes_Background_Color_Primary": {
+    "name": "Background primary color"
+  },
+  "📦 Enhanced Nodes_Background_Color_Secondary": {
+    "name": "Background secondary color"
+  },
+  "📦 Enhanced Nodes_Background_Color_Accent": {
+    "name": "Background accent color"
+  },
+  "📦 Enhanced Nodes_Background_Detail": {
+    "name": "Background detail",
+    "tooltip": "How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all.",
+    "options": {
+      "Fast": "Fast",
+      "Balanced": "Balanced",
+      "Rich": "Rich"
+    }
+  },
   "📦 Enhanced Nodes_Glow_Show": {
     "name": "Node effect glow",
     "tooltip": "A halo in the effect's primary color around each node with an effect."

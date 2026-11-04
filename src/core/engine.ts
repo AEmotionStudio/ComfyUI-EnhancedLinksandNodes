@@ -45,12 +45,13 @@ const CALM_FPS = 20;
  * more than MAX_FLASH_HZ times a second, which binds above speed 1.44. The nodes run on v1's 60 Hz rates
  * (old_node_animations.js:71-127, 2945-2957), whatever the frame rate: their phase turns TURN × speed radians a second,
  * their particles' time runs Particle.Speed seconds a second and nodeTime one, and nodeDir turns them around as linkDir
- * does the links. A Calm run moves both at a quarter of their pace. burstTime runs a second a second while a burst
+ * does the links. backgroundTime runs Background.Speed seconds a second while the nodes move, wrapping round each hour
+ * so a shader keeps its precision. A Calm run moves all of these at a quarter of their pace. burstTime runs a second a second while a burst
  * plays, from 0 as its show starts, markTime while a node is marked, from 0 as its mark starts, runTime while a
  * run's visuals move, and assistTime while connection assist draws. Only the ticker moves the clock, never a draw, so
  * a canvas drawn again within a frame (as MagnifyGlass does) shows the same moment.
  */
-export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
+export const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, backgroundTime: 0, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
 
 /** The pose of still links: the first frame v1 drew in Static mode (old_link_animations.js:2440-2456). */
 export const STILL_PHASE = (9 * Math.PI) / 4;
@@ -266,7 +267,10 @@ export function advance(k: typeof clock, dt: number, moving: typeof live): void 
     }
     const nodeDt = during(N.pauseDuringRender) === 'calm' ? dt * CALM : dt;
     k.nodeDir = moving.nodes || moving.particles ? toward(k.nodeDir, N.direction, dt) : N.direction;
-    if (moving.nodes) k.nodePhase += TURN * N.animationSpeed * k.nodeDir * nodeDt;
+    if (moving.nodes) {
+        k.nodePhase += TURN * N.animationSpeed * k.nodeDir * nodeDt;
+        k.backgroundTime = (k.backgroundTime + N.backgroundSpeed * nodeDt) % 3600;
+    }
     if (moving.particles) {
         k.particleTime += N.particleSpeed * k.nodeDir * nodeDt;
         k.nodeTime += nodeDt;

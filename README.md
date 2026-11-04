@@ -28,6 +28,7 @@
 *   **Run visuals and completion effects.** For the runs you queue: light flowing into the running node, a progress ring, a fading trail and a red pulse on errors, then fireworks, confetti, a shockwave or a path trace when the run finishes.
 *   **The FX panel.** 11 looks with live previews, search, Undo and a first-run look picker; every setting also has a readable name and group in ComfyUI's settings dialog.
 *   **New effects.** Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust, wire physics, and connection assist with reaching hands and googly eyes.
+*   **Node backgrounds.** Animated patterns drawn on the GPU on each node's body, under its widgets and any node effect.
 
 > **Upgrading from 2.x:** your settings are kept. On first load a **Choose your look** card asks for a look; until you pick, Subtle shows and nothing is written to your settings. If you had changed settings in 2.x, **Keep my settings** keeps them.
 
@@ -124,6 +125,20 @@
 
 </td>
 </tr>
+<tr>
+<td width="50%">
+
+### 🌌 Node backgrounds
+![Node backgrounds](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/backgrounds.webp)
+
+*   **8 patterns** drawn on the GPU on each node's body, under its slots and widgets: Plasma, Aurora, Starfield, Liquid, Smoke, Grid, Lava and Caustics.
+*   In their own colors, the node effect's or yours, with **Strength**, **Speed**, **Scale** and **Detail**; they lie under any node effect.
+*   **Node background** in the node menu gives one node its own, or none. Classic nodes, with WebGL on a GPU.
+
+</td>
+<td width="50%">
+</td>
+</tr>
 </table>
 
 ---
@@ -209,7 +224,7 @@ All 96 settings are in ComfyUI's settings dialog under **Enhanced Links & Nodes*
 | :--- | :--- |
 | **ComfyUI frontend** | 1.39.5 or later; tested on 1.39.5 and 1.57.1. |
 | **Classic nodes** | Everything. |
-| **Nodes 2.0** | Glows, particles, selection focus, run visuals, completion effects and connection assist. Classic only, as the panel says: the patterns inside nodes (Neon Nexus's tube and lattice, Cosmic Ripple's rings, Sacred Rosette's and Flower of Life's patterns), animated titles, the hover outline, focus on hover and the double-click jump. |
+| **Nodes 2.0** | Glows, particles, selection focus, run visuals, completion effects and connection assist. Classic only, as the panel says: the patterns inside nodes (Neon Nexus's tube and lattice, Cosmic Ripple's rings, Sacred Rosette's and Flower of Life's patterns), node backgrounds, animated titles, the hover outline, focus on hover and the double-click jump. |
 | **Subgraphs** | Effects keep animating inside them, and links into and out of them stay native. |
 | **KJNodes, MagnifyGlass** | Work alongside, tested together. |
 | **LinkFX and other extensions that draw links** | **Other link extensions** is *Step aside if one is found* by default: the other extension draws the links, and node effects, progress rings and completion effects keep working. |

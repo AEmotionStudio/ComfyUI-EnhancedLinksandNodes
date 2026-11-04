@@ -124,6 +124,22 @@ const QUALITY_OPTIONS = [
   { value: 2, text: "Balanced" },
   { value: 3, text: "Rich" }
 ];
+const BACKGROUND_OPTIONS = [
+  { value: "none", text: "None" },
+  { value: "plasma", text: "Plasma" },
+  { value: "aurora", text: "Aurora" },
+  { value: "starfield", text: "Starfield" },
+  { value: "liquid", text: "Liquid" },
+  { value: "smoke", text: "Smoke" },
+  { value: "grid", text: "Grid" },
+  { value: "lava", text: "Lava" },
+  { value: "caustics", text: "Caustics" }
+];
+const BACKGROUND_COLOR_OPTIONS = [
+  { value: "preset", text: "Pattern colors" },
+  { value: "effect", text: "Node effect colors" },
+  { value: "custom", text: "Custom" }
+];
 const DENSITY_OPTIONS = [
   { value: 0.5, text: "Minimal" },
   { value: 1, text: "Balanced" },
@@ -214,6 +230,7 @@ const shadows = () => linksOn() && L.animate === CLASSIC$2 && L.linkShadowEnable
 const effects$1 = () => N.enabled && N.animate !== 0;
 const nodesDraw = () => N.enabled && (N.animate !== 0 || N.particleShow || N.textAnimationEnabled);
 const particles = () => N.enabled && N.particleShow;
+const backgrounds$1 = () => N.enabled && N.background !== "none";
 const focusOn = () => L.focusEnabled;
 const runsChange = () => L.pauseMode !== "ignore";
 const titles = () => N.enabled && N.textAnimationEnabled;
@@ -280,6 +297,15 @@ const SETTINGS = [
   { id: "📦 Enhanced Nodes.Animation.Size", key: "animationSize", name: "Node effect size", type: "slider", min: 0.5, max: 3, step: 0.1, default: 1, group: "Nodes · Effect", advanced: true, showIf: effects$1 },
   { id: "📦 Enhanced Nodes.Animation.Glow", key: "animationGlow", name: "Node effect bloom", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "Glow of the effect's lines and light, and of the hover outline." },
   { id: "📦 Enhanced Nodes.Quality", key: "quality", name: "Node effect quality", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Effect", advanced: true, showIf: effects$1, tooltip: "More detail, more GPU." },
+  { id: "📦 Enhanced Nodes.Background", key: "background", name: "Node background", type: "combo", options: BACKGROUND_OPTIONS, default: "none", group: "Nodes · Background", showIf: () => N.enabled, needs: classicNodes, tooltip: "An animated pattern on each node's body, under its slots and widgets, drawn on the GPU. Node background in the node menu picks one for a node." },
+  { id: "📦 Enhanced Nodes.Background.Strength", key: "backgroundStrength", name: "Background strength", type: "slider", min: 0.1, max: 1, step: 0.05, default: 0.45, group: "Nodes · Background", showIf: backgrounds$1, needs: classicNodes, tooltip: "How much of the node's own fill it covers: less keeps slot names easier to read." },
+  { id: "📦 Enhanced Nodes.Background.Speed", key: "backgroundSpeed", name: "Background speed", type: "slider", min: 0, max: 3, step: 0.1, default: 1, group: "Nodes · Background", showIf: backgrounds$1, needs: classicNodes, tooltip: "0 holds it still." },
+  { id: "📦 Enhanced Nodes.Background.Scale", key: "backgroundScale", name: "Background scale", type: "slider", min: 0.25, max: 4, step: 0.05, default: 1, group: "Nodes · Background", showIf: backgrounds$1, needs: classicNodes, tooltip: "How large its pattern is." },
+  { id: "📦 Enhanced Nodes.Background.Color.Mode", key: "backgroundColorMode", name: "Background colors", type: "combo", options: BACKGROUND_COLOR_OPTIONS, default: "preset", group: "Nodes · Background", showIf: backgrounds$1, needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Background.Color.Primary", key: "backgroundColorPrimary", name: "Background primary color", type: "color", default: "#00e5ff", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Background.Color.Secondary", key: "backgroundColorSecondary", name: "Background secondary color", type: "color", default: "#7c4dff", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Background.Color.Accent", key: "backgroundColorAccent", name: "Background accent color", type: "color", default: "#ff2bd6", group: "Nodes · Background", showIf: () => backgrounds$1() && N.backgroundColorMode === "custom", needs: classicNodes },
+  { id: "📦 Enhanced Nodes.Background.Detail", key: "backgroundDetail", name: "Background detail", type: "combo", options: QUALITY_OPTIONS, default: 2, group: "Nodes · Background", advanced: true, showIf: backgrounds$1, needs: classicNodes, tooltip: "How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all." },
   { id: "📦 Enhanced Nodes.Glow.Show", key: "glowShow", name: "Node effect glow", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "A halo in the effect's primary color around each node with an effect." },
   { id: "📦 Enhanced Nodes.Glow", key: "glow", name: "Node glow strength", type: "slider", min: 0, max: 1, step: 0.05, default: 0.5, group: "Nodes · Glow & hover", showIf: () => effects$1() && (N.glowShow || N.selectionGlow), tooltip: "How far the halo and the selection frame glow." },
   { id: "📦 Enhanced Nodes.Selection.Glow", key: "selectionGlow", name: "Glowing frame around selected nodes", type: "boolean", default: true, group: "Nodes · Glow & hover", showIf: effects$1, tooltip: "On nodes with an effect." },
@@ -531,7 +557,7 @@ const FAILURES = 5;
 const CALM = 0.25;
 const CALM_ALPHA = 0.5;
 const CALM_FPS = 20;
-const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
+const clock = { linkPhase: 0, linkFlow: 0, linkDir: 1, quantumPhase: 0, nodePhase: 0, particleTime: 0, nodeTime: 0, nodeDir: 1, backgroundTime: 0, burstTime: 0, markTime: 0, runTime: 0, assistTime: 0 };
 const STILL_PHASE = 9 * Math.PI / 4;
 const env = { running: false, reducedMotion: false };
 const PLAIN = 1;
@@ -663,7 +689,10 @@ function advance(k2, dt, moving2) {
   }
   const nodeDt = during(N.pauseDuringRender) === "calm" ? dt * CALM : dt;
   k2.nodeDir = moving2.nodes || moving2.particles ? toward(k2.nodeDir, N.direction, dt) : N.direction;
-  if (moving2.nodes) k2.nodePhase += TURN * N.animationSpeed * k2.nodeDir * nodeDt;
+  if (moving2.nodes) {
+    k2.nodePhase += TURN * N.animationSpeed * k2.nodeDir * nodeDt;
+    k2.backgroundTime = (k2.backgroundTime + N.backgroundSpeed * nodeDt) % 3600;
+  }
   if (moving2.particles) {
     k2.particleTime += N.particleSpeed * k2.nodeDir * nodeDt;
     k2.nodeTime += nodeDt;
@@ -719,7 +748,7 @@ function transformPane() {
   if (!found?.isConnected) found = document.querySelector(PANE);
   return found;
 }
-function ours(main) {
+function ours(main2) {
   const pane = transformPane();
   if (!pane) return null;
   if (!own$1) {
@@ -729,9 +758,9 @@ function ours(main) {
     ownCtx = own$1.getContext("2d");
   }
   if (pane.nextElementSibling !== own$1) pane.after(own$1);
-  if (own$1.width !== main.width || own$1.height !== main.height) {
-    own$1.width = main.width;
-    own$1.height = main.height;
+  if (own$1.width !== main2.width || own$1.height !== main2.height) {
+    own$1.width = main2.width;
+    own$1.height = main2.height;
   } else ownCtx?.clearRect(0, 0, own$1.width, own$1.height);
   return ownCtx;
 }
@@ -752,8 +781,8 @@ function overNodes(canvas, ctx) {
     if (own$1) drop();
     return foreground(canvas, ctx);
   }
-  const main = canvas.canvas;
-  const top = "overlayCtx" in canvas ? canvas.overlayCtx : ours(main);
+  const main2 = canvas.canvas;
+  const top = "overlayCtx" in canvas ? canvas.overlayCtx : ours(main2);
   if (!top) return foreground(canvas, ctx);
   top.save();
   try {
@@ -927,6 +956,10 @@ function parse(colour2) {
   }
   const channel = (v, unit) => Math.round(clamp(unit ? Number(v) * 255 / 100 : Number(v), 0, 255));
   return [channel(x, xUnit), channel(y, yUnit), channel(z, zUnit), alpha];
+}
+function rgb(colour2) {
+  const [r, g, b] = parse(colour2) ?? [0, 0, 0];
+  return [r / 255, g / 255, b / 255];
 }
 function show$1([r, g, b, a]) {
   if (a < 1) return `rgba(${r}, ${g}, ${b}, ${a})`;
@@ -2837,8 +2870,8 @@ function syncRuns(canvas) {
       into.set(Number(node2.id), entry2);
       continue;
     }
-    const { start, end: end2, progress: progress2, failed } = seen2.step;
-    seen2.step = { start: Math.min(start, step2.start), end: Math.max(end2, step2.end), progress: step2.end === Infinity ? step2.progress : progress2, failed: failed || step2.failed };
+    const { start, end: end2, progress: progress2, failed: failed2 } = seen2.step;
+    seen2.step = { start: Math.min(start, step2.start), end: Math.max(end2, step2.end), progress: step2.end === Infinity ? step2.progress : progress2, failed: failed2 || step2.failed };
   }
   for (const { node: node2, step: step2 } of shown$2) if (node2.inputs.some((input) => input.link != null)) rank.set(step2, ranks++);
 }
@@ -3117,10 +3150,10 @@ function installRuns(part2) {
   }
   if (listening) return;
   listening = true;
-  const ours2 = (detail) => env.running && detail.prompt_id === run.prompt;
-  api.addEventListener("execution_start", ({ detail }) => {
+  const ours2 = (detail2) => env.running && detail2.prompt_id === run.prompt;
+  api.addEventListener("execution_start", ({ detail: detail2 }) => {
     if (performance.now() - celebrated < BATCH_MS) endBursts();
-    Object.assign(run, { prompt: detail.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
+    Object.assign(run, { prompt: detail2.prompt_id, workflow: app.extensionManager.workflow.activeWorkflow, end: Infinity });
     steps.clear();
     cached.clear();
     held$3.clear();
@@ -3128,13 +3161,13 @@ function installRuns(part2) {
     env.running = true;
     changed$2(true);
   });
-  api.addEventListener("execution_cached", ({ detail }) => {
-    if (ours2(detail)) for (const id of detail.nodes) cached.add(String(id));
+  api.addEventListener("execution_cached", ({ detail: detail2 }) => {
+    if (ours2(detail2)) for (const id of detail2.nodes) cached.add(String(id));
   });
-  api.addEventListener("progress_state", ({ detail }) => {
-    if (!ours2(detail)) return;
+  api.addEventListener("progress_state", ({ detail: detail2 }) => {
+    if (!ours2(detail2)) return;
     let moved2 = false;
-    for (const { state: state2, value, max, node_id, display_node_id } of Object.values(detail.nodes)) {
+    for (const { state: state2, value, max, node_id, display_node_id } of Object.values(detail2.nodes)) {
       const id = String(display_node_id ?? node_id);
       let step2 = steps.get(id);
       if (state2 === "running") {
@@ -3154,14 +3187,14 @@ function installRuns(part2) {
     }
     changed$2(moved2);
   });
-  api.addEventListener("execution_success", ({ detail }) => {
-    if (!ours2(detail)) return;
+  api.addEventListener("execution_success", ({ detail: detail2 }) => {
+    if (!ours2(detail2)) return;
     finish();
-    celebrate(detail.prompt_id);
+    celebrate(detail2.prompt_id);
   });
-  api.addEventListener("execution_error", ({ detail }) => {
-    if (!ours2(detail)) return;
-    const id = detail.node_id == null ? void 0 : String(detail.node_id);
+  api.addEventListener("execution_error", ({ detail: detail2 }) => {
+    if (!ours2(detail2)) return;
+    const id = detail2.node_id == null ? void 0 : String(detail2.node_id);
     if (id !== void 0) {
       const step2 = steps.get(id) ?? { start: clock.runTime, end: Infinity, progress: NaN, failed: false };
       step2.failed = true;
@@ -3171,8 +3204,8 @@ function installRuns(part2) {
     const node2 = id === void 0 ? void 0 : path(id).at(-1);
     if (node2) held$3.set(id, signature(node2));
   });
-  api.addEventListener("execution_interrupted", ({ detail }) => {
-    if (ours2(detail)) finish();
+  api.addEventListener("execution_interrupted", ({ detail: detail2 }) => {
+    if (ours2(detail2)) finish();
   });
   api.addEventListener("reconnected", () => {
     if (env.running) finish();
@@ -4124,10 +4157,10 @@ class LinkPath {
   /** Writes the point `d` px along the path, clamped to it, and the path's direction there: x, y, then the unit tangent. */
   find(d, out) {
     const { p, cum } = this;
-    const target = Math.min(this.length, Math.max(0, d));
-    const i = this.seek(target);
+    const target2 = Math.min(this.length, Math.max(0, d));
+    const i = this.seek(target2);
     const span = cum[i + 1] - cum[i];
-    const f = span ? (target - cum[i]) / span : 0;
+    const f = span ? (target2 - cum[i]) / span : 0;
     let tx;
     let ty;
     if (this.spline) {
@@ -5501,9 +5534,9 @@ function record(canvas, link2, a, b, color, startDir, endDir, extras, focused, f
   let shaped = false;
   if (wobbling) {
     const origin = from ? void 0 : canvas.graph?.getNodeById(link2.origin_id);
-    const target = reroute ? void 0 : canvas.graph?.getNodeById(link2.target_id);
+    const target2 = reroute ? void 0 : canvas.graph?.getNodeById(link2.target_id);
     if (origin && moved$1(origin, a, startAt)) [a, shaped] = [startAt, true];
-    if (target && moved$1(target, b, endAt)) [b, shaped] = [endAt, true];
+    if (target2 && moved$1(target2, b, endAt)) [b, shaped] = [endAt, true];
   }
   segment2.lay(
     a,
@@ -6149,7 +6182,7 @@ const optionsOf = (id) => {
   const s = setting(id);
   return s.type === "combo" ? s.options : [];
 };
-const hex = (rgb) => `#${rgb.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+const hex = (rgb2) => `#${rgb2.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 const light = () => !document.documentElement.classList.contains("dark-theme") && !document.body.classList.contains("dark-theme");
 function mix(seed) {
   const random = rng(seed);
@@ -6529,6 +6562,401 @@ function row(s, found2 = false) {
       }
     }
   };
+}
+const BACKGROUND = "Node background";
+const OWN_BACKGROUND = "enhanced_fx_background";
+const NAMES = new Set(BACKGROUND_OPTIONS.map((option) => option.value));
+function ownBackground(node2) {
+  const own2 = node2.properties[OWN_BACKGROUND];
+  return NAMES.has(own2) ? own2 : void 0;
+}
+const backgroundOf = (node2) => ownBackground(node2) ?? N.background;
+const NO_TITLE = 1;
+const backed = (node2) => !node2.flags.collapsed && node2.title_mode !== NO_TITLE && backgroundOf(node2) !== "none";
+const STILL_TIME = 7.3;
+const DETAIL = [0, 0.35, 0.5, 1];
+const MARGIN = 16;
+const PACKED = 0.8;
+const COMMON = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform float u_time;
+uniform vec2 u_size;
+uniform float u_scale;
+uniform float u_px;
+uniform float u_seed;
+uniform vec3 u_c1;
+uniform vec3 u_c2;
+uniform vec3 u_c3;
+varying vec2 v_at;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float fbm(vec2 p, float px) {
+    float v = 0.0;
+    float a = 0.5;
+    float f = 1.0;
+    for (int i = 0; i < 4; i++) {
+        v += a * mix(0.5, noise(p * f), clamp(1.0 - f * px * 2.0, 0.0, 1.0));
+        f *= 2.0;
+        a *= 0.5;
+    }
+    return v;
+}
+vec3 ramp(float t) {
+    t = clamp(t, 0.0, 1.0);
+    return t < 0.5 ? mix(u_c1, u_c2, t * 2.0) : mix(u_c2, u_c3, t * 2.0 - 1.0);
+}
+`;
+const PATTERNS = {
+  plasma: {
+    colours: ["#ff2bd6", "#7c4dff", "#00e5ff"],
+    hz: 0.16,
+    main: `
+    vec2 p = P * 3.0;
+    float v = sin(p.x + t) + sin(p.y * 1.3 - t * 0.8) + sin((p.x + p.y) * 0.7 + t * 0.6) + sin(length(p - vec2(1.5)) * 1.8 - t);
+    gl_FragColor = vec4(ramp(0.5 + 0.22 * v) * (0.6 + 0.4 * cos(v)), 1.0);`
+  },
+  aurora: {
+    colours: ["#3dffa8", "#38c6ff", "#c77dff"],
+    hz: 0.1,
+    main: `
+    float x = P.x * 1.6 + 1.2 * fbm(vec2(P.x * 0.8, t * 0.08), u_px * 0.8);
+    float band = 0.5 + 0.5 * sin(x * 4.0 + t * 0.35);
+    float hang = smoothstep(1.05, 0.0, v_at.y / u_size.y);
+    float rays = mix(0.875, 0.75 + 0.25 * noise(vec2(P.x * 14.0, t * 0.1)), clamp(1.0 - 28.0 * u_px, 0.0, 1.0));
+    vec3 light = mix(mix(u_c1, u_c2, band), u_c3, smoothstep(0.75, 1.0, band));
+    gl_FragColor = vec4(u_c2 * 0.08 + light * band * band * hang * rays, 1.0);`
+  },
+  starfield: {
+    colours: ["#5a6bff", "#1b1f4a", "#ffffff"],
+    hz: 0.48,
+    main: `
+    vec3 c = u_c2 * 0.5 + u_c1 * 0.6 * smoothstep(0.3, 0.8, fbm(P * 1.2 + vec2(t * 0.02, 0.0), u_px * 1.2));
+    vec2 g = P * 5.0;
+    vec2 id = floor(g);
+    float h = hash(id + 3.1);
+    if (h > 0.6) {
+        vec2 off = vec2(hash(id + 1.7), hash(id + 9.2)) - 0.5;
+        float d = length(fract(g) - 0.5 - off * 0.6);
+        float r = max(0.08, u_px * 5.0);
+        float star = smoothstep(r, 0.0, d) * (0.08 / r) * (0.08 / r) + 0.35 * smoothstep(4.0 * r, 0.0, d);
+        float twinkle = 0.65 + 0.35 * sin(t * (1.0 + 2.0 * fract(h * 13.0)) + h * 40.0);
+        c += mix(u_c3, vec3(1.0), 0.5) * star * twinkle;
+    }
+    gl_FragColor = vec4(c, 1.0);`
+  },
+  liquid: {
+    colours: ["#00c2ff", "#2a2f8f", "#9dfff5"],
+    hz: 0.5,
+    main: `
+    vec2 p = P * 1.4;
+    float px = u_px * 1.4;
+    vec2 q = vec2(fbm(p + vec2(0.0, t * 0.03), px), fbm(p + vec2(5.2, 1.3) - t * 0.025, px));
+    float v = fbm(p + 2.0 * q + t * 0.02, px);
+    gl_FragColor = vec4(ramp(v * 1.3 - 0.1) * (0.35 + 0.65 * v), 1.0);`
+  },
+  smoke: {
+    colours: ["#3a3f4b", "#8a93a6", "#e6ecff"],
+    hz: 0.6,
+    main: `
+    vec2 p = P * 2.0 + vec2(0.0, t * 0.15);
+    float v = fbm(p + 0.6 * fbm(P * 3.0 - vec2(0.0, t * 0.1), u_px * 3.0), u_px * 2.0);
+    gl_FragColor = vec4(ramp(v) * smoothstep(0.25, 0.85, v), 1.0);`
+  },
+  grid: {
+    colours: ["#ff2bd6", "#1a0b2e", "#ffb300"],
+    hz: 0.8,
+    main: `
+    vec2 uv = v_at / u_size;
+    float horizon = 0.35;
+    vec3 c = mix(u_c2 * 0.6, u_c3 * 0.55, smoothstep(0.0, horizon, uv.y));
+    if (uv.y > horizon) {
+        float d = uv.y - horizon;
+        float z = 0.3 / d;
+        vec2 g = vec2((uv.x - 0.5) * (u_size.x / u_size.y) * z, z + t * 0.4) * 2.0 / u_scale;
+        vec2 cell = abs(fract(g) - 0.5);
+        float px = u_px * 100.0 * u_scale / u_size.y;
+        float fz = 0.3 / (d * d) * px * 2.0 / u_scale;
+        float fx = z * px * 2.0 / u_scale;
+        float lines = max(smoothstep(0.04 + fx, 0.04, 0.5 - cell.x) * clamp(1.0 - fx * 3.0, 0.0, 1.0), smoothstep(0.04 + fz, 0.04, 0.5 - cell.y) * clamp(1.0 - fz * 3.0, 0.0, 1.0));
+        c = u_c2 * 0.5 + u_c1 * lines + u_c3 * exp(-d * 18.0) * 0.6;
+    }
+    gl_FragColor = vec4(c, 1.0);`
+  },
+  lava: {
+    colours: ["#ff4d00", "#3a0a00", "#ffb300"],
+    hz: 0.1,
+    main: `
+    vec2 uv = v_at / u_size;
+    float aspect = u_size.x / u_size.y;
+    float f = 0.0;
+    for (int i = 0; i < 6; i++) {
+        float fi = float(i);
+        float rise = fract(fi * 0.37 + u_seed * 0.013 + t * 0.04 * (1.0 + fi * 0.15));
+        vec2 c = vec2(0.5 + 0.38 * sin(t * 0.25 * (1.0 + fi * 0.13) + fi * 2.1 + u_seed), 1.15 - rise * 1.3);
+        float r = (0.1 + 0.05 * fract(fi * 0.61)) * sin(3.14159 * rise) * clamp(u_scale, 0.5, 2.0);
+        vec2 d = (uv - c) * vec2(aspect, 1.0);
+        f += r * r / max(dot(d, d), 0.0001);
+    }
+    float m = smoothstep(0.85, 1.15, f);
+    float rim = smoothstep(0.6, 0.95, f) - m;
+    gl_FragColor = vec4(mix(u_c2 * 0.6, ramp(0.35 + 0.4 * clamp(f - 1.0, 0.0, 1.0)), m) + u_c3 * rim * 0.5, 1.0);`
+  },
+  caustics: {
+    colours: ["#7fe9ff", "#06374a", "#ffffff"],
+    hz: 0.8,
+    main: `
+    vec2 p = P * 2.5;
+    float v = 0.0;
+    for (int n = 0; n < 3; n++) {
+        float a = float(n) * 2.094 + 0.4;
+        vec2 dir = vec2(cos(a), sin(a));
+        v += sin(dot(p, dir) * 3.0 + t * (0.5 + 0.15 * float(n)) + 0.8 * sin(dot(p, dir.yx) * 1.7 + t * 0.3));
+    }
+    float ridge = 1.0 - abs(v) / 3.0;
+    float light = pow(ridge, mix(8.0, 2.0, clamp(u_px * 22.0, 0.0, 1.0)));
+    gl_FragColor = vec4(u_c2 * 0.6 + u_c1 * light * 0.8 + u_c3 * pow(light, 3.0) * 0.4, 1.0);`
+  }
+};
+const VERTEX = `
+attribute vec2 a_corner;
+uniform vec4 u_area;
+varying vec2 v_at;
+void main() {
+    v_at = u_area.xy + vec2(a_corner.x, 1.0 - a_corner.y) * u_area.zw;
+    gl_Position = vec4(a_corner * 2.0 - 1.0, 0.0, 1.0);
+}
+`;
+const fragment = (pattern) => `${COMMON}
+void main() {
+    vec2 P = v_at / (100.0 * u_scale) + vec2(u_seed);
+    float t = u_time;
+${pattern.main}
+}
+`;
+function pack(sizes2, width, height, out) {
+  let total = 0;
+  for (const { w, h: h2 } of sizes2) total += w * h2;
+  const shrink = total > PACKED * width * height ? Math.sqrt(PACKED * width * height / total) : 1;
+  const order = sizes2.map((_, i) => i).sort((a, b) => sizes2[b].h - sizes2[a].h);
+  let [x, y, shelf] = [0, 0, 0];
+  out.length = sizes2.length;
+  for (const i of order) {
+    const w = Math.max(1, Math.ceil(sizes2[i].w * shrink));
+    const h2 = Math.max(1, Math.ceil(sizes2[i].h * shrink));
+    if (x + w > width) [x, y, shelf] = [0, y + shelf, 0];
+    if (x + w > width || y + h2 > height) {
+      out[i] = { x: -1, y: 0, w, h: h2 };
+      continue;
+    }
+    out[i] = { x, y, w, h: h2 };
+    x += w;
+    shelf = Math.max(shelf, h2);
+  }
+  return shrink;
+}
+const ATTRIBUTES = { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "low-power", failIfMajorPerformanceCaveat: true };
+function target() {
+  if (typeof OffscreenCanvas !== "function") return void 0;
+  const canvas = new OffscreenCanvas(1, 1);
+  const gl = canvas.getContext("webgl", ATTRIBUTES);
+  if (!gl) return void 0;
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
+  return { canvas, gl, programs: /* @__PURE__ */ new Map(), quad };
+}
+function compile(gl, kind, source) {
+  const shader = gl.createShader(kind);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS) && !gl.isContextLost()) throw new Error(`Node background shader: ${gl.getShaderInfoLog(shader)}`);
+  return shader;
+}
+function programOf(t, name) {
+  let p = t.programs.get(name);
+  if (p) return p;
+  const { gl } = t;
+  const program = gl.createProgram();
+  gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERTEX));
+  gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, fragment(PATTERNS[name])));
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS) && !gl.isContextLost()) throw new Error(`Node background program: ${gl.getProgramInfoLog(program)}`);
+  const at = (uniform) => gl.getUniformLocation(program, uniform);
+  p = {
+    program,
+    corner: gl.getAttribLocation(program, "a_corner"),
+    area: at("u_area"),
+    time: at("u_time"),
+    size: at("u_size"),
+    scale: at("u_scale"),
+    px: at("u_px"),
+    seed: at("u_seed"),
+    c1: at("u_c1"),
+    c2: at("u_c2"),
+    c3: at("u_c3")
+  };
+  t.programs.set(name, p);
+  return p;
+}
+function render$1(t, draws2, places2, height, time) {
+  const { gl } = t;
+  const scale2 = N.backgroundScale;
+  let current2 = "";
+  let p;
+  gl.bindBuffer(gl.ARRAY_BUFFER, t.quad);
+  for (let i = 0; i < draws2.length; i++) {
+    const d = draws2[i];
+    const at = places2[i];
+    if (at.x < 0) continue;
+    if (d.name !== current2) {
+      current2 = d.name;
+      p = programOf(t, d.name);
+      gl.useProgram(p.program);
+      gl.enableVertexAttribArray(p.corner);
+      gl.vertexAttribPointer(p.corner, 2, gl.FLOAT, false, 0, 0);
+      gl.uniform1f(p.time, time);
+      gl.uniform1f(p.scale, scale2);
+    }
+    gl.viewport(at.x, height - at.y - at.h, at.w, at.h);
+    gl.uniform4f(p.area, d.x0, d.y0, d.x1 - d.x0, d.y1 - d.y0);
+    gl.uniform2f(p.size, d.w, d.h);
+    gl.uniform1f(p.px, d.px / (100 * scale2));
+    gl.uniform1f(p.seed, d.seed);
+    gl.uniform3fv(p.c1, d.colours[0]);
+    gl.uniform3fv(p.c2, d.colours[1]);
+    gl.uniform3fv(p.c3, d.colours[2]);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+}
+let main;
+let failed = false;
+function available() {
+  if (!main && !failed) {
+    main = target();
+    failed = !main;
+  }
+  return !failed;
+}
+const timeOf = (time) => holdsStill() ? STILL_TIME : time;
+const coloursSince = { revision: -1, custom: [], own: /* @__PURE__ */ new Map(), effect: /* @__PURE__ */ new Map() };
+function coloursOf(node2, name) {
+  if (coloursSince.revision !== revision) {
+    coloursSince.revision = revision;
+    coloursSince.custom = [N.backgroundColorPrimary, N.backgroundColorSecondary, N.backgroundColorAccent].map(rgb);
+    coloursSince.own.clear();
+    coloursSince.effect.clear();
+  }
+  if (N.backgroundColorMode === "custom") return coloursSince.custom;
+  const style = effectOf(node2);
+  if (N.backgroundColorMode === "effect" && style > 0) {
+    let colours2 = coloursSince.effect.get(style);
+    if (!colours2) {
+      const { primary, secondary, accent: accent2 } = nodePalette(style);
+      coloursSince.effect.set(style, colours2 = [primary, secondary, accent2].map(rgb));
+    }
+    return colours2;
+  }
+  let colours = coloursSince.own.get(name);
+  if (!colours) coloursSince.own.set(name, colours = PATTERNS[name].colours.map(rgb));
+  return colours;
+}
+const draws = [];
+const places = [];
+const sizes = [];
+const placed = /* @__PURE__ */ new Map();
+let bitmap;
+let drawnFor = "";
+function detail() {
+  const steps2 = adaptive.level >= THIN ? 2 : adaptive.level >= PLAIN ? 1 : 0;
+  return DETAIL[Math.max(1, N.backgroundDetail - steps2)];
+}
+function prepareBackgrounds(canvas, ctx) {
+  placed.clear();
+  draws.length = sizes.length = 0;
+  const { graph: graph2 } = canvas;
+  if (!graph2 || guard.off(BACKGROUND) || zoomedOut(canvas) || !N.enabled || LiteGraph.vueNodesMode) return 0;
+  const share = detail();
+  const [vx, vy, vw, vh] = canvas.visible_area;
+  let scale2 = 0;
+  let margin = 0;
+  const nodes = [];
+  for (const node2 of graph2.nodes) {
+    if (!backed(node2)) continue;
+    if (!scale2) {
+      scale2 = ctx.getTransform().a;
+      margin = MARGIN / scale2;
+    }
+    const [x, y] = node2.pos;
+    const [w, h2] = node2.size;
+    const x0 = Math.max(x, vx - margin);
+    const y0 = Math.max(y, vy - margin);
+    const x1 = Math.min(x + w, vx + vw + margin);
+    const y1 = Math.min(y + h2, vy + vh + margin);
+    if (x1 <= x0 || y1 <= y0) continue;
+    const name = backgroundOf(node2);
+    nodes.push(node2);
+    draws.push({ name, w, h: h2, x0: x0 - x, y0: y0 - y, x1: x1 - x, y1: y1 - y, seed: (hash(String(node2.id)) >>> 0) % 640 / 10, colours: coloursOf(node2, name), px: 0 });
+    sizes.push({ w: (x1 - x0) * scale2 * share, h: (y1 - y0) * scale2 * share });
+  }
+  if (!nodes.length || !available()) return 0;
+  try {
+    if (main.gl.isContextLost()) {
+      main = void 0;
+      failed = false;
+      throw new Error("Node background: the WebGL context was lost");
+    }
+    const t = main;
+    const width = Math.max(1, Math.round(ctx.canvas.width * share));
+    const height = Math.max(1, Math.round(ctx.canvas.height * share));
+    if (t.canvas.width !== width || t.canvas.height !== height) [t.canvas.width, t.canvas.height] = [width, height];
+    const shrink = pack(sizes, t.gl.drawingBufferWidth, t.gl.drawingBufferHeight, places);
+    for (let i = 0; i < draws.length; i++) {
+      draws[i].px = 1 / (scale2 * share * shrink);
+      if (places[i].x >= 0) placed.set(nodes[i], i);
+    }
+    const held2 = holdsStill();
+    const time = timeOf(clock.backgroundTime);
+    const key = held2 ? `${revision} ${width} ${height} ${JSON.stringify(draws)} ${JSON.stringify(places)}` : "";
+    if (!held2 || key !== drawnFor || !bitmap) {
+      render$1(t, draws, places, t.gl.drawingBufferHeight, time);
+      bitmap?.close();
+      bitmap = t.canvas.transferToImageBitmap();
+      drawnFor = key;
+    }
+  } catch (error) {
+    placed.clear();
+    guard.fail(BACKGROUND, error);
+    return 0;
+  }
+  return holdsStill() || N.backgroundSpeed === 0 ? 0 : placed.size;
+}
+const hasBackground = (node2) => bitmap !== void 0 && placed.has(node2);
+function drawBackground(ctx, node2, w, h2, alpha) {
+  const i = placed.get(node2);
+  if (i === void 0 || !bitmap) return false;
+  const d = draws[i];
+  const at = places[i];
+  ctx.save();
+  try {
+    ctx.beginPath();
+    ctx.rect(0, 0, w, h2);
+    ctx.clip();
+    ctx.shadowColor = "transparent";
+    ctx.globalAlpha = N.backgroundStrength * alpha;
+    ctx.drawImage(bitmap, at.x, at.y, at.w, at.h, d.x0, d.y0, d.x1 - d.x0, d.y1 - d.y0);
+  } finally {
+    ctx.restore();
+  }
+  return true;
 }
 const css = `/*
  * The panel, on ComfyUI's own tokens so it follows the palette: the palette's
@@ -7975,6 +8403,9 @@ function noticesOf(tab) {
       action: ["Use classic nodes", () => void app.extensionManager.setting.set("Comfy.VueNodes.Enabled", false)]
     });
   }
+  if ((all2 || tab === "nodes") && N.enabled && N.background !== "none" && !LiteGraph.vueNodesMode && !available()) {
+    list.push({ text: "Node backgrounds need WebGL on a GPU, which this browser does not offer here, so none show." });
+  }
   if ((all2 || tab === "links") && deferring()) list.push({ text: L.coexist === "defer" ? "Link effects are set to always step aside for other link extensions." : "Another extension draws links, so link effects step aside for it.", action: ["Keep Enhanced link effects", () => commit(COEXIST, "ours")] });
   for (const key of tab === "perf" ? [] : guard.tripped()) {
     list.push({ text: `${key} kept failing, so it was turned off.`, action: ["Retry", () => {
@@ -8119,6 +8550,7 @@ const NEWS$1 = [
   "Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.",
   "Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.",
   "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; Circuit Trace, pulses racing along etched traces; Aurora Veil, curtains of light hanging from the title bar; and Ember Crown, flames licking up from it. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+  "Node backgrounds: Plasma, Aurora, Starfield and five more patterns drawn on the GPU on each node's body, under its widgets and any node effect.",
   "Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.",
   "Much lighter than 2.x on big graphs."
 ];
@@ -8423,6 +8855,13 @@ function effects() {
     ...NODE_ANIMATION_OPTIONS.map((option) => ({ name: option.value ? option.text : "Off", choices: { [OWN_STYLE]: option.value }, has: (node2) => ownStyle(node2) === option.value }))
   ];
 }
+function backgrounds() {
+  const global = BACKGROUND_OPTIONS.find((option) => option.value === N.background).text;
+  return [
+    { name: `Use global (${global})`, choices: { [OWN_BACKGROUND]: void 0 }, has: (node2) => ownBackground(node2) === void 0 },
+    ...BACKGROUND_OPTIONS.map((option) => ({ name: option.text, choices: { [OWN_BACKGROUND]: option.value }, has: (node2) => ownBackground(node2) === option.value }))
+  ];
+}
 function particlesOnly(node2) {
   const own2 = node2.properties[OWN_ONLY];
   return typeof own2 === "boolean" ? own2 : !N.animationsEnabled;
@@ -8446,6 +8885,11 @@ function nodeMenu(node2) {
         ]
       }
     },
+    ...LiteGraph.vueNodesMode ? [] : [{
+      content: nodes.length > 1 ? `Node background (${nodes.length} selected)` : "Node background",
+      has_submenu: true,
+      submenu: { options: backgrounds().map((choice2) => entry(choice2.name, nodes.every(choice2.has), () => pick(nodes, choice2.choices))) }
+    }],
     {
       content: "Completion FX",
       has_submenu: true,
@@ -8500,7 +8944,7 @@ function connections(node2) {
     if (source) list.push({ up: true, slot: slotName(input), node: source });
   });
   for (const output of node2.outputs) {
-    for (const target of targetsOf(graph2, output.links)) list.push({ up: false, slot: slotName(output), node: target });
+    for (const target2 of targetsOf(graph2, output.links)) list.push({ up: false, slot: slotName(output), node: target2 });
   }
   return list;
 }
@@ -8642,8 +9086,8 @@ function interrupted(event) {
 function installFollow() {
   if (watched === app.canvas) return;
   if (!watched) {
-    api.addEventListener("executing", ({ detail }) => {
-      if (detail != null && env.running) follow(String(detail));
+    api.addEventListener("executing", ({ detail: detail2 }) => {
+      if (detail2 != null && env.running) follow(String(detail2));
     });
     for (const type of ["wheel", "pointermove"]) {
       document.addEventListener(type, (event) => {
@@ -8695,8 +9139,12 @@ export {
   overlaps as a7,
   JELLY as a8,
   kicked as a9,
-  wobbling as aA,
-  stopSprites as aB,
+  STILL_NODE as aA,
+  wobbling as aB,
+  hasBackground as aC,
+  drawBackground as aD,
+  BACKGROUND as aE,
+  stopSprites as aF,
   zoomedOut as aa,
   holdsStill as ab,
   during as ac,
@@ -8717,12 +9165,12 @@ export {
   OVER as ar,
   dummy as as,
   startShaking as at,
-  shake as au,
-  reach as av,
-  UNDER as aw,
-  ownStyle as ax,
-  CALM_ALPHA as ay,
-  STILL_NODE as az,
+  prepareBackgrounds as au,
+  shake as av,
+  reach as aw,
+  UNDER as ax,
+  ownStyle as ay,
+  CALM_ALPHA as az,
   dark as b,
   clock as c,
   darker as d,
@@ -8749,4 +9197,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-D_GvKIFD.js.map
+//# sourceMappingURL=menus-Cx0tk3FA.js.map

@@ -601,18 +601,20 @@ describe('the node menu', () => {
     const labels = (item: Item) => item.submenu!.options.map((option) => option?.content ?? null);
     const pick = (node: FakeNode, menuName: string, label: string) => menu(node).find((item) => item.content === menuName)!.submenu!.options.find((option) => option?.content.replace('✓ ', '') === label)!.callback!();
 
-    it('offers Node FX and Completion FX, each one submenu level, with the choice ticked and Use global naming the global effect', async () => {
+    it('offers Node FX, Node background and Completion FX, each one submenu level, with the choice ticked and Use global naming the global one', async () => {
         const canvas = await start({ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 2 }, { nodes: [KSAMPLER] });
         const [node] = canvas.graph._nodes;
         const items = menu(node);
-        // Go to connected node comes third (tests/unit/navigation.test.ts).
-        expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Completion FX', true], ['Go to connected node', true]]);
+        // Then Go to connected node (tests/unit/navigation.test.ts).
+        expect(items.map((item) => [item.content, item.has_submenu])).toEqual([['Node FX', true], ['Node background', true], ['Completion FX', true], ['Go to connected node', true]]);
         expect(labels(items[0])).toEqual(['✓ Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', 'Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', 'Ember Crown', null, 'Particles only']);
-        expect(labels(items[1])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
+        expect(labels(items[1])).toEqual(['✓ Use global (None)', 'None', 'Plasma', 'Aurora', 'Starfield', 'Liquid', 'Smoke', 'Grid', 'Lava', 'Caustics']);
+        expect(labels(items[2])).toEqual(['✓ Use global', 'Primary (anchor here)', 'Exclude']);
         for (const item of items) expect(item.submenu!.options.every((option) => !option?.has_submenu && !option?.submenu)).toBe(true);
-        node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude' };
+        node.properties = { enhanced_fx_style: 3, enhanced_fx_particles_only: true, enhanced_fx_completion: 'exclude', enhanced_fx_background: 'lava' };
         expect(labels(menu(node)[0])).toEqual(['Use global (Neon Nexus)', 'Off', 'Gentle Pulse', 'Neon Nexus', '✓ Cosmic Ripple', 'Sacred Rosette', 'Flower of Life', 'Jelly', 'Circuit Trace', 'Aurora Veil', 'Ember Crown', null, '✓ Particles only']);
-        expect(labels(menu(node)[1])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
+        expect(labels(menu(node)[1])).toEqual(['Use global (None)', 'None', 'Plasma', 'Aurora', 'Starfield', 'Liquid', 'Smoke', 'Grid', 'Lava', 'Caustics'].map((label) => (label === 'Lava' ? '✓ Lava' : label)));
+        expect(labels(menu(node)[2])).toEqual(['Use global', 'Primary (anchor here)', '✓ Exclude']);
     });
 
     it('write a pick to the node as one change the history can undo, and Use global takes it back out', async () => {
@@ -636,8 +638,8 @@ describe('the node menu', () => {
             canvas.selectedItems.add(node);
         }
         second.properties.enhanced_fx_style = 2;
-        const [fx, completion] = menu(first);
-        expect(fx.content).toBe('Node FX (2 selected)');
+        const [fx, background, completion] = menu(first);
+        expect([fx.content, background.content]).toEqual(['Node FX (2 selected)', 'Node background (2 selected)']);
         // They have no effect in common, and both draw their whole effect.
         expect(labels(fx).filter((label) => label?.startsWith('✓'))).toEqual([]);
         pick(first, 'Node FX (2 selected)', 'Cosmic Ripple');

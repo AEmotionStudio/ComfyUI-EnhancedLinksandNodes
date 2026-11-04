@@ -83,6 +83,20 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Node effect bloom | `📦 Enhanced Nodes.Animation.Glow` | slider | 0 to 1, step 0.05 | `0.5` | Glow of the effect's lines and light, and of the hover outline. |
 | Node effect quality | `📦 Enhanced Nodes.Quality` | combo | `1` Fast, `2` Balanced, `3` Rich | `2` Balanced | More detail, more GPU. |
 
+## Nodes · Background
+
+| Name | Id | Type | Options or range | Default | Tooltip |
+| --- | --- | --- | --- | --- | --- |
+| Node background | `📦 Enhanced Nodes.Background` | combo | `none` None, `plasma` Plasma, `aurora` Aurora, `starfield` Starfield, `liquid` Liquid, `smoke` Smoke, `grid` Grid, `lava` Lava, `caustics` Caustics | `none` None | An animated pattern on each node's body, under its slots and widgets, drawn on the GPU. Node background in the node menu picks one for a node. |
+| Background strength | `📦 Enhanced Nodes.Background.Strength` | slider | 0.1 to 1, step 0.05 | `0.45` | How much of the node's own fill it covers: less keeps slot names easier to read. |
+| Background speed | `📦 Enhanced Nodes.Background.Speed` | slider | 0 to 3, step 0.1 | `1` | 0 holds it still. |
+| Background scale | `📦 Enhanced Nodes.Background.Scale` | slider | 0.25 to 4, step 0.05 | `1` | How large its pattern is. |
+| Background colors | `📦 Enhanced Nodes.Background.Color.Mode` | combo | `preset` Pattern colors, `effect` Node effect colors, `custom` Custom | `preset` Pattern colors |  |
+| Background primary color | `📦 Enhanced Nodes.Background.Color.Primary` | color | `#rrggbb` | `#00e5ff` |  |
+| Background secondary color | `📦 Enhanced Nodes.Background.Color.Secondary` | color | `#rrggbb` | `#7c4dff` |  |
+| Background accent color | `📦 Enhanced Nodes.Background.Color.Accent` | color | `#rrggbb` | `#ff2bd6` |  |
+| Background detail | `📦 Enhanced Nodes.Background.Detail` | combo | `1` Fast, `2` Balanced, `3` Rich | `2` Balanced | How many pixels it is drawn at: Fast a third of the screen's, Balanced half, Rich all. |
+
 ## Nodes · Glow & hover
 
 | Name | Id | Type | Options or range | Default | Tooltip |

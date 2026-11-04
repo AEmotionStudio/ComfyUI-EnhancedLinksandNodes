@@ -72,6 +72,12 @@ function parse(colour: string): Rgba | null {
     return [channel(x, xUnit), channel(y, yUnit), channel(z, zUnit), alpha];
 }
 
+/** A colour's red, green and blue from 0 to 1, as a shader takes them; black for one the canvas would not take. */
+export function rgb(colour: string): [number, number, number] {
+    const [r, g, b] = parse(colour) ?? [0, 0, 0];
+    return [r / 255, g / 255, b / 255];
+}
+
 /** A colour as the canvas writes it back: #rrggbb, or rgba() while it is translucent. */
 function show([r, g, b, a]: Rgba): string {
     if (a < 1) return `rgba(${r}, ${g}, ${b}, ${a})`;

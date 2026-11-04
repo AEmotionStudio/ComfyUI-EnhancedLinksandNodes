@@ -29,7 +29,8 @@ const nodes = fake.extensions as unknown as ComfyExtension[];
 /** The node menu's Go to connected node, and what its submenu lists. */
 function goTo(node: FakeNode): [IContextMenuValue, IContextMenuValue[]] {
     const items = nodes.find((e) => e.name === 'enhanced.node.animations')!.getNodeMenuItems!(node as never) as IContextMenuValue[];
-    return [items[2], items[2].submenu!.options as IContextMenuValue[]];
+    const item = items.find((i) => i.content === 'Go to connected node')!;
+    return [item, item.submenu!.options as IContextMenuValue[]];
 }
 const selected = (canvas: FakeCanvas) => [...canvas.selectedItems].map((n) => (n as FakeNode).title);
 const chipText = () => document.querySelector('.eln-chipbar')?.textContent;

@@ -209,6 +209,24 @@ const QUALITY_OPTIONS = [
     { value: 3, text: 'Rich' },
 ] as const;
 
+export const BACKGROUND_OPTIONS = [
+    { value: 'none', text: 'None' },
+    { value: 'plasma', text: 'Plasma' },
+    { value: 'aurora', text: 'Aurora' },
+    { value: 'starfield', text: 'Starfield' },
+    { value: 'liquid', text: 'Liquid' },
+    { value: 'smoke', text: 'Smoke' },
+    { value: 'grid', text: 'Grid' },
+    { value: 'lava', text: 'Lava' },
+    { value: 'caustics', text: 'Caustics' },
+] as const;
+
+const BACKGROUND_COLOR_OPTIONS = [
+    { value: 'preset', text: 'Pattern colors' },
+    { value: 'effect', text: 'Node effect colors' },
+    { value: 'custom', text: 'Custom' },
+] as const;
+
 /** v1's presets (old_link_animations.js:1167-1202). */
 const DENSITY_OPTIONS = [
     { value: 0.5, text: 'Minimal' },
@@ -327,6 +345,7 @@ const effects = (): boolean => N.enabled && N.animate !== 0;
 /** Whether the nodes draw anything that takes the node colours: an effect, particles or styled titles. */
 const nodesDraw = (): boolean => N.enabled && (N.animate !== 0 || N.particleShow || N.textAnimationEnabled);
 const particles = (): boolean => N.enabled && N.particleShow;
+const backgrounds = (): boolean => N.enabled && N.background !== 'none';
 const focusOn = (): boolean => L.focusEnabled;
 /** Whether a run changes anything: Pause.Mode is not Keep animating. */
 const runsChange = (): boolean => L.pauseMode !== 'ignore';
@@ -407,6 +426,16 @@ export const SETTINGS = [
     { id: '📦 Enhanced Nodes.Animation.Size', key: 'animationSize', name: 'Node effect size', type: 'slider', min: 0.5, max: 3, step: 0.1, default: 1, group: 'Nodes · Effect', advanced: true, showIf: effects },
     { id: '📦 Enhanced Nodes.Animation.Glow', key: 'animationGlow', name: 'Node effect bloom', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Effect', advanced: true, showIf: effects, tooltip: "Glow of the effect's lines and light, and of the hover outline." },
     { id: '📦 Enhanced Nodes.Quality', key: 'quality', name: 'Node effect quality', type: 'combo', options: QUALITY_OPTIONS, default: 2, group: 'Nodes · Effect', advanced: true, showIf: effects, tooltip: 'More detail, more GPU.' },
+
+    { id: '📦 Enhanced Nodes.Background', key: 'background', name: 'Node background', type: 'combo', options: BACKGROUND_OPTIONS, default: 'none', group: 'Nodes · Background', showIf: (): boolean => N.enabled, needs: classicNodes, tooltip: "An animated pattern on each node's body, under its slots and widgets, drawn on the GPU. Node background in the node menu picks one for a node." },
+    { id: '📦 Enhanced Nodes.Background.Strength', key: 'backgroundStrength', name: 'Background strength', type: 'slider', min: 0.1, max: 1, step: 0.05, default: 0.45, group: 'Nodes · Background', showIf: backgrounds, needs: classicNodes, tooltip: "How much of the node's own fill it covers: less keeps slot names easier to read." },
+    { id: '📦 Enhanced Nodes.Background.Speed', key: 'backgroundSpeed', name: 'Background speed', type: 'slider', min: 0, max: 3, step: 0.1, default: 1, group: 'Nodes · Background', showIf: backgrounds, needs: classicNodes, tooltip: '0 holds it still.' },
+    { id: '📦 Enhanced Nodes.Background.Scale', key: 'backgroundScale', name: 'Background scale', type: 'slider', min: 0.25, max: 4, step: 0.05, default: 1, group: 'Nodes · Background', showIf: backgrounds, needs: classicNodes, tooltip: 'How large its pattern is.' },
+    { id: '📦 Enhanced Nodes.Background.Color.Mode', key: 'backgroundColorMode', name: 'Background colors', type: 'combo', options: BACKGROUND_COLOR_OPTIONS, default: 'preset', group: 'Nodes · Background', showIf: backgrounds, needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Background.Color.Primary', key: 'backgroundColorPrimary', name: 'Background primary color', type: 'color', default: '#00e5ff', group: 'Nodes · Background', showIf: (): boolean => backgrounds() && N.backgroundColorMode === 'custom', needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Background.Color.Secondary', key: 'backgroundColorSecondary', name: 'Background secondary color', type: 'color', default: '#7c4dff', group: 'Nodes · Background', showIf: (): boolean => backgrounds() && N.backgroundColorMode === 'custom', needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Background.Color.Accent', key: 'backgroundColorAccent', name: 'Background accent color', type: 'color', default: '#ff2bd6', group: 'Nodes · Background', showIf: (): boolean => backgrounds() && N.backgroundColorMode === 'custom', needs: classicNodes },
+    { id: '📦 Enhanced Nodes.Background.Detail', key: 'backgroundDetail', name: 'Background detail', type: 'combo', options: QUALITY_OPTIONS, default: 2, group: 'Nodes · Background', advanced: true, showIf: backgrounds, needs: classicNodes, tooltip: 'How many pixels it is drawn at: Fast a third of the screen\'s, Balanced half, Rich all.' },
 
     { id: '📦 Enhanced Nodes.Glow.Show', key: 'glowShow', name: 'Node effect glow', type: 'boolean', default: true, group: 'Nodes · Glow & hover', showIf: effects, tooltip: "A halo in the effect's primary color around each node with an effect." },
     { id: '📦 Enhanced Nodes.Glow', key: 'glow', name: 'Node glow strength', type: 'slider', min: 0, max: 1, step: 0.05, default: 0.5, group: 'Nodes · Glow & hover', showIf: (): boolean => effects() && (N.glowShow || N.selectionGlow), tooltip: 'How far the halo and the selection frame glow.' },

@@ -7,7 +7,7 @@
  *
  * Importing this module gives the page a clock: requestAnimationFrame queues
  * for frames(), performance.now() reads page.now, and document.hidden reads
- * page.hidden. OffscreenCanvas contexts are CanvasRecorders.
+ * page.hidden. OffscreenCanvas contexts are CanvasRecorders, and none is WebGL, as in a browser without it.
  *
  * @module tests/helpers/fake-litegraph
  */
@@ -50,7 +50,8 @@ Object.assign(globalThis, {
     OffscreenCanvas: class {
         constructor(readonly width = 1, readonly height = 1) {}
 
-        getContext() {
+        getContext(kind: string) {
+            if (kind !== '2d') return null;
             const recorder = new CanvasRecorder(this.width, this.height);
             offscreens.push(recorder);
             return recorder.ctx;

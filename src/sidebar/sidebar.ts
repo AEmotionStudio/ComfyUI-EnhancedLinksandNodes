@@ -23,6 +23,7 @@ import { app } from '/scripts/app.js';
 import { L, N, SETTINGS, commit, commitAll, reset, shown, watch, type Setting } from '@/core/settings';
 import { adaptive, env, guard, nodes2 } from '@/core/engine';
 import { deferring } from '@/links/pipeline';
+import { available } from '@/nodes/shader';
 import { LOOKS, applyLook, changed, currentLook, deleteLook, exportLook, importLook, light, previewLook, renameLook, saveLook, surprise, userLooks, type Look } from '@/ui/looks';
 import { button, check, endHover, h, hover, hovering, iconButton, roving, row, type Row, type Visible } from './controls';
 import { installPicker, showPicker, undoBar } from './picker';
@@ -570,6 +571,9 @@ function noticesOf(tab: string): Notice[] {
             action: ['Use classic nodes', () => void app.extensionManager.setting.set('Comfy.VueNodes.Enabled', false)],
         });
     }
+    if ((all || tab === 'nodes') && N.enabled && N.background !== 'none' && !LiteGraph.vueNodesMode && !available()) {
+        list.push({ text: 'Node backgrounds need WebGL on a GPU, which this browser does not offer here, so none show.' });
+    }
     if ((all || tab === 'links') && deferring()) list.push({ text: L.coexist === 'defer' ? 'Link effects are set to always step aside for other link extensions.' : 'Another extension draws links, so link effects step aside for it.', action: ['Keep Enhanced link effects', () => commit(COEXIST, 'ours')] });
     for (const key of tab === 'perf' ? [] : guard.tripped()) {
         list.push({ text: `${key} kept failing, so it was turned off.`, action: ['Retry', () => {
@@ -719,6 +723,7 @@ const NEWS = [
     'Wire physics: links hang and swing like a cable, a spring or syrup, with any link animation or none, as in the Living Wires look.',
     'Four new link animations: Merkaba Beads, DNA Helix 3D, Comet Trails and Stardust.',
     "New node effects: Flower of Life, which draws itself in and blooms; Jelly, which wobbles the node itself like gel; Circuit Trace, pulses racing along etched traces; Aurora Veil, curtains of light hanging from the title bar; and Ember Crown, flames licking up from it. v1's Flower of Life is now Sacred Rosette, its rings closed and much lighter.",
+    "Node backgrounds: Plasma, Aurora, Starfield and five more patterns drawn on the GPU on each node's body, under its widgets and any node effect.",
     'Connection assist: while you drag a link, a guide line, or hands and eyes, show the nearest slot it can connect to, as in the Showcase look.',
     'Much lighter than 2.x on big graphs.',
 ];

@@ -1,6 +1,7 @@
 /**
  * What a node is given in its menu: its Node FX, an effect of its own or Use
- * global, Particles only, and its Completion FX, which makes it a primary node
+ * global, Particles only, its Node background in classic mode, and its
+ * Completion FX, which makes it a primary node
  * the completion effect plays over or keeps it off it, kept as flat keys in its
  * properties. Node FX sets every selected node when the node is one of them,
  * and the selection toolbox's button steps the selection through the same
@@ -24,11 +25,12 @@
 import type { IContextMenuValue, LLink, LinkId } from '@comfyorg/comfyui-frontend-types';
 import { app } from '/scripts/app.js';
 import { api } from '/scripts/api.js';
-import { L, N, NODE_ANIMATION_OPTIONS } from '@/core/settings';
+import { BACKGROUND_OPTIONS, L, N, NODE_ANIMATION_OPTIONS } from '@/core/settings';
 import { PANE, clock, env, layers, live, overlaps, wake } from '@/core/engine';
 import { accent } from '@/core/colors';
 import { OWN_COMPLETION, RED, errorNodes, running, shownAs, trace } from '@/fx/execution';
 import { OWN_STYLE, ownStyle } from '@/nodes/effects';
+import { OWN_BACKGROUND, ownBackground } from '@/nodes/shader';
 import { CHIP_MS, chip } from '@/sidebar/picker';
 
 type Node = InstanceType<typeof LGraphNode>;
@@ -85,6 +87,15 @@ export function effects(): Effect[] {
     ];
 }
 
+/** Node background's choices, in its menu's order: Use global, named after Background's, then each background, None first. */
+function backgrounds(): Effect[] {
+    const global = BACKGROUND_OPTIONS.find((option) => option.value === N.background)!.text;
+    return [
+        { name: `Use global (${global})`, choices: { [OWN_BACKGROUND]: undefined }, has: (node) => ownBackground(node) === undefined },
+        ...BACKGROUND_OPTIONS.map((option): Effect => ({ name: option.text, choices: { [OWN_BACKGROUND]: option.value }, has: (node) => ownBackground(node) === option.value })),
+    ];
+}
+
 /** Whether a node draws its effect's particles alone: as its Particles only says, else as Show base effect does. */
 export function particlesOnly(node: Node): boolean {
     const own = node.properties[OWN_ONLY];
@@ -95,9 +106,10 @@ export function particlesOnly(node: Node): boolean {
 const entry = (content: string, ticked: boolean, callback: () => void): IContextMenuValue => ({ content: ticked ? `✓ ${content}` : content, callback });
 
 /**
- * The node menu's Node FX, Completion FX and Go to connected node, one submenu level each, with has_submenu, so the Vue node menu shows them
- * too (FE157 composables/graph/contextMenuConverter.ts L428-447). For a node among others selected, as right-clicking
- * keeps it (FE157 LGraphCanvas.ts L2615, FE1395 L2242), Node FX sets them all, and ticks what they all have.
+ * The node menu's Node FX, Node background (classic nodes only), Completion FX and Go to connected node, one submenu
+ * level each, with has_submenu, so the Vue node menu shows them too (FE157 composables/graph/contextMenuConverter.ts
+ * L428-447). For a node among others selected, as right-clicking keeps it (FE157 LGraphCanvas.ts L2615, FE1395 L2242),
+ * Node FX and Node background set them all, and tick what they all have.
  */
 export function nodeMenu(node: Node): IContextMenuValue[] {
     const connected = connections(node).slice(0, LISTED);
@@ -117,6 +129,13 @@ export function nodeMenu(node: Node): IContextMenuValue[] {
                 ],
             },
         },
+        ...(LiteGraph.vueNodesMode
+            ? []
+            : [{
+                content: nodes.length > 1 ? `Node background (${nodes.length} selected)` : 'Node background',
+                has_submenu: true,
+                submenu: { options: backgrounds().map((choice) => entry(choice.name, nodes.every(choice.has), () => pick(nodes, choice.choices))) },
+            }]),
         {
             content: 'Completion FX',
             has_submenu: true,

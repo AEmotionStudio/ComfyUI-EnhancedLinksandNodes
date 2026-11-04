@@ -168,7 +168,7 @@ describe('clock', () => {
     it('moves only the clocks of what animates', async () => {
         for (const [settings, moving] of [
             [{}, ['linkPhase', 'linkFlow', 'quantumPhase']],
-            [{ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 1 }, ['nodePhase']],
+            [{ ...LINKS_OFF, '📦 Enhanced Nodes.Animate': 1 }, ['nodePhase', 'backgroundTime']],
             [{ ...LINKS_OFF, '📦 Enhanced Nodes.Particle.Show': true }, ['particleTime', 'nodeTime']],
         ] as const) {
             warmUp(await start(settings, PAIR));

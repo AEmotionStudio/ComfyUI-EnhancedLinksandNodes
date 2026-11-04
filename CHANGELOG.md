@@ -53,6 +53,9 @@ A rework: effects now decorate ComfyUI's own link and node drawing instead of re
 - **Aurora Veil**: curtains of light hang from the title bar into the body, rays in the effect's colours brightest in each curtain's middle, their hems waving as the curtains drift and sway and each ray shimmering. Motes rise through the body as its particles. In Nodes 2.0 its glow sways from side to side.
 - **Ember Crown**: a crown of flames licks up from the top of the title bar, each swaying and flickering on its own, gold at the root and red at the tip, with a warmth on the body under the title bar. Embers rise from the flames and die out as its particles. In Nodes 2.0 a glow flickers up from the title.
 
+### Node backgrounds
+- **Node background** (classic nodes): Plasma, Aurora, Starfield, Liquid, Smoke, Grid, Lava or Caustics, an animated pattern of our own drawn on the GPU on each node's body below its title bar, under its slots and widgets and under any node effect, in its own colors, the node effect's or custom ones, with Strength, Speed, Scale and Detail. **Node background** in the node menu gives one node its own. It needs WebGL on a GPU; without it the panel says so and nodes are drawn as before.
+
 ### Selection focus and navigation
 - **Selection focus** (#4, #5, #45): highlight the selected nodes' links, animate only them, or dim or hide the others; color them in ComfyUI's white, the theme accent or their type color; reach direct links, everything upstream or downstream, or the whole chain, through reroutes; draw them above nodes; optionally on hover. Works with link effects off.
 - **Go to connected node** in the node menu, a double-click on a slot to fly to the other end (again to cycle), and Go back. **Follow execution** pans to the running node when it is off screen.
