@@ -5969,7 +5969,7 @@ const LOOKS = [
   {
     id: "neon-night",
     name: "Neon Night",
-    description: "Energy Pulse links and Circuit Trace nodes over a neon grid, in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.",
+    description: "Energy Pulse links and Circuit Trace nodes over a synthwave grid, in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.",
     values: {
       "🔗 Enhanced Links.Animate": 5,
       "🔗 Enhanced Links.Quality": 2,
@@ -9255,4 +9255,4 @@ export {
   savedEarly as y,
   commandKeys as z
 };
-//# sourceMappingURL=menus-LPn-y7mR.js.map
+//# sourceMappingURL=menus-JKzhJa4A.js.map

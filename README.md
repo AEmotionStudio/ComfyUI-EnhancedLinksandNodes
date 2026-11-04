@@ -156,7 +156,7 @@ A look sets how links and nodes look in one click; it never changes your focus, 
 <tr>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-performance.webp" alt="Performance"><br><b>Performance</b>: still links, less glow, no shadows or completion effect.</td>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-classic-v1.webp" alt="Classic v1"><br><b>Classic v1</b>: v1 out of the box, with none of 3.0's run visuals.</td>
-<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-neon-night.webp" alt="Neon Night"><br><b>Neon Night</b>: Energy Pulse and Circuit Trace over a neon grid, in cyan and magenta, confetti.</td>
+<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-neon-night.webp" alt="Neon Night"><br><b>Neon Night</b>: Energy Pulse and Circuit Trace over a synthwave grid, in cyan and magenta, confetti.</td>
 </tr>
 <tr>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-lava-lamp.webp" alt="Lava Lamp"><br><b>Lava Lamp</b>: Lava Flow and Ember Crown over molten lava, in reds and ambers, fireworks.</td>
