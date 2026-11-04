@@ -147,7 +147,7 @@ test.describe('rolling back to 2.0.1', { tag: '@rollback' }, () => {
         '🔗 Enhanced Links.Marker.Shape': 'merkaba',
         '🔗 Enhanced Links.Marker.Color.Mode': 'inherit',
         '🔗 Enhanced Links.Particle.Density': 3,
-        '📦 Enhanced Nodes.Animate': 4,
+        '📦 Enhanced Nodes.Animate': 9,
         '📦 Enhanced Nodes.Particle.Color.Mode': 'aurora',
         '📦 Enhanced Nodes.End Animation.Enabled': true,
         '📦 Enhanced Nodes.Text.Animation.Enabled': true,
@@ -167,6 +167,8 @@ test.describe('rolling back to 2.0.1', { tag: '@rollback' }, () => {
         '🔗 Enhanced Links.Motion': 'full',
         '📦 Enhanced Nodes.Completion.Style': 'confetti',
         '📦 Enhanced Nodes.Completion.PerNode': true,
+        '📦 Enhanced Nodes.Background': 'plasma',
+        '📦 Enhanced Nodes.Background.Strength': 0.8,
     };
 
     for (const [name, settings] of [['the author’s settings as 3.0 left them', AUTHOR_V3], ['values only 3.0 has', NEW]] as const) {

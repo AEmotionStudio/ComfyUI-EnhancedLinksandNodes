@@ -181,7 +181,7 @@ describe('the panel', () => {
             buttonOf(slot.querySelector('[role=menu]')!, name)!.click();
         };
         pick('Showcase');
-        expect([L.animate, N.animate, L.look, slot.querySelector('[role=menu]'), document.activeElement]).toEqual([4, 2, 'showcase', null, choose]);
+        expect([L.animate, N.animate, L.look, slot.querySelector('[role=menu]'), document.activeElement]).toEqual([4, 8, 'showcase', null, choose]);
         expect(choose.textContent).toContain('Showcase');
         pick('Presenter');
         expect([L.thickness, L.animate, L.look]).toEqual([5, 9, 'presenter']);

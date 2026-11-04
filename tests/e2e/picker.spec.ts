@@ -116,7 +116,7 @@ test.describe('on v2.0.1’s defaults, as v2’s panel saved them', () => {
         const before = await settingValues(page, looked);
         await picker.locator('[data-look=showcase]').click();
         await expect(picker).toHaveCount(0);
-        await expect.poll(() => settingValues(page, looked)).toEqual([4, 2, true, true, 3, 'showcase']);
+        await expect.poll(() => settingValues(page, looked)).toEqual([4, 8, true, true, 3, 'showcase']);
         await expect.poll(() => posts.filter(ours)).toContain(SEEN);
         // One POST for each value that differs: v2's thickness is Showcase's.
         const saved = posts.filter(ours);

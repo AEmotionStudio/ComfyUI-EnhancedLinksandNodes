@@ -13,7 +13,7 @@
 [![Activity](https://img.shields.io/github/commit-activity/m/AEmotionStudio/ComfyUI-EnhancedLinksandNodes?style=for-the-badge&label=Activity&color=yellow)](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/commits)
 
 ![The Showcase look on a txt2img workflow](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/hero.webp)  
-*The Showcase look: Cosmic Weave links that hang like cables, Neon Nexus nodes with aurora particles.*
+*The Showcase look: Cosmic Weave links that hang like cables, Aurora Veil nodes over a starfield with aurora particles.*
 
 [What's new](#-whats-new-in-30) • [Features](#-features) • [Looks](#-looks) • [Installation](#-installation) • [Quick toggles](#-quick-toggles) • [Settings](#-settings) • [Compatibility](#-compatibility) • [FAQ](#-faq) • [Changelog](CHANGELOG.md)
 
@@ -151,15 +151,15 @@ A look sets how links and nodes look in one click; it never changes your focus, 
 <tr>
 <td width="33%"><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-off.webp" alt="Off"><br><b>Off</b>: native links and nodes, no run visuals or completion effect.</td>
 <td width="33%"><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-subtle.webp" alt="Subtle"><br><b>Subtle</b> (default): Classic Flow with gliding arrows and v1's halo, plain nodes, a shockwave at the end of a run.</td>
-<td width="33%"><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-showcase.webp" alt="Showcase"><br><b>Showcase</b>: Cosmic Weave on hanging cables, Neon Nexus with aurora particles, hands and eyes, fireworks.</td>
+<td width="33%"><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-showcase.webp" alt="Showcase"><br><b>Showcase</b>: Cosmic Weave on hanging cables, Aurora Veil over a starfield with aurora particles, hands and eyes, fireworks.</td>
 </tr>
 <tr>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-performance.webp" alt="Performance"><br><b>Performance</b>: still links, less glow, no shadows or completion effect.</td>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-classic-v1.webp" alt="Classic v1"><br><b>Classic v1</b>: v1 out of the box, with none of 3.0's run visuals.</td>
-<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-neon-night.webp" alt="Neon Night"><br><b>Neon Night</b>: Energy Pulse and Neon Nexus in cyan and magenta, confetti.</td>
+<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-neon-night.webp" alt="Neon Night"><br><b>Neon Night</b>: Energy Pulse and Circuit Trace over a neon grid, in cyan and magenta, confetti.</td>
 </tr>
 <tr>
-<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-lava-lamp.webp" alt="Lava Lamp"><br><b>Lava Lamp</b>: Lava Flow and Cosmic Ripple in reds and ambers, fireworks.</td>
+<td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-lava-lamp.webp" alt="Lava Lamp"><br><b>Lava Lamp</b>: Lava Flow and Ember Crown over molten lava, in reds and ambers, fireworks.</td>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-sacred-geometry.webp" alt="Sacred Geometry"><br><b>Sacred Geometry</b>: Merkaba Beads and Flower of Life in gold, path trace.</td>
 <td><img src="https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/look-living-wires.webp" alt="Living Wires"><br><b>Living Wires</b>: native-looking wires that hang like cables, reaching hands.</td>
 </tr>

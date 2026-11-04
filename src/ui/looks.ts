@@ -56,7 +56,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'showcase',
         name: 'Showcase',
-        description: 'Cosmic Weave links that hang like cables and Neon Nexus nodes with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
+        description: 'Cosmic Weave links that hang like cables and Aurora Veil nodes over a starfield with aurora particles, in more detail and glow, hands and eyes that reach for the slot a link can go to, calmer while your runs play, with a burst as each node finishes and fireworks at the end.',
         values: {
             '🔗 Enhanced Links.Animate': 4,
             '🔗 Enhanced Links.Physics.Profile': 'rope',
@@ -66,7 +66,8 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Glow.Intensity': 14,
             '🔗 Enhanced Links.Blend': 'additive',
             '🔗 Enhanced Links.Assist.Mode': 'hands-eyes',
-            '📦 Enhanced Nodes.Animate': 2,
+            '📦 Enhanced Nodes.Animate': 8,
+            '📦 Enhanced Nodes.Background': 'starfield',
             '📦 Enhanced Nodes.Intensity': 1.2,
             '📦 Enhanced Nodes.Glow': 1,
             '📦 Enhanced Nodes.Particle.Show': true,
@@ -116,7 +117,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'neon-night',
         name: 'Neon Night',
-        description: 'Energy Pulse links and Neon Nexus nodes in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.',
+        description: 'Energy Pulse links and Circuit Trace nodes over a neon grid, in electric cyan and magenta, with color-cycling particles and confetti when a run finishes.',
         values: {
             '🔗 Enhanced Links.Animate': 5,
             '🔗 Enhanced Links.Quality': 2,
@@ -126,7 +127,8 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Color.Accent': '#7c4dff',
             '🔗 Enhanced Links.Glow.Intensity': 16,
             '🔗 Enhanced Links.Blend': 'additive',
-            '📦 Enhanced Nodes.Animate': 2,
+            '📦 Enhanced Nodes.Animate': 7,
+            '📦 Enhanced Nodes.Background': 'grid',
             '📦 Enhanced Nodes.Color.Mode': 'custom',
             '📦 Enhanced Nodes.Color.Primary': '#00e5ff',
             '📦 Enhanced Nodes.Color.Secondary': '#ff2bd6',
@@ -139,7 +141,7 @@ export const LOOKS: readonly Look[] = [
     {
         id: 'lava-lamp',
         name: 'Lava Lamp',
-        description: 'Lava Flow links and Cosmic Ripple nodes in molten reds and ambers, with color-cycling particles and fireworks when a run finishes.',
+        description: 'Lava Flow links and Ember Crown nodes over molten lava, in reds and ambers, with color-cycling particles and fireworks when a run finishes.',
         values: {
             '🔗 Enhanced Links.Animate': 7,
             '🔗 Enhanced Links.Quality': 2,
@@ -148,7 +150,8 @@ export const LOOKS: readonly Look[] = [
             '🔗 Enhanced Links.Color.Primary': '#ff4d00',
             '🔗 Enhanced Links.Color.Secondary': '#ffb300',
             '🔗 Enhanced Links.Color.Accent': '#ff006e',
-            '📦 Enhanced Nodes.Animate': 3,
+            '📦 Enhanced Nodes.Animate': 9,
+            '📦 Enhanced Nodes.Background': 'lava',
             '📦 Enhanced Nodes.Color.Mode': 'custom',
             '📦 Enhanced Nodes.Color.Primary': '#ff4d00',
             '📦 Enhanced Nodes.Color.Secondary': '#ffb300',

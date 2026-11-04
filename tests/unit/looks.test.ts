@@ -102,6 +102,14 @@ describe('curated looks', () => {
         });
     });
 
+    it('give each look with node effects its own: Classic v1 alone keeps Neon Nexus, and Showcase, Neon Night and Lava Lamp lie over a background', () => {
+        const nodes = (l: Look) => [l.values['📦 Enhanced Nodes.Animate'] ?? 0, l.values['📦 Enhanced Nodes.Background'] ?? 'none'];
+        expect(Object.fromEntries(LOOKS.map((l) => [l.id, nodes(l)]))).toEqual({
+            off: [0, 'none'], subtle: [0, 'none'], showcase: [8, 'starfield'], performance: [0, 'none'], 'classic-v1': [2, 'none'],
+            'neon-night': [7, 'grid'], 'lava-lamp': [9, 'lava'], 'sacred-geometry': [5, 'none'], 'living-wires': [0, 'none'], presenter: [0, 'none'], blueprint: [0, 'none'],
+        });
+    });
+
     it('hang Showcase on rope at 0.6 and Living Wires, native-looking, on rope at 1; the others leave wires off', () => {
         const wires = (l: Look) => [l.values['🔗 Enhanced Links.Physics.Profile'] ?? 'off', l.values['🔗 Enhanced Links.Physics.Amount'] ?? 1];
         expect(Object.fromEntries(LOOKS.map((l) => [l.id, wires(l)]))).toEqual(Object.fromEntries(LOOKS.map((l) => [l.id,
@@ -139,8 +147,9 @@ describe('applying a look', () => {
             ['🔗 Enhanced Links.Glow.Intensity', 14],
             ['🔗 Enhanced Links.Blend', 'additive'],
             ['🔗 Enhanced Links.Assist.Mode', 'hands-eyes'],
-            ['📦 Enhanced Nodes.Animate', 2],
+            ['📦 Enhanced Nodes.Animate', 8],
             ['📦 Enhanced Nodes.Intensity', 1.2],
+            ['📦 Enhanced Nodes.Background', 'starfield'],
             ['📦 Enhanced Nodes.Glow', 1],
             ['📦 Enhanced Nodes.Particle.Show', true],
             ['📦 Enhanced Nodes.Particle.Glow', 1],
@@ -156,7 +165,7 @@ describe('applying a look', () => {
         undo();
         await settle();
         expect(fake.posts.map(([id]) => id)).toEqual([THICKNESS, '🔗 Enhanced Links.Physics.Profile', '🔗 Enhanced Links.Quality', '🔗 Enhanced Links.Particle.Density', '🔗 Enhanced Links.Physics.Amount', '🔗 Enhanced Links.Glow.Intensity', '🔗 Enhanced Links.Blend', '🔗 Enhanced Links.Assist.Mode',
-            '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
+            '📦 Enhanced Nodes.Animate', '📦 Enhanced Nodes.Intensity', '📦 Enhanced Nodes.Background', '📦 Enhanced Nodes.Glow', '📦 Enhanced Nodes.Particle.Show', '📦 Enhanced Nodes.Particle.Glow',
             '📦 Enhanced Nodes.Particle.Color.Mode', '🔗 Enhanced Links.Pause.Mode', '📦 Enhanced Nodes.Completion.Style', '📦 Enhanced Nodes.Completion.PerNode', LOOK]);
         expect(showing()).toEqual(before);
     });
