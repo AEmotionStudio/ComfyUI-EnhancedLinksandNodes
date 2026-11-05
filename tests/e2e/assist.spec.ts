@@ -267,10 +267,12 @@ test('works inside a subgraph', async ({ page, profile }) => {
     await openSubgraph(page, graph.subgraph!);
     const [source, target] = await page.evaluate(() => window.app.canvas.graph.nodes.filter((n: { type: string }) => n.type === 'ELNImage').sort((a: { pos: number[] }, b: { pos: number[] }) => a.pos[0] - b.pos[0]).map((n: { id: number }) => Number(n.id)));
     const [from, to] = [await slot(page, source, false), await slot(page, target, true)];
+    // Opening the subgraph may zoom in, and zoomed in assist grows with the nodes: its px are graph units.
+    const zoom = Math.max(1, await page.evaluate(() => window.app.canvas.ds.scale));
     await page.mouse.move(...from);
     await page.mouse.down();
-    await page.mouse.move(...toward(from, to, 170), { steps: 12 });
-    await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the input');
+    await page.mouse.move(...toward(from, to, 170 * zoom), { steps: 12 });
+    await expectWhites(page, toward(from, to, 30 * zoom), [40 * zoom, 24 * zoom], true, false, 'glove at the input');
     await page.mouse.up();
 });
 

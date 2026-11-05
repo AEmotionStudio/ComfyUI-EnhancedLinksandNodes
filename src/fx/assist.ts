@@ -2,7 +2,7 @@
  * Connection assist, after nodezator's hands and eyes (issue #3; ideas only,
  * no assets): while a link is dragged, from an output or an input, as a new
  * link or links moved off a slot or a reroute, it shows where the link can go.
- * The candidate is the slot nearest the link's end within RANGE px on screen,
+ * The candidate is the slot nearest the link's end within RANGE px,
  * on a node on screen other than the one the link comes from, or on a
  * subgraph's input or output node, whose type LiteGraph.isValidConnection takes
  * in the drag's direction; where native holds the end on a slot or a reroute,
@@ -20,8 +20,9 @@
  *   end and blink now and then, and smile while the hands clasp.
  *
  * With reduced motion or links frozen nothing pops in, waves, marches, bursts
- * or blinks, and the ticker rests. It is drawn over the nodes, as large on screen
- * at any zoom. Native connects a link let go on a slot, a node or a reroute as
+ * or blinks, and the ticker rests. It is drawn over the nodes in its own px: a
+ * graph unit zoomed in, so that it grows with the nodes as at zoom 1, and a px on
+ * screen zoomed out, so that it stays as large as there. Native connects a link let go on a slot, a node or a reroute as
  * it always does; one let go on nothing connects to the candidate as if let go
  * on it, with Assist.AutoConnect wherever the guide line points or once the
  * hands clasp, and with Assist.SnapKey held anywhere in reach, while the hands
@@ -43,7 +44,7 @@ type Drop = Parameters<Canvas['linkConnector']['dropOnNothing']>[0];
 /** The guard's key, which its toast names when it turns assist off. */
 const ASSIST = 'Connection assist';
 
-/** In px on screen: how far from the link's end a slot is in reach, and how near the hands clasp. */
+/** How far from the link's end a slot is in reach, and how near the hands clasp, in px as unitOf() has them. */
 const RANGE = 200;
 const CLASP = 120;
 /** How far out of its node's box a slot may lie, in graph units: Nodes 2.0's dots sit on its edge. */
@@ -347,6 +348,9 @@ function line(ctx: CanvasRenderingContext2D, x: number, y: number, turn: number,
     ctx.restore();
 }
 
+/** Graph units to a px of assist: one zoomed in, so it grows with the nodes, and a px on screen zoomed out. */
+const unitOf = (canvas: Canvas) => Math.max(1, 1 / canvas.ds.scale);
+
 /** 0 to 1 as x goes from 0 to 1, easing in and out. */
 const smooth = (x: number) => x * x * (3 - 2 * x);
 
@@ -365,12 +369,12 @@ function take(node: Node, i: number, sx: number, sy: number, x: number, y: numbe
 }
 
 /**
- * Finds the slot of a node on screen, other than the one `link` comes from, nearest x, y within RANGE px on screen,
+ * Finds the slot of a node on screen, other than the one `link` comes from, nearest x, y within RANGE px,
  * that the link may connect to: an input of a type LiteGraph takes from its output's, or the other way about. A node
  * whose box is no nearer than the nearest slot so far is passed over.
  */
 function seek(canvas: Canvas, link: Link, x: number, y: number): boolean {
-    const reach = RANGE / canvas.ds.scale;
+    const reach = RANGE * unitOf(canvas);
     const inputs = canvas.linkConnector.state.connectingTo === 'input';
     const type = link.fromSlot.type;
     found.node = undefined;
@@ -410,7 +414,7 @@ const snapKey = (event: { ctrlKey: boolean; metaKey: boolean; altKey: boolean })
 let snapping = false;
 
 /**
- * Whether letting go `d` px on screen from the candidate connects to it: with the snap key `held`, anywhere in reach;
+ * Whether letting go `d` px from the candidate connects to it: with the snap key `held`, anywhere in reach;
  * with Assist.AutoConnect, anywhere the guide line points, and once the hands clasp.
  */
 const grips = (d: number, held: boolean): boolean => held || (L.assistAutoConnect && (L.assistMode === 'line' || d <= CLASP));
@@ -425,7 +429,7 @@ function drop(canvas: Canvas, event: Drop): boolean {
     const link = linkConnector.renderLinks[0];
     if (!link || !L.enabled || L.assistMode === 'off' || guard.off(ASSIST)) return false;
     const { canvasX: x, canvasY: y } = event;
-    if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) * canvas.ds.scale, snapKey(event))) return false;
+    if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) / unitOf(canvas), snapKey(event))) return false;
     const node = found.node!;
     const at = event as { canvasX: number; canvasY: number };
     at.canvasX = found.x;
@@ -491,9 +495,8 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
         found.y = held[1];
         there = true;
     }
-    const scale = canvas.ds.scale;
-    const unit = 1 / scale;
-    const d = Math.hypot(found.x - x, found.y - y) * scale;
+    const unit = unitOf(canvas);
+    const d = Math.hypot(found.x - x, found.y - y) / unit;
     const clasped = there && (d <= CLASP || snapping);
     const t = clock.assistTime;
     const still = env.reducedMotion || L.staticMode;

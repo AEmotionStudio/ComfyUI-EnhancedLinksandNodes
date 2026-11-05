@@ -129,13 +129,19 @@ describe('the candidate', () => {
         expect(ring(drawn(canvas))).toEqual([911, 114]);
     });
 
-    it('is 200 px on screen at any zoom', async () => {
+    it('is 200 graph units zoomed in, and 200 px on screen zoomed out', async () => {
         const { canvas, nodes } = await scene('line');
         canvas.ds.scale = 2;
         frames(1);
-        drag(canvas, nodes[0], [309, 134]);
+        drag(canvas, nodes[0], [209, 134]);
         expect(ring(drawn(canvas))).toBeUndefined();
-        drag(canvas, nodes[0], [311, 134]);
+        drag(canvas, nodes[0], [211, 134]);
+        expect(ring(drawn(canvas))).toEqual([410, 134]);
+        canvas.ds.scale = 0.8;
+        frames(1);
+        drag(canvas, nodes[0], [159, 134]);
+        expect(ring(drawn(canvas))).toBeUndefined();
+        drag(canvas, nodes[0], [161, 134]);
         expect(ring(drawn(canvas))).toEqual([410, 134]);
     });
 
@@ -287,11 +293,13 @@ describe('the gloves', () => {
         expect(cuffs(rec)).toBe(1);
     });
 
-    it('stay as large on screen at any zoom', async () => {
+    it('grow with the nodes zoomed in, and stay as large on screen zoomed out', async () => {
         const { canvas, nodes } = await scene('hands');
         const scales = () => drawn(canvas).lines.filter((line) => line.startsWith('scale('));
         drag(canvas, nodes[0], [340, 134]);
         const one = scales();
+        canvas.ds.scale = 2;
+        expect(scales()).toEqual(one);
         canvas.ds.scale = 0.5;
         expect(scales()).toEqual(one.map((line) => line.replace(/[\d.]+/g, (n) => String(Number(n) * 2))));
     });
@@ -334,6 +342,13 @@ describe('the eyes', () => {
         const [left] = pupils(drawn(canvas));
         expect([left[0] > 200, left[1] > 70]).toEqual([true, true]);
         // Held on a reroute 12 px from the upper node's IMAGE input, they stay on the source.
+        drag(canvas, nodes[0], [380, 150]);
+        canvas._highlight_pos = [400, 140];
+        expect(eyes(drawn(canvas))).toEqual([[200, 70], [220, 70]]);
+        canvas._highlight_pos = undefined;
+        // Zoomed in, they are where they were, growing with the node.
+        canvas.ds.scale = 2;
+        frames(1);
         drag(canvas, nodes[0], [380, 150]);
         canvas._highlight_pos = [400, 140];
         expect(eyes(drawn(canvas))).toEqual([[200, 70], [220, 70]]);

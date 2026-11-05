@@ -238,6 +238,7 @@ function line(ctx, x, y, turn, d, unit, colour, pop, march) {
   ctx.stroke();
   ctx.restore();
 }
+const unitOf = (canvas) => Math.max(1, 1 / canvas.ds.scale);
 const smooth = (x) => x * x * (3 - 2 * x);
 const found = { node: void 0, slot: -1, x: 0, y: 0, d: 0 };
 function take(node, i, sx, sy, x, y) {
@@ -250,7 +251,7 @@ function take(node, i, sx, sy, x, y) {
   found.d = d;
 }
 function seek(canvas, link, x, y) {
-  const reach = RANGE / canvas.ds.scale;
+  const reach = RANGE * unitOf(canvas);
   const inputs = canvas.linkConnector.state.connectingTo === "input";
   const type = link.fromSlot.type;
   found.node = void 0;
@@ -287,7 +288,7 @@ function drop(canvas, event) {
   const link = linkConnector.renderLinks[0];
   if (!link || !L.enabled || L.assistMode === "off" || guard.off(ASSIST)) return false;
   const { canvasX: x, canvasY: y } = event;
-  if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) * canvas.ds.scale, snapKey(event))) return false;
+  if (!seek(canvas, link, x, y) || !grips(Math.sqrt(found.d) / unitOf(canvas), snapKey(event))) return false;
   const node = found.node;
   const at = event;
   at.canvasX = found.x;
@@ -337,9 +338,8 @@ function drawAssist(canvas, ctx) {
     found.y = held[1];
     there = true;
   }
-  const scale = canvas.ds.scale;
-  const unit = 1 / scale;
-  const d = Math.hypot(found.x - x, found.y - y) * scale;
+  const unit = unitOf(canvas);
+  const d = Math.hypot(found.x - x, found.y - y) / unit;
   const clasped = there && (d <= CLASP || snapping);
   const t = clock.assistTime;
   const still = env.reducedMotion || L.staticMode;

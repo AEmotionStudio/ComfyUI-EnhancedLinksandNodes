@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Connection assist
 - **Cleaner gloves**: each hand is one outline with rounded fingers. They are right hands meeting, the link's showing its back and the slot's its palm. The clasp is a handshake laid out like 🤝, the size of the gloves, in their white with cuffs in the link's colour.
 - **A helping hand**: the slot's glove reaches out on its arm toward the link as it nears. Slots come in reach from 200 px instead of 150, and the hands clasp, and connect on release, from 120 px instead of 75.
+- **Hands and eyes grow with the nodes** as you zoom in, as do how far they reach and where they clasp, so they keep their size beside the nodes; zoomed out they keep their size on screen.
 - **Clasp shimmer** (on by default, `Assist.Shine`): light bursts from the hands as they clasp, then a faint glow stays. With Hands & eyes, the node you drag from keeps its eyes for the whole drag, next to the eyes on the slot's node, and both pairs smile while the hands clasp.
 
 ## [3.0.0] - 2026-11-03
