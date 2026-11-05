@@ -1,5 +1,5 @@
 // Connection assist in ComfyUI: dragging a link from an output toward an input of its type puts a glove on the input
-// within 150 px and clasps the hands within 75 px, an input of another type gets none, and dropping the link connects it
+// within 200 px, reaching out to the end on its arm, and clasps the hands within 120 px, an input of another type gets none, and dropping the link connects it
 // as native does, then leaves nothing drawn and the canvas still, as cancelling with Escape leaves nothing drawn;
 // dragging from an input reaches for an output; a link dropped on the canvas opens the link-release search with
 // nothing drawn; it works inside a subgraph, toward its output node too, and, in Nodes 2.0, on the canvas above the DOM
@@ -88,7 +88,7 @@ const expectWhites = (page: Page, at: Point, box: Point, some: boolean, overlay 
     expect.poll(() => whites(page, at, box, overlay), { message, timeout: 3000 })[some ? 'toBeGreaterThan' : 'toBe'](some ? 20 : 0);
 
 test.describe('dragging from an output', () => {
-    test('reaches for an input of its type from 150 px and clasps within 75 px; one of another type gets none', async ({ page, profile }) => {
+    test('reaches for an input of its type from 200 px and clasps within 120 px; one of another type gets none', async ({ page, profile }) => {
         ours(profile);
         const graph = await buildGraph(page, scene);
         const [from, to, ints] = [await slot(page, graph.nodes.source, false), await slot(page, graph.nodes.target, true), await slot(page, graph.nodes.ints, true)];
@@ -97,11 +97,11 @@ test.describe('dragging from an output', () => {
         // Out of reach: nothing at the input.
         await page.mouse.move(...toward(from, to, 250), { steps: 10 });
         await expectWhites(page, toward(from, to, 15), [40, 24], false);
-        // In reach: a glove on the input, reaching out of it; the hands' fingertips are still apart halfway.
-        await page.mouse.move(...toward(from, to, 110), { steps: 10 });
-        await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the input');
-        await page.mouse.move(...toward(from, to, 90), { steps: 4 });
-        await expectWhites(page, toward(from, to, 45), [10, 10], false, false, 'nothing between the hands');
+        // In reach: a glove at the input, reaching out of it on its arm; 150 px off, the hands' fingertips are still apart.
+        await page.mouse.move(...toward(from, to, 170), { steps: 10 });
+        await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the input');
+        await page.mouse.move(...toward(from, to, 150), { steps: 4 });
+        await expectWhites(page, toward(from, to, 90), [10, 10], false, false, 'nothing between the hands');
         // Clasped between the end and the input.
         await page.mouse.move(...toward(from, to, 60), { steps: 4 });
         await expectWhites(page, toward(from, to, 30), [10, 10], true, false, 'clasped hands');
@@ -142,8 +142,8 @@ test.describe('dragging from an output', () => {
         const [from, to] = [await slot(page, graph.nodes.source, false), await slot(page, graph.nodes.target, true)];
         await page.mouse.move(...from);
         await page.mouse.down();
-        await page.mouse.move(...toward(from, to, 110), { steps: 12 });
-        await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the input');
+        await page.mouse.move(...toward(from, to, 170), { steps: 12 });
+        await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the input');
         await page.keyboard.press('Escape');
         expect(await page.evaluate(() => window.app.canvas.linkConnector.isConnecting)).toBe(false);
         await expectWhites(page, toward(from, to, 60), [160, 40], false, false, 'nothing once cancelled');
@@ -158,11 +158,11 @@ test.describe('dragging from an output', () => {
         const searchBox = page.getByRole('dialog').or(page.getByRole('search')).first();
         await page.mouse.move(...from);
         await page.mouse.down();
-        await page.mouse.move(...toward(from, to, 200), { steps: 12 });
-        await expectWhites(page, toward(from, to, 200), [40, 40], true, false, 'the open hand');
+        await page.mouse.move(...toward(from, to, 260), { steps: 12 });
+        await expectWhites(page, toward(from, to, 260), [40, 40], true, false, 'the open hand');
         await page.mouse.up();
         await expect(searchBox).toBeVisible({ timeout: 3000 });
-        await expectWhites(page, toward(from, to, 200), [80, 80], false, false, 'nothing once dropped');
+        await expectWhites(page, toward(from, to, 260), [80, 80], false, false, 'nothing once dropped');
         await page.keyboard.press('Escape');
     });
 });
@@ -199,7 +199,7 @@ test.describe('let go on nothing', () => {
 
     test('between the clasp and the reach, leaves it to native: the link-release search opens', async ({ page, profile }) => {
         ours(profile);
-        const { graph, up } = await letGo(page, 110);
+        const { graph, up } = await letGo(page, 160);
         await up();
         await expect(searchBox(page)).toBeVisible({ timeout: 3000 });
         expect(await linkInto(page, graph.nodes.target)).toBeNull();
@@ -208,8 +208,8 @@ test.describe('let go on nothing', () => {
 
     test('with the snap key held, the hands clasp anywhere in reach, and letting go connects', async ({ page, profile }) => {
         ours(profile);
-        const { graph, from, to, up } = await letGo(page, 110, 'Control');
-        await expectWhites(page, toward(from, to, 55), [10, 10], true, false, 'clasped halfway');
+        const { graph, from, to, up } = await letGo(page, 160, 'Control');
+        await expectWhites(page, toward(from, to, 133), [10, 10], true, false, 'clasped by the end');
         await up();
         expect(await linkInto(page, graph.nodes.target)).toEqual([graph.nodes.source, 0, 'IMAGE']);
     });
@@ -254,9 +254,9 @@ test('dragging from an input reaches for an output of its type', async ({ page, 
     const [from, to] = [await slot(page, graph.nodes.target, true), await slot(page, graph.nodes.source, false)];
     await page.mouse.move(...from);
     await page.mouse.down();
-    await page.mouse.move(...toward(from, to, 110), { steps: 12 });
+    await page.mouse.move(...toward(from, to, 170), { steps: 12 });
     expect(await page.evaluate(() => window.app.canvas.linkConnector.state.connectingTo)).toBe('output');
-    await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the output');
+    await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the output');
     await page.mouse.up();
 });
 
@@ -269,8 +269,8 @@ test('works inside a subgraph', async ({ page, profile }) => {
     const [from, to] = [await slot(page, source, false), await slot(page, target, true)];
     await page.mouse.move(...from);
     await page.mouse.down();
-    await page.mouse.move(...toward(from, to, 110), { steps: 12 });
-    await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the input');
+    await page.mouse.move(...toward(from, to, 170), { steps: 12 });
+    await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the input');
     await page.mouse.up();
 });
 
@@ -292,8 +292,8 @@ test("reaches for the empty slot of a subgraph's output node", async ({ page, pr
     const [from, to] = [await client(page, out), await client(page, empty)];
     await page.mouse.move(...from);
     await page.mouse.down();
-    await page.mouse.move(...toward(from, to, 110), { steps: 12 });
-    await expectWhites(page, toward(from, to, 15), [40, 24], true, false, 'glove at the empty slot');
+    await page.mouse.move(...toward(from, to, 170), { steps: 12 });
+    await expectWhites(page, toward(from, to, 30), [40, 24], true, false, 'glove at the empty slot');
     // Let go inside the clasp, it makes the subgraph an output, as a drop on the empty slot does.
     const outputs = () => page.evaluate(() => window.app.canvas.subgraph.outputNode.slots.length);
     const before = await outputs();
@@ -319,8 +319,8 @@ for (const scale of [1, 2]) {
             const [from, to] = [await slot(page, graph.nodes.source, false, true), await slot(page, graph.nodes.target, true, true)];
             await page.mouse.move(...from);
             await page.mouse.down();
-            await page.mouse.move(...toward(from, to, 110), { steps: 12 });
-            await expectWhites(page, toward(from, to, 15), [40, 24], true, true, 'glove at the input dot');
+            await page.mouse.move(...toward(from, to, 170), { steps: 12 });
+            await expectWhites(page, toward(from, to, 30), [40, 24], true, true, 'glove at the input dot');
             await page.mouse.move(...toward(from, to, 60), { steps: 4 });
             await expectWhites(page, toward(from, to, 30), [10, 10], true, true, 'clasped hands');
             await page.mouse.move(...to, { steps: 4 });

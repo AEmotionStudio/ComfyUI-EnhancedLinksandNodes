@@ -1,9 +1,11 @@
 /**
  * Connection assist (fx/assist.ts): while a link is dragged it finds the slot
- * the link can go to, the nearest valid one within 150 px on screen, a
+ * the link can go to, the nearest valid one within 200 px on screen, a
  * subgraph's input or output node's too, or what native snaps to, and draws
- * the guide line, the gloves, which clasp within 75 px and keep their thumbs on
- * one side about the vertical, and the eyes over it; it draws nothing once the
+ * the guide line, the gloves, the slot's reaching out on its arm, which clasp
+ * within 120 px, upright, with a burst of light, and keep their thumbs on one
+ * side about the vertical, and the eyes over it, which smile at the clasp; it
+ * draws nothing once the
  * drag ends or the link is dropped on the canvas, and asks for one paint to
  * clear it then, holds still with reduced motion, keeps the ticker going only
  * while something of it moves, and reads no settings as it does.
@@ -93,8 +95,8 @@ function gloves(rec: CanvasRecorder): Point[] {
     });
 }
 
-/** The middle of each eye's white, not of its pupil's glint. */
-const eyes = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style === WHITE && p.box && p.box[2] - p.box[0] > 10).map((p) => middle(p.box!));
+/** The middle of each eye's white, not of its pupil's glint or the light from the clasp. */
+const eyes = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style === WHITE && p.composite !== 'lighter' && p.box && p.box[2] - p.box[0] > 10).map((p) => middle(p.box!));
 
 /** How open each eye is: its white's height over its width. */
 const open = (rec: CanvasRecorder) => rec.lines.flatMap((line) => {
@@ -103,17 +105,17 @@ const open = (rec: CanvasRecorder) => rec.lines.flatMap((line) => {
 });
 
 describe('the candidate', () => {
-    it('is the nearest slot within 150 px on screen that the link can connect to: an input of its type from an output', async () => {
+    it('is the nearest slot within 200 px on screen that the link can connect to: an input of its type from an output', async () => {
         const { canvas, nodes } = await scene('line');
         // The INT input at (410, 114) is nearer, but takes no IMAGE.
         drag(canvas, nodes[0], [360, 110]);
         expect(ring(drawn(canvas))).toEqual([410, 134]);
         drag(canvas, nodes[0], [400, 320]);
         expect(ring(drawn(canvas))).toEqual([410, 414]);
-        // 151 px from the nearest, and nearer the source's own IMAGE input, which the link cannot take.
-        drag(canvas, nodes[0], [259, 134]);
+        // 201 px from the nearest, and nearer the source's own IMAGE input, which the link cannot take.
+        drag(canvas, nodes[0], [209, 134]);
         expect(ring(drawn(canvas))).toBeUndefined();
-        drag(canvas, nodes[0], [261, 134]);
+        drag(canvas, nodes[0], [211, 134]);
         expect(ring(drawn(canvas))).toEqual([410, 134]);
     });
 
@@ -127,13 +129,13 @@ describe('the candidate', () => {
         expect(ring(drawn(canvas))).toEqual([911, 114]);
     });
 
-    it('is 150 px on screen at any zoom', async () => {
+    it('is 200 px on screen at any zoom', async () => {
         const { canvas, nodes } = await scene('line');
         canvas.ds.scale = 2;
         frames(1);
-        drag(canvas, nodes[0], [334, 134]);
+        drag(canvas, nodes[0], [309, 134]);
         expect(ring(drawn(canvas))).toBeUndefined();
-        drag(canvas, nodes[0], [336, 134]);
+        drag(canvas, nodes[0], [311, 134]);
         expect(ring(drawn(canvas))).toEqual([410, 134]);
     });
 
@@ -158,9 +160,9 @@ describe('the candidate', () => {
 
     it("is a slot just out of its node's box, where Nodes 2.0 puts its dot", async () => {
         const { canvas, nodes } = await scene('line');
-        // The upper node's IMAGE input 8 px left of its box, 143 px from the end, which is 151 px from the box.
+        // The upper node's IMAGE input 8 px left of its box, 193 px from the end, which is 201 px from the box.
         nodes[1].getInputPos = (i) => [392, 114 + 20 * i];
-        drag(canvas, nodes[0], [249, 134]);
+        drag(canvas, nodes[0], [199, 134]);
         expect(ring(drawn(canvas))).toEqual([392, 134]);
     });
 
@@ -188,12 +190,16 @@ describe('the candidate', () => {
 });
 
 describe('the gloves', () => {
-    it('reach from the end and the slot, clasp between them within 75 px, and an open hand waits at the end with nothing in reach', async () => {
+    it('reach from the end and the slot, clasp within 120 px, the end\'s cuff at the end, and the end\'s glove waits at the end with nothing in reach', async () => {
         const { canvas, nodes } = await scene('hands');
-        drag(canvas, nodes[0], [310, 134]);
-        expect(gloves(drawn(canvas))).toEqual([[310, 134], [410, 134]]);
-        drag(canvas, nodes[0], [340, 134]);
-        expect(gloves(drawn(canvas))).toEqual([[375, 134]]);
+        drag(canvas, nodes[0], [270, 134]);
+        expect(gloves(drawn(canvas))).toEqual([[270, 134], [410, 134]]);
+        // 110 px off, the clasp's middle 26.7 px on from the end once it has popped in; 40 px off, halfway.
+        drag(canvas, nodes[0], [300, 134]);
+        drawn(canvas);
+        expect(gloves(drawn(canvas, 0.2))).toEqual([[326.7, 134]]);
+        drag(canvas, nodes[0], [370, 134]);
+        expect(gloves(drawn(canvas))).toEqual([[390, 134]]);
         canvas._highlight_pos = [410, 134];
         expect(gloves(drawn(canvas))).toEqual([[410, 134]]);
         canvas._highlight_pos = undefined;
@@ -204,29 +210,81 @@ describe('the gloves', () => {
     it('reach from the pointer for the slot native would snap to while links do not snap to slots', async () => {
         const { canvas, nodes } = await scene('hands');
         LiteGraph.snaps_for_comfy = false;
-        drag(canvas, nodes[0], [500, 140]);
+        drag(canvas, nodes[0], [550, 140]);
         canvas._highlight_pos = [410, 134];
-        expect(gloves(drawn(canvas))).toEqual([[500, 140], [410, 134]]);
+        expect(gloves(drawn(canvas))).toEqual([[550, 140], [410, 134]]);
     });
 
-    it('keep their thumbs on one side while a drag wavers about the vertical, and turn over once it heads the other way', async () => {
+    it("stay right hands whichever way the drag heads: turned, never mirrored but for the slot's palm", async () => {
         const { canvas, nodes } = await scene('hands');
-        /** Whether each glove, or the clasp, is mirrored. */
+        /** Whether each glove is mirrored. */
         const flips = () => drawn(canvas).lines.filter((line) => line.startsWith('scale(')).map((line) => line.includes(', -'));
-        // Reaching 110 px above the lower IMAGE input at (410, 414), then clasped 50 px above it, a px either side of straight up.
-        for (const y of [304, 364]) {
-            drag(canvas, nodes[0], [409, y]);
-            const first = flips();
-            for (const x of [411, 409, 411, 409]) {
-                canvas.graph_mouse = [x, y];
-                expect(flips(), `${x}, ${y}`).toEqual(first);
-            }
+        // Reaching from the left, then above, below and to the right of the slot, and with nothing in reach.
+        for (const at of [[270, 134], [409, 290], [409, 10], [560, 134]] as Point[]) {
+            drag(canvas, nodes[0], at);
+            expect(flips(), String(at)).toEqual([false, true]);
         }
-        // To the input's right, heading left to it; a new drag starts afresh.
-        canvas.graph_mouse = [500, 380];
-        expect(flips()).toEqual([true, false]);
-        drag(canvas, nodes[0], [411, 304]);
-        expect(flips()).toEqual([false, true]);
+        drag(canvas, nodes[0], [200, 300]);
+        expect(flips()).toEqual([false]);
+        canvas.graph_mouse = [0, 300];
+        expect(flips()).toEqual([false]);
+    });
+
+    it('keep the clasp from turning round while a drag wavers about the vertical, and upright once it heads the other way', async () => {
+        const { canvas, nodes } = await scene('hands');
+        const turn = () => Number(/^rotate\((\S+)\)$/.exec(drawn(canvas).lines.find((line) => line.startsWith('rotate('))!)![1]);
+        // Clasped 50 px above the lower IMAGE input at (410, 414), a px either side of straight up.
+        drag(canvas, nodes[0], [409, 364]);
+        const first = turn();
+        for (const x of [411, 409, 411, 409]) {
+            canvas.graph_mouse = [x, 364];
+            expect(Math.abs(turn() - first), String(x)).toBeLessThan(0.1);
+        }
+        // To the input's right, heading left to it, and to its left, heading right: upright, a little tilted, both.
+        canvas.graph_mouse = [460, 400];
+        expect(Math.cos(turn())).toBeGreaterThan(0.9);
+        drag(canvas, nodes[0], [360, 400]);
+        expect(Math.cos(turn())).toBeGreaterThan(0.9);
+    });
+
+    it("are right hands meeting: the end's with the stitches on its back, the slot's with the crease across its palm", async () => {
+        const { canvas, nodes } = await scene('hands');
+        /** Each glove's line work over its white: the stitches on a back, or the crease across a palm. */
+        const sides = (rec: CanvasRecorder) => rec.lines.filter((line) => /^path\d+ = Path2D\[moveTo\(/.test(line))
+            .map((line) => (line.includes('moveTo(2.5, -3.6)') ? 'back' : line.includes('quadraticCurveTo(14, -7.4, 17.5, -9.2)') ? 'palm' : line));
+        drag(canvas, nodes[0], [270, 134]);
+        expect(sides(drawn(canvas))).toEqual(['back', 'palm']);
+        drag(canvas, nodes[0], [200, 300]);
+        expect(sides(drawn(canvas))).toEqual(['back']);
+    });
+
+    it('clasp upright: heading left, the clasp turns round rather than over', async () => {
+        const { canvas, nodes } = await scene('hands');
+        const turns = () => drawn(canvas).lines.filter((line) => /^(rotate|scale)\(/.test(line));
+        drag(canvas, nodes[0], [360, 134]);
+        expect(turns()).toEqual(['rotate(0)', 'scale(1.05, 1.05)']);
+        // Heading left, a half turn more: a whole one.
+        drag(canvas, nodes[0], [460, 134]);
+        expect(turns()).toEqual(['rotate(6.28)', 'scale(1.05, 1.05)']);
+    });
+
+    it("reach out on the slot's arm as the end nears, as far as has the fingertips meet at 120 px, and hold on to the clasp by it", async () => {
+        const { canvas, nodes } = await scene('hands', { '🔗 Enhanced Links.Assist.Shine': false });
+        /** The fills not in white: the cuffs and the arm. */
+        const cuffs = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style !== WHITE).length;
+        // 160 px off, the slot's wrist is half of 48 px out; 140 px off, 84 % of it; it pops in from the slot.
+        drag(canvas, nodes[0], [250, 134]);
+        expect(gloves(drawn(canvas))[1]).toEqual([410, 134]);
+        let rec = drawn(canvas, 0.2);
+        expect([gloves(rec)[1], cuffs(rec)]).toEqual([[386, 134], 3]);
+        canvas.graph_mouse = [270, 134];
+        expect(gloves(drawn(canvas))[1]).toEqual([369.5, 134]);
+        // Clasped 110 px off, the arm reaches the clasp's cuff; 50 px off, there is no room for it.
+        drag(canvas, nodes[0], [300, 134]);
+        expect(cuffs(drawn(canvas, 0.2))).toBe(2);
+        drag(canvas, nodes[0], [360, 134]);
+        rec = drawn(canvas, 0.2);
+        expect(cuffs(rec)).toBe(1);
     });
 
     it('stay as large on screen at any zoom', async () => {
@@ -238,10 +296,10 @@ describe('the gloves', () => {
         expect(scales()).toEqual(one.map((line) => line.replace(/[\d.]+/g, (n) => String(Number(n) * 2))));
     });
 
-    it('pop in as a slot comes in reach, wave and blink, and with reduced motion are where they go at once and hold still', async () => {
+    it('pop in as a slot comes in reach, sway and blink, and with reduced motion are where they go at once and hold still', async () => {
         for (const motion of ['full', 'reduce']) {
             const { canvas, nodes } = await scene('hands-eyes', { '🔗 Enhanced Links.Motion': motion });
-            drag(canvas, nodes[0], [300, 134]);
+            drag(canvas, nodes[0], [270, 134]);
             const alphas = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style === WHITE && !p.box).map((p) => p.globalAlpha);
             // The slot's glove, after the end's.
             const first = alphas(drawn(canvas));
@@ -263,16 +321,16 @@ describe('the gloves', () => {
 });
 
 describe('the eyes', () => {
-    it("sit on the candidate's node, else on the node dragged from, and look at the end", async () => {
+    it("sit on the node dragged from all the drag, and on the candidate's node too, and look at the end", async () => {
         const { canvas, nodes } = await scene('hands-eyes');
-        drag(canvas, nodes[0], [300, 300]);
-        // On the middle of the source's top edge, 20 px apart, then on the node with the candidate.
+        drag(canvas, nodes[0], [230, 320]);
+        // On the middle of the source's top edge, 20 px apart, then on the node with the candidate as well.
         expect(eyes(drawn(canvas))).toEqual([[200, 70], [220, 70]]);
         drag(canvas, nodes[0], [380, 150]);
-        expect(eyes(drawn(canvas))).toEqual([[500, 70], [520, 70]]);
+        expect(eyes(drawn(canvas))).toEqual([[200, 70], [220, 70], [500, 70], [520, 70]]);
         // Their pupils look at the end: down and right, then down and left.
         const pupils = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.style !== WHITE && p.box).map((p) => middle(p.box!));
-        drag(canvas, nodes[0], [300, 300]);
+        drag(canvas, nodes[0], [230, 320]);
         const [left] = pupils(drawn(canvas));
         expect([left[0] > 200, left[1] > 70]).toEqual([true, true]);
         // Held on a reroute 12 px from the upper node's IMAGE input, they stay on the source.
@@ -302,6 +360,64 @@ describe('the eyes', () => {
         const gaps = blinks.slice(1).map((t, i) => t - blinks[i]);
         expect(Math.min(...gaps)).toBeGreaterThanOrEqual(3);
         expect(blinks[0]).toBeGreaterThan(1 / MAX_FLASH_HZ);
+    });
+
+    it('smile on both nodes while the hands clasp, and look again once they let go', async () => {
+        const { canvas, nodes } = await scene('hands-eyes');
+        /** The eyes' smiles and blushes: the arcs in ink that are no pupils, and the fills in neither white nor ink. */
+        const smiles = (rec: CanvasRecorder) => rec.lines.filter((line) => /^arc\(.*, 3\.59, 5\.83\)$/.test(line)).length;
+        const blushes = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && /^rgba\(255, 110, 150/.test(p.style)).length;
+        drag(canvas, nodes[0], [300, 134]);
+        drawn(canvas);
+        let rec = drawn(canvas, 0.2);
+        expect([smiles(rec), blushes(rec), eyes(rec)]).toEqual([4, 4, [[200, 70], [220, 70], [500, 70], [520, 70]]]);
+        canvas.graph_mouse = [270, 134];
+        rec = drawn(canvas);
+        expect([smiles(rec), blushes(rec)]).toEqual([0, 0]);
+    });
+});
+
+describe('the light from the clasp', () => {
+    /** The light added over the dark palette: the aura, then while it bursts the rays and the sparkles, at what alpha. */
+    const light = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fill' && p.composite === 'lighter').map((p) => Math.round(p.globalAlpha * 1000) / 1000);
+
+    it('bursts as the hands clasp and fades over 0.8 s, leaving a faint aura, and rests the ticker then', async () => {
+        const { canvas, nodes } = await scene('hands');
+        // Well past the last burst of the tests before, and with the hands apart first.
+        drag(canvas, nodes[0], [200, 300]);
+        drawn(canvas, 10);
+        canvas.graph_mouse = [300, 134];
+        expect(light(drawn(canvas))).toEqual([1, 1, 1]);
+        expect(light(drawn(canvas, 0.4))).toEqual([1, 0.5, 0.5]);
+        frames(60);
+        expect([light(drawn(canvas)), live.assist, page.waiting.length]).toEqual([[1], 0, 0]);
+    });
+
+    it('bursts again no more than MAX_FLASH_HZ times a second, however fast the hands clasp and let go', async () => {
+        const { canvas, nodes } = await scene('hands');
+        drag(canvas, nodes[0], [300, 134]);
+        drawn(canvas);
+        const starts: number[] = [];
+        for (let i = 0; i < 120; i++) {
+            canvas.graph_mouse = i % 2 ? [300, 134] : [270, 134];
+            const rays = light(drawn(canvas, 1 / 30))[1];
+            if (rays === 1) starts.push(i / 30);
+        }
+        const gaps = starts.slice(1).map((t, i) => t - starts[i]);
+        expect(starts.length).toBeGreaterThan(1);
+        expect(Math.min(...gaps)).toBeGreaterThanOrEqual(1 / MAX_FLASH_HZ - 1e-9);
+    });
+
+    it('is the aura alone with reduced motion or links frozen, and none with Assist.Shine off', async () => {
+        for (const [settings, expected] of [
+            [{ '🔗 Enhanced Links.Motion': 'reduce' }, [1]],
+            [{ '🔗 Enhanced Links.Static.Mode': true }, [1]],
+            [{ '🔗 Enhanced Links.Assist.Shine': false }, []],
+        ] as [Record<string, unknown>, number[]][]) {
+            const { canvas, nodes } = await scene('hands', settings);
+            drag(canvas, nodes[0], [300, 134]);
+            expect(light(drawn(canvas)), JSON.stringify(settings)).toEqual(expected);
+        }
     });
 });
 
@@ -373,7 +489,7 @@ describe('drawing', () => {
             ['hands-eyes', { '🔗 Enhanced Links.Motion': 'reduce' }, [340, 134]],
             ['hands-eyes', { '🔗 Enhanced Links.Static.Mode': true }, [200, 300]],
             ['line', {}, [200, 300]],
-            ['hands', {}, [310, 134]],
+            ['hands', {}, [270, 134]],
         ];
         for (const [mode, settings, at] of cases) {
             const { canvas, nodes } = await scene(mode, settings);
@@ -393,13 +509,13 @@ describe('drawing', () => {
     it('clears what it drew with one paint as the drag ends or the link is dropped on the canvas, and asks for none with assist off', async () => {
         for (const mode of ['hands', 'off']) {
             const { canvas, nodes } = await scene(mode, { '🔗 Enhanced Links.Motion': 'reduce' });
-            drag(canvas, nodes[0], [310, 134]);
+            drag(canvas, nodes[0], [270, 134]);
             frames(1);
             drop(canvas);
             expect(canvas.dirty_canvas, mode).toBe(mode === 'hands');
             const before = canvas.front.lines.length;
             frames(1);
-            expect(canvas.front.lines.slice(before), mode).not.toContain('translate(310, 134)');
+            expect(canvas.front.lines.slice(before), mode).not.toContain('translate(270, 134)');
             drag(canvas, nodes[0], [200, 300]);
             frames(1);
             canvas.linkConnector.events.dispatchEvent(new Event('dropped-on-canvas'));
@@ -409,12 +525,12 @@ describe('drawing', () => {
 
     it('draws over the nodes, after everything else over them', async () => {
         const { canvas, nodes } = await scene('hands');
-        drag(canvas, nodes[0], [340, 134]);
+        drag(canvas, nodes[0], [370, 134]);
         const before = canvas.front.lines.length;
         frames(1);
         const pass = canvas.front.lines.slice(before);
         const titles = pass.reduce((last, line, i) => (line.startsWith('fillText(') ? i : last), -1);
         expect(titles).toBeGreaterThan(0);
-        expect(pass.indexOf('translate(375, 134)')).toBeGreaterThan(titles);
+        expect(pass.indexOf('translate(390, 134)')).toBeGreaterThan(titles);
     });
 });

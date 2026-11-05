@@ -217,7 +217,7 @@ describe('v3 traces', () => {
 
     it('connection assist over a link dragged from an IMAGE output: the guide line, the open, reaching and clasped hands, and the eyes', async () => {
         type Point = [number, number];
-        /** The end far off, 133 px from the IMAGE input at (510, 214), 60 px from it, and held on it by native with the pointer by it. */
+        /** The end far off, 133 px from the IMAGE input at (510, 214), reaching, 60 px from it, clasped, and held on it by native with the pointer by it. */
         const poses: [string, Point, Point?][] = [['far', [200, 400]], ['133 px', [400, 140]], ['60 px', [460, 180]], ['snapped', [470, 230], [510, 214]]];
         const traces: string[] = [];
         for (const mode of ['line', 'hands', 'hands-eyes']) {

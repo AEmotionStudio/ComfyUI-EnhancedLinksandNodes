@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Connection assist
+- **Cleaner gloves**: each hand is one outline with rounded fingers. They are right hands meeting, the link's showing its back and the slot's its palm. The clasp is a handshake laid out like 🤝, the size of the gloves, in their white with cuffs in the link's colour.
+- **A helping hand**: the slot's glove reaches out on its arm toward the link as it nears. Slots come in reach from 200 px instead of 150, and the hands clasp, and connect on release, from 120 px instead of 75.
+- **Clasp shimmer** (on by default, `Assist.Shine`): light bursts from the hands as they clasp, then a faint glow stays. With Hands & eyes, the node you drag from keeps its eyes for the whole drag, next to the eyes on the slot's node, and both pairs smile while the hands clasp.
+
 ## [3.0.0] - 2026-11-03
 
 A rework: effects now decorate ComfyUI's own link and node drawing instead of replacing it, v1's effects are back as v1 drew them, and there are looks, selection focus, run visuals and new effects.

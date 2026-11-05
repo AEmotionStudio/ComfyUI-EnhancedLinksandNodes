@@ -10,14 +10,17 @@
  *
  * - Guide line: dashes from the end to the candidate, in the link's colour,
  *   and a ring on it.
- * - Reaching hands: a glove at the end and one at the candidate, which reach
- *   for each other as the end nears and clasp within CLASP px; an open hand
- *   waves at the end while nothing is in reach.
- * - Hands & eyes: the gloves, and a pair of eyes on the candidate's node, else
- *   on the node dragged from, that look at the end and blink now and then.
+ * - Reaching hands: a glove at the end and one at the candidate, which
+ *   reaches out on its arm for the end's as it nears; they clasp, as 🤝 does,
+ *   within CLASP px, and with Assist.Shine light bursts from the clasp. The
+ *   end's glove sways while nothing is in reach. Both are right hands, turned
+ *   but never mirrored, the end's back to us and the slot's palm.
+ * - Hands & eyes: the gloves, and a pair of eyes on the node dragged from for
+ *   as long as the drag lasts, and on the candidate's node, that look at the
+ *   end and blink now and then, and smile while the hands clasp.
  *
- * With reduced motion or links frozen nothing pops in, waves, marches or
- * blinks, and the ticker rests. It is drawn over the nodes, as large on screen
+ * With reduced motion or links frozen nothing pops in, waves, marches, bursts
+ * or blinks, and the ticker rests. It is drawn over the nodes, as large on screen
  * at any zoom. Native connects a link let go on a slot, a node or a reroute as
  * it always does; one let go on nothing connects to the candidate as if let go
  * on it, with Assist.AutoConnect wherever the guide line points or once the
@@ -29,8 +32,8 @@
 
 import { app } from '/scripts/app.js';
 import { L } from '@/core/settings';
-import { clock, env, guard, layers, live, wake } from '@/core/engine';
-import { dark, darker } from '@/core/colors';
+import { MAX_FLASH_HZ, clock, env, guard, layers, live, wake } from '@/core/engine';
+import { dark, darker, translucent } from '@/core/colors';
 
 type Canvas = typeof app.canvas;
 type Node = InstanceType<typeof LGraphNode> | NonNullable<Canvas['subgraph']>['inputNode' | 'outputNode'];
@@ -41,17 +44,25 @@ type Drop = Parameters<Canvas['linkConnector']['dropOnNothing']>[0];
 const ASSIST = 'Connection assist';
 
 /** In px on screen: how far from the link's end a slot is in reach, and how near the hands clasp. */
-const RANGE = 150;
-const CLASP = 75;
+const RANGE = 200;
+const CLASP = 120;
 /** How far out of its node's box a slot may lie, in graph units: Nodes 2.0's dots sit on its edge. */
 const SLACK = 10;
-/** How large a reaching glove is while the end is still RANGE away: it grows as the end nears, to 35 px from wrist to fingertips at CLASP. */
+/** How large a reaching glove is while the end is still RANGE away: it grows as the end nears, to HAND px from wrist to fingertips at CLASP. */
 const SMALL = 0.75;
-/** How far past upright the cosine of the gloves' heading goes before they turn over, so a drag about the vertical keeps them still. */
+const HAND = 36;
+/** How far the slot's glove stretches out on its arm, in px, at CLASP: as far as has the fingertips meet there. */
+const ARM = CLASP - 2 * HAND;
+/** How far the clasp's cuffs are from its middle, in px, and where in them an arm goes. */
+const HALF = 26.7;
+const WRISTS = [[-26.9, -3.2], [27, -5.2]];
+/** How far past upright the cosine of the clasp's heading goes before it turns round, so a drag about the vertical keeps it still. */
 const FLIP = 0.3;
 /** How long a glove, the clasp or the ring takes to pop in, in s. */
 const POP_S = 0.18;
-/** How far the open hand turns either way as it waves, and how often a second. */
+/** How long the light bursts from the clasp, in s; it starts again no sooner than MAX_FLASH_HZ allows. */
+const SHINE_S = 0.8;
+/** How far the end's glove turns either way as it sways with nothing in reach, and how often a second. */
 const WAVE = 0.22;
 const WAVE_HZ = 0.7;
 /** The eyes in px: their radius, how far apart their middles are, their pupils' radius and how far a pupil looks. */
@@ -69,67 +80,73 @@ const DASH = [6, 6];
 const NO_DASH: number[] = [];
 const MARCH = 24;
 const RING = 9;
-/** The gloves' and eyes' white and their outline, which read on dark and light palettes alike, in px. */
+/** The gloves' and eyes' white and their outline, which read on dark and light palettes alike, in px, and the happy eyes' blush. */
 const WHITE = '#fdfdfd';
 const INK = '#1d1d24';
 const OUTLINE = 1.6;
+const BLUSH = 'rgba(255, 110, 150, 0.55)';
 
 /**
- * The gloves, in px with the wrist at 0, 0 and the fingers toward +x, thumb up, each a stack of shapes inked in turn:
- * the open hand, its fingers spread; the reaching hand, fingers together, and the creases between them; the clasp,
- * about its middle; and the cuffs. Built once.
+ * The glove, in px with the wrist at 0, 0 and the fingers toward +x, together, thumb up, one outline: as is, a right
+ * hand's back, with the seams between the fingers and the stitches on its back; mirrored, a right hand's palm, with
+ * the seams running on to the crease across it. And the cuff. The clasp, laid out as 🤝 is, about its middle: the
+ * hands, the fingers curled under, the creases and the cuffs. Built once.
  */
 interface Shapes {
-    open: Path2D[];
     reach: Path2D;
+    knuckles: Path2D;
     creases: Path2D;
-    clasp: Path2D[];
     cuff: Path2D;
+    clasp: Path2D[];
+    clasped: Path2D;
     cuffs: Path2D;
 }
 
 let shapes: Shapes | undefined;
 
-/** Adds an ellipse about x, y turned by `turn` to `path` as a shape of its own. */
-function oval(path: Path2D, x: number, y: number, rx: number, ry: number, turn = 0): void {
-    path.moveTo(x + rx * Math.cos(turn), y + rx * Math.sin(turn));
-    path.ellipse(x, y, rx, ry, turn, 0, 2 * Math.PI);
-}
-
-/** Fingers as [turn, x, y, length, width] halves, every other one in each, so that each outlines the next. */
-function fingers(spec: number[][]): Path2D[] {
-    const halves = [new Path2D(), new Path2D()];
-    spec.forEach(([turn, x, y, rx, ry], i) => oval(halves[i % 2], x, y, rx, ry, turn));
-    return halves;
+/** Adds a finger from x1, y1 to x2, y2, r either side, to `path`, turning as roundRect does, so that what overlaps fills as one. */
+function finger(path: Path2D, x1: number, y1: number, x2: number, y2: number, r: number): void {
+    const turn = Math.atan2(y2 - y1, x2 - x1);
+    path.moveTo(x1 + r * Math.sin(turn), y1 - r * Math.cos(turn));
+    path.arc(x2, y2, r, turn - Math.PI / 2, turn + Math.PI / 2);
+    path.arc(x1, y1, r, turn + Math.PI / 2, turn + 1.5 * Math.PI);
+    path.closePath();
 }
 
 function build(): Shapes {
-    const open = new Path2D();
-    oval(open, 9, 0.5, 10.5, 10);
-    oval(open, 10 + 10 * Math.cos(-1.25), 10 * Math.sin(-1.25), 6.5, 3.4, -1.25);
-    const spread = [[-0.62, 8.5], [-0.21, 10], [0.2, 9.5], [0.6, 7.5]].map(([turn, length]) => [turn, 10 + 13 * Math.cos(turn), 0.5 + 13 * Math.sin(turn), length, 3.1]);
     const reach = new Path2D();
-    oval(reach, 9, 1, 11, 9.5);
-    oval(reach, 12.5, -8.6, 7.8, 3.6, -0.55);
-    for (const [y, tip, turn] of [[-6.1, 33, -0.05], [-0.8, 35, -0.01], [4.5, 33, 0.03], [9.3, 28.5, 0.08]]) oval(reach, (12 + tip) / 2, y, (tip - 12) / 2, 2.9, turn);
-    const creases = new Path2D();
-    for (const y of [-3.45, 1.85, 6.9]) {
-        creases.moveTo(17, y);
-        creases.lineTo(26, y * 1.03);
+    reach.roundRect(-1, -9, 20, 19, 7);
+    const tips = [[-6.3, 31], [-1.7, 34], [2.9, 32], [7.3, 28]];
+    for (const [y, tip] of tips) finger(reach, 14, y, tip, y, 2.55);
+    finger(reach, 7, -6.5, 19, -11.5, 3);
+    // Seen from the back the seams stop at the knuckles; from the palm they run on to the crease across it.
+    const knuckles = new Path2D();
+    for (const y of [-4, 0.5, 5]) {
+        knuckles.moveTo(2.5, 0.9 * y);
+        knuckles.lineTo(9, y);
     }
-    // The right hand's fingers wrap the left's palm, under the left's thumb.
-    const palms = new Path2D();
-    oval(palms, -12, 1, 12.5, 10);
-    oval(palms, 12, -0.5, 12.5, 10);
-    const wrapped = [[-7.4, -15], [-2.5, -17], [2.4, -16.5], [7.2, -13]].map(([y, tip], i) => [0.1 * i - 0.1, (5 + tip) / 2, y, (5 - tip) / 2, 2.7]);
-    const thumb = new Path2D();
-    oval(thumb, 2, -9.6, 10, 3.5, -0.14);
+    const creases = new Path2D();
+    for (let i = 1; i < tips.length; i++) {
+        const y = (tips[i - 1][0] + tips[i][0]) / 2;
+        const tip = Math.min(tips[i - 1][1], tips[i][1]) - 2.5;
+        knuckles.moveTo(23, y);
+        knuckles.lineTo(tip, y);
+        creases.moveTo(19, y);
+        creases.lineTo(tip, y);
+    }
+    creases.moveTo(10, -6.4);
+    creases.quadraticCurveTo(14, -7.4, 17.5, -9.2);
     const cuff = new Path2D();
     cuff.roundRect(-10, -9.5, 10.5, 19, 4);
-    const cuffs = new Path2D();
-    cuffs.roundRect(-35, -9.5, 10.5, 19, 4);
-    cuffs.roundRect(24.5, -9.5, 10.5, 19, 4);
-    return { open: [open, ...fingers(spread)], reach, creases, clasp: [palms, ...fingers(wrapped), thumb], cuff, cuffs };
+    const hands = new Path2D('M-25.6-12.5C-17.2-12-8.1-10.7-0.3-8.8C8.8-10.1 17.9-11.4 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C24.4 6.5 21.8 9.8 19.2 13C15.3 18.9 8.8 24.7 1.3 25C-1.6 25-3.5 24.1-4.8 23.1L-18.5 13.7C-21.1 11.7-23.7 9.1-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5Z');
+    const curled = [[-6, 20.9, -3.9, 22.5, 2.5], [-9.8, 18.1, -7.7, 19.6, 2.7], [-13.9, 15, -11.8, 16.5, 2.9], [-18.3, 11.6, -16.2, 13.1, 2.9]].map(([x1, y1, x2, y2, r]) => {
+        const path = new Path2D();
+        finger(path, x1, y1, x2, y2, r);
+        return path;
+    });
+    const clasped = new Path2D('M0-6.8C-6.1-5.9-10.9-4.5-11.3-2.3C-11.6-0.5-8.7-0.1-5.2-0.5C2.3-1.3 10.8-0.3 17.7 2.9L19.5 11.4M2.3 15.9L7 20.8M6.9 10.7L14 17.7');
+    const cuffs = new Path2D('M-25.6-12.5C-23-12.3-21.1-12.2-19.8-12L-20.8 8.1C-23 7.5-25.6 6.8-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5ZM19.2-12C21.2-12.5 22.9-12.9 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C25.5 4.2 24.2 5.2 22.9 6.2C22.5 0 20.8-6.5 19.2-12Z');
+    return { reach, knuckles, creases, cuff, clasp: [hands, ...curled], clasped, cuffs };
 }
 
 /** Fills `path` in `colour` over its outline, which shows outside it only: one outline round shapes that overlap. */
@@ -141,6 +158,20 @@ function inked(ctx: CanvasRenderingContext2D, path: Path2D, colour: string): voi
     ctx.fill(path);
 }
 
+/** An arm from the slot, at `from` along the x axis, to a cuff at x, y, thinner at the slot. */
+function arm(ctx: CanvasRenderingContext2D, from: number, x: number, y: number, colour: string): void {
+    const d = Math.hypot(x - from, y);
+    const nx = -y / d;
+    const ny = (x - from) / d;
+    const path = new Path2D();
+    path.moveTo(from + 3 * nx, 3 * ny);
+    path.lineTo(x + 5.5 * nx, y + 5.5 * ny);
+    path.lineTo(x - 5.5 * nx, y - 5.5 * ny);
+    path.lineTo(from - 3 * nx, -3 * ny);
+    path.closePath();
+    inked(ctx, path, colour);
+}
+
 /** Sets the context to draw in px about x, y along `turn`, `size` graph units a px, mirrored with `flip`. */
 function place(ctx: CanvasRenderingContext2D, x: number, y: number, turn: number, size: number, flip: boolean): void {
     ctx.translate(x, y);
@@ -148,25 +179,89 @@ function place(ctx: CanvasRenderingContext2D, x: number, y: number, turn: number
     ctx.scale(size, flip ? -size : size);
 }
 
-/** The open hand, or with `reaching` the reaching one, with its wrist at x, y and its fingers toward `turn`, its cuff in `cuff`. */
-function glove(ctx: CanvasRenderingContext2D, s: Shapes, reaching: boolean, x: number, y: number, turn: number, size: number, flip: boolean, cuff: string): void {
+/**
+ * A right glove with its wrist at x, y and its fingers toward `turn`, its cuff in `cuff`: the end's, its back to us,
+ * or with `palm` the slot's, its palm to us, on an arm `stretch` px long behind it.
+ */
+function glove(ctx: CanvasRenderingContext2D, s: Shapes, palm: boolean, x: number, y: number, turn: number, size: number, cuff: string, stretch = 0): void {
     ctx.save();
-    place(ctx, x, y, turn, size, flip);
-    if (reaching) {
-        inked(ctx, s.reach, WHITE);
-        ctx.lineWidth = 1.2;
-        ctx.stroke(s.creases);
-    } else for (const part of s.open) inked(ctx, part, WHITE);
+    place(ctx, x, y, turn, size, palm);
+    if (stretch > 8) arm(ctx, -stretch, -8, 0, cuff);
+    inked(ctx, s.reach, WHITE);
+    ctx.lineWidth = 1.2;
+    ctx.stroke(palm ? s.creases : s.knuckles);
     inked(ctx, s.cuff, cuff);
     ctx.restore();
 }
 
-/** The two hands clasped about x, y along `turn`. */
-function clasp(ctx: CanvasRenderingContext2D, s: Shapes, x: number, y: number, turn: number, size: number, flip: boolean, cuff: string): void {
+/**
+ * The hands clasped about x, y along `turn`, upright, the end's on the left: mirrored with `flip`, the scene turns
+ * round instead. The slot's arm comes from `slot` px along `turn`.
+ */
+function clasp(ctx: CanvasRenderingContext2D, s: Shapes, x: number, y: number, turn: number, size: number, flip: boolean, cuff: string, slot: number): void {
     ctx.save();
-    place(ctx, x, y, turn, size, flip);
+    place(ctx, x, y, flip ? turn + Math.PI : turn, size, false);
+    const [wx, wy] = WRISTS[flip ? 0 : 1];
+    const from = flip ? -slot : slot;
+    if (Math.abs(from) > Math.abs(wx)) arm(ctx, from, wx, wy, cuff);
     for (const part of s.clasp) inked(ctx, part, WHITE);
+    ctx.lineWidth = 1.2;
+    ctx.stroke(s.clasped);
     inked(ctx, s.cuffs, cuff);
+    ctx.restore();
+}
+
+/**
+ * The light about the clasp at x, y, `unit` graph units a px: `p` of the way through its burst, rays and sparkles
+ * flying out of an aura that grows; from 1 on the aura alone, faint. With `lit`, added light in white, for dark
+ * palettes; else in `tint`.
+ */
+function shine(ctx: CanvasRenderingContext2D, x: number, y: number, unit: number, p: number, tint: string, lit: boolean): void {
+    const grown = 1 - (1 - p) ** 3;
+    const core = lit ? WHITE : tint;
+    const glow = 0.3 + 0.5 * (1 - p);
+    const r = (30 + 40 * grown) * unit;
+    ctx.save();
+    if (lit) ctx.globalCompositeOperation = 'lighter';
+    const aura = ctx.createRadialGradient(x, y, 0, x, y, r);
+    aura.addColorStop(0, translucent(core, glow));
+    aura.addColorStop(0.45, translucent(tint, glow * 0.6));
+    aura.addColorStop(1, translucent(tint, 0));
+    ctx.fillStyle = aura;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fill();
+    if (p < 1) {
+        ctx.globalAlpha = 1 - p;
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+            const turn = (i * Math.PI) / 5 + 0.35 * grown;
+            const [c, s] = [Math.cos(turn), Math.sin(turn)];
+            const from = (18 + 6 * grown) * unit;
+            const to = from + (i % 2 ? 22 : 34) * grown * unit;
+            const w = 3 * unit;
+            ctx.moveTo(x + c * from - s * w, y + s * from + c * w);
+            ctx.lineTo(x + c * to, y + s * to);
+            ctx.lineTo(x + c * from + s * w, y + s * from - c * w);
+            ctx.closePath();
+        }
+        ctx.fill();
+        const k = 4 * Math.sin(Math.PI * Math.min(1, 1.4 * p)) * unit;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const turn = (i * Math.PI) / 3 + 0.5;
+            const far = (26 + 44 * grown) * unit;
+            const sx = x + far * Math.cos(turn);
+            const sy = y + far * Math.sin(turn);
+            ctx.moveTo(sx, sy - 1.6 * k);
+            ctx.quadraticCurveTo(sx, sy, sx + k, sy);
+            ctx.quadraticCurveTo(sx, sy, sx, sy + 1.6 * k);
+            ctx.quadraticCurveTo(sx, sy, sx - k, sy);
+            ctx.quadraticCurveTo(sx, sy, sx, sy - 1.6 * k);
+        }
+        ctx.fill();
+    }
     ctx.restore();
 }
 
@@ -179,9 +274,10 @@ function lid(t: number): number {
 
 /**
  * A pair of eyes on the middle of the top of `box`, raised as the view zooms out so that they cover no more of its
- * title than at zoom 1, open by `open`, their pupils turned to x, y.
+ * title than at zoom 1, open by `open`, their pupils turned to x, y; or, `happy` of the way popped in, smiling shut
+ * over blushing cheeks.
  */
-function eyes(ctx: CanvasRenderingContext2D, box: ArrayLike<number>, x: number, y: number, unit: number, open: number): void {
+function eyes(ctx: CanvasRenderingContext2D, box: ArrayLike<number>, x: number, y: number, unit: number, open: number, happy: number): void {
     const cy = box[1] - Math.max(0, unit - 1) * EYE;
     for (let side = -0.5; side <= 0.5; side++) {
         const cx = box[0] + box[2] / 2 + side * EYES * unit;
@@ -192,6 +288,17 @@ function eyes(ctx: CanvasRenderingContext2D, box: ArrayLike<number>, x: number, 
         ctx.lineWidth = OUTLINE * unit;
         ctx.strokeStyle = INK;
         ctx.stroke();
+        if (happy) {
+            ctx.beginPath();
+            ctx.arc(cx, cy + 3 * unit, 4.2 * unit * happy, Math.PI + 0.45, 2 * Math.PI - 0.45);
+            ctx.lineWidth = 2.2 * unit;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.ellipse(cx + side * 1.5 * EYE * unit, cy + 1.05 * EYE * unit, 4 * unit * happy, 2.2 * unit * happy, 0, 0, 2 * Math.PI);
+            ctx.fillStyle = BLUSH;
+            ctx.fill();
+            continue;
+        }
         if (open < 0.5) continue;
         const dx = x - cx;
         const dy = y - cy;
@@ -336,7 +443,7 @@ function drop(canvas: Canvas, event: Drop): boolean {
 /**
  * The link being dragged, as its first render link, and the one dropped on the canvas, which native keeps while the
  * link-release search or menu shows. As a drag starts: when on clock.assistTime, and the colour its link is drawn in.
- * Whether the gloves are mirrored, to keep their thumbs up as the drag heads left. The candidate shown, and when it last
+ * Whether the clasp is turned round, to keep it upright as the drag heads left. The candidate shown, and when it last
  * changed, or the hands clasped or let go, on clock.assistTime.
  */
 let dragged: Link | undefined;
@@ -344,6 +451,8 @@ let released: Link | undefined;
 let began = 0;
 let tint = '';
 let mirrored = false;
+/** When the light last burst from the clasp, on clock.assistTime. */
+let shone = -Infinity;
 const shown = { node: undefined as Node | undefined, slot: -1, there: false, clasped: false, since: 0 };
 
 /**
@@ -387,6 +496,8 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
     const d = Math.hypot(found.x - x, found.y - y) * scale;
     const clasped = there && (d <= CLASP || snapping);
     const t = clock.assistTime;
+    const still = env.reducedMotion || L.staticMode;
+    if (clasped && !shown.clasped && !still && L.assistShine && t - shone >= 1 / MAX_FLASH_HZ) shone = t;
     if (found.node !== shown.node || found.slot !== shown.slot || there !== shown.there || clasped !== shown.clasped) {
         shown.node = found.node;
         shown.slot = found.slot;
@@ -394,10 +505,11 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
         shown.clasped = clasped;
         shown.since = t;
     }
-    const still = env.reducedMotion || L.staticMode;
     const pop = still ? 1 : smooth(Math.min(1, (t - shown.since) / POP_S));
-    // What moves: the line's dashes, the open hand's wave, a glove, the clasp or the ring popping in, and the eyes' blinks.
-    const moving = !still && (L.assistMode === 'line' ? there : !there || pop < 1 || L.assistMode === 'hands-eyes');
+    const burst = clasped && L.assistShine && !still ? (t - shone) / SHINE_S : 1;
+    // What moves: the line's dashes, the open hand's wave, a glove, the clasp or the ring popping in, the light bursting
+    // from the clasp, and the eyes' blinks.
+    const moving = !still && (L.assistMode === 'line' ? there : !there || pop < 1 || burst < 1 || L.assistMode === 'hands-eyes');
     live.assist = moving ? 1 : 0;
     if (moving) wake();
     if (L.assistMode === 'line' && !there) return;
@@ -412,17 +524,32 @@ function drawAssist(canvas: Canvas, ctx: CanvasRenderingContext2D): void {
         const heading = there ? turn : Math.atan2(y - fy, x - fx);
         mirrored = mirrored ? Math.cos(heading) < FLIP : Math.cos(heading) < -FLIP;
         if (!there) {
-            glove(ctx, s, false, x, y, heading + (still ? 0 : WAVE * Math.sin(2 * Math.PI * WAVE_HZ * (t - began))), unit, mirrored, tint);
+            glove(ctx, s, false, x, y, heading + (still ? 0 : WAVE * Math.sin(2 * Math.PI * WAVE_HZ * (t - began))), unit, tint);
         } else if (clasped) {
-            clasp(ctx, s, (x + found.x) / 2, (y + found.y) / 2, turn, unit * (1.15 - 0.15 * pop), mirrored, tint);
+            // The end's cuff stays at the end, and the slot's arm holds on, until they are too near for the hands between.
+            const k = 1.05 - 0.05 * pop;
+            const off = Math.min(d / 2, HALF * k);
+            const cx = x + Math.cos(turn) * off * unit;
+            const cy = y + Math.sin(turn) * off * unit;
+            if (L.assistShine) shine(ctx, cx, cy, unit, Math.min(1, burst), tint, dark(canvas.clear_background_color));
+            clasp(ctx, s, cx, cy, turn, unit * k, mirrored, tint, (d - off) / k);
         } else {
-            const size = unit * (SMALL + (1 - SMALL) * smooth((RANGE - d) / (RANGE - CLASP)));
-            glove(ctx, s, true, x, y, turn, size, mirrored, tint);
+            const near = smooth(Math.min(1, Math.max(0, (RANGE - d) / (RANGE - CLASP))));
+            const size = unit * (SMALL + (1 - SMALL) * near);
+            glove(ctx, s, false, x, y, turn, size, tint);
+            // The slot's glove reaches out on its arm as the end nears, to meet it at CLASP.
+            const stretch = ARM * near * pop;
+            const grown = size * (SMALL + (1 - SMALL) * pop);
             ctx.globalAlpha = pop;
-            glove(ctx, s, true, found.x, found.y, turn + Math.PI, size * (SMALL + (1 - SMALL) * pop), !mirrored, tint);
+            glove(ctx, s, true, found.x - Math.cos(turn) * stretch * unit, found.y - Math.sin(turn) * stretch * unit, turn + Math.PI, grown, tint, (stretch * unit) / grown);
             ctx.globalAlpha = 1;
         }
-        if (L.assistMode === 'hands-eyes') eyes(ctx, (found.node ?? link.node).boundingRect, x, y, unit, still ? 1 : lid(t - began));
+        if (L.assistMode === 'hands-eyes') {
+            const open = still || clasped ? 1 : lid(t - began);
+            const happy = clasped ? pop : 0;
+            eyes(ctx, link.node.boundingRect, x, y, unit, open, happy);
+            if (found.node) eyes(ctx, found.node.boundingRect, x, y, unit, open, happy);
+        }
     } finally {
         ctx.restore();
     }

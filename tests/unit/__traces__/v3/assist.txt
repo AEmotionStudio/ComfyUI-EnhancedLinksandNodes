@@ -114,31 +114,22 @@ lineCap = round
 save()
 translate(200, 400)
 rotate(2.05)
-scale(1, -1)
+scale(1, 1)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path1 = Path2D[moveTo(19.5, 0.5) ellipse(9, 0.5, 10.5, 10, 0, 0, 6.28) moveTo(15.2, -15.66) ellipse(13.15, -9.49, 6.5, 3.4, -1.25, 0, 6.28)]
+path1 = Path2D[roundRect(-1, -9, 20, 19, 7) moveTo(14, -8.85) arc(31, -6.3, 2.55, -1.57, 1.57) arc(14, -6.3, 2.55, 1.57, 4.71) closePath() moveTo(14, -4.25) arc(34, -1.7, 2.55, -1.57, 1.57) arc(14, -1.7, 2.55, 1.57, 4.71) closePath() moveTo(14, 0.35) arc(32, 2.9, 2.55, -1.57, 1.57) arc(14, 2.9, 2.55, 1.57, 4.71) closePath() moveTo(14, 4.75) arc(28, 7.3, 2.55, -1.57, 1.57) arc(14, 7.3, 2.55, 1.57, 4.71) closePath() moveTo(5.85, -9.27) arc(19, -11.5, 3, -1.97, 1.18) arc(7, -6.5, 3, 1.18, 4.32) closePath()]
 stroke(path1)
 fillStyle = #fdfdfd
 fill(path1)
-lineWidth = 3.2
-strokeStyle = #1d1d24
-path2 = Path2D[moveTo(27.5, -11.99) ellipse(20.58, -7.05, 8.5, 3.1, -0.62, 0, 6.28) moveTo(32.05, 4.97) ellipse(22.74, 3.08, 9.5, 3.1, 0.2, 0, 6.28)]
+lineWidth = 1.2
+path2 = Path2D[moveTo(2.5, -3.6) lineTo(9, -4) moveTo(2.5, 0.45) lineTo(9, 0.5) moveTo(2.5, 4.5) lineTo(9, 5) moveTo(23, -4) lineTo(28.5, -4) moveTo(23, 0.6) lineTo(29.5, 0.6) moveTo(23, 5.1) lineTo(25.5, 5.1)]
 stroke(path2)
-fillStyle = #fdfdfd
-fill(path2)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path3 = Path2D[moveTo(32.49, -4.29) ellipse(22.71, -2.21, 10, 3.1, -0.21, 0, 6.28) moveTo(26.92, 12.08) ellipse(20.73, 7.84, 7.5, 3.1, 0.6, 0, 6.28)]
+path3 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
 stroke(path3)
-fillStyle = #fdfdfd
-fill(path3)
-lineWidth = 3.2
-strokeStyle = #1d1d24
-path4 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
-stroke(path4)
 fillStyle = #64b5f6
-fill(path4)
+fill(path3)
 restore()
 restore()
 restore()
@@ -151,92 +142,286 @@ lineCap = round
 save()
 translate(400, 140)
 rotate(0.59)
-scale(0.78, 0.78)
+scale(0.98, 0.98)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path5 = Path2D[moveTo(20, 1) ellipse(9, 1, 11, 9.5, 0, 0, 6.28) moveTo(19.15, -12.68) ellipse(12.5, -8.6, 7.8, 3.6, -0.55, 0, 6.28) moveTo(32.99, -6.62) ellipse(22.5, -6.1, 10.5, 2.9, -0.05, 0, 6.28) moveTo(35, -0.91) ellipse(23.5, -0.8, 11.5, 2.9, -0.01, 0, 6.28) moveTo(33, 4.81) ellipse(22.5, 4.5, 10.5, 2.9, 0.03, 0, 6.28) moveTo(28.47, 9.96) ellipse(20.25, 9.3, 8.25, 2.9, 0.08, 0, 6.28)]
-stroke(path5)
+stroke(path1)
 fillStyle = #fdfdfd
-fill(path5)
+fill(path1)
 lineWidth = 1.2
-path6 = Path2D[moveTo(17, -3.45) lineTo(26, -3.55) moveTo(17, 1.85) lineTo(26, 1.91) moveTo(17, 6.9) lineTo(26, 7.11)]
-stroke(path6)
+stroke(path2)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-stroke(path4)
+stroke(path3)
 fillStyle = #64b5f6
-fill(path4)
+fill(path3)
 restore()
 globalAlpha = 1
 save()
-translate(510, 214)
+translate(472.82, 188.99)
 rotate(3.73)
-scale(0.78, -0.78)
+scale(0.98, -0.98)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-stroke(path5)
-fillStyle = #fdfdfd
-fill(path5)
-lineWidth = 1.2
-stroke(path6)
-lineWidth = 3.2
-strokeStyle = #1d1d24
+path4 = Path2D[moveTo(-45.57, 3) lineTo(-8, 5.5) lineTo(-8, -5.5) lineTo(-45.57, -3) closePath()]
 stroke(path4)
 fillStyle = #64b5f6
 fill(path4)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path1)
+fillStyle = #fdfdfd
+fill(path1)
+lineWidth = 1.2
+path5 = Path2D[moveTo(19, -4) lineTo(28.5, -4) moveTo(19, 0.6) lineTo(29.5, 0.6) moveTo(19, 5.1) lineTo(25.5, 5.1) moveTo(10, -6.4) quadraticCurveTo(14, -7.4, 17.5, -9.2)]
+stroke(path5)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path3)
+fillStyle = #64b5f6
+fill(path3)
 restore()
 globalAlpha = 1
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=0 shadowBlurSets=0 path2d=1
 # 60 px, 0.6 s in
 save()
 save()
 lineJoin = round
 lineCap = round
 save()
-translate(485, 197)
+globalCompositeOperation = lighter
+grad1 = createRadialGradient(482.08, 195.01, 0, 482.08, 195.01, 69.38)
+grad1.addColorStop(0, rgba(253, 253, 253, 0.425))
+grad1.addColorStop(0.45, rgba(100, 181, 246, 0.255))
+grad1.addColorStop(1, rgba(100, 181, 246, 0))
+fillStyle = grad1
+beginPath()
+arc(482.08, 195.01, 69.38, 0, 6.28)
+fill()
+globalAlpha = 0.25
+fillStyle = #fdfdfd
+beginPath()
+moveTo(503.57, 205.91)
+lineTo(536.08, 214.39)
+lineTo(505.59, 200.26)
+closePath()
+moveTo(493.06, 216.46)
+lineTo(507.73, 232.67)
+lineTo(498.02, 213.08)
+closePath()
+moveTo(478.35, 218.82)
+lineTo(480.34, 252.36)
+lineTo(484.35, 219)
+closePath()
+moveTo(465.07, 212.08)
+lineTo(454.19, 231.04)
+lineTo(469.82, 215.75)
+closePath()
+moveTo(458.29, 198.83)
+lineTo(427, 211.08)
+lineTo(459.97, 204.59)
+closePath()
+moveTo(460.59, 184.12)
+lineTo(439.19, 179.62)
+lineTo(458.56, 189.76)
+closePath()
+moveTo(471.1, 173.57)
+lineTo(449.78, 147.59)
+lineTo(466.14, 176.94)
+closePath()
+moveTo(485.8, 171.21)
+lineTo(483.46, 149.47)
+lineTo(479.81, 171.03)
+closePath()
+moveTo(499.08, 177.94)
+lineTo(517.2, 149.64)
+lineTo(494.34, 174.27)
+closePath()
+moveTo(505.87, 191.2)
+lineTo(525.82, 182.26)
+lineTo(504.19, 185.44)
+closePath()
+fill()
+beginPath()
+moveTo(542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+moveTo(483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+moveTo(422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+moveTo(421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+moveTo(480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+moveTo(541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+fill()
+restore()
+save()
+translate(482.08, 195.01)
 rotate(0.6)
 scale(1, 1)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path7 = Path2D[moveTo(0.5, 1) ellipse(-12, 1, 12.5, 10, 0, 0, 6.28) moveTo(24.5, -0.5) ellipse(12, -0.5, 12.5, 10, 0, 0, 6.28)]
+path6 = Path2D[moveTo(35.59, -2.38) lineTo(30.35, -9.56) lineTo(23.65, -0.84) lineTo(31.94, 2.38) closePath()]
+stroke(path6)
+fillStyle = #64b5f6
+fill(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path7 = Path2D[svg("M-25.6-12.5C-17.2-12-8.1-10.7-0.3-8.8C8.8-10.1 17.9-11.4 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C24.4 6.5 21.8 9.8 19.2 13C15.3 18.9 8.8 24.7 1.3 25C-1.6 25-3.5 24.1-4.8 23.1L-18.5 13.7C-21.1 11.7-23.7 9.1-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5Z")]
 stroke(path7)
 fillStyle = #fdfdfd
 fill(path7)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path8 = Path2D[moveTo(4.95, -8.4) ellipse(-5, -7.4, 10, 2.7, -0.1, 0, 6.28) moveTo(4.95, 3.47) ellipse(-5.75, 2.4, 10.75, 2.7, 0.1, 0, 6.28)]
+path8 = Path2D[moveTo(-4.48, 18.91) arc(-3.9, 22.5, 2.5, -0.92, 2.22) arc(-6, 20.9, 2.5, 2.22, 5.36) closePath()]
 stroke(path8)
 fillStyle = #fdfdfd
 fill(path8)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path9 = Path2D[moveTo(5, -2.5) ellipse(-6, -2.5, 11, 2.7, 0, 0, 6.28) moveTo(4.82, 8.99) ellipse(-4, 7.2, 9, 2.7, 0.2, 0, 6.28)]
+path9 = Path2D[moveTo(-8.23, 15.9) arc(-7.7, 19.6, 2.7, -0.95, 2.19) arc(-9.8, 18.1, 2.7, 2.19, 5.33) closePath()]
 stroke(path9)
 fillStyle = #fdfdfd
 fill(path9)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path10 = Path2D[moveTo(11.9, -11) ellipse(2, -9.6, 10, 3.5, -0.14, 0, 6.28)]
+path10 = Path2D[moveTo(-12.21, 12.64) arc(-11.8, 16.5, 2.9, -0.95, 2.19) arc(-13.9, 15, 2.9, 2.19, 5.33) closePath()]
 stroke(path10)
 fillStyle = #fdfdfd
 fill(path10)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path11 = Path2D[roundRect(-35, -9.5, 10.5, 19, 4) roundRect(24.5, -9.5, 10.5, 19, 4)]
+path11 = Path2D[moveTo(-16.61, 9.24) arc(-16.2, 13.1, 2.9, -0.95, 2.19) arc(-18.3, 11.6, 2.9, 2.19, 5.33) closePath()]
 stroke(path11)
-fillStyle = #64b5f6
+fillStyle = #fdfdfd
 fill(path11)
+lineWidth = 1.2
+path12 = Path2D[svg("M0-6.8C-6.1-5.9-10.9-4.5-11.3-2.3C-11.6-0.5-8.7-0.1-5.2-0.5C2.3-1.3 10.8-0.3 17.7 2.9L19.5 11.4M2.3 15.9L7 20.8M6.9 10.7L14 17.7")]
+stroke(path12)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path13 = Path2D[svg("M-25.6-12.5C-23-12.3-21.1-12.2-19.8-12L-20.8 8.1C-23 7.5-25.6 6.8-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5ZM19.2-12C21.2-12.5 22.9-12.9 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C25.5 4.2 24.2 5.2 22.9 6.2C22.5 0 20.8-6.5 19.2-12Z")]
+stroke(path13)
+fillStyle = #64b5f6
+fill(path13)
 restore()
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=1 shadowBlurSets=0 path2d=2
 # snapped, 0.6 s in
 save()
 save()
 lineJoin = round
 lineCap = round
+save()
+globalCompositeOperation = lighter
+grad2 = createRadialGradient(510, 214, 0, 510, 214, 69.38)
+grad2.addColorStop(0, rgba(253, 253, 253, 0.425))
+grad2.addColorStop(0.45, rgba(100, 181, 246, 0.255))
+grad2.addColorStop(1, rgba(100, 181, 246, 0))
+fillStyle = grad2
+beginPath()
+arc(510, 214, 69.38, 0, 6.28)
+fill()
+globalAlpha = 0.25
+fillStyle = #fdfdfd
+beginPath()
+moveTo(531.49, 224.9)
+lineTo(564, 233.38)
+lineTo(533.51, 219.25)
+closePath()
+moveTo(520.98, 235.45)
+lineTo(535.65, 251.66)
+lineTo(525.94, 232.07)
+closePath()
+moveTo(506.28, 237.8)
+lineTo(508.26, 271.35)
+lineTo(512.27, 237.99)
+closePath()
+moveTo(493, 231.07)
+lineTo(482.11, 250.03)
+lineTo(497.74, 234.74)
+closePath()
+moveTo(486.21, 217.81)
+lineTo(454.92, 230.06)
+lineTo(487.89, 223.57)
+closePath()
+moveTo(488.51, 203.1)
+lineTo(467.12, 198.61)
+lineTo(486.49, 208.75)
+closePath()
+moveTo(499.02, 192.55)
+lineTo(477.7, 166.58)
+lineTo(494.06, 195.93)
+closePath()
+moveTo(513.72, 190.2)
+lineTo(511.38, 168.46)
+lineTo(507.73, 190.01)
+closePath()
+moveTo(527, 196.93)
+lineTo(545.12, 168.63)
+lineTo(522.26, 193.26)
+closePath()
+moveTo(533.79, 210.19)
+lineTo(553.74, 201.24)
+lineTo(532.11, 204.43)
+closePath()
+fill()
+beginPath()
+moveTo(570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+moveTo(511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+moveTo(450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+moveTo(449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+moveTo(508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+moveTo(569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+fill()
+restore()
 save()
 translate(510, 214)
 rotate(0)
@@ -264,12 +449,19 @@ fill(path10)
 lineWidth = 3.2
 strokeStyle = #1d1d24
 stroke(path11)
-fillStyle = #64b5f6
+fillStyle = #fdfdfd
 fill(path11)
+lineWidth = 1.2
+stroke(path12)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path13)
+fillStyle = #64b5f6
+fill(path13)
 restore()
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=1 shadowBlurSets=0 path2d=0
 # Assist hands-eyes
 # far, 0.6 s in
 save()
@@ -279,31 +471,22 @@ lineCap = round
 save()
 translate(200, 400)
 rotate(2.05)
-scale(1, -1)
+scale(1, 1)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path1 = Path2D[moveTo(19.5, 0.5) ellipse(9, 0.5, 10.5, 10, 0, 0, 6.28) moveTo(15.2, -15.66) ellipse(13.15, -9.49, 6.5, 3.4, -1.25, 0, 6.28)]
+path1 = Path2D[roundRect(-1, -9, 20, 19, 7) moveTo(14, -8.85) arc(31, -6.3, 2.55, -1.57, 1.57) arc(14, -6.3, 2.55, 1.57, 4.71) closePath() moveTo(14, -4.25) arc(34, -1.7, 2.55, -1.57, 1.57) arc(14, -1.7, 2.55, 1.57, 4.71) closePath() moveTo(14, 0.35) arc(32, 2.9, 2.55, -1.57, 1.57) arc(14, 2.9, 2.55, 1.57, 4.71) closePath() moveTo(14, 4.75) arc(28, 7.3, 2.55, -1.57, 1.57) arc(14, 7.3, 2.55, 1.57, 4.71) closePath() moveTo(5.85, -9.27) arc(19, -11.5, 3, -1.97, 1.18) arc(7, -6.5, 3, 1.18, 4.32) closePath()]
 stroke(path1)
 fillStyle = #fdfdfd
 fill(path1)
-lineWidth = 3.2
-strokeStyle = #1d1d24
-path2 = Path2D[moveTo(27.5, -11.99) ellipse(20.58, -7.05, 8.5, 3.1, -0.62, 0, 6.28) moveTo(32.05, 4.97) ellipse(22.74, 3.08, 9.5, 3.1, 0.2, 0, 6.28)]
+lineWidth = 1.2
+path2 = Path2D[moveTo(2.5, -3.6) lineTo(9, -4) moveTo(2.5, 0.45) lineTo(9, 0.5) moveTo(2.5, 4.5) lineTo(9, 5) moveTo(23, -4) lineTo(28.5, -4) moveTo(23, 0.6) lineTo(29.5, 0.6) moveTo(23, 5.1) lineTo(25.5, 5.1)]
 stroke(path2)
-fillStyle = #fdfdfd
-fill(path2)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path3 = Path2D[moveTo(32.49, -4.29) ellipse(22.71, -2.21, 10, 3.1, -0.21, 0, 6.28) moveTo(26.92, 12.08) ellipse(20.73, 7.84, 7.5, 3.1, 0.6, 0, 6.28)]
+path3 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
 stroke(path3)
-fillStyle = #fdfdfd
-fill(path3)
-lineWidth = 3.2
-strokeStyle = #1d1d24
-path4 = Path2D[roundRect(-10, -9.5, 10.5, 19, 4)]
-stroke(path4)
 fillStyle = #64b5f6
-fill(path4)
+fill(path3)
 restore()
 beginPath()
 ellipse(200, 70, 8, 8, 0, 0, 6.28)
@@ -346,41 +529,76 @@ lineCap = round
 save()
 translate(400, 140)
 rotate(0.59)
-scale(0.78, 0.78)
+scale(0.98, 0.98)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path5 = Path2D[moveTo(20, 1) ellipse(9, 1, 11, 9.5, 0, 0, 6.28) moveTo(19.15, -12.68) ellipse(12.5, -8.6, 7.8, 3.6, -0.55, 0, 6.28) moveTo(32.99, -6.62) ellipse(22.5, -6.1, 10.5, 2.9, -0.05, 0, 6.28) moveTo(35, -0.91) ellipse(23.5, -0.8, 11.5, 2.9, -0.01, 0, 6.28) moveTo(33, 4.81) ellipse(22.5, 4.5, 10.5, 2.9, 0.03, 0, 6.28) moveTo(28.47, 9.96) ellipse(20.25, 9.3, 8.25, 2.9, 0.08, 0, 6.28)]
-stroke(path5)
+stroke(path1)
 fillStyle = #fdfdfd
-fill(path5)
+fill(path1)
 lineWidth = 1.2
-path6 = Path2D[moveTo(17, -3.45) lineTo(26, -3.55) moveTo(17, 1.85) lineTo(26, 1.91) moveTo(17, 6.9) lineTo(26, 7.11)]
-stroke(path6)
+stroke(path2)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-stroke(path4)
+stroke(path3)
 fillStyle = #64b5f6
-fill(path4)
+fill(path3)
 restore()
 globalAlpha = 1
 save()
-translate(510, 214)
+translate(472.82, 188.99)
 rotate(3.73)
-scale(0.78, -0.78)
+scale(0.98, -0.98)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-stroke(path5)
-fillStyle = #fdfdfd
-fill(path5)
-lineWidth = 1.2
-stroke(path6)
-lineWidth = 3.2
-strokeStyle = #1d1d24
+path4 = Path2D[moveTo(-45.57, 3) lineTo(-8, 5.5) lineTo(-8, -5.5) lineTo(-45.57, -3) closePath()]
 stroke(path4)
 fillStyle = #64b5f6
 fill(path4)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path1)
+fillStyle = #fdfdfd
+fill(path1)
+lineWidth = 1.2
+path5 = Path2D[moveTo(19, -4) lineTo(28.5, -4) moveTo(19, 0.6) lineTo(29.5, 0.6) moveTo(19, 5.1) lineTo(25.5, 5.1) moveTo(10, -6.4) quadraticCurveTo(14, -7.4, 17.5, -9.2)]
+stroke(path5)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path3)
+fillStyle = #64b5f6
+fill(path3)
 restore()
 globalAlpha = 1
+beginPath()
+ellipse(200, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(203.4, 71.19, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(202.3, 70.09, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+beginPath()
+ellipse(220, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(223.36, 71.3, 3.6, 0, 6.28)
+fillStyle = #1d1d24
+fill()
+beginPath()
+arc(222.26, 70.2, 1.1, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
 beginPath()
 ellipse(600, 170, 8, 8, 0, 0, 6.28)
 fillStyle = #fdfdfd
@@ -413,47 +631,179 @@ fillStyle = #fdfdfd
 fill()
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=0 shadowBlurSets=0 path2d=1
 # 60 px, 0.6 s in
 save()
 save()
 lineJoin = round
 lineCap = round
 save()
-translate(485, 197)
+globalCompositeOperation = lighter
+grad1 = createRadialGradient(482.08, 195.01, 0, 482.08, 195.01, 69.38)
+grad1.addColorStop(0, rgba(253, 253, 253, 0.425))
+grad1.addColorStop(0.45, rgba(100, 181, 246, 0.255))
+grad1.addColorStop(1, rgba(100, 181, 246, 0))
+fillStyle = grad1
+beginPath()
+arc(482.08, 195.01, 69.38, 0, 6.28)
+fill()
+globalAlpha = 0.25
+fillStyle = #fdfdfd
+beginPath()
+moveTo(503.57, 205.91)
+lineTo(536.08, 214.39)
+lineTo(505.59, 200.26)
+closePath()
+moveTo(493.06, 216.46)
+lineTo(507.73, 232.67)
+lineTo(498.02, 213.08)
+closePath()
+moveTo(478.35, 218.82)
+lineTo(480.34, 252.36)
+lineTo(484.35, 219)
+closePath()
+moveTo(465.07, 212.08)
+lineTo(454.19, 231.04)
+lineTo(469.82, 215.75)
+closePath()
+moveTo(458.29, 198.83)
+lineTo(427, 211.08)
+lineTo(459.97, 204.59)
+closePath()
+moveTo(460.59, 184.12)
+lineTo(439.19, 179.62)
+lineTo(458.56, 189.76)
+closePath()
+moveTo(471.1, 173.57)
+lineTo(449.78, 147.59)
+lineTo(466.14, 176.94)
+closePath()
+moveTo(485.8, 171.21)
+lineTo(483.46, 149.47)
+lineTo(479.81, 171.03)
+closePath()
+moveTo(499.08, 177.94)
+lineTo(517.2, 149.64)
+lineTo(494.34, 174.27)
+closePath()
+moveTo(505.87, 191.2)
+lineTo(525.82, 182.26)
+lineTo(504.19, 185.44)
+closePath()
+fill()
+beginPath()
+moveTo(542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+quadraticCurveTo(542.91, 228.24, 542.91, 228.24)
+moveTo(483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+quadraticCurveTo(483.71, 264.31, 483.71, 264.31)
+moveTo(422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+quadraticCurveTo(422.89, 231.08, 422.89, 231.08)
+moveTo(421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+quadraticCurveTo(421.25, 161.78, 421.25, 161.78)
+moveTo(480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+quadraticCurveTo(480.44, 125.72, 480.44, 125.72)
+moveTo(541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+quadraticCurveTo(541.27, 158.95, 541.27, 158.95)
+fill()
+restore()
+save()
+translate(482.08, 195.01)
 rotate(0.6)
 scale(1, 1)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path7 = Path2D[moveTo(0.5, 1) ellipse(-12, 1, 12.5, 10, 0, 0, 6.28) moveTo(24.5, -0.5) ellipse(12, -0.5, 12.5, 10, 0, 0, 6.28)]
+path6 = Path2D[moveTo(35.59, -2.38) lineTo(30.35, -9.56) lineTo(23.65, -0.84) lineTo(31.94, 2.38) closePath()]
+stroke(path6)
+fillStyle = #64b5f6
+fill(path6)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path7 = Path2D[svg("M-25.6-12.5C-17.2-12-8.1-10.7-0.3-8.8C8.8-10.1 17.9-11.4 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C24.4 6.5 21.8 9.8 19.2 13C15.3 18.9 8.8 24.7 1.3 25C-1.6 25-3.5 24.1-4.8 23.1L-18.5 13.7C-21.1 11.7-23.7 9.1-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5Z")]
 stroke(path7)
 fillStyle = #fdfdfd
 fill(path7)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path8 = Path2D[moveTo(4.95, -8.4) ellipse(-5, -7.4, 10, 2.7, -0.1, 0, 6.28) moveTo(4.95, 3.47) ellipse(-5.75, 2.4, 10.75, 2.7, 0.1, 0, 6.28)]
+path8 = Path2D[moveTo(-4.48, 18.91) arc(-3.9, 22.5, 2.5, -0.92, 2.22) arc(-6, 20.9, 2.5, 2.22, 5.36) closePath()]
 stroke(path8)
 fillStyle = #fdfdfd
 fill(path8)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path9 = Path2D[moveTo(5, -2.5) ellipse(-6, -2.5, 11, 2.7, 0, 0, 6.28) moveTo(4.82, 8.99) ellipse(-4, 7.2, 9, 2.7, 0.2, 0, 6.28)]
+path9 = Path2D[moveTo(-8.23, 15.9) arc(-7.7, 19.6, 2.7, -0.95, 2.19) arc(-9.8, 18.1, 2.7, 2.19, 5.33) closePath()]
 stroke(path9)
 fillStyle = #fdfdfd
 fill(path9)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path10 = Path2D[moveTo(11.9, -11) ellipse(2, -9.6, 10, 3.5, -0.14, 0, 6.28)]
+path10 = Path2D[moveTo(-12.21, 12.64) arc(-11.8, 16.5, 2.9, -0.95, 2.19) arc(-13.9, 15, 2.9, 2.19, 5.33) closePath()]
 stroke(path10)
 fillStyle = #fdfdfd
 fill(path10)
 lineWidth = 3.2
 strokeStyle = #1d1d24
-path11 = Path2D[roundRect(-35, -9.5, 10.5, 19, 4) roundRect(24.5, -9.5, 10.5, 19, 4)]
+path11 = Path2D[moveTo(-16.61, 9.24) arc(-16.2, 13.1, 2.9, -0.95, 2.19) arc(-18.3, 11.6, 2.9, 2.19, 5.33) closePath()]
 stroke(path11)
-fillStyle = #64b5f6
+fillStyle = #fdfdfd
 fill(path11)
+lineWidth = 1.2
+path12 = Path2D[svg("M0-6.8C-6.1-5.9-10.9-4.5-11.3-2.3C-11.6-0.5-8.7-0.1-5.2-0.5C2.3-1.3 10.8-0.3 17.7 2.9L19.5 11.4M2.3 15.9L7 20.8M6.9 10.7L14 17.7")]
+stroke(path12)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+path13 = Path2D[svg("M-25.6-12.5C-23-12.3-21.1-12.2-19.8-12L-20.8 8.1C-23 7.5-25.6 6.8-27.6 6.2C-27.8 0-27.3-6.5-25.6-12.5ZM19.2-12C21.2-12.5 22.9-12.9 24.4-13.3C26.8-7.8 28.1-1.3 26.8 2.9C25.5 4.2 24.2 5.2 22.9 6.2C22.5 0 20.8-6.5 19.2-12Z")]
+stroke(path13)
+fillStyle = #64b5f6
+fill(path13)
 restore()
+beginPath()
+ellipse(200, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(200, 73, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
+beginPath()
+ellipse(194, 78.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
+fill()
+beginPath()
+ellipse(220, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(220, 73, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
+beginPath()
+ellipse(226, 78.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
+fill()
 beginPath()
 ellipse(600, 170, 8, 8, 0, 0, 6.28)
 fillStyle = #fdfdfd
@@ -462,12 +812,12 @@ lineWidth = 1.6
 strokeStyle = #1d1d24
 stroke()
 beginPath()
-arc(596.41, 170.26, 3.6, 0, 6.28)
-fillStyle = #1d1d24
-fill()
+arc(600, 173, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
 beginPath()
-arc(595.31, 169.16, 1.1, 0, 6.28)
-fillStyle = #fdfdfd
+ellipse(594, 178.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
 fill()
 beginPath()
 ellipse(620, 170, 8, 8, 0, 0, 6.28)
@@ -477,21 +827,108 @@ lineWidth = 1.6
 strokeStyle = #1d1d24
 stroke()
 beginPath()
-arc(616.41, 170.22, 3.6, 0, 6.28)
-fillStyle = #1d1d24
-fill()
+arc(620, 173, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
 beginPath()
-arc(615.31, 169.12, 1.1, 0, 6.28)
-fillStyle = #fdfdfd
+ellipse(626, 178.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
 fill()
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=1 shadowBlurSets=0 path2d=2
 # snapped, 0.6 s in
 save()
 save()
 lineJoin = round
 lineCap = round
+save()
+globalCompositeOperation = lighter
+grad2 = createRadialGradient(510, 214, 0, 510, 214, 69.38)
+grad2.addColorStop(0, rgba(253, 253, 253, 0.425))
+grad2.addColorStop(0.45, rgba(100, 181, 246, 0.255))
+grad2.addColorStop(1, rgba(100, 181, 246, 0))
+fillStyle = grad2
+beginPath()
+arc(510, 214, 69.38, 0, 6.28)
+fill()
+globalAlpha = 0.25
+fillStyle = #fdfdfd
+beginPath()
+moveTo(531.49, 224.9)
+lineTo(564, 233.38)
+lineTo(533.51, 219.25)
+closePath()
+moveTo(520.98, 235.45)
+lineTo(535.65, 251.66)
+lineTo(525.94, 232.07)
+closePath()
+moveTo(506.28, 237.8)
+lineTo(508.26, 271.35)
+lineTo(512.27, 237.99)
+closePath()
+moveTo(493, 231.07)
+lineTo(482.11, 250.03)
+lineTo(497.74, 234.74)
+closePath()
+moveTo(486.21, 217.81)
+lineTo(454.92, 230.06)
+lineTo(487.89, 223.57)
+closePath()
+moveTo(488.51, 203.1)
+lineTo(467.12, 198.61)
+lineTo(486.49, 208.75)
+closePath()
+moveTo(499.02, 192.55)
+lineTo(477.7, 166.58)
+lineTo(494.06, 195.93)
+closePath()
+moveTo(513.72, 190.2)
+lineTo(511.38, 168.46)
+lineTo(507.73, 190.01)
+closePath()
+moveTo(527, 196.93)
+lineTo(545.12, 168.63)
+lineTo(522.26, 193.26)
+closePath()
+moveTo(533.79, 210.19)
+lineTo(553.74, 201.24)
+lineTo(532.11, 204.43)
+closePath()
+fill()
+beginPath()
+moveTo(570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+quadraticCurveTo(570.83, 247.23, 570.83, 247.23)
+moveTo(511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+quadraticCurveTo(511.64, 283.29, 511.64, 283.29)
+moveTo(450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+quadraticCurveTo(450.81, 250.06, 450.81, 250.06)
+moveTo(449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+quadraticCurveTo(449.17, 180.77, 449.17, 180.77)
+moveTo(508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+quadraticCurveTo(508.36, 144.71, 508.36, 144.71)
+moveTo(569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+quadraticCurveTo(569.19, 177.94, 569.19, 177.94)
+fill()
+restore()
 save()
 translate(510, 214)
 rotate(0)
@@ -519,9 +956,46 @@ fill(path10)
 lineWidth = 3.2
 strokeStyle = #1d1d24
 stroke(path11)
-fillStyle = #64b5f6
+fillStyle = #fdfdfd
 fill(path11)
+lineWidth = 1.2
+stroke(path12)
+lineWidth = 3.2
+strokeStyle = #1d1d24
+stroke(path13)
+fillStyle = #64b5f6
+fill(path13)
 restore()
+beginPath()
+ellipse(200, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(200, 73, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
+beginPath()
+ellipse(194, 78.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
+fill()
+beginPath()
+ellipse(220, 70, 8, 8, 0, 0, 6.28)
+fillStyle = #fdfdfd
+fill()
+lineWidth = 1.6
+strokeStyle = #1d1d24
+stroke()
+beginPath()
+arc(220, 73, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
+beginPath()
+ellipse(226, 78.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
+fill()
 beginPath()
 ellipse(600, 170, 8, 8, 0, 0, 6.28)
 fillStyle = #fdfdfd
@@ -530,12 +1004,12 @@ lineWidth = 1.6
 strokeStyle = #1d1d24
 stroke()
 beginPath()
-arc(596.77, 171.58, 3.6, 0, 6.28)
-fillStyle = #1d1d24
-fill()
+arc(600, 173, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
 beginPath()
-arc(595.67, 170.48, 1.1, 0, 6.28)
-fillStyle = #fdfdfd
+ellipse(594, 178.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
 fill()
 beginPath()
 ellipse(620, 170, 8, 8, 0, 0, 6.28)
@@ -545,13 +1019,13 @@ lineWidth = 1.6
 strokeStyle = #1d1d24
 stroke()
 beginPath()
-arc(616.66, 171.34, 3.6, 0, 6.28)
-fillStyle = #1d1d24
-fill()
+arc(620, 173, 4.2, 3.59, 5.83)
+lineWidth = 2.2
+stroke()
 beginPath()
-arc(615.56, 170.24, 1.1, 0, 6.28)
-fillStyle = #fdfdfd
+ellipse(626, 178.4, 4, 2.2, 0, 0, 6.28)
+fillStyle = rgba(255, 110, 150, 0.55)
 fill()
 restore()
 restore()
-# gradients=0 shadowBlurSets=0 path2d=0
+# gradients=1 shadowBlurSets=0 path2d=0

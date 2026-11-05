@@ -226,6 +226,10 @@
       "Hands & eyes": "Hands & eyes"
     }
   },
+  "🔗 Enhanced Links_Assist_Shine": {
+    "name": "Clasp shimmer",
+    "tooltip": "Light bursts from the hands as they clasp."
+  },
   "🔗 Enhanced Links_Assist_AutoConnect": {
     "name": "Connect on release",
     "tooltip": "Let go once the hands clasp, or once the guide line points at a slot, and the link connects there."

@@ -413,6 +413,7 @@ export const SETTINGS = [
     { id: '🔗 Enhanced Links.Shadow.Offset', key: 'shadowOffset', name: 'Drop shadow offset', type: 'slider', min: 0, max: 10, step: 0.5, default: 3, group: 'Links · Shadows', advanced: true, showIf: (): boolean => shadows() && L.shadowStyle === 'drop', tooltip: 'Used by Drop shadow.' },
 
     { id: '🔗 Enhanced Links.Assist.Mode', key: 'assistMode', name: 'Connection assist', type: 'combo', options: ASSIST_OPTIONS, default: 'off', group: 'Links · Connecting', showIf: (): boolean => L.enabled, tooltip: 'While you drag a link, show the nearest slot it can connect to.' },
+    { id: '🔗 Enhanced Links.Assist.Shine', key: 'assistShine', name: 'Clasp shimmer', type: 'boolean', default: true, group: 'Links · Connecting', look: false, showIf: (): boolean => L.enabled && L.assistMode.startsWith('hands'), tooltip: 'Light bursts from the hands as they clasp.' },
     { id: '🔗 Enhanced Links.Assist.AutoConnect', key: 'assistAutoConnect', name: 'Connect on release', type: 'boolean', default: true, group: 'Links · Connecting', look: false, showIf: assisting, tooltip: 'Let go once the hands clasp, or once the guide line points at a slot, and the link connects there.' },
     { id: '🔗 Enhanced Links.Assist.SnapKey', key: 'assistSnapKey', name: 'Snap key', type: 'combo', options: SNAP_KEY_OPTIONS, default: 'ctrl', group: 'Links · Connecting', look: false, showIf: assisting, tooltip: 'Hold it as you let go to connect to the slot connection assist shows, anywhere in its reach.' },
 
