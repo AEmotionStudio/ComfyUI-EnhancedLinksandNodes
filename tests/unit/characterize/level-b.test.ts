@@ -282,21 +282,27 @@ describe('Level B: nodes', () => {
         });
     });
 
-    it('draw five distinct title styles, each node its title once', async () => {
+    it('draw each title style distinctly, each node its title once', async () => {
         const native = vi.spyOn(FakeNode.prototype, 'drawTitleText');
         const drawn = new Set<string>();
-        for (const style of ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal']) {
+        const styles = SETTINGS.find((s) => s.id === '📦 Enhanced Nodes.Text.Style')!;
+        const values = styles.type === 'combo' ? styles.options.map((o) => o.value) : [];
+        for (const style of values) {
             const canvas = await start({ ...V1_NODES, '📦 Enhanced Nodes.Text.Animation.Enabled': true, '📦 Enhanced Nodes.Text.Style': style }, KSAMPLER);
             native.mockClear();
             const from = canvas.front.lines.length;
+            // Just past each style's resting pose, where Typewriter and Decode show the whole title.
+            clock.nodePhase = Math.PI / 4;
             frames(1);
-            const shown = canonical(canvas.front.lines.slice(from).join('\n')).split('\n').filter((line) => line.startsWith('fillText') || /^stroke \[[^\]]*\] moveTo\(30, -5\)/.test(line));
+            const shown = canonical(canvas.front.lines.slice(from).join('\n')).split('\n').filter((line) => line.startsWith('fillText') || line.startsWith('fillRect') || /^stroke \[[^\]]*\] moveTo\(30, -5\)/.test(line));
             drawn.add(shown.join('\n'));
             // Native's title, once, where nobody sees it; the frame shows ours.
             expect(native.mock.calls.map(([ctx]) => ctx === canvas.ctx), style).toEqual([false]);
-            expect(shown.every((line) => line.includes('"KSampler"') || line.startsWith('stroke')), style).toBe(true);
+            // The title whole, or letter by letter, and Typewriter's caret.
+            expect(shown.every((line) => /"(KSampler|[KSampler])"/.test(line) || line.startsWith('stroke') || line.startsWith('fillRect')), style).toBe(true);
+            expect(shown.length, style).toBeGreaterThan(0);
         }
-        expect(drawn.size).toBe(5);
+        expect(drawn.size).toBe(values.length);
     });
 
     it("play v1's fireworks when this client's run succeeds: three bursts in v1's colours, sizes and delays, 250 sparks each, for 1.2 s", async () => {

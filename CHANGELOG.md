@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Titles
+- **Eight new title styles**: **Rainbow wave**, each letter its own hue riding a wave; **Bounce**, letters hopping one after another; **Typewriter**, typed out behind a blinking caret, then backspaced; **Decode**, letters scrambling and locking into place left to right; **Molten**, gold to red in Ember Crown's colours with a flickering glow; **Chrome shine**, polished silver with a sheen sweeping across; **Groovy 70s**, stacked mustard, orange, red and brown copies swaying behind the title; and **Hologram**, a see-through title with bright lines drifting up through it.
+- **v1's five move more**: Neon pulse carries a surge of current across it, Glitch tears slices of the title sideways in bursts, Retro rolls a VHS tracking band down through it, Simple pulse swells as it breathes, and Minimal's underline slides off and draws itself in again.
+- Titles held still, or with reduced motion, show the whole title in every style.
+
 ### Connection assist
 - **Cleaner gloves**: each hand is one outline with rounded fingers. They are right hands meeting, the link's showing its back and the slot's its palm. The clasp is a handshake laid out like 🤝, the size of the gloves, in their white with cuffs in the link's colour.
 - **A helping hand**: the slot's glove reaches out on its arm toward the link as it nears. Slots come in reach from 200 px instead of 150, and the hands clasp, and connect on release, from 120 px instead of 75.

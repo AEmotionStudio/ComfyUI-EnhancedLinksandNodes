@@ -136,7 +136,7 @@ ComfyUI's settings dialog lists every setting under **Enhanced Links & Nodes**, 
 | Name | Id | Type | Options or range | Default | Tooltip |
 | --- | --- | --- | --- | --- | --- |
 | Animated titles | `📦 Enhanced Nodes.Text.Animation.Enabled` | boolean | `true`, `false` | `false` | Draws each node title in the chosen style. |
-| Title style | `📦 Enhanced Nodes.Text.Style` | combo | `neon` Neon pulse, `cyberpunk` Glitch, `retro` Retro, `pulse` Simple pulse, `minimal` Minimal | `neon` Neon pulse |  |
+| Title style | `📦 Enhanced Nodes.Text.Style` | combo | `neon` Neon pulse, `cyberpunk` Glitch, `retro` Retro, `pulse` Simple pulse, `minimal` Minimal, `rainbow` Rainbow wave, `bounce` Bounce, `typewriter` Typewriter, `decode` Decode, `molten` Molten, `chrome` Chrome shine, `groovy` Groovy 70s, `hologram` Hologram | `neon` Neon pulse |  |
 | Title color | `📦 Enhanced Nodes.Text.Color` | color | `#rrggbb` | `#00ffff` | Used when Node effect colors is Custom; otherwise titles take the effect's accent color. |
 | Title size | `📦 Enhanced Nodes.Text.Size` | slider | 8 to 24, step 1 | `14` |  |
 | Title glow | `📦 Enhanced Nodes.Text.Glow` | slider | 0 to 1, step 0.05 | `0.5` |  |

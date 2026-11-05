@@ -118,9 +118,9 @@ describe('node settings', () => {
         const trace = canvas.front.trace();
         expect(trace).toContain('font = 18px Inter');
         expect(trace).toContain('letterSpacing = 1.5px');
-        // Retro draws two offset copies, then the title itself: where native's starts, on the title bar's middle, moved by the offsets.
+        // Retro draws two offset copies, then the title itself, then its tracking band: where native's starts, on the title bar's middle, moved by the offsets.
         expect(trace).toContain('fillText("KSampler", 37, -19)');
-        expect(canvas.front.paints.filter((p) => p.op === 'fillText').at(-1)).toMatchObject({ style: '#ff0000', shadowColor: '#ff0000', shadowBlur: 3 * 0.8 });
+        expect(canvas.front.paints.filter((p) => p.op === 'fillText').at(-2)).toMatchObject({ style: '#ff0000', shadowColor: '#ff0000', shadowBlur: 3 * 0.8 });
     });
 });
 

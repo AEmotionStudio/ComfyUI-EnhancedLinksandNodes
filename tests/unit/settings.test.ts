@@ -225,6 +225,8 @@ const V3_CHANGED_OPTIONS: Record<string, unknown[]> = {
     '🔗 Enhanced Links.Animate': [0, 9, 1, 10, 2, 3, 4, 5, 12, 6, 11, 7, 8, 13],
     // M10a: Flower of Life and Jelly; M10b: Circuit Trace, Aurora Veil and Ember Crown.
     '📦 Enhanced Nodes.Animate': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    // 3.1: eight title styles after v1's five.
+    '📦 Enhanced Nodes.Text.Style': ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal', 'rainbow', 'bounce', 'typewriter', 'decode', 'molten', 'chrome', 'groovy', 'hologram'],
 };
 const V3_CHANGED_RANGES: Record<string, [min: number, max: number, step: number]> = {
     // M4: v1's speed works quadratically, so 3× moves effects 9× as fast.

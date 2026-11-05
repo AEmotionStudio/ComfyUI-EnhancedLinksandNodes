@@ -290,6 +290,14 @@ function leftAligned(line: string): string {
     return `fillText "${words}", ${fmt(left)}, ${y} ${paint} font=${size}px align=left ${rest}`;
 }
 
+/** A title frame without what v3 adds to v1's styles: what it draws from its first clip on, Minimal's underline and Simple pulse's swell. */
+const REFRESHED = (lines: string[]) => {
+    const clip = lines.findIndex((line) => line.startsWith('clip '));
+    return (clip < 0 ? lines : lines.slice(0, clip))
+        .filter((line) => !line.startsWith('stroke '))
+        .map((line) => line.replace(/ @\[translate\([^)]*\) scale\([^)]*\) translate\([^)]*\)\]$/, ''));
+};
+
 /** A canonical fill of a firework's core: a disc filled with a gradient out to its rim, which v3 leaves out once it has faded. */
 const CORE = /^fill \[\] arc\(([^,]+), ([^,]+), ([^,]+), 0, 6\.28\) style=radial\(\1, \2, 0, \1, \2, \3\)/;
 /** A canonical paint whose every colour is transparent. */
@@ -831,18 +839,33 @@ export const DEVIATIONS: Deviation[] = [
     },
     {
         title: 'Nothing flashes more than three times a second',
-        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, a DNA Helix 3D strand turns from back to front 1.25 times a second, and Stardust's motes twinkle 2.5 times a second. Circuit Trace lights each of its pads once a pulse, 1.25 times a second at speed 3, Aurora Veil's rays shimmer at most 0.62 times a second, and Ember Crown's flames flicker at most 1.6 times a second and each ember lights once a rise, 1.75 times a second at Particle.Speed 5.",
+        why: "WCAG 2.3.1. Quantum Field's five filaments each sweep round their link once a turn of v1's phase, 6 times a second at speed 3 between them; its phase turns at most three fifths of a turn a second, which only binds above speed 1.44. Markers' Pulse, Fade and Rainbow stay under three flashes a second at the fastest speed. The titles' flicker runs at up to ten times the node phase: Glitch's copies shook 3.3 times a second at v1's top speed, 5; at v3's, 3, they shake twice. Neon pulse's surge, Retro's band and Chrome shine's sheen cross the title once a cycle, Glitch tears twice a cycle, Typewriter's caret blinks twice a second, Hologram's lines pass a point 2.5 times a second, and Decode's letters change shape, not brightness, as they scramble, lighting once each as they lock. A run's fireworks flash three times, once a burst; a run that starts while a show plays ends it, and the next show waits 3 s. A failed node's outline pulses once a second, three times, and the river into a running node fades in and out without flickering. Confetti pieces flip at most 1.2 times a second, showing their faces 2.4 times; each shockwave ring and each link's comet lights once; where a show of these has several anchors, each starts a third of a second after the one before; and a node's burst as it finishes, sparks or with reduced motion a ring, waits a third of a second before its next. Merkaba beads and comet heads grow out of the output and back into the input once a trip, 1.8 and 2.25 trips a second at speed 3, a DNA Helix 3D strand turns from back to front 1.25 times a second, and Stardust's motes twinkle 2.5 times a second. Circuit Trace lights each of its pads once a pulse, 1.25 times a second at speed 3, Aurora Veil's rays shimmer at most 0.62 times a second, and Ember Crown's flames flicker at most 1.6 times a second and each ember lights once a rise, 1.75 times a second at Particle.Speed 5.",
         async proof() {
-            // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the glow it breathes or where it shakes its copies.
+            // Each title style's flicker over two seconds at Node effect speed 3, sampled at 60 Hz: the alpha it fades, the
+            // glow it breathes, where it shakes its copies, whether its caret or sheen shows, or how bright a letter is.
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Animation.Speed': 3 });
-            for (const style of ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal']) {
+            const luma = (colour: string) => {
+                const [r, g, b] = parseColor(colour)!;
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            };
+            const FLICKERS: Record<string, (rec: CanvasRecorder) => number> = {
+                neon: (rec) => rec.paints.filter((p) => p.op === 'fillText')[3].globalAlpha,
+                cyberpunk: (rec) => Number(filled(rec)[0].split(', ')[1]),
+                retro: (rec) => Number(filled(rec)[0].split(', ')[2].slice(0, -1)),
+                pulse: (rec) => rec.paints.filter((p) => p.op === 'fillText').at(-1)!.shadowBlur,
+                minimal: (rec) => rec.paints.filter((p) => p.op === 'fillText').at(-1)!.globalAlpha,
+                rainbow: (rec) => luma(rec.paints.filter((p) => p.op === 'fillText')[1].style),
+                bounce: (rec) => Number(filled(rec)[1].split(', ')[2].slice(0, -1)),
+                typewriter: (rec) => rec.paints.filter((p) => p.op === 'fillRect').length,
+                decode: (rec) => rec.paints.filter((p) => p.op === 'fillText').reduce((sum, p) => sum + p.globalAlpha * (p.style === '#ffffff' ? 2 : 1), 0),
+                molten: (rec) => rec.paints.filter((p) => p.op === 'fillText').at(-1)!.shadowBlur,
+                chrome: (rec) => rec.paints.filter((p) => p.op === 'fillText').length,
+                groovy: (rec) => Number(filled(rec)[0].split(', ')[1]),
+                hologram: (rec) => rec.paints.filter((p) => p.op === 'fillText').at(-1)!.globalAlpha,
+            };
+            for (const [style, flicker] of Object.entries(FLICKERS)) {
                 preview('📦 Enhanced Nodes.Text.Style', style);
-                const seen = Array.from({ length: 121 }, (_, i) => {
-                    const rec = draw((ctx) => drawTitle(ctx, { text: 'KSampler', width: 56 }, 30, -15, '#00ffff', TURN * 3 * (i / 60), 1));
-                    const [first] = filled(rec);
-                    const last = rec.paints.filter((p) => p.op === 'fillText').at(-1)!;
-                    return style === 'cyberpunk' ? Number(first.split(', ')[1]) : style === 'retro' ? Number(first.split(', ')[2].slice(0, -1)) : style === 'pulse' ? last.shadowBlur : last.globalAlpha;
-                });
+                const seen = Array.from({ length: 121 }, (_, i) => flicker(draw((ctx) => drawTitle(ctx, { text: 'KSampler', width: 56 }, 30, -15, '#00ffff', TURN * 3 * (i / 60), 1))));
                 expect(turns(seen) / 2, style).toBeLessThanOrEqual(3 * 2);
                 expect(turns(seen), style).toBeGreaterThan(0);
             }
@@ -1424,6 +1447,38 @@ export const DEVIATIONS: Deviation[] = [
         },
     },
     {
+        title: "v1's title styles move more than v1's",
+        why: "v1's five styles only breathed, slid or rolled their copies. v3 draws each as v1 did and adds to it: Neon pulse's tube carries a white surge across it once a cycle; Glitch tears two slices of its title sideways in two short bursts a cycle; Retro rolls a bright VHS tracking band down through its title; Simple pulse swells to 104% as it breathes; and Minimal's underline is whole half the cycle, slides off to the right and draws itself in again from the left. Each cycle rests at STILL_NODE's phase, where the surge and the band are off the title and the underline is whole.",
+        frames: /^text\//,
+        mask: REFRESHED,
+        proof() {
+            const title = (style: string, u: number, rate: number) => {
+                storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Text.Style': style });
+                return draw((ctx) => drawTitle(ctx, { text: 'KSampler', width: 56 }, 30, -15, '#00ffff', Math.PI / 4 + (u * 2 * Math.PI) / rate, 1));
+            };
+            const clips = (rec: CanvasRecorder) => rec.lines.filter((line) => line.startsWith('rect('));
+            const last = (rec: CanvasRecorder) => rec.paints.filter((p) => p.op === 'fillText').at(-1)!;
+            // Neon's surge: a strip a title size wide, crossing the title over the first 30% of its cycle, then gone.
+            expect([0.05, 0.15, 0.5].map((u) => clips(title('neon', u, 2)))).toEqual([['rect(23, -29, 14, 28)'], ['rect(51, -29, 14, 28)'], []]);
+            expect([last(title('neon', 0.15, 2))].map((p) => [p.style, p.globalAlpha])).toEqual([['#ffffff', 0.9]]);
+            // Glitch's tears: two slices redrawn 3 to 5 px aside at the start of each half cycle, none between.
+            const torn = title('cyberpunk', 0.02, 3);
+            expect(clips(torn)).toHaveLength(2);
+            const shifts = filled(torn).slice(-2).map((line) => Math.abs(Number(line.split(', ')[1]) - 30));
+            expect(shifts.every((shift) => shift >= 3 && shift <= 5), String(shifts)).toBe(true);
+            expect(clips(title('cyberpunk', 0.3, 3))).toEqual([]);
+            // Retro's band: 3 px, rolling down the title as the cycle runs, the title in it white and pushed aside.
+            expect([0, 0.5, 1 - 1e-9].map((u) => clips(title('retro', u, 3))[0])).toEqual(['rect(26, -24.8, 64, 3)', 'rect(26, -15, 64, 3)', 'rect(26, -5.2, 64, 3)']);
+            expect(filled(title('retro', 0.5, 3)).at(-1)).toBe('fillText("KSampler", 31.5, -15)');
+            // Simple pulse swells about its middle as it breathes: 104% at the top of its breath, at rest.
+            expect(title('pulse', 0, 1).lines).toEqual(expect.arrayContaining(['translate(58, -15)', 'scale(1.04, 1.04)', 'translate(-58, 15)']));
+            // Minimal's underline: whole, sliding off to the right, gone, drawing in from the left.
+            expect([0, 0.575, 0.675, 0.85].map((u) => points(title('minimal', u, 2), ['moveTo', 'lineTo']))).toEqual([
+                [[30, -5], [86, -5]], [[58, -5], [86, -5]], [], [[30, -5], [58, -5]],
+            ]);
+        },
+    },
+    {
         title: 'Titles keep their style apart from the node effect',
         why: "v1 drew its title in its drawNodeShape along with the node's effect, so a node without one had no styled title, and with Show base effect off it drew the title plainly. v3 restyles the title of every titled node while Animated titles is on, effect or not, and moves it, so the setting works with Node effect None, its default.",
         async proof() {
@@ -1441,7 +1496,8 @@ export const DEVIATIONS: Deviation[] = [
         why: "v1 spread its title with hair spaces between the characters, more the wider the spacing, so a negative spacing spread it too, and measureText, and so Minimal's underline, left the spaces out. v3 sets the canvas's letterSpacing to Title letter spacing in px: a negative one draws the title tighter, and the room native leaves it and the underline are measured on the text as it is drawn. A canvas without letterSpacing draws the title unspaced.",
         proof() {
             storeSettings({ ...V1_NODE_SETTINGS, '📦 Enhanced Nodes.Text.Style': 'minimal', '📦 Enhanced Nodes.Text.Letter.Spacing': -1.5 });
-            const rec = draw((ctx) => drawTitle(ctx, { text: 'KSampler', width: 44 }, 30, -15, '#00ffff', 0, 1));
+            // At its resting phase, where Minimal's underline is whole.
+            const rec = draw((ctx) => drawTitle(ctx, { text: 'KSampler', width: 44 }, 30, -15, '#00ffff', Math.PI / 4, 1));
             expect(rec.lines).toContain('letterSpacing = -1.5px');
             expect(filled(rec)).toEqual(['fillText("KSampler", 30, -15)']);
             expect(rec.lines).toEqual(expect.arrayContaining(['moveTo(30, -5)', 'lineTo(74, -5)']));

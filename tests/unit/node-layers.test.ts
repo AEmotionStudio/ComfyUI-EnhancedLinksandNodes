@@ -347,10 +347,10 @@ describe('titles', () => {
         });
         clock.nodePhase = 0;
         const { lines, calls } = frame(canvas);
-        // Retro draws a copy a pixel either side, then the title: after the title box, on the bar's middle, in native's font; on a collapsed node too.
+        // Retro draws a copy a pixel either side, the title, and its tracking band: after the title box, on the bar's middle, in native's font; on a collapsed node too.
         expect(texts(lines)).toEqual([
-            'fillText("KSampler", 29, -15)', 'fillText("KSampler", 31, -15)', 'fillText("KSampler", 30, -15)',
-            'fillText("Load", 29, -15)', 'fillText("Load", 31, -15)', 'fillText("Load", 30, -15)',
+            'fillText("KSampler", 29, -15)', 'fillText("KSampler", 31, -15)', 'fillText("KSampler", 30, -15)', 'fillText("KSampler", 31.5, -15)',
+            'fillText("Load", 29, -15)', 'fillText("Load", 31, -15)', 'fillText("Load", 30, -15)', 'fillText("Load", 31.5, -15)',
         ]);
         expect(lines).toEqual(expect.arrayContaining(['font = 14px Inter', 'textAlign = left', 'textBaseline = middle']));
         expect(native.mock.calls.map(([ctx]) => ctx === dummy())).toEqual([true, true]);
@@ -387,7 +387,8 @@ describe('titles', () => {
             const from = canvas.front.paints.length;
             canvas.setDirty(true, true);
             frames(1);
-            return canvas.front.paints.slice(from).filter((p) => p.op === 'fillText').at(-1)!.style;
+            // Retro's title, under its tracking band.
+            return canvas.front.paints.slice(from).filter((p) => p.op === 'fillText').at(-2)!.style;
         };
         expect(colour()).toBe('#ff40ff');
         canvas.graph._nodes[0].properties.enhanced_fx_style = 2;

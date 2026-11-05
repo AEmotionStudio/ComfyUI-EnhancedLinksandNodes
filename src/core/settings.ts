@@ -176,6 +176,14 @@ const TEXT_STYLE_OPTIONS = [
     { value: 'retro', text: 'Retro' },
     { value: 'pulse', text: 'Simple pulse' },
     { value: 'minimal', text: 'Minimal' },
+    { value: 'rainbow', text: 'Rainbow wave' },
+    { value: 'bounce', text: 'Bounce' },
+    { value: 'typewriter', text: 'Typewriter' },
+    { value: 'decode', text: 'Decode' },
+    { value: 'molten', text: 'Molten' },
+    { value: 'chrome', text: 'Chrome shine' },
+    { value: 'groovy', text: 'Groovy 70s' },
+    { value: 'hologram', text: 'Hologram' },
 ] as const;
 
 const LINK_COLOR_MODE_OPTIONS = [

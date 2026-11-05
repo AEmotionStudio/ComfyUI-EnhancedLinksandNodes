@@ -252,13 +252,26 @@ const NODE_EFFECTS: [number, string, string][] = [
     [9, 'Ember Crown', 'New in v3: a crown of flames licking up from each title bar, swaying and flickering, gold to red, a warmth under the title, and embers rising and dying out.'],
 ];
 
-const TITLE_NAMES = { neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal' };
+const TITLE_NAMES = {
+    neon: 'Neon pulse', cyberpunk: 'Glitch', retro: 'Retro', pulse: 'Simple pulse', minimal: 'Minimal',
+    rainbow: 'Rainbow wave', bounce: 'Bounce', typewriter: 'Typewriter', decode: 'Decode', molten: 'Molten', chrome: 'Chrome shine', groovy: 'Groovy 70s', hologram: 'Hologram',
+};
+/** v1's five styles, which the gallery shows beside v1's own. */
+const V1_TITLES = ['neon', 'cyberpunk', 'retro', 'pulse', 'minimal'] as const;
 const TITLE_LOOKS = {
-    neon: 'Three glowing layers under a white highlight, breathing.',
-    cyberpunk: 'Pink, cyan and yellow copies sliding apart behind the glowing title.',
-    retro: 'Red and cyan ghosts a pixel either side, rolling up and down.',
-    pulse: 'The title breathing its glow in and out.',
-    minimal: 'The title fading in and out over a faint underline.',
+    neon: 'Three glowing layers under a white highlight, breathing, with a white surge of current crossing them once a cycle.',
+    cyberpunk: 'Pink, cyan and yellow copies sliding apart behind the glowing title, and two slices of it torn sideways in short bursts.',
+    retro: 'Red and cyan ghosts a pixel either side, rolling up and down, and a bright VHS tracking band rolling down through the title.',
+    pulse: 'The title breathing its glow in and out, swelling a little as it breathes in.',
+    minimal: 'The title fading in and out over a faint underline that slides off to the right and draws itself in again from the left.',
+    rainbow: 'Each letter its own hue, the colours rolling along the title as the letters ride a wave.',
+    bounce: 'The letters hopping one after another, squashing flat as each lands.',
+    typewriter: 'The title typed out letter by letter behind a caret, held while the caret blinks, then backspaced.',
+    decode: 'The letters scrambling through glyphs and locking into place left to right, each flashing white as it locks.',
+    molten: "Gold at the top to red at the foot in Ember Crown's colours, whatever the node colours, the heat drifting and its glow flickering.",
+    chrome: 'Polished silver with a dark edge, a bright sheen sweeping across it once a cycle.',
+    groovy: 'Mustard, orange, red and brown copies stacked down to the right behind the title, swaying.',
+    hologram: 'A faint see-through title, bright lines drifting up through it, jolting sideways once a cycle.',
 };
 
 const ANIMATIONS: [number, string, string][] = [
@@ -362,13 +375,16 @@ const ROWS: Row[] = [
         nodes: true,
         select: 'ELNImage',
     },
-    ...(['neon', 'cyberpunk', 'retro', 'pulse', 'minimal'] as const).map((style): Row => ({
+    ...(Object.keys(TITLE_NAMES) as (keyof typeof TITLE_NAMES)[]).map((style): Row => ({
         slug: `title-${style}`,
         title: `Title style ${TITLE_NAMES[style]}`,
-        look: `${TITLE_LOOKS[style]} v1 drew its title centred 16 px into the node in Arial, over the native title, which still showed in the title bar; v3 restyles the native title in its place, in ComfyUI's font. Over Gentle Pulse, as v1 drew titles only on nodes with an effect.`,
+        look: V1_TITLES.includes(style as (typeof V1_TITLES)[number])
+            ? `${TITLE_LOOKS[style]} v1 drew its title centred 16 px into the node in Arial, over the native title, which still showed in the title bar, and without what v3 adds; v3 restyles the native title in its place, in ComfyUI's font. Over Gentle Pulse, as v1 drew titles only on nodes with an effect.`
+            : `${TITLE_LOOKS[style]} New in v3. Over Gentle Pulse.`,
         base: V1_NODES,
         settings: { [NODE_ANIMATE]: 1, [PARTICLES]: false, '📦 Enhanced Nodes.Text.Animation.Enabled': true, '📦 Enhanced Nodes.Text.Style': style },
         nodes: true,
+        v3: !V1_TITLES.includes(style as (typeof V1_TITLES)[number]),
     })),
     {
         slug: 'fireworks',
