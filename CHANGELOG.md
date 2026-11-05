@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-05
+
 ### Titles
 - **Eight new title styles**: **Rainbow wave**, each letter its own hue riding a wave; **Bounce**, letters hopping one after another; **Typewriter**, typed out behind a blinking caret, then backspaced; **Decode**, letters scrambling and locking into place left to right; **Molten**, gold to red in Ember Crown's colours with a flickering glow; **Chrome shine**, polished silver with a sheen sweeping across; **Groovy 70s**, stacked mustard, orange, red and brown copies swaying behind the title; and **Hologram**, a see-through title with bright lines drifting up through it.
 - **v1's five move more**: Neon pulse carries a surge of current across it, Glitch tears slices of the title sideways in bursts, Retro rolls a VHS tracking band down through it, Simple pulse swells as it breathes, and Minimal's underline slides off and draws itself in again.

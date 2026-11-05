@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-enhancedlinksandnodes"
 description = "Animated links and nodes for ComfyUI that keep every native click, reroute and subgraph, with looks, selection focus, run visuals and completion effects."
-version = "3.0.0"
+version = "3.1.0"
 license = {file = "LICENSE"}
 classifiers = [
     "Operating System :: OS Independent",

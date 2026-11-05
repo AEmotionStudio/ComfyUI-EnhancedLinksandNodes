@@ -8627,7 +8627,7 @@ const PLACES = [
   ["pi-heart", "Ko-fi", KOFI]
 ];
 const BADGES = [
-  { label: `${TITLE} ${"3.0.0"}`, url: REPO, icon: "pi pi-github" },
+  { label: `${TITLE} ${"3.1.0"}`, url: REPO, icon: "pi pi-github" },
   { label: "Æmotion Studio Discord", url: DISCORD, icon: "pi pi-discord" },
   { label: "Ko-fi", url: KOFI, icon: "pi pi-heart" }
 ];
@@ -8685,7 +8685,7 @@ function aboutTab() {
       h(
         "div",
         {},
-        h("h3", { class: "eln-heading" }, `${TITLE} ${"3.0.0"}`),
+        h("h3", { class: "eln-heading" }, `${TITLE} ${"3.1.0"}`),
         h("p", { class: "eln-hint" }, "by Æmotion Studio · GPL-3.0 · ", h("a", { href: REPO, ...AWAY }, "Source on GitHub"))
       )
     ),
@@ -8719,7 +8719,7 @@ function diagnostics() {
   const look = currentLook();
   const changes2 = VISIBLE.filter((s) => shown$3(s.id) !== s.default).map((s) => `  ${s.id}: ${JSON.stringify(shown$3(s.id))}`);
   return [
-    `${TITLE} ${"3.0.0"}, ComfyUI frontend ${window.__COMFYUI_FRONTEND_VERSION__}`,
+    `${TITLE} ${"3.1.0"}, ComfyUI frontend ${window.__COMFYUI_FRONTEND_VERSION__}`,
     `Browser: ${navigator.userAgent}; language ${navigator.language}`,
     `Palette: ${light() ? "light" : "dark"}, canvas ${app.canvas.clear_background_color}`,
     `Nodes 2.0: ${LiteGraph.vueNodesMode ? "on" : "off"}`,
@@ -9265,4 +9265,4 @@ export {
   keyName as y,
   savedEarly as z
 };
-//# sourceMappingURL=menus-fA9Bxy3d.js.map
+//# sourceMappingURL=menus-tZZ10UH5.js.map
