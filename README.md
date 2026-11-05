@@ -57,7 +57,7 @@
 
 *   **9 effects**: Gentle Pulse, Neon Nexus, Cosmic Ripple and Sacred Rosette (v1's Flower of Life, its rings now closed), drawn over the node at v1's strength; and new ones: **Flower of Life**, nineteen circles that draw themselves in, the Seed of Life first, then bloom and turn; **Jelly**, which makes the node itself wobble like gel as you drag, drop or select it and as its run finishes, then settle still; and **Circuit Trace**, which makes the node a chip, pulses racing along etched traces from its pins to light its pads; **Aurora Veil**, curtains of light hanging from the title bar, waving and drifting; and **Ember Crown**, flames licking up from the title bar with embers rising from them. All with a halo and a glowing frame on selected nodes.
 *   **Particles** with or without an effect, in 6 color modes.
-*   **13 title styles**: v1's Neon pulse, Glitch, Retro, Simple pulse and Minimal, livelier now, and **Rainbow wave**, **Bounce**, **Typewriter**, **Decode**, **Molten**, **Chrome shine**, **Groovy 70s** and **Hologram**. And a **Node FX** menu to give one node its own effect.
+*   **13 animated title styles** (see Animated titles below), and a **Node FX** menu to give one node its own effect.
 
 </td>
 </tr>
@@ -138,6 +138,14 @@
 
 </td>
 <td width="50%">
+
+### 🔤 Animated titles
+![Animated titles](https://github.com/AEmotionStudio/ComfyUI-EnhancedLinksandNodes/releases/download/assets-v3/titles.webp)
+
+*   **13 styles** for node titles: v1's Neon pulse, Glitch, Retro, Simple pulse and Minimal, now with a surge of current, tearing slices, a VHS tracking band, a swell and a sliding underline; and **Rainbow wave**, **Bounce**, **Typewriter**, **Decode**, **Molten**, **Chrome shine**, **Groovy 70s** and **Hologram**.
+*   Turn on **Animated titles** in Nodes · Titles and pick a **Title style**; size, glow, letter spacing, offset, orbit and rotation are there too, and **Title color** with Custom node colors. Classic nodes.
+*   Held still, or with reduced motion, every style shows the whole title.
+
 </td>
 </tr>
 </table>
